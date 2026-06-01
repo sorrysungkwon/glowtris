@@ -56,7 +56,7 @@ A neon-styled block stacking game built with ES modules and canvas.
 | Milestone | Target Version | Focus |
 |---|---|---|
 | 🧱 Loop & Input Core | v0.2 | Decoupled fixed-timestep loop, ordered sub-frame input |
-| 🎮 Movement Standard | v0.3 | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
+| 🎮 Movement Standard | v0.3 (Done) | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
 | 🏆 Scoring Standard | v0.4 | Back-to-Back, 5-piece next queue, all-spin (SRS+) |
 | 🖼 Renderer & Audio | v0.5 | GPU-accelerated rendering, low-latency audio |
 | ⏱ Modes & Metrics | v0.6 | Ultra/Blitz mode, in-game APM/PPS |
@@ -124,7 +124,7 @@ A neon-styled block stacking game built with ES modules and canvas.
 | Version | Theme | Features |
 |---|---|---|
 | v0.2 | **Loop & Input Core** | Decoupled fixed-timestep logic loop (sub-4ms input-to-state latency). Ordered sub-frame input handling — inputs in the same render frame simulated in true chronological order. |
-| v0.3 | **Movement Standard** | 180° rotation. Customisable keybinds. SDF (soft-drop factor) slider with ∞ option. Lock-delay reset cap (15 moves). IRS (initial rotation) and IHS (initial hold). DCD (dash cancellation delay). Instant ARR=0 transition. |
+| v0.3 (Done) | **Movement Standard** | 180° rotation. Customisable keybinds. SDF (soft-drop factor) slider with ∞ option. Lock-delay reset cap (15 moves). IRS (initial rotation) and IHS (initial hold). DCD (dash cancellation delay). Instant ARR=0 transition. |
 | v0.4 | **Scoring Standard** | Back-to-Back 1.5× bonus for consecutive T-spins/Tetrises. 5-piece next queue. All-spin detection (SRS+) for S/Z/J/L/I in addition to T. |
 | v0.5 | **Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged: board → particles → background → shader effects). Render interpolation between 1ms logic ticks for full monitor refresh rate (144Hz+). 1000+ particle systems. Signature neon/glow shader pipeline. Low-latency audio dispatch (SFX <5ms). |
 | v0.6 | **Modes & Metrics** | Ultra/Blitz 2-minute timed mode. In-game APM / PPS display. |
