@@ -121,6 +121,8 @@ export const S = {
   // Live board data (game.js writes, ui.js reads each frame)
   board:   null,
   current: null,
+  lockResets: 0,
+  lowestY: 0,
   next:    null,
   held:    null,
 

@@ -1552,6 +1552,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     // Live board data (game.js writes, ui.js reads each frame)
     board: null,
     current: null,
+    lockResets: 0,
+    lowestY: 0,
     next: null,
     held: null,
     // Score HUD (game.js writes, ui.js updateUI reads)
@@ -2183,10 +2185,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     playBeep(80, "sawtooth", 0.15, 0.45);
     playBeep(180, "sawtooth", 0.06, 0.35, 0.02, 60);
     playBeep(800, "square", 0.03, 0.18, 0.01);
-  }
-  function sfxHold() {
-    playBeep(392, "square", 0.06, 0.15);
-    playBeep(523, "square", 0.05, 0.12, 0.05);
   }
   function sfxLineClear(n) {
     if (n >= 4) {
@@ -4648,6 +4646,10 @@ ${window.location.origin}`;
         S.current.x += dx;
         S.current.y += dy;
         S.current.rot = toRot;
+        if (S.current.y > S.lowestY) {
+          S.lowestY = S.current.y;
+          S.lockResets = 0;
+        }
         cancelLock();
         lastWasRotate = true;
         sfxRotate();
@@ -4666,8 +4668,16 @@ ${window.location.origin}`;
     _tryRotate(newShape, from, to, dir === 2);
   }
   function cancelLock() {
-    S.lockActive = false;
-    S.lockTimer = 0;
+    if (S.lockActive) {
+      if (S.lockResets < 15) {
+        S.lockActive = false;
+        S.lockTimer = 0;
+        S.lockResets++;
+      }
+    } else {
+      S.lockActive = false;
+      S.lockTimer = 0;
+    }
   }
   function lockPiece() {
     const tspin = checkTSpin();
@@ -4808,25 +4818,27 @@ ${window.location.origin}`;
   function spawnPiece() {
     lastWasRotate = false;
     S.current = makePiece(S.next.key);
+    S.lowestY = S.current.y;
+    S.lockResets = 0;
     S.next = makePiece(nextFromBag());
     canHold = true;
     drawNext();
     if (!validPos(S.current)) endGame();
   }
   function holdPiece() {
-    if (!canHold || !S.gameRunning || S.gamePaused) return;
-    canHold = false;
-    sfxHold();
-    if (S.held) {
-      const pk = S.held.key;
+    if (!canHold || !S.gameRunning || S.gamePaused || !S.current || S._countdownVal) return;
+    if (!S.held) {
       S.held = makePiece(S.current.key);
-      S.current = makePiece(pk);
+      spawnPiece();
     } else {
-      S.held = makePiece(S.current.key);
-      S.current = makePiece(S.next.key);
-      S.next = makePiece(nextFromBag());
-      drawNext();
+      const t = S.current.key;
+      S.current = makePiece(S.held.key);
+      S.held = makePiece(t);
+      if (!validPos(S.current)) endGame();
     }
+    S.lowestY = S.current.y;
+    S.lockResets = 0;
+    canHold = false;
     cancelLock();
     drawHold();
   }
@@ -5023,6 +5035,10 @@ ${window.location.origin}`;
           if (S.current.y < gy) {
             S.score += gy - S.current.y;
             S.current.y = gy;
+            if (S.current.y > S.lowestY) {
+              S.lowestY = S.current.y;
+              S.lockResets = 0;
+            }
             spawnDropTrail(S.current);
             cancelLock();
             lastWasRotate = false;
@@ -5038,6 +5054,10 @@ ${window.location.origin}`;
         S.gravityTimer -= dropInterval;
         if (validPos(S.current, 0, 1)) {
           S.current.y++;
+          if (S.current.y > S.lowestY) {
+            S.lowestY = S.current.y;
+            S.lockResets = 0;
+          }
           if (KEYS["ArrowDown"]) S.score += 1;
           spawnDropTrail(S.current);
           if (S.gravityTimer < dropInterval) updateUI();
