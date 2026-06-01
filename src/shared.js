@@ -40,6 +40,7 @@ export const LS = {
   NAME:         'glowTrisName',
   MUTE:         'glowTrisMute',
   DAS:          'glowTrisDAS',
+  SDF:          'glowTrisSDF',
   ARR:          'glowTrisARR',
   LOCK:         'glowTrisLock',
   GHOST:        'glowTrisGhost',
@@ -173,6 +174,7 @@ export const S = {
 
   // Input settings (ui.js settings fns write, game.js DAS timer reads)
   das: 150,
+  sdf: 0, // 0 = Infinity
   arr: 50,
 
   // Sprint timing (game.js writes, ui.js updateUI/updateSprintTimer reads)

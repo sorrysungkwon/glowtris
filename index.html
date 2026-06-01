@@ -1462,6 +1462,7 @@
     NAME: "glowTrisName",
     MUTE: "glowTrisMute",
     DAS: "glowTrisDAS",
+    SDF: "glowTrisSDF",
     ARR: "glowTrisARR",
     LOCK: "glowTrisLock",
     GHOST: "glowTrisGhost",
@@ -1590,6 +1591,8 @@
     lockMs: 500,
     // Input settings (ui.js settings fns write, game.js DAS timer reads)
     das: 150,
+    sdf: 0,
+    // 0 = Infinity
     arr: 50,
     // Sprint timing (game.js writes, ui.js updateUI/updateSprintTimer reads)
     _sprintStartTime: 0,
@@ -3344,6 +3347,12 @@
     const el = document.getElementById("ov-das-val");
     if (el) el.textContent = v + "ms";
   }
+  function updateSDF(v) {
+    S.sdf = parseInt(v);
+    localStorage.setItem(LS.SDF, v);
+    const el = document.getElementById("ov-sdf-val");
+    if (el) el.textContent = S.sdf === 0 ? "\u221E" : S.sdf + "x";
+  }
   function updateARR(v) {
     S.arr = parseInt(v);
     localStorage.setItem(LS.ARR, v);
@@ -3715,6 +3724,11 @@
             <span class="settings-lbl">ARR</span>
             <input type="range" class="neon-range" min="0" max="100" value="${S.arr}" oninput="updateARR(this.value)">
             <span class="settings-val" id="ov-arr-val">${S.arr}ms</span>
+          </div>
+          <div class="settings-row">
+            <span class="settings-lbl">SDF</span>
+            <input type="range" class="neon-range" min="0" max="40" value="${S.sdf}" oninput="updateSDF(this.value)">
+            <span class="settings-val" id="ov-sdf-val">${S.sdf === 0 ? "\u221E" : S.sdf + "x"}</span>
           </div>
           <div class="settings-row">
             <span class="settings-lbl">LOCK</span>
@@ -4793,6 +4807,11 @@ ${window.location.origin}`;
     cancelLock();
     drawHold();
   }
+  function getGhostY() {
+    let d = 0;
+    while (validPos(S.current, 0, d + 1)) d++;
+    return S.current.y + d;
+  }
   function checkTSpin() {
     if (!S.current || S.current.key !== "T" || !lastWasRotate) return false;
     const x = S.current.x, y = S.current.y;
@@ -4930,8 +4949,6 @@ ${window.location.origin}`;
         S.dasCharge.right = 0;
         break;
       case "ArrowDown":
-        softDrop();
-        S.dasCharge.down = 0;
         break;
       case "ArrowUp":
       case "KeyX":
@@ -4976,23 +4993,42 @@ ${window.location.origin}`;
         return;
       }
     } else {
-      S.gravityTimer += dt;
+      let gTimer = dt;
+      if (KEYS["ArrowDown"]) {
+        if (S.sdf === 0) {
+          const gy = getGhostY();
+          if (S.current.y < gy) {
+            S.score += gy - S.current.y;
+            S.current.y = gy;
+            spawnDropTrail(S.current);
+            cancelLock();
+            lastWasRotate = false;
+            updateUI();
+          }
+          gTimer = dropInterval;
+        } else {
+          gTimer += dt * S.sdf;
+        }
+      }
+      S.gravityTimer += gTimer;
       while (S.gravityTimer >= dropInterval) {
         S.gravityTimer -= dropInterval;
         if (validPos(S.current, 0, 1)) {
           S.current.y++;
+          if (KEYS["ArrowDown"]) S.score += 1;
           spawnDropTrail(S.current);
+          if (S.gravityTimer < dropInterval) updateUI();
         } else {
           S.lockActive = true;
           S.lockTimer = S.lockMs;
           S.gravityTimer = 0;
+          updateUI();
           break;
         }
       }
     }
     _tickDAS("left", "ArrowLeft", () => moveX(-1), dt);
     _tickDAS("right", "ArrowRight", () => moveX(1), dt);
-    _tickDAS("down", "ArrowDown", softDrop, dt);
   }
   function moveX(d) {
     if (!S.current) return;
@@ -5001,22 +5037,6 @@ ${window.location.origin}`;
       cancelLock();
       lastWasRotate = false;
       sfxMove();
-    }
-  }
-  function softDrop() {
-    if (!S.current) return;
-    if (validPos(S.current, 0, 1)) {
-      S.current.y++;
-      S.score += 1;
-      updateUI();
-      cancelLock();
-      lastWasRotate = false;
-      spawnDropTrail(S.current);
-    } else {
-      if (!S.lockActive) {
-        S.lockActive = true;
-        S.lockTimer = S.lockMs;
-      }
     }
   }
   function hardDrop() {
@@ -5037,7 +5057,7 @@ ${window.location.origin}`;
     sfxHardDrop();
     lockPiece();
   }
-  function makeTouchBtn(id, onPress, mode = "repeat") {
+  function makeTouchBtn(id, onPress, mode = "repeat", keyTarget = null) {
     const el = document.getElementById(id);
     if (!el) return;
     let iv = null, to = null, on = false;
@@ -5049,11 +5069,12 @@ ${window.location.origin}`;
       el.classList.add("pressed");
       if (!S.gameRunning && mode !== "any") return;
       if ((S.gamePaused || S._countdownVal) && mode !== "any") return;
-      onPress();
+      if (keyTarget) KEYS[keyTarget] = true;
+      if (onPress) onPress();
       if (mode === "repeat") {
         to = setTimeout(() => {
           iv = setInterval(() => {
-            if (S.gameRunning && !S.gamePaused && !S._countdownVal) onPress();
+            if (S.gameRunning && !S.gamePaused && !S._countdownVal && onPress) onPress();
           }, S.arr);
         }, S.das);
       }
@@ -5063,6 +5084,7 @@ ${window.location.origin}`;
       if (!on) return;
       on = false;
       el.classList.remove("pressed");
+      if (keyTarget) KEYS[keyTarget] = false;
       clearTimeout(to);
       clearInterval(iv);
       to = null;
@@ -5077,7 +5099,7 @@ ${window.location.origin}`;
   }
   makeTouchBtn("btn-left", () => moveX(-1), "repeat");
   makeTouchBtn("btn-right", () => moveX(1), "repeat");
-  makeTouchBtn("btn-soft", () => softDrop(), "repeat");
+  makeTouchBtn("btn-soft", null, "state", "ArrowDown");
   makeTouchBtn("btn-rotate", () => rotatePiece(1), "game");
   makeTouchBtn("btn-rotate-ccw", () => rotatePiece(-1), "game");
   makeTouchBtn("btn-rotate-180", () => rotatePiece(2), "game");
@@ -5386,6 +5408,7 @@ ${window.location.origin}`;
     toggleMute,
     updateDAS,
     updateARR,
+    updateSDF,
     updateLockDelay,
     updateGhost,
     updateColorblind,

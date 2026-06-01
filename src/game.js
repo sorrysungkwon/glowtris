@@ -17,7 +17,7 @@ import {
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
   applyShake, _enableKbMode, _disableKbMode,
   updateUI, updateSprintTimer, showScorePopup,
-  updateDAS, updateARR, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel,
+  updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel,
   triggerScreenFlash, triggerAllClearFlash, triggerLevelUpVisuals, spawnGoldBurst,
   showAchievementToast, unlockAchievement,
   openHowToPlay, closeHowToPlay, openStats, closeStats, showAchTooltip, hideAchTooltip,
@@ -420,7 +420,7 @@ function processInput(input){
   switch(input.code){
     case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
     case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
-    case'ArrowDown':  softDrop(); S.dasCharge.down=0; break;
+    case'ArrowDown':  /* handled in gameTick */       break;
     case'ArrowUp':case'KeyX': rotatePiece(1);      break;
     case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1); break;
     case'KeyA': rotatePiece(2); break;
@@ -448,20 +448,36 @@ function gameTick(dt){
     S.lockTimer-=dt;
     if(S.lockTimer<=0){lockPiece();return;}
   }else{
-    S.gravityTimer+=dt;
+    let gTimer=dt;
+    if(KEYS['ArrowDown']){
+      if(S.sdf===0){
+        const gy=getGhostY();
+        if(S.current.y<gy){
+          S.score+=(gy-S.current.y); S.current.y=gy;
+          spawnDropTrail(S.current); cancelLock(); lastWasRotate=false; updateUI();
+        }
+        gTimer=dropInterval;
+      }else{
+        gTimer+=dt*S.sdf;
+      }
+    }
+    S.gravityTimer+=gTimer;
     while(S.gravityTimer>=dropInterval){
       S.gravityTimer-=dropInterval;
-      if(validPos(S.current,0,1)){S.current.y++;spawnDropTrail(S.current);}
-      else{S.lockActive=true;S.lockTimer=S.lockMs;S.gravityTimer=0;break;}
+      if(validPos(S.current,0,1)){
+        S.current.y++;
+        if(KEYS['ArrowDown'])S.score+=1;
+        spawnDropTrail(S.current);
+        if(S.gravityTimer<dropInterval) updateUI();
+      }
+      else{S.lockActive=true;S.lockTimer=S.lockMs;S.gravityTimer=0; updateUI(); break;}
     }
   }
   _tickDAS('left', 'ArrowLeft', ()=>moveX(-1), dt);
   _tickDAS('right','ArrowRight',()=>moveX(1),  dt);
-  _tickDAS('down', 'ArrowDown', softDrop,      dt);
 }
 
 function moveX(d){if(!S.current)return;if(validPos(S.current,d)){S.current.x+=d;cancelLock();lastWasRotate=false;sfxMove();}}
-function softDrop(){if(!S.current)return;if(validPos(S.current,0,1)){S.current.y++;S.score+=1;updateUI();cancelLock();lastWasRotate=false;spawnDropTrail(S.current);}else{if(!S.lockActive){S.lockActive=true;S.lockTimer=S.lockMs;}}}
 function hardDrop(){
   if(!S.current)return;
   let d=0;while(validPos(S.current,0,1)){S.current.y++;d++;}
@@ -473,11 +489,21 @@ function hardDrop(){
 }
 
 // ─── Touch buttons ────────────────────────────────────────────────────────────
-function makeTouchBtn(id,onPress,mode='repeat'){
+function makeTouchBtn(id,onPress,mode='repeat',keyTarget=null){
   const el=document.getElementById(id);if(!el)return;
   let iv=null,to=null,on=false;
-  function press(e){e.preventDefault();e.stopPropagation();if(on)return;on=true;el.classList.add('pressed');if(!S.gameRunning&&mode!=='any')return;if((S.gamePaused||S._countdownVal)&&mode!=='any')return;onPress();if(mode==='repeat'){to=setTimeout(()=>{iv=setInterval(()=>{if(S.gameRunning&&!S.gamePaused&&!S._countdownVal)onPress();},S.arr);},S.das);}}
-  function rel(e){if(e)e.preventDefault();if(!on)return;on=false;el.classList.remove('pressed');clearTimeout(to);clearInterval(iv);to=null;iv=null;}
+  function press(e){
+    e.preventDefault();e.stopPropagation();if(on)return;on=true;el.classList.add('pressed');
+    if(!S.gameRunning&&mode!=='any')return;if((S.gamePaused||S._countdownVal)&&mode!=='any')return;
+    if(keyTarget) KEYS[keyTarget] = true;
+    if(onPress) onPress();
+    if(mode==='repeat'){to=setTimeout(()=>{iv=setInterval(()=>{if(S.gameRunning&&!S.gamePaused&&!S._countdownVal&&onPress)onPress();},S.arr);},S.das);}
+  }
+  function rel(e){
+    if(e)e.preventDefault();if(!on)return;on=false;el.classList.remove('pressed');
+    if(keyTarget) KEYS[keyTarget] = false;
+    clearTimeout(to);clearInterval(iv);to=null;iv=null;
+  }
   el.addEventListener('touchstart',press,{passive:false});
   el.addEventListener('touchend',rel,{passive:false});
   el.addEventListener('touchcancel',rel,{passive:false});
@@ -488,7 +514,7 @@ function makeTouchBtn(id,onPress,mode='repeat'){
 
 makeTouchBtn('btn-left',  ()=>moveX(-1),  'repeat');
 makeTouchBtn('btn-right', ()=>moveX(1),   'repeat');
-makeTouchBtn('btn-soft',  ()=>softDrop(), 'repeat');
+makeTouchBtn('btn-soft',  null,           'state', 'ArrowDown');
 makeTouchBtn('btn-rotate',()=>rotatePiece(1),'game');
 makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(-1),'game');
 makeTouchBtn('btn-rotate-180',()=>rotatePiece(2),'game');
@@ -756,7 +782,7 @@ Object.assign(window, {
   togglePause, showStartScreen, showModeSelector,
   submitScore, submitSprintScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
-  toggleMute, updateDAS, updateARR, updateLockDelay,
+  toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,
   updateGhost, updateColorblind, cycleAnimIntensity,
   openHowToPlay, closeHowToPlay, openStats, closeStats,
   showAchTooltip, hideAchTooltip,
