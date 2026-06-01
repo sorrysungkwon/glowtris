@@ -177,7 +177,7 @@ export const S = {
   // Input settings (ui.js settings fns write, game.js DAS timer reads)
   das: 150,
   sdf: 40, // 0 = Infinity
-  arr: 50,
+  arr: 50, dcd: 16, dcdTimer: 0,
 
   // Sprint timing (game.js writes, ui.js updateUI/updateSprintTimer reads)
   _sprintStartTime: 0,

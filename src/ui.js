@@ -467,6 +467,10 @@ function drawCell(ctx, x, y, color, alpha=1, glow=1, key=null) {
   if (S.colorblindMode && key) drawCBPattern(ctx, px, py, s, key);
 }
 
+let visX = null;
+let visY = null;
+let _lastPieceRef = null;
+
 export function drawBoard() {
   const W = COLS*S.CELL, H = ROWS*S.CELL;
   gctx.clearRect(0, 0, W, H);
@@ -496,6 +500,19 @@ export function drawBoard() {
   }
 
   if (S.gameRunning && !S.gamePaused && S.current) {
+    if (_lastPieceRef !== S.current) {
+      visX = S.current.x;
+      visY = S.current.y;
+      _lastPieceRef = S.current;
+    }
+    if (S.lowPerfMode) {
+      visX = S.current.x;
+      visY = S.current.y;
+    } else {
+      visX += (S.current.x - visX) * 0.45;
+      visY += (S.current.y - visY) * 0.45;
+    }
+
     const ghostY = _getGhostY();
     if (S.ghostVisible && ghostY !== S.current.y) {
       const {r,g,b} = hexToRgb(S.current.color);
@@ -504,9 +521,9 @@ export function drawBoard() {
         gctx.save();
         gctx.shadowBlur = 0;
         gctx.strokeStyle = `rgba(${r},${g},${b},0.32)`; gctx.lineWidth = 1.5;
-        gctx.strokeRect((S.current.x+col)*S.CELL+2, (ghostY+row)*S.CELL+2, S.CELL-4, S.CELL-4);
+        gctx.strokeRect((visX+col)*S.CELL+2, (ghostY+row)*S.CELL+2, S.CELL-4, S.CELL-4);
         gctx.fillStyle = `rgba(${r},${g},${b},0.06)`;
-        gctx.fillRect((S.current.x+col)*S.CELL+2, (ghostY+row)*S.CELL+2, S.CELL-4, S.CELL-4);
+        gctx.fillRect((visX+col)*S.CELL+2, (ghostY+row)*S.CELL+2, S.CELL-4, S.CELL-4);
         gctx.restore();
       }
       let minCol = COLS, maxCol = -1;
@@ -518,10 +535,10 @@ export function drawBoard() {
       gctx.save();
       gctx.strokeStyle = `rgba(${r},${g},${b},0.09)`; gctx.lineWidth = 1;
       gctx.setLineDash([4,4]);
-      const lx = (S.current.x + minCol) * S.CELL;
-      gctx.beginPath(); gctx.moveTo(lx, (S.current.y+S.current.shape.length)*S.CELL); gctx.lineTo(lx, ghostY*S.CELL); gctx.stroke();
-      const rx = (S.current.x + maxCol + 1) * S.CELL;
-      gctx.beginPath(); gctx.moveTo(rx, (S.current.y+S.current.shape.length)*S.CELL); gctx.lineTo(rx, ghostY*S.CELL); gctx.stroke();
+      const lx = (visX + minCol) * S.CELL;
+      gctx.beginPath(); gctx.moveTo(lx, (visY+S.current.shape.length)*S.CELL); gctx.lineTo(lx, ghostY*S.CELL); gctx.stroke();
+      const rx = (visX + maxCol + 1) * S.CELL;
+      gctx.beginPath(); gctx.moveTo(rx, (visY+S.current.shape.length)*S.CELL); gctx.lineTo(rx, ghostY*S.CELL); gctx.stroke();
       gctx.restore();
     }
 
@@ -531,18 +548,18 @@ export function drawBoard() {
       for (let row = 0; row < S.current.shape.length; row++) for (let col = 0; col < S.current.shape[row].length; col++) {
         if (!S.current.shape[row][col]) continue;
         gctx.save(); gctx.fillStyle = `rgba(${r},${g},${b},${0.18*pct})`;
-        gctx.fillRect((S.current.x+col)*S.CELL+1, (S.current.y+row)*S.CELL+1, S.CELL-2, S.CELL-2); gctx.restore();
+        gctx.fillRect((visX+col)*S.CELL+1, (visY+row)*S.CELL+1, S.CELL-2, S.CELL-2); gctx.restore();
       }
-      const bY = (S.current.y + S.current.shape.length)*S.CELL - 3;
+      const bY = (visY + S.current.shape.length)*S.CELL - 3;
       gctx.save();
       gctx.fillStyle = `rgba(${r},${g},${b},0.75)`;
       if (!S.lowPerfMode) { gctx.shadowColor = S.current.color; gctx.shadowBlur = 5; }
-      gctx.fillRect(S.current.x*S.CELL, bY, S.current.shape[0].length*S.CELL*pct, 3);
+      gctx.fillRect(visX*S.CELL, bY, S.current.shape[0].length*S.CELL*pct, 3);
       gctx.restore();
     }
 
     for (let row = 0; row < S.current.shape.length; row++) for (let col = 0; col < S.current.shape[row].length; col++) {
-      if (S.current.shape[row][col]) drawCell(gctx, S.current.x+col, S.current.y+row, S.current.color, 1, 1.5, S.colorblindMode ? S.current.key : null);
+      if (S.current.shape[row][col]) drawCell(gctx, visX+col, visY+row, S.current.color, 1, 1.5, S.colorblindMode ? S.current.key : null);
     }
 
     if (_lastBorderColor !== S.current.color) {
