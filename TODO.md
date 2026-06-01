@@ -9,21 +9,38 @@
 
 ## 🎯 Version Pipeline (current → next)
 
-| Version | DAU Goal | Status |
-|---|---:|---|
-| v1.0.9.4 | 100 | ✅ Done |
-| Pre-v1.1 | — | ✅ Done |
-| v1.1 Sprint Mode + Domain | 500 | ✅ Done |
-| v1.1.1 UX Polish | — | ✅ Done |
-| v1.2 Ultra + Streak | 700 | 🔲 |
-| v1.3 Training & Finesse | 1,200 | 🔲 |
-| v1.4 Visual Customization | 1,800 | 🔲 |
-| v1.5 Weekly Events | 2,500 | 🔲 |
-| v1.6 Ghost & Replay | 3,500 | 🔲 |
-| v1.7 Advanced Stats | 4,500 | 🔲 |
-| v1.8 Season & Rank | 6,000 | 🔲 |
-| v1.9 Social Layer | 8,000 | 🔲 |
-| v2.0 Multiplayer | 15,000+ | 🔲 |
+> **Strategic shift (2026-06-01):** Official release / public launch is **deferred** until the engine meets competitive-standard quality.
+> **Version revision (2026-06-01):** Previously-shipped v1.0.x ~ v1.1.1 are retroactively classified as **pre-1.0 beta**. The next version pipeline restarts at **v0.2** for engine work, and **v1.0 is now the engine-complete real release** (was previously labeled "v2.0"). Git tags from the beta era remain in history; the *displayed* version (`template.html`) will be bumped back to v0.2.0 with the next engine release.
+> Bug tracking and gap analysis: see [`BUGS.md`](./BUGS.md) (ARCH-001~005, FEAT-001~012).
+>
+> **Two non-negotiable engineering principles for every Phase A change:**
+> 1. **Correctness** — output must match the standard behavior exactly. No "close enough." If a competitive player would notice the difference, it's wrong.
+> 2. **Maintainability** — code must stay readable and modifiable. Prefer simple, well-named modules over clever optimizations. If the cleanest implementation can't meet the correctness bar, isolate the complex part behind a small, documented seam (e.g. a single `tick()` module) so the rest of the code stays simple.
+
+### Phase A: Engine Foundation (pre-1.0 beta — no public launch)
+
+| Version | Focus | Source | Status |
+|---|---|---|---|
+| v1.0.9.4 ~ v1.1.1 *(now reframed as v0.1.x beta)* | Sprint, domain, UX polish | — | ✅ Done |
+| **v0.2 Loop & Input Core** | Decoupled fixed-timestep loop, ordered sub-frame input handling | ARCH-001, ARCH-002 | 🔲 Next |
+| **v0.3 Movement Standard** | 180° rotation, custom keybinds, SDF (+ ∞), lock-delay reset cap, IRS, IHS, DCD, instant ARR=0 | FEAT-001/002/003/006/007/008/012, ARCH-003 | 🔲 |
+| **v0.4 Scoring Standard** | Back-to-Back, 5-piece next queue, all-spin (SRS+) | FEAT-004/005/010 | 🔲 |
+| **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3 substages — see BUGS.md ARCH-004), render interpolation between ticks, low-latency audio dispatch | ARCH-004/005 | 🔲 |
+| **v0.6 Modes & Metrics** | Ultra/Blitz mode, in-game APM/PPS | FEAT-009/011 | 🔲 |
+
+### Phase B: Public Launch & Growth (gated by Phase A completion)
+
+| Version | Focus | DAU Goal | Status |
+|---|---|---:|---|
+| **v1.0 Standards Compliance Release** | Official competitive-standard public launch (the real 1.0) | 700 | 🔲 |
+| v1.1 Training & Finesse | — | 1,200 | 🔲 |
+| v1.2 Visual Customization | — | 1,800 | 🔲 |
+| v1.3 Weekly Events | — | 2,500 | 🔲 |
+| v1.4 Ghost & Replay | — | 3,500 | 🔲 |
+| v1.5 Advanced Stats | — | 4,500 | 🔲 |
+| v1.6 Season & Rank | — | 6,000 | 🔲 |
+| v1.7 Social Layer | — | 8,000 | 🔲 |
+| v2.0 Multiplayer | — | 15,000+ | 🔲 |
 
 > Full roadmap, DAU milestones, and infrastructure upgrade triggers → see `README.md`.
 > Marketing strategy and growth plan → see `GROWTHPLAN.md` (local only).
