@@ -330,7 +330,7 @@ export function showStartScreen(){
         </div>
       </div>
       <div class="btn-row main-actions">
-        <button class="action-btn" onclick="showModeSelector()">PLAY</button>
+        <button class="action-btn play-btn" onclick="showModeSelector()">PLAY</button>
       </div>
       <div class="btn-row sub-actions">
         <button class="action-btn ghost" onclick="openHowToPlay()">HOW TO PLAY</button>
