@@ -325,8 +325,8 @@ export function showStartScreen(){
             <button class="lb-tab" data-tab="all" onclick="renderLbTab('all')">ALL TIME</button>
           `}
         </div>
-        <div class="lb-inner">
-          <div style="text-align:center; padding:30px 0; color:rgba(0,200,255,0.4); font-size:10px; letter-spacing:2px; animation:pulse 1s infinite;">LOADING...</div>
+        <div class="lb-inner" style="display:flex; align-items:center; justify-content:center;">
+          <div style="color:rgba(0,200,255,0.4); font-size:12px; letter-spacing:4px; animation:text-pulse 1.5s ease-in-out infinite;">LOADING...</div>
         </div>
       </div>
       <div class="btn-row main-actions">
