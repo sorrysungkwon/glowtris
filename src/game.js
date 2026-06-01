@@ -423,7 +423,7 @@ function processInput(input){
     case'ArrowDown':  softDrop(); S.dasCharge.down=0; break;
     case'ArrowUp':case'KeyX': rotatePiece(1);      break;
     case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1); break;
-    case'KeyA':case'ShiftRight': rotatePiece(2); break;
+    case'KeyA': rotatePiece(2); break;
     case'Space':      hardDrop();         break;
     case'KeyC':case'ShiftLeft': holdPiece(); break;
   }
