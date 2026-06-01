@@ -173,35 +173,35 @@
   </div>
 
   <!-- Touch controls (all screens) -->
-  <div id="touch-controls">
-    <!-- Row 1: hard drop — isolated, full-width to prevent misclick from rotation -->
-    <div id="tc-drop" class="ctrl-row">
+  <div id="touch-controls" class="nes-layout">
+    <!-- D-Pad (Left side) -->
+    <div class="nes-dpad">
       <button class="tbtn tbtn-drop" id="btn-drop">
-        <span class="material-icons-round">keyboard_double_arrow_down</span>
+        <span class="material-icons-round">arrow_upward</span>
+      </button>
+      <button class="tbtn" id="btn-left">
+        <span class="material-icons-round">chevron_left</span>
+      </button>
+      <button class="tbtn" id="btn-right">
+        <span class="material-icons-round">chevron_right</span>
+      </button>
+      <button class="tbtn" id="btn-soft">
+        <span class="material-icons-round">keyboard_arrow_down</span>
       </button>
     </div>
-    <!-- Row 2: actions (hold / CCW / CW) — medium -->
-    <div id="tc-act" class="ctrl-row">
+    <!-- Center (Hold) -->
+    <div class="nes-center">
       <button class="tbtn tbtn-hold" id="btn-hold">
         <span class="material-icons-round">swap_horiz</span>
       </button>
+    </div>
+    <!-- Action Buttons (Right side) -->
+    <div class="nes-actions">
       <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
         <span class="material-icons-round">rotate_left</span>
       </button>
       <button class="tbtn tbtn-rotate" id="btn-rotate">
         <span class="material-icons-round">rotate_right</span>
-      </button>
-    </div>
-    <!-- Row 3: movement (← / soft / →) — largest, bottom -->
-    <div id="tc-move" class="ctrl-row">
-      <button class="tbtn" id="btn-left">
-        <span class="material-icons-round">chevron_left</span>
-      </button>
-      <button class="tbtn" id="btn-soft">
-        <span class="material-icons-round">keyboard_arrow_down</span>
-      </button>
-      <button class="tbtn" id="btn-right">
-        <span class="material-icons-round">chevron_right</span>
       </button>
     </div>
   </div>

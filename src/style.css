@@ -689,74 +689,74 @@
     #touch-controls { display:none; }
   }
 
-  /* ── ALL TOUCH DEVICES: iPhone-style 3-row stacked layout ── */
+  /* ── ALL TOUCH DEVICES: NES Style Layout ── */
   @media (pointer:coarse) {
     /* Let the game row fill whatever vertical space remains between header and controls. */
     /* ResizeObserver in JS reads clientHeight and sets CELL — no hardcoded arithmetic. */
     #game-row { flex:1 1 0; min-height:0; align-items:center; justify-content:center; }
 
-    #touch-controls {
-      width: min(340px, 92vw);
-      padding-bottom:16px;
-      gap:8px;
+    #touch-controls.nes-layout {
+      width: min(380px, 96vw); /* Wider to accommodate split */
+      padding-bottom: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 10px;
     }
     #mobile-header { width: min(340px, 92vw); }
 
-    /* Row 1 — system: small, space-between */
-    #tc-sys {
-      justify-content:space-between;
-      opacity:0.6;
-      transition:opacity .2s;
+    .nes-dpad {
+      display: grid;
+      grid-template-columns: 50px 50px 50px;
+      grid-template-rows: 50px 50px 50px;
+      gap: 4px;
     }
-    #tc-sys:hover { opacity:1; }
-    #tc-sys .tbtn {
-      flex:0 0 auto;
-      height:30px;
-      border-radius:8px;
-      padding:0 18px;
-      font-size:18px;
-    }
-    #tc-sys .tbtn .material-icons-round { font-size:18px; }
+    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 8px 8px 4px 4px; }
+    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 8px 4px 4px 8px; }
+    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 8px 8px 4px; }
+    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 8px 8px; }
+    .nes-dpad .tbtn { height: 100%; font-size: 28px; }
 
-    /* Row 1 — hard drop: full-width, shorter than action row */
-    #tc-drop .tbtn {
-      flex:1; min-width:0;
-      height:40px;
-      border-radius:10px;
-      font-size:clamp(20px, 5.5vw, 28px);
+    .nes-center {
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 20px;
     }
-
-    /* Row 2 — actions: equal-width, medium height */
-    #tc-act .tbtn {
-      flex:1; min-width:0;
-      height:54px;
-      border-radius:10px;
-      font-size:clamp(20px, 5.5vw, 28px);
+    .nes-center #btn-hold {
+      width: 50px; height: 50px;
+      border-radius: 12px;
+      font-size: 24px;
     }
 
-    /* Row 3 — movement: equal-width, tallest */
-    #tc-move .tbtn {
-      flex:1; min-width:0;
-      height:72px;
-      border-radius:12px;
-      font-size:clamp(28px, 9vw, 40px);
+    .nes-actions {
+      display: flex;
+      gap: 12px;
+      padding-bottom: 15px;
     }
-    /* ← and → slightly wider than soft-drop */
-    #btn-left, #btn-right { flex:1.35; }
+    .nes-actions #btn-rotate-ccw, 
+    .nes-actions #btn-rotate {
+      width: 65px; height: 65px;
+      border-radius: 50%;
+      font-size: 32px;
+    }
+    .nes-actions #btn-rotate-ccw {
+      transform: translateY(15px); /* Offset B button lower like NES */
+    }
   }
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    #touch-controls { width: 340px; gap:10px; }
+    #touch-controls.nes-layout { width: 500px; padding-bottom: 30px; }
     #mobile-header { width: 340px; }
 
-    #tc-sys .tbtn  { height:34px; font-size:20px; padding:0 22px; }
-
-    #tc-drop .tbtn { height:46px; font-size:30px; border-radius:12px; }
-
-    #tc-act .tbtn  { height:64px; font-size:30px; border-radius:12px; }
-
-    #tc-move .tbtn { height:84px; font-size:38px; border-radius:14px; }
+    .nes-dpad {
+      grid-template-columns: 65px 65px 65px;
+      grid-template-rows: 65px 65px 65px;
+    }
+    .nes-center #btn-hold { width: 65px; height: 65px; }
+    .nes-actions #btn-rotate-ccw, 
+    .nes-actions #btn-rotate { width: 85px; height: 85px; }
   }
 
   /* ─── Performance mode indicator ─── */
