@@ -43,20 +43,36 @@ A neon-styled block stacking game built with ES modules and canvas.
 - PWA: installable on iOS/Android home screen (manifest + icons)
 - OG image + social meta tags for rich SNS sharing preview
 
+## Version Revision (2026-06-01)
+
+> Previously-shipped v1.0.x ~ v1.1.1 are **retroactively classified as pre-1.0 beta**. The engine did not yet meet competitive-standard quality at those releases. The version pipeline now restarts at **v0.2**, and **v1.0 is the engine-complete real release**. Git tags from the beta era remain in history for reference; the displayed version will be bumped back to v0.2.0 with the next engine release.
+>
+> See [`BUGS.md`](./BUGS.md) for the engine architecture gap analysis (ARCH-001~005) and feature gaps (FEAT-001~012) that gate the real 1.0 release.
+
 ## Growth Milestones
+
+### Phase A — Engine Foundation (pre-1.0, no public launch)
+
+| Milestone | Target Version | Focus |
+|---|---|---|
+| 🧱 Loop & Input Core | v0.2 | Decoupled fixed-timestep loop, ordered sub-frame input |
+| 🎮 Movement Standard | v0.3 | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
+| 🏆 Scoring Standard | v0.4 | Back-to-Back, 5-piece next queue, all-spin (SRS+) |
+| 🖼 Renderer & Audio | v0.5 | GPU-accelerated rendering, low-latency audio |
+| ⏱ Modes & Metrics | v0.6 | Ultra/Blitz mode, in-game APM/PPS |
+
+### Phase B — Public Launch & Growth (gated by Phase A)
 
 | Milestone | Target DAU | Target Version | Key Driver |
 |---|---:|---|---|
-| 🌱 Launch Stable | 100 | v1.0.9.4 ✅ | Core gameplay complete |
-| 🚀 Sprint Launch | 500 | v1.1 ✅ | Sprint Mode viral sharing |
-| 📈 Multi-Mode | 700 | v1.2 | Ultra Mode + basic daily streak |
-| 🎓 Skill Depth | 1,200 | v1.3 | Training mode, finesse tracking |
-| 🎨 Identity | 1,800 | v1.4 | Visual customization |
-| 🔥 Weekly Events | 2,500 | v1.5 | Weekly challenges + monthly leaderboard |
-| 👻 Self-Competition | 3,500 | v1.6 | Ghost race / personal replay |
-| 📊 Meta Game | 4,500 | v1.7 | Advanced stats dashboard |
-| 🏆 Ranked Play | 6,000 | v1.8 | Season & rank tier system |
-| 👥 Social Graph | 8,000 | v1.9 | Friend codes + async challenge |
+| 🚀 **Real Release** | 700 | **v1.0** | Standards-compliant engine, official public launch |
+| 🎓 Skill Depth | 1,200 | v1.1 | Training mode, finesse tracking |
+| 🎨 Identity | 1,800 | v1.2 | Visual customization |
+| 🔥 Weekly Events | 2,500 | v1.3 | Weekly challenges + monthly leaderboard |
+| 👻 Self-Competition | 3,500 | v1.4 | Ghost race / personal replay |
+| 📊 Meta Game | 4,500 | v1.5 | Advanced stats dashboard |
+| 🏆 Ranked Play | 6,000 | v1.6 | Season & rank tier system |
+| 👥 Social Graph | 8,000 | v1.7 | Friend codes + async challenge |
 | ⚔️ Multiplayer | 15,000+ | v2.0 | Real-time 1v1 battle |
 
 ### Infrastructure Upgrade Triggers
@@ -103,19 +119,28 @@ A neon-styled block stacking game built with ES modules and canvas.
 | ~~v1.1~~ ✅ | **Sprint Mode + iPad Keyboard**: Sprint 40L engine — clear 40 lines, stopwatch HUD, remaining-lines counter, mode selector card UI (Marathon / Sprint 40L / Daily Challenge), 3-2-1 animated countdown (per-number colours, scale animation, expanding rings, GO! flash). Sprint leaderboard ascending (lowest time = best), personal best tracking, shareable Sprint result card (time + LPM + rank). iPad external-keyboard mode — first keydown on coarse-pointer tablet shows desktop side panels (SCORE / LINES / LEVEL / NEXT / HOLD / KEYS), touch restores instantly; phones always keep touch UI. Keyboard nudge spring-back redesigned with `void offsetWidth` forced reflow + `cubic-bezier(0.15,2.8,0.5,0.82)` overshoot. API: `KEY_SPRINT` / `KEY_SPRINT_DAILY` / `KEY_SPRINT_WEEKLY` Redis keys, ascending `getSprintBoard()`, `deduplicateAndAddSprint()`. |
 | ~~v1.1.1~~ ✅ | **UX/UI Polish & Keyboard Nav**: Gestalt visual grouping of overlays. Full keyboard navigation for all dialogs (WASD, Arrows, Tab, Enter). Intelligent Escape/Backspace bindings. Auto-focus management for modals to prevent trapping. Fixed touch controls bypassing game countdown. Duplicate modal prevention. Upgraded hover sound logic and UI interaction effects. |
 
-### 🔮 Planned
+### 🔮 Planned — Phase A (Engine Foundation, pre-1.0 beta)
+
+| Version | Theme | Features |
+|---|---|---|
+| v0.2 | **Loop & Input Core** | Decoupled fixed-timestep logic loop (sub-4ms input-to-state latency). Ordered sub-frame input handling — inputs in the same render frame simulated in true chronological order. |
+| v0.3 | **Movement Standard** | 180° rotation. Customisable keybinds. SDF (soft-drop factor) slider with ∞ option. Lock-delay reset cap (15 moves). IRS (initial rotation) and IHS (initial hold). DCD (dash cancellation delay). Instant ARR=0 transition. |
+| v0.4 | **Scoring Standard** | Back-to-Back 1.5× bonus for consecutive T-spins/Tetrises. 5-piece next queue. All-spin detection (SRS+) for S/Z/J/L/I in addition to T. |
+| v0.5 | **Renderer & Audio** | WebGL2 renderer migration (staged: board → particles → background → shader effects). Targets full monitor refresh rate, 1000+ particle systems, signature neon/glow shader pipeline. Low-latency audio dispatch (SFX <5ms). |
+| v0.6 | **Modes & Metrics** | Ultra/Blitz 2-minute timed mode. In-game APM / PPS display. |
+
+### 🔮 Planned — Phase B (Public Launch & Growth, post-1.0)
 
 | Version | Theme | Features | DAU Goal |
 |---|---|---|---:|
-| ~~v1.1.1~~ ✅ | **UX/UI Polish & Keyboard Nav** | Visual grouping of overlays. Full keyboard control for all menus. Auto-focus modal management. Escape/Backspace bindings. Fix touch controls bypassing countdown. | — |
-| v1.2 | **Ultra Mode + Streak** | 2-minute score attack with a score multiplier that ramps as time runs out. Daily streak badge — tracks consecutive days played, resets on a missed day. | **700** |
-| v1.3 | **Training & Finesse** | Practice mode (no game over, no timer). Finesse counter — tracks wasted keypresses vs optimal. Per-piece heatmap overlay. Speed metrics (PPS, lines/min). | 1,200 |
-| v1.4 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. BGM track selection saved to localStorage. | 1,800 |
-| v1.5 | **Weekly Events** | Weekly special challenge (rotating rule modifiers: invisible pieces, 20-line board, etc.) with 7-day Redis TTL leaderboard. Monthly event leaderboard. | 2,500 |
-| v1.6 | **Ghost & Replay** | Best-run ghost stored in Redis (serialised input log). Ghost race mode — race against your own personal best. Shareable replay link via short code. | 3,500 |
-| v1.7 | **Advanced Stats** | Expanded STATS overlay: PPS, finesse rate, T-spin %, all-clear %, average combo. Session graph (score over last 10 games). Weekly personal report card. | 4,500 |
-| v1.8 | **Season & Rank** | Monthly season resets leaderboard. 7-tier rank system (Bronze → Radiant) based on season score. Season-exclusive title badges and board borders unlock at each tier. | 6,000 |
-| v1.9 | **Social Layer** | Friend code system (6-char code → follow mutual). Friend-only leaderboard tab. Async challenge — share a seeded run; recipient plays same sequence, results compared on a shared card. | 8,000 |
+| **v1.0** | **Real Release — Standards Compliance** | Engine officially meets competitive-standard quality. Public launch. Daily streak badge bundled. | **700** |
+| v1.1 | **Training & Finesse** | Practice mode (no game over, no timer). Finesse counter — tracks wasted keypresses vs optimal. Per-piece heatmap overlay. | 1,200 |
+| v1.2 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. BGM track selection saved to localStorage. | 1,800 |
+| v1.3 | **Weekly Events** | Weekly special challenge (rotating rule modifiers: invisible pieces, 20-line board, etc.) with 7-day Redis TTL leaderboard. Monthly event leaderboard. | 2,500 |
+| v1.4 | **Ghost & Replay** | Best-run ghost stored in Redis (serialised input log). Ghost race mode — race against your own personal best. Shareable replay link via short code. | 3,500 |
+| v1.5 | **Advanced Stats** | Expanded STATS overlay: T-spin %, all-clear %, average combo. Session graph (score over last 10 games). Weekly personal report card. | 4,500 |
+| v1.6 | **Season & Rank** | Monthly season resets leaderboard. 7-tier rank system (Bronze → Radiant) based on season score. Season-exclusive title badges and board borders unlock at each tier. | 6,000 |
+| v1.7 | **Social Layer** | Friend code system (6-char code → follow mutual). Friend-only leaderboard tab. Async challenge — share a seeded run; recipient plays same sequence, results compared on a shared card. | 8,000 |
 | v2.0 | **Real-time Multiplayer** | 1v1 battle via WebSocket (Pusher/Ably). Garbage line mechanic. Live spectator mode. Elo-based matchmaking queue. Battle-exclusive leaderboard. | **15,000+** |
 
 ## Infrastructure

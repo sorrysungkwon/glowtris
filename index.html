@@ -1182,12 +1182,12 @@
     <button id="htp-close" onclick="closeHowToPlay()">✕</button>
     <div id="htp-scroll">
       <div class="htp-section">KEYBOARD</div>
-      <div class="htp-row"><span class="htp-key">← → / A D</span><span class="htp-lbl">Move</span></div>
-      <div class="htp-row"><span class="htp-key">↑ / W / X</span><span class="htp-lbl">Rotate CW</span></div>
-      <div class="htp-row"><span class="htp-key">Z / Ctrl</span><span class="htp-lbl">Rotate CCW</span></div>
-      <div class="htp-row"><span class="htp-key">↓ / S</span><span class="htp-lbl">Soft Drop</span></div>
+      <div class="htp-row"><span class="htp-key">← →</span><span class="htp-lbl">Move</span></div>
+      <div class="htp-row"><span class="htp-key">↑</span><span class="htp-lbl">Rotate CW</span></div>
+      <div class="htp-row"><span class="htp-key">Ctrl</span><span class="htp-lbl">Rotate CCW</span></div>
+      <div class="htp-row"><span class="htp-key">↓</span><span class="htp-lbl">Soft Drop</span></div>
       <div class="htp-row"><span class="htp-key">SPC</span><span class="htp-lbl">Hard Drop</span></div>
-      <div class="htp-row"><span class="htp-key">C</span><span class="htp-lbl">Hold</span></div>
+      <div class="htp-row"><span class="htp-key">C / Shift</span><span class="htp-lbl">Hold</span></div>
       <div class="htp-row"><span class="htp-key">P</span><span class="htp-lbl">Pause</span></div>
       <div class="htp-row"><span class="htp-key">M</span><span class="htp-lbl">Mute</span></div>
       <div class="htp-section">TOUCH</div>
@@ -1215,7 +1215,7 @@
   <!-- Desktop title header -->
   <div id="desktop-header">
     <span class="dh-title">GLOWTRIS</span>
-    <span class="dh-version">v1.1.1</span>
+    <span class="dh-version">v0.2.0 BETA</span>
   </div>
 
   <!-- Mobile-only compact header -->
@@ -1286,12 +1286,12 @@
       <div class="divider"></div>
       <div class="panel-title">KEYS</div>
       <div class="key-map">
-        <div class="key-row" id="key-move"><kbd>← →</kbd><kbd>A D</kbd><span>move</span></div>
-        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>W</kbd><span>rotate CW</span></div>
-        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
-        <div class="key-row" id="key-soft"><kbd>↓</kbd><kbd>S</kbd><span>soft drop</span></div>
+        <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
+        <div class="key-row" id="key-rotate"><kbd>↑</kbd><span>rotate CW</span></div>
+        <div class="key-row" id="key-rotate-ccw"><kbd>Ctrl</kbd><span>rotate CCW</span></div>
+        <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
         <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
-        <div class="key-row" id="key-hold"><kbd>C</kbd><span>hold</span></div>
+        <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
         <div class="key-row" id="key-pause"><kbd>P</kbd><span>pause</span></div>
         <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
       </div>
@@ -4374,6 +4374,36 @@ ${window.location.origin}`;
     loadStartLeaderboard();
   }
 
+  // src/loop.js
+  var TICK_RATE = 1;
+  var ACCUMULATOR_CAP = 250;
+  var inputQueue = [];
+  var lastTickTs = 0;
+  var accumulator = 0;
+  function enqueueInput(code, type) {
+    inputQueue.push({ code, type, t: performance.now() });
+  }
+  function resetLoop(now) {
+    lastTickTs = now;
+    accumulator = 0;
+    inputQueue.length = 0;
+  }
+  function tickLoop(now, callbacks) {
+    if (lastTickTs === 0) lastTickTs = now;
+    accumulator += now - lastTickTs;
+    lastTickTs = now;
+    if (accumulator > ACCUMULATOR_CAP) accumulator = ACCUMULATOR_CAP;
+    if (inputQueue.length > 1) inputQueue.sort((a, b) => a.t - b.t);
+    while (accumulator >= TICK_RATE) {
+      accumulator -= TICK_RATE;
+      const tickEndTs = now - accumulator;
+      while (inputQueue.length && inputQueue[0].t <= tickEndTs) {
+        callbacks.onInput(inputQueue.shift());
+      }
+      callbacks.onTick(TICK_RATE);
+    }
+  }
+
   // src/game.js
   document.addEventListener("mouseover", (e) => {
     const btn = e.target.closest(".action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap");
@@ -4393,8 +4423,6 @@ ${window.location.origin}`;
   var dropInterval;
   var animFrame;
   var bag = [];
-  var lastDropTs = 0;
-  var prevTs = 0;
   var _countdownTimer = null;
   var _prng = null;
   var lastWasRotate = false;
@@ -4676,12 +4704,11 @@ ${window.location.origin}`;
     return false;
   }
   var KEYS = {};
-  var dasTimer = null;
   function updateKeyGuideState(code, isPressed) {
     let el = null;
-    if (code === "ArrowLeft" || code === "ArrowRight" || code === "KeyA" || code === "KeyD") el = _keyGuide.move;
-    else if (code === "ArrowUp" || code === "KeyW") el = _keyGuide.rotate;
-    else if (code === "ArrowDown" || code === "KeyS") el = _keyGuide.soft;
+    if (code === "ArrowLeft" || code === "ArrowRight") el = _keyGuide.move;
+    else if (code === "ArrowUp") el = _keyGuide.rotate;
+    else if (code === "ArrowDown") el = _keyGuide.soft;
     else if (code === "Space") el = _keyGuide.hard;
     else if (code === "KeyC" || code === "ShiftLeft") el = _keyGuide.hold;
     else if (code === "KeyP") el = _keyGuide.pause;
@@ -4719,10 +4746,10 @@ ${window.location.origin}`;
         return false;
       }
     }
-    const isDown = e.code === "ArrowDown" || e.code === "KeyS";
-    const isUp = e.code === "ArrowUp" || e.code === "KeyW";
-    const isRight = e.code === "ArrowRight" || e.code === "KeyD";
-    const isLeft = e.code === "ArrowLeft" || e.code === "KeyA";
+    const isDown = e.code === "ArrowDown";
+    const isUp = e.code === "ArrowUp";
+    const isRight = e.code === "ArrowRight";
+    const isLeft = e.code === "ArrowLeft";
     const scrollable = activeOverlay.querySelector("#htp-scroll, #stats-scroll");
     if (scrollable && (isDown || isUp)) {
       scrollable.scrollTop += isDown ? 60 : -60;
@@ -4773,76 +4800,83 @@ ${window.location.origin}`;
       return;
     }
     if (S.gamePaused || S._countdownVal) return;
-    switch (e.code) {
+    if (e.code === "ArrowDown" || e.code === "Space") e.preventDefault();
+    enqueueInput(e.code, "down");
+  });
+  document.addEventListener("keyup", (e) => {
+    updateKeyGuideState(e.code, false);
+    KEYS[e.code] = false;
+  });
+  function processInput(input) {
+    if (input.type !== "down") return;
+    switch (input.code) {
       case "ArrowLeft":
-      case "KeyA":
         moveX(-1);
-        startDAS(-1);
+        S.dasCharge.left = 0;
         break;
       case "ArrowRight":
-      case "KeyD":
         moveX(1);
-        startDAS(1);
+        S.dasCharge.right = 0;
         break;
       case "ArrowDown":
-      case "KeyS":
         softDrop();
-        startDASDown();
-        e.preventDefault();
+        S.dasCharge.down = 0;
         break;
       case "ArrowUp":
-      case "KeyW":
-      case "KeyX":
         rotatePiece();
         break;
-      case "KeyZ":
       case "ControlLeft":
       case "ControlRight":
         rotatePiece(true);
         break;
       case "Space":
         hardDrop();
-        e.preventDefault();
         break;
       case "KeyC":
       case "ShiftLeft":
         holdPiece();
         break;
     }
-  });
-  document.addEventListener("keyup", (e) => {
-    updateKeyGuideState(e.code, false);
-    KEYS[e.code] = false;
-    if (e.code === "ArrowLeft" || e.code === "ArrowRight" || e.code === "KeyA" || e.code === "KeyD") clearDAS();
-    if (e.code === "ArrowDown" || e.code === "KeyS") clearDASDown();
-  });
-  function startDAS(d) {
-    clearDAS();
-    dasTimer = setTimeout(() => {
-      dasTimer = setInterval(() => {
-        if (S.gameRunning && !S.gamePaused) moveX(d);
-      }, S.arr);
-    }, S.das);
   }
-  function clearDAS() {
-    clearTimeout(dasTimer);
-    clearInterval(dasTimer);
-    dasTimer = null;
+  function _tickDAS(slot, key, action, dt) {
+    if (!KEYS[key]) {
+      S.dasCharge[slot] = 0;
+      return;
+    }
+    const prev = S.dasCharge[slot];
+    S.dasCharge[slot] += dt;
+    if (S.dasCharge[slot] < S.das) return;
+    const arr = Math.max(1, S.arr);
+    const pulsesPrev = Math.floor(Math.max(0, prev - S.das) / arr);
+    const pulsesNow = Math.floor((S.dasCharge[slot] - S.das) / arr);
+    for (let i = pulsesPrev; i < pulsesNow; i++) action();
   }
-  var dasDownTimer = null;
-  function startDASDown() {
-    clearDASDown();
-    dasDownTimer = setTimeout(() => {
-      if (S.gameRunning && !S.gamePaused) softDrop();
-      dasDownTimer = setInterval(() => {
-        if (S.gameRunning && !S.gamePaused) softDrop();
-      }, S.arr);
-    }, S.das);
-  }
-  function clearDASDown() {
-    clearTimeout(dasDownTimer);
-    clearInterval(dasDownTimer);
-    dasDownTimer = null;
+  function gameTick(dt) {
+    if (!S.gameRunning || S.gamePaused || !S.current || S._countdownVal) return;
+    if (S.lockActive) {
+      S.lockTimer -= dt;
+      if (S.lockTimer <= 0) {
+        lockPiece();
+        return;
+      }
+    } else {
+      S.gravityTimer += dt;
+      while (S.gravityTimer >= dropInterval) {
+        S.gravityTimer -= dropInterval;
+        if (validPos(S.current, 0, 1)) {
+          S.current.y++;
+          spawnDropTrail(S.current);
+        } else {
+          S.lockActive = true;
+          S.lockTimer = S.lockMs;
+          S.gravityTimer = 0;
+          break;
+        }
+      }
+    }
+    _tickDAS("left", "ArrowLeft", () => moveX(-1), dt);
+    _tickDAS("right", "ArrowRight", () => moveX(1), dt);
+    _tickDAS("down", "ArrowDown", softDrop, dt);
   }
   function moveX(d) {
     if (!S.current) return;
@@ -4934,24 +4968,8 @@ ${window.location.origin}`;
   makeTouchBtn("btn-pause", () => togglePause(), "any");
   function gameLoop(ts) {
     measureFPS(ts);
-    const dt = prevTs ? Math.min(ts - prevTs, 100) : 16;
-    prevTs = ts;
+    tickLoop(ts, { onInput: processInput, onTick: gameTick });
     drawBackground();
-    if (!S.gamePaused && S.gameRunning && S.current && !S._countdownVal) {
-      if (S.lockActive) {
-        S.lockTimer -= dt;
-        if (S.lockTimer <= 0) lockPiece();
-      } else if (ts - lastDropTs > dropInterval) {
-        lastDropTs = ts;
-        if (validPos(S.current, 0, 1)) {
-          S.current.y++;
-          spawnDropTrail(S.current);
-        } else {
-          S.lockActive = true;
-          S.lockTimer = S.lockMs;
-        }
-      }
-    }
     if (S.isSprintMode && S.gameRunning && !S.gamePaused && !S._countdownVal) updateSprintTimer();
     drawBoard();
     updateParticles();
@@ -5017,6 +5035,8 @@ ${window.location.origin}`;
     S.comboFlashColor = "#00c8ff";
     S.dangerPulse = 0;
     S.levelUpScanline = 0;
+    S.gravityTimer = 0;
+    S.dasCharge = { left: 0, right: 0, down: 0 };
     S.hiScore = parseInt(localStorage.getItem(LS.HI) || "0");
     bag = [];
     refillBag();
@@ -5044,8 +5064,7 @@ ${window.location.origin}`;
     updateUI();
     if (S.isSprintMode) updateSprintTimer();
     if (animFrame) cancelAnimationFrame(animFrame);
-    prevTs = 0;
-    lastDropTs = performance.now();
+    resetLoop(performance.now());
     startBGM();
     S._countdownGo = 0;
     S._countdownVal = 3;
@@ -5060,7 +5079,7 @@ ${window.location.origin}`;
         _countdownTimer = null;
         S._countdownVal = 0;
         S._countdownGo = 55;
-        lastDropTs = performance.now();
+        S.gravityTimer = 0;
         if (S.isSprintMode) S._sprintStartTime = performance.now();
         if (!S.muteAudio) {
           [523, 659, 784].forEach((f, i) => playBeep(f, "sawtooth", 0.16, 0.3, i * 0.04));
@@ -5087,8 +5106,7 @@ ${window.location.origin}`;
       S._sprintStartTime += performance.now() - _sprintPauseTs;
       _sprintPauseTs = 0;
     }
-    lastDropTs = performance.now();
-    prevTs = 0;
+    resetLoop(performance.now());
   }
   function stopGameAndReset() {
     clearInterval(_countdownTimer);
@@ -5215,7 +5233,7 @@ ${window.location.origin}`;
       animFrame = null;
     }
   });
-  var _VERSION = "v1.1.1";
+  var _VERSION = "v0.2.0";
   window.onerror = function(msg, src, line, col, err) {
     console.error("[glowtris " + _VERSION + "] uncaught error", {
       msg,

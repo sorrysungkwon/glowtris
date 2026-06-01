@@ -58,3 +58,129 @@
 ## 🔲 Open
 
 _No open bugs._
+
+---
+
+## 🏛️ Engine Architecture (Competitive standard responsiveness)
+
+> **Goal:** Match modern competitive-standard quality. Implementation paths are flexible — what matters is the measurable outcome.
+> Reference: "Architectural Framework for Ultra-Responsive Tetris Engines Exceeding Benchmark Standards" (2026-06) describes one valid implementation; equivalent alternatives are acceptable.
+
+### [ARCH-001] Decoupled fixed-timestep logic loop
+- **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
+- **Symptom:** Game loop is single-RAF; gravity, DAS, lock delay all evaluated once per render frame → 60Hz-bound jitter (16.7ms granularity).
+- **Acceptance criteria:** Input-to-state latency ≤ 4 ms p99, independent of monitor refresh rate. Logic timers (gravity, DAS, ARR, lock delay) advance on a fixed tick decoupled from RAF.
+- **Reference implementation:** Accumulator pattern at 1000 Hz (1 ms tick) per paper §3.1. A larger tick (e.g. 4 ms / 250 Hz) is acceptable if the criteria above hold.
+- **Status:** 🔲 Open
+
+### [ARCH-002] Ordered sub-frame input handling
+- **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
+- **Symptom:** Inputs are processed at the moment of the keydown event; two inputs within one frame are not ordered by their actual sub-frame timing.
+- **Acceptance criteria:** Two inputs arriving inside the same render frame are simulated in true chronological order, not in event-listener arrival order. No input is silently dropped or coalesced.
+- **Reference implementation:** Input queue carrying `performance.now()` timestamps, drained per tick in ARCH-001 loop.
+- **Status:** 🔲 Open (depends on ARCH-001)
+
+### [ARCH-003] Instant ARR=0 transition
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** ARR is implemented with `setInterval` repeating `moveX(d)`; even ARR=0 requires CPU-bound iteration.
+- **Acceptance criteria:** With ARR=0, holding a direction snaps the piece to the wall within one tick of ARCH-001.
+- **Reference implementation:** Raycast to wall via `ΔX_max_to_wall` (paper §4.1). Equivalent loop-in-one-tick implementations are acceptable.
+- **Status:** 🔲 Open
+
+### [ARCH-004] WebGL2 renderer migration
+- **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
+- **Symptom:** Board, current piece, ghost, particles drawn via Canvas2D `fillRect`/`stroke*` each frame. Caps effective framerate at ~60fps regardless of monitor. Suspected source of [BUG-004] state leaks on Chrome. Neon/glow effects bounded by `shadowBlur` performance ceiling.
+- **Acceptance criteria:** Render at the full monitor refresh rate (144Hz+ on capable displays). Particle systems sustain 1000+ active particles with no frame drops. No Canvas2D state-leak regressions. Mobile thermal/battery improvement measurable.
+- **Reference implementation:** WebGL2 VBO + uniform updates + single draw call per layer (paper §5.1). TETR.IO migrated to WebGL2 ~2024 for the same reasons (high-refresh monitors, high PPS rendering load, mobile PWA, signature shader effects).
+- **Why Critical (not Low):** The "fanboy-grade" target shifted our user profile assumption — competitive players bias heavily toward 144Hz+ monitors. Glowtris's identity is neon/glow effects, which are bounded by Canvas2D `shadowBlur` performance. WebGL2 is needed for both ceiling and identity.
+- **Staged rollout (planned across v0.5.0~v0.5.3):**
+  - v0.5.0 — board + current piece + ghost on WebGL2; particles/background/UI stay on Canvas2D
+  - v0.5.1 — particle system on WebGL2 (instanced rendering, 1000+ particles)
+  - v0.5.2 — background nebula shader (real-time gradient)
+  - v0.5.3 — line-clear / T-spin / Glowtris shader effects (RGB split, distortion, bloom)
+  - Each substage keeps a Canvas2D fallback path for shader-compile failures
+- **Status:** 🔲 Open
+
+### [ARCH-005] Low-latency audio dispatch
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** Audio dispatch path not yet audited.
+- **Acceptance criteria:** SFX trigger-to-output latency consistently under ~5 ms; no decoding cost on the hot path.
+- **Reference implementation:** Pre-decoded `AudioBuffer` + `AudioBufferSourceNode` + `AudioContext.currentTime` scheduling. AudioWorklet upgrade only if measurements require it.
+- **Status:** 🔲 Open (audit pending)
+
+---
+
+## 🔵 Feature Gaps
+
+> Missing features that affect gameplay quality. Not regressions.
+
+### [FEAT-001] 180° rotation
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** No way to flip a piece 180° in one action
+- **Note:** Standard in modern Tetris guideline clients. Typically bound to a dedicated key.
+- **Status:** 🔲 Open
+
+### [FEAT-002] Custom key bindings
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** Key layout is hardcoded — no way to remap controls
+- **Status:** 🔲 Open
+
+### [FEAT-003] SDF (Soft Drop Factor) adjustment
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** Soft drop speed is hardcoded; no separate SDF slider (distinct from ARR). Standard: configurable from 1× to instant.
+- **Status:** 🔲 Open
+
+### [FEAT-004] Back-to-Back (B2B) bonus
+- **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
+- **Symptom:** No score multiplier for consecutive difficult clears (T-spin → T-spin, Tetris → Tetris, etc.)
+- **Note:** Tetris guideline requires 1.5× bonus on back-to-back difficult clears. Currently `lockPiece()` scores each clear independently with no `S.b2b` state.
+- **Status:** 🔲 Open
+
+### [FEAT-005] Next queue: show 5 previews
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** Only 1 next piece shown. Standard is 5–6 pieces from the upcoming bag.
+- **Note:** `S.next` holds a single piece. Requires expanding to an array and rendering multiple mini-canvases or a single stacked preview.
+- **Status:** 🔲 Open
+
+### [FEAT-006] Lock delay reset cap (15-move limit)
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** `cancelLock()` resets the lock timer unconditionally on every move/rotation. Players can stall a piece indefinitely.
+- **Note:** Tetris guideline caps lock delay resets at 15 per piece. Requires a `lockResetCount` counter reset on `spawnPiece()`.
+- **Status:** 🔲 Open
+
+### [FEAT-007] IRS (Initial Rotation System)
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** Holding a rotation key while a piece is locking does not pre-rotate the next piece on spawn.
+- **Note:** `spawnPiece()` ignores held key state. IRS is expected by competitive players for high-speed play continuity.
+- **Status:** 🔲 Open
+
+### [FEAT-008] IHS (Initial Hold System)
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** Holding the hold key (C) while a piece is locking does not immediately hold the next piece on spawn.
+- **Note:** Same as IRS — `spawnPiece()` ignores held key state.
+- **Status:** 🔲 Open
+
+### [FEAT-009] In-game APM / PPS stats
+- **Reported:** 2026-06-01 | **Priority:** 🔵 Low
+- **Symptom:** No real-time Actions Per Minute or Pieces Per Second display during play.
+- **Note:** Standard metric in competitive clients. Important for self-improvement feedback.
+- **Status:** 🔲 Open
+
+### [FEAT-010] All-spin detection (SRS+)
+- **Reported:** 2026-06-01 | **Priority:** 🔵 Low
+- **Symptom:** Only T-piece spins are detected and rewarded. S/Z/J/L/I spins with kick are not recognized.
+- **Note:** SRS+ treats any piece that uses a non-zero kick as a spin. Adds score bonus for creative play.
+- **Status:** 🔲 Open
+
+### [FEAT-011] Ultra / Blitz mode (2-minute timed)
+- **Reported:** 2026-06-01 | **Priority:** 🔵 Low
+- **Symptom:** No timed score-attack mode. Current modes: Marathon, Sprint 40L, Daily.
+- **Note:** Ultra (2-minute max score) is a standard competitive format alongside Sprint.
+- **Status:** 🔲 Open
+
+### [FEAT-012] DCD (Dash Cancellation Delay)
+- **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
+- **Symptom:** When the player presses rotate or hold while moving (DAS active), the DAS charge state is not explicitly preserved with a configurable decay window.
+- **Required:** Add a `dcd` parameter (ms) — during DCD window, DAS charge persists through rotation/hold inputs to prevent unintended movement stalls.
+- **Note:** Standard parameter in modern competitive clients. Required to feel correct at high speeds.
+- **Status:** 🔲 Open
