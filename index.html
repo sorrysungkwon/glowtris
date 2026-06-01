@@ -622,22 +622,22 @@
   .action-btn.ghost:hover { border-color:rgba(0,200,255,0.45); color:var(--cyan); background:rgba(0,200,255,0.08); }
   
   .action-btn.play-btn {
-    font-size: 24px;
-    padding: 16px 24px;
-    letter-spacing: 8px;
-    background: linear-gradient(135deg, rgba(0,200,255,0.6), rgba(160,0,255,0.6));
-    border: 2px solid rgba(255,255,255,0.7);
-    text-shadow: 0 0 15px rgba(255,255,255,0.9);
-    animation: play-pulse 1.5s infinite alternate;
+    font-size: 16px;
+    padding: 14px 24px;
+    letter-spacing: 5px;
+    background: linear-gradient(135deg, rgba(0,200,255,0.45), rgba(160,0,255,0.45));
+    border: 2px solid rgba(255,255,255,0.6);
+    text-shadow: 0 0 10px rgba(255,255,255,0.7);
+    animation: play-pulse 2s infinite alternate;
   }
   @keyframes play-pulse {
-    0% { box-shadow: 0 0 20px rgba(0,200,255,0.5), inset 0 0 10px rgba(160,0,255,0.3); transform: scale(1); }
-    100% { box-shadow: 0 0 40px rgba(0,200,255,0.9), inset 0 0 25px rgba(160,0,255,0.7); transform: scale(1.03); border-color: #fff; }
+    0% { box-shadow: 0 0 15px rgba(0,200,255,0.4), inset 0 0 8px rgba(160,0,255,0.2); transform: scale(1); }
+    100% { box-shadow: 0 0 25px rgba(0,200,255,0.7), inset 0 0 15px rgba(160,0,255,0.5); transform: scale(1.02); border-color: rgba(255,255,255,0.9); }
   }
   .action-btn.play-btn:hover {
-    transform: scale(1.1) !important;
-    box-shadow: 0 0 60px rgba(0,200,255,1), inset 0 0 30px rgba(255,255,255,0.8) !important;
-    background: linear-gradient(135deg, rgba(0,200,255,0.9), rgba(160,0,255,0.9));
+    transform: scale(1.06) !important;
+    box-shadow: 0 0 40px rgba(0,200,255,0.8), inset 0 0 20px rgba(255,255,255,0.6) !important;
+    background: linear-gradient(135deg, rgba(0,200,255,0.7), rgba(160,0,255,0.7));
   }
   #daily-challenge-btn, #daily-launch-btn {
     background: linear-gradient(90deg, #ffe600, #ffaa00);
