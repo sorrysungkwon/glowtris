@@ -23,7 +23,7 @@
 |---|---|---|---|
 | v1.0.9.4 ~ v1.1.1 *(now reframed as v0.1.x beta)* | Sprint, domain, UX polish | — | ✅ Done |
 | **v0.2 Loop & Input Core** | Decoupled fixed-timestep loop, ordered sub-frame input handling | ARCH-001, ARCH-002 | ✅ Done |
-| **v0.3 Movement Standard** | 180° rotation, custom keybinds, SDF (+ ∞), lock-delay reset cap, IRS, IHS, DCD, instant ARR=0 | FEAT-001/002/003/006/007/008/012, ARCH-003 | 🔲 Next |
+| **v0.3 Movement Standard** | ~~180° rotation~~, custom keybinds, ~~SDF (+ ∞)~~, lock-delay reset cap, IRS, IHS, DCD, instant ARR=0 | FEAT-001/002/003/006/007/008/012, ARCH-003 | 🔲 Next |
 | **v0.4 Scoring Standard** | Back-to-Back, 5-piece next queue, all-spin (SRS+) | FEAT-004/005/010 | 🔲 |
 | **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3 substages — see BUGS.md ARCH-004), render interpolation between ticks, low-latency audio dispatch | ARCH-004/005 | 🔲 |
 | **v0.6 Modes & Metrics** | Ultra/Blitz mode, in-game APM/PPS | FEAT-009/011 | 🔲 |
