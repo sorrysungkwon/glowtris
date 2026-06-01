@@ -4566,6 +4566,12 @@ ${window.location.origin}`;
     "3>0": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
     "0>3": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]]
   };
+  var KICKS_180 = {
+    "0>2": [[0, 0], [0, -1], [1, -1], [-1, -1], [0, -2], [1, -2], [-1, -2]],
+    "1>3": [[0, 0], [1, 0], [1, -2], [1, -1], [2, 0], [2, -2], [2, -1]],
+    "2>0": [[0, 0], [0, 1], [-1, 1], [1, 1], [0, 2], [-1, 2], [1, 2]],
+    "3>1": [[0, 0], [-1, 0], [-1, -2], [-1, -1], [-2, 0], [-2, -2], [-2, -1]]
+  };
   function createBoard() {
     return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
   }
@@ -4587,9 +4593,14 @@ ${window.location.origin}`;
     const R = shape.length, C = shape[0].length;
     return Array.from({ length: C }, (_, c) => Array.from({ length: R }, (_2, r) => shape[r][C - 1 - c]));
   }
-  function _tryRotate(newShape, fromRot, toRot) {
+  function _tryRotate(newShape, fromRot, toRot, is180 = false) {
     const key = `${fromRot}>${toRot}`;
-    const kicks = S.current.key === "I" ? KICKS_I : S.current.key === "O" ? [[0, 0]] : KICKS_JLSTZ;
+    let kicks;
+    if (is180) {
+      kicks = KICKS_180;
+    } else {
+      kicks = S.current.key === "I" ? KICKS_I : S.current.key === "O" ? [[0, 0]] : KICKS_JLSTZ;
+    }
     const table = kicks[key] || [[0, 0]];
     for (const [dx, dy] of table) {
       if (validPos(S.current, dx, dy, newShape)) {
@@ -4605,10 +4616,14 @@ ${window.location.origin}`;
     }
     return false;
   }
-  function rotatePiece(ccw = false) {
+  function rotatePiece(dir = 1) {
     const from = S.current.rot;
-    const to = ccw ? (from + 3) % 4 : (from + 1) % 4;
-    _tryRotate(ccw ? rotateCCW(S.current.shape) : rotateCW(S.current.shape), from, to);
+    const to = (from + dir + 4) % 4;
+    let newShape;
+    if (dir === 1) newShape = rotateCW(S.current.shape);
+    else if (dir === -1) newShape = rotateCCW(S.current.shape);
+    else if (dir === 2) newShape = rotateCW(rotateCW(S.current.shape));
+    _tryRotate(newShape, from, to, dir === 2);
   }
   function cancelLock() {
     S.lockActive = false;
@@ -4917,12 +4932,16 @@ ${window.location.origin}`;
         break;
       case "ArrowUp":
       case "KeyX":
-        rotatePiece();
+        rotatePiece(1);
         break;
       case "KeyZ":
       case "ControlLeft":
       case "ControlRight":
-        rotatePiece(true);
+        rotatePiece(-1);
+        break;
+      case "KeyA":
+      case "ShiftRight":
+        rotatePiece(2);
         break;
       case "Space":
         hardDrop();
@@ -5057,8 +5076,9 @@ ${window.location.origin}`;
   makeTouchBtn("btn-left", () => moveX(-1), "repeat");
   makeTouchBtn("btn-right", () => moveX(1), "repeat");
   makeTouchBtn("btn-soft", () => softDrop(), "repeat");
-  makeTouchBtn("btn-rotate", () => rotatePiece(), "game");
-  makeTouchBtn("btn-rotate-ccw", () => rotatePiece(true), "game");
+  makeTouchBtn("btn-rotate", () => rotatePiece(1), "game");
+  makeTouchBtn("btn-rotate-ccw", () => rotatePiece(-1), "game");
+  makeTouchBtn("btn-rotate-180", () => rotatePiece(2), "game");
   makeTouchBtn("btn-drop", () => hardDrop(), "game");
   makeTouchBtn("btn-hold", () => holdPiece(), "game");
   makeTouchBtn("btn-pause", () => togglePause(), "any");
