@@ -270,9 +270,42 @@ function addScore(pts,n,tspin=false){
 
 function spawnPiece(){
   lastWasRotate=false;
-  S.current=makePiece(S.next.key);
+  
+  // IHS (Initial Hold System)
+  if (canHold && (KEYS['KeyC'] || KEYS['ShiftLeft'] || KEYS['ShiftRight'])) {
+    if (!S.held) {
+      S.held = makePiece(S.next.key);
+      S.current = makePiece(nextFromBag());
+      S.next = makePiece(nextFromBag());
+    } else {
+      S.current = makePiece(S.held.key);
+      S.held = makePiece(S.next.key);
+      S.next = makePiece(nextFromBag());
+    }
+    canHold = false;
+    sfxHold();
+    drawHold();
+  } else {
+    S.current = makePiece(S.next.key);
+    S.next = makePiece(nextFromBag());
+    canHold = true;
+  }
+  
+  // IRS (Initial Rotation System)
+  let rotShape = null, rotState = S.current.rot;
+  if (KEYS['ArrowUp'] || KEYS['KeyX']) {
+    rotShape = rotateCW(S.current.shape); rotState = (rotState + 1) % 4;
+  } else if (KEYS['KeyZ']) {
+    rotShape = rotateCCW(S.current.shape); rotState = (rotState + 3) % 4;
+  } else if (KEYS['KeyA']) {
+    rotShape = rotateCW(rotateCW(S.current.shape)); rotState = (rotState + 2) % 4;
+  }
+  
+  if (rotShape && validPos(S.current, 0, 0, rotShape)) {
+    S.current.shape = rotShape; S.current.rot = rotState;
+  }
+  
   S.lowestY = S.current.y; S.lockResets = 0;
-  S.next=makePiece(nextFromBag());canHold=true;
   drawNext();if(!validPos(S.current))endGame();
 }
 
