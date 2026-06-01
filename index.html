@@ -620,6 +620,25 @@
   .action-btn.sm { font-size:10px; padding:9px 18px; letter-spacing:2px; border-radius:6px; }
   .action-btn.ghost { background:transparent; border-color:rgba(255,255,255,0.22); color:rgba(255,255,255,0.55); }
   .action-btn.ghost:hover { border-color:rgba(0,200,255,0.45); color:var(--cyan); background:rgba(0,200,255,0.08); }
+  
+  .action-btn.play-btn {
+    font-size: 24px;
+    padding: 16px 24px;
+    letter-spacing: 8px;
+    background: linear-gradient(135deg, rgba(0,200,255,0.6), rgba(160,0,255,0.6));
+    border: 2px solid rgba(255,255,255,0.7);
+    text-shadow: 0 0 15px rgba(255,255,255,0.9);
+    animation: play-pulse 1.5s infinite alternate;
+  }
+  @keyframes play-pulse {
+    0% { box-shadow: 0 0 20px rgba(0,200,255,0.5), inset 0 0 10px rgba(160,0,255,0.3); transform: scale(1); }
+    100% { box-shadow: 0 0 40px rgba(0,200,255,0.9), inset 0 0 25px rgba(160,0,255,0.7); transform: scale(1.03); border-color: #fff; }
+  }
+  .action-btn.play-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 60px rgba(0,200,255,1), inset 0 0 30px rgba(255,255,255,0.8) !important;
+    background: linear-gradient(135deg, rgba(0,200,255,0.9), rgba(160,0,255,0.9));
+  }
   #daily-challenge-btn, #daily-launch-btn {
     background: linear-gradient(90deg, #ffe600, #ffaa00);
     box-shadow: 0 0 25px rgba(255, 170, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
@@ -1234,6 +1253,7 @@
     color: var(--cyan);
   }
 @keyframes text-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 8px rgba(0,200,255,0.8); } }
+html.low-perf .action-btn.play-btn { animation: none !important; }
 </style>
 <!-- Vercel Speed Insights -->
 <script defer src="/_vercel/speed-insights/script.js"></script>
@@ -3926,7 +3946,7 @@
         </div>
       </div>
       <div class="btn-row main-actions">
-        <button class="action-btn" onclick="showModeSelector()">PLAY</button>
+        <button class="action-btn play-btn" onclick="showModeSelector()">PLAY</button>
       </div>
       <div class="btn-row sub-actions">
         <button class="action-btn ghost" onclick="openHowToPlay()">HOW TO PLAY</button>
