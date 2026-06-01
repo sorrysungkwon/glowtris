@@ -138,6 +138,7 @@ function _tryRotate(newShape, fromRot, toRot, is180 = false) {
 }
 
 function rotatePiece(dir = 1) { // 1 = CW, -1 = CCW, 2 = 180
+  if (!S.current) return;
   const from = S.current.rot;
   const to = (from + dir + 4) % 4;
   let newShape;
@@ -298,16 +299,20 @@ function spawnPiece(fromHold = false){
   let rotShape = null, rotState = S.current.rot;
   if (KEYS['ArrowUp'] || KEYS['KeyX']) {
     rotShape = rotateCW(S.current.shape); rotState = (rotState + 1) % 4;
+    S.current.irsDir = 1;
   } else if (KEYS['KeyZ']) {
     rotShape = rotateCCW(S.current.shape); rotState = (rotState + 3) % 4;
+    S.current.irsDir = -1;
   } else if (KEYS['KeyA']) {
     rotShape = rotateCW(rotateCW(S.current.shape)); rotState = (rotState + 2) % 4;
+    S.current.irsDir = 2;
   }
   
   if (rotShape && validPos(S.current, 0, 0, rotShape)) {
     S.current.shape = rotShape; S.current.rot = rotState;
   }
   
+  S.current.justSpawned = true;
   S.lowestY = S.current.y; S.lockResets = 0; S.dcdTimer = S.dcd || 0;
   drawNext();if(!validPos(S.current))endGame();
 }
@@ -464,6 +469,13 @@ document.addEventListener('keyup',e=>{
 // ─── Tick callbacks ───────────────────────────────────────────────────────────
 function processInput(input){
   if(input.type!=='down')return;
+  
+  if (S.current && S.current.justSpawned) {
+    if ((input.code === 'ArrowUp' || input.code === 'KeyX') && S.current.irsDir === 1) return;
+    if ((input.code === 'KeyZ' || input.code === 'ControlLeft' || input.code === 'ControlRight') && S.current.irsDir === -1) return;
+    if (input.code === 'KeyA' && S.current.irsDir === 2) return;
+  }
+
   switch(input.code){
     case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
     case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
@@ -492,6 +504,7 @@ function _tickDAS(slot, key, action, dt){
 
 function gameTick(dt){
   if(!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
+  S.current.justSpawned = false;
   if(S.dcdTimer > 0) S.dcdTimer = Math.max(0, S.dcdTimer - dt);
   if(S.lockActive){
     S.lockTimer-=dt;
