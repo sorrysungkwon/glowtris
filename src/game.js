@@ -32,6 +32,7 @@ import {
   showDailyGateOverlay, startDailyChallenge, togglePause, _saveGameStats, _renderGameOverScreen,
   _renderSprintScreen, showStartScreen, showModeSelector
 } from './screens.js';
+import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
 
 document.addEventListener('gesturestart',  e=>e.preventDefault(), {passive:false});
 document.addEventListener('gesturechange', e=>e.preventDefault(), {passive:false});
@@ -43,8 +44,6 @@ let gameOver;
 let dropInterval;
 let animFrame;
 let bag=[];
-let lastDropTs=0;
-let prevTs=0;
 let _countdownTimer=null;
 let _prng=null;
 
@@ -283,13 +282,13 @@ function checkTSpin(){
 }
 
 // ─── Keyboard ─────────────────────────────────────────────────────────────────
-const KEYS={};let dasTimer=null;
+const KEYS={};
 
 function updateKeyGuideState(code, isPressed) {
   let el = null;
-  if (code === 'ArrowLeft' || code === 'ArrowRight' || code === 'KeyA' || code === 'KeyD') el = _keyGuide.move;
-  else if (code === 'ArrowUp'   || code === 'KeyW')  el = _keyGuide.rotate;
-  else if (code === 'ArrowDown' || code === 'KeyS')  el = _keyGuide.soft;
+  if (code === 'ArrowLeft' || code === 'ArrowRight') el = _keyGuide.move;
+  else if (code === 'ArrowUp')   el = _keyGuide.rotate;
+  else if (code === 'ArrowDown') el = _keyGuide.soft;
   else if (code === 'Space')                          el = _keyGuide.hard;
   else if (code === 'KeyC' || code === 'ShiftLeft')   el = _keyGuide.hold;
   else if (code === 'KeyP')                           el = _keyGuide.pause;
@@ -335,10 +334,10 @@ function handleUINavigation(e) {
     }
   }
 
-  const isDown = e.code === 'ArrowDown' || e.code === 'KeyS';
-  const isUp   = e.code === 'ArrowUp'   || e.code === 'KeyW';
-  const isRight= e.code === 'ArrowRight'|| e.code === 'KeyD';
-  const isLeft = e.code === 'ArrowLeft' || e.code === 'KeyA';
+  const isDown = e.code === 'ArrowDown';
+  const isUp   = e.code === 'ArrowUp';
+  const isRight= e.code === 'ArrowRight';
+  const isLeft = e.code === 'ArrowLeft';
 
   const scrollable = activeOverlay.querySelector('#htp-scroll, #stats-scroll');
   if (scrollable && (isDown || isUp)) {
@@ -391,27 +390,58 @@ document.addEventListener('keydown',e=>{
   if(!S.gameRunning)return;
   if(e.code==='KeyP' || e.code==='Escape'){togglePause();return;}
   if(S.gamePaused||S._countdownVal)return;
-  switch(e.code){
-    case'ArrowLeft':case'KeyA':  moveX(-1);startDAS(-1);break;
-    case'ArrowRight':case'KeyD': moveX(1); startDAS(1); break;
-    case'ArrowDown':case'KeyS':  softDrop();startDASDown();e.preventDefault();break;
-    case'ArrowUp':case'KeyW':case'KeyX': rotatePiece();break;
-    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(true);break;
-    case'Space':     hardDrop();e.preventDefault();break;
-    case'KeyC':case'ShiftLeft':holdPiece();break;
-  }
+  if(e.code==='ArrowDown'||e.code==='Space') e.preventDefault();
+  enqueueInput(e.code, 'down');
 });
 document.addEventListener('keyup',e=>{
   updateKeyGuideState(e.code, false);
   KEYS[e.code]=false;
-  if(e.code==='ArrowLeft'||e.code==='ArrowRight'||e.code==='KeyA'||e.code==='KeyD')clearDAS();
-  if(e.code==='ArrowDown'||e.code==='KeyS')clearDASDown();
 });
-function startDAS(d){clearDAS();dasTimer=setTimeout(()=>{dasTimer=setInterval(()=>{if(S.gameRunning&&!S.gamePaused)moveX(d);},S.arr);},S.das);}
-function clearDAS(){clearTimeout(dasTimer);clearInterval(dasTimer);dasTimer=null;}
-let dasDownTimer=null;
-function startDASDown(){clearDASDown();dasDownTimer=setTimeout(()=>{if(S.gameRunning&&!S.gamePaused)softDrop();dasDownTimer=setInterval(()=>{if(S.gameRunning&&!S.gamePaused)softDrop();},S.arr);},S.das);}
-function clearDASDown(){clearTimeout(dasDownTimer);clearInterval(dasDownTimer);dasDownTimer=null;}
+
+// ─── Tick callbacks ───────────────────────────────────────────────────────────
+function processInput(input){
+  if(input.type!=='down')return;
+  switch(input.code){
+    case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
+    case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
+    case'ArrowDown':  softDrop(); S.dasCharge.down=0; break;
+    case'ArrowUp':    rotatePiece();      break;
+    case'ControlLeft':case'ControlRight': rotatePiece(true); break;
+    case'Space':      hardDrop();         break;
+    case'KeyC':case'ShiftLeft': holdPiece(); break;
+  }
+}
+
+// DAS/ARR pulses fire when held duration crosses S.das + n*S.arr boundaries.
+// First ARR pulse fires at S.das + S.arr, matching the previous setTimeout/setInterval timing.
+function _tickDAS(slot, key, action, dt){
+  if(!KEYS[key]){S.dasCharge[slot]=0;return;}
+  const prev=S.dasCharge[slot];
+  S.dasCharge[slot]+=dt;
+  if(S.dasCharge[slot]<S.das)return;
+  const arr=Math.max(1,S.arr);
+  const pulsesPrev=Math.floor(Math.max(0,prev-S.das)/arr);
+  const pulsesNow =Math.floor((S.dasCharge[slot]-S.das)/arr);
+  for(let i=pulsesPrev;i<pulsesNow;i++) action();
+}
+
+function gameTick(dt){
+  if(!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
+  if(S.lockActive){
+    S.lockTimer-=dt;
+    if(S.lockTimer<=0){lockPiece();return;}
+  }else{
+    S.gravityTimer+=dt;
+    while(S.gravityTimer>=dropInterval){
+      S.gravityTimer-=dropInterval;
+      if(validPos(S.current,0,1)){S.current.y++;spawnDropTrail(S.current);}
+      else{S.lockActive=true;S.lockTimer=S.lockMs;S.gravityTimer=0;break;}
+    }
+  }
+  _tickDAS('left', 'ArrowLeft', ()=>moveX(-1), dt);
+  _tickDAS('right','ArrowRight',()=>moveX(1),  dt);
+  _tickDAS('down', 'ArrowDown', softDrop,      dt);
+}
 
 function moveX(d){if(!S.current)return;if(validPos(S.current,d)){S.current.x+=d;cancelLock();lastWasRotate=false;sfxMove();}}
 function softDrop(){if(!S.current)return;if(validPos(S.current,0,1)){S.current.y++;S.score+=1;updateUI();cancelLock();lastWasRotate=false;spawnDropTrail(S.current);}else{if(!S.lockActive){S.lockActive=true;S.lockTimer=S.lockMs;}}}
@@ -448,14 +478,11 @@ makeTouchBtn('btn-hold',  ()=>holdPiece(),'game');
 makeTouchBtn('btn-pause', ()=>togglePause(),'any');
 
 // ─── Game loop ────────────────────────────────────────────────────────────────
+// RAF drives rendering; logic advances on a fixed 1ms tick inside tickLoop.
 function gameLoop(ts){
   measureFPS(ts);
-  const dt=prevTs?Math.min(ts-prevTs,100):16;prevTs=ts;
+  tickLoop(ts, { onInput: processInput, onTick: gameTick });
   drawBackground();
-  if(!S.gamePaused&&S.gameRunning&&S.current&&!S._countdownVal){
-    if(S.lockActive){S.lockTimer-=dt;if(S.lockTimer<=0)lockPiece();}
-    else if(ts-lastDropTs>dropInterval){lastDropTs=ts;if(validPos(S.current,0,1)){S.current.y++;spawnDropTrail(S.current);}else{S.lockActive=true;S.lockTimer=S.lockMs;}}
-  }
   if(S.isSprintMode&&S.gameRunning&&!S.gamePaused&&!S._countdownVal)updateSprintTimer();
   drawBoard();updateParticles();applyShake();
   animFrame=requestAnimationFrame(gameLoop);
@@ -499,6 +526,7 @@ function _doStartGame(){
   S.board=createBoard();S.score=0;S.lines=0;S.level=1;S.combo=0;S.maxCombo=0;dropInterval=800;
   S.particles=[];S.shakeFrames=0;S.shakeMag=0.4;S.shakeAllDir=false;S.flashLines=new Set();S.flashTimer=0;
   S.lockTimer=0;S.lockActive=false;lastWasRotate=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
+  S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
   bag=[];refillBag();S.next=makePiece(nextFromBag());S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
@@ -519,7 +547,7 @@ function _doStartGame(){
   spawnPiece();drawNext();drawHold();updateUI();
   if(S.isSprintMode)updateSprintTimer();
   if(animFrame)cancelAnimationFrame(animFrame);
-  prevTs=0;lastDropTs=performance.now();
+  resetLoop(performance.now());
   startBGM();
   // 3-2-1 countdown before pieces start falling
   S._countdownGo=0;
@@ -533,7 +561,7 @@ function _doStartGame(){
     if(S._countdownVal<=0){
       clearInterval(_countdownTimer);_countdownTimer=null;S._countdownVal=0;
       S._countdownGo=55;
-      lastDropTs=performance.now();
+      S.gravityTimer=0;
       if(S.isSprintMode)S._sprintStartTime=performance.now();
       if(!S.muteAudio){[523,659,784].forEach((f,i)=>playBeep(f,'sawtooth',.16,.3,i*.04));}
     }else{
@@ -562,8 +590,7 @@ export function resumeGameTiming() {
     S._sprintStartTime += performance.now() - _sprintPauseTs;
     _sprintPauseTs = 0;
   }
-  lastDropTs = performance.now();
-  prevTs = 0;
+  resetLoop(performance.now());
 }
 
 export function stopGameAndReset() {
@@ -687,7 +714,7 @@ window.addEventListener('beforeunload',()=>{
 });
 
 // ─── Error monitoring ─────────────────────────────────────────────────────────
-const _VERSION = 'v1.1.1';
+const _VERSION = 'v0.2.0';
 window.onerror = function(msg, src, line, col, err) {
   console.error('[glowtris ' + _VERSION + '] uncaught error', {
     msg, src: src ? src.replace(window.location.origin, '') : src, line, col,
