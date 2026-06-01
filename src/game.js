@@ -129,7 +129,8 @@ function _tryRotate(newShape, fromRot, toRot, is180 = false) {
       S.current.x += dx;
       S.current.y += dy;
       S.current.rot = toRot;
-      cancelLock(); lastWasRotate = true; sfxRotate();
+      if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
+      cancelLock(); lastWasRotate=true; sfxRotate();
       return true;
     }
   }
@@ -147,7 +148,15 @@ function rotatePiece(dir = 1) { // 1 = CW, -1 = CCW, 2 = 180
   _tryRotate(newShape, from, to, dir === 2);
 }
 
-function cancelLock(){S.lockActive=false;S.lockTimer=0;}
+function cancelLock(){
+  if (S.lockActive) {
+    if (S.lockResets < 15) {
+      S.lockActive = false; S.lockTimer = 0; S.lockResets++;
+    }
+  } else {
+    S.lockActive = false; S.lockTimer = 0;
+  }
+}
 
 function lockPiece(){
   const tspin=checkTSpin();
@@ -261,16 +270,18 @@ function addScore(pts,n,tspin=false){
 
 function spawnPiece(){
   lastWasRotate=false;
-  S.current=makePiece(S.next.key);S.next=makePiece(nextFromBag());canHold=true;
+  S.current=makePiece(S.next.key);
+  S.lowestY = S.current.y; S.lockResets = 0;
+  S.next=makePiece(nextFromBag());canHold=true;
   drawNext();if(!validPos(S.current))endGame();
 }
 
 function holdPiece(){
-  if(!canHold||!S.gameRunning||S.gamePaused)return;
-  canHold=false;sfxHold();
-  if(S.held){const pk=S.held.key;S.held=makePiece(S.current.key);S.current=makePiece(pk);}
-  else{S.held=makePiece(S.current.key);S.current=makePiece(S.next.key);S.next=makePiece(nextFromBag());drawNext();}
-  cancelLock();drawHold();
+  if(!canHold||!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
+  if(!S.held){S.held=makePiece(S.current.key);spawnPiece();}
+  else{const t=S.current.key;S.current=makePiece(S.held.key);S.held=makePiece(t);if(!validPos(S.current))endGame();}
+  S.lowestY = S.current.y; S.lockResets = 0;
+  canHold=false;cancelLock();drawHold();
 }
 
 // ─── Ghost ────────────────────────────────────────────────────────────────────
@@ -454,6 +465,7 @@ function gameTick(dt){
         const gy=getGhostY();
         if(S.current.y<gy){
           S.score+=(gy-S.current.y); S.current.y=gy;
+          if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
           spawnDropTrail(S.current); cancelLock(); lastWasRotate=false; updateUI();
         }
         gTimer=dropInterval;
@@ -466,6 +478,7 @@ function gameTick(dt){
       S.gravityTimer-=dropInterval;
       if(validPos(S.current,0,1)){
         S.current.y++;
+        if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
         if(KEYS['ArrowDown'])S.score+=1;
         spawnDropTrail(S.current);
         if(S.gravityTimer<dropInterval) updateUI();
