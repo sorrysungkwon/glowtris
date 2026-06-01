@@ -389,7 +389,7 @@
     background:rgba(0,200,255,0.16);
     border-color: var(--cyan);
     box-shadow:0 0 30px rgba(0,200,255,0.6), inset 0 0 15px rgba(0,200,255,0.5);
-    transform:scale(0.90);
+    transform:scale(0.96);
   }
   .tbtn.pressed::after {
     width: 200px; height: 200px;
@@ -696,7 +696,7 @@
     #game-row { flex:1 1 0; min-height:0; align-items:center; justify-content:center; }
 
     #touch-controls.nes-layout {
-      width: min(380px, 96vw); /* Wider to accommodate split */
+      width: min(340px, 98vw); /* Stay within typical mobile width */
       padding-bottom: 20px;
       display: flex;
       flex-direction: row;
@@ -708,40 +708,39 @@
 
     .nes-dpad {
       display: grid;
-      grid-template-columns: 50px 50px 50px;
-      grid-template-rows: 50px 50px 50px;
-      gap: 4px;
+      grid-template-columns: 46px 46px 46px;
+      grid-template-rows: 46px 46px 46px;
+      gap: 2px;
     }
     .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 8px 8px 4px 4px; }
     .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 8px 4px 4px 8px; }
     .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 8px 8px 4px; }
     .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 8px 8px; }
-    .nes-dpad .tbtn { height: 100%; font-size: 28px; }
+    .nes-dpad .tbtn { height: 100%; font-size: 26px; }
 
-    .nes-center {
+    .nes-right-panel {
       display: flex;
+      flex-direction: column;
       align-items: flex-end;
-      padding-bottom: 20px;
+      gap: 12px;
     }
-    .nes-center #btn-hold {
-      width: 50px; height: 50px;
-      border-radius: 12px;
-      font-size: 24px;
+
+    #btn-hold {
+      width: 140px; /* Long horizontal */
+      height: 48px;
+      border-radius: 8px;
+      font-size: 20px;
     }
 
     .nes-actions {
       display: flex;
       gap: 12px;
-      padding-bottom: 15px;
     }
     .nes-actions #btn-rotate-ccw, 
     .nes-actions #btn-rotate {
-      width: 65px; height: 65px;
+      width: 64px; height: 64px;
       border-radius: 50%;
-      font-size: 32px;
-    }
-    .nes-actions #btn-rotate-ccw {
-      transform: translateY(15px); /* Offset B button lower like NES */
+      font-size: 30px;
     }
   }
 
@@ -754,9 +753,9 @@
       grid-template-columns: 65px 65px 65px;
       grid-template-rows: 65px 65px 65px;
     }
-    .nes-center #btn-hold { width: 65px; height: 65px; }
+    #btn-hold { width: 170px; height: 60px; }
     .nes-actions #btn-rotate-ccw, 
-    .nes-actions #btn-rotate { width: 85px; height: 85px; }
+    .nes-actions #btn-rotate { width: 78px; height: 78px; }
   }
 
   /* ─── Performance mode indicator ─── */

@@ -177,7 +177,7 @@
     <!-- D-Pad (Left side) -->
     <div class="nes-dpad">
       <button class="tbtn tbtn-drop" id="btn-drop">
-        <span class="material-icons-round">arrow_upward</span>
+        <span class="material-icons-round">keyboard_double_arrow_down</span>
       </button>
       <button class="tbtn" id="btn-left">
         <span class="material-icons-round">chevron_left</span>
@@ -189,20 +189,23 @@
         <span class="material-icons-round">keyboard_arrow_down</span>
       </button>
     </div>
-    <!-- Center (Hold) -->
-    <div class="nes-center">
+    
+    <!-- Right Panel (Hold + Actions) -->
+    <div class="nes-right-panel">
+      <!-- Hold Button (Long horizontal) -->
       <button class="tbtn tbtn-hold" id="btn-hold">
         <span class="material-icons-round">swap_horiz</span>
+        <span class="hold-text" style="font-size:12px; font-weight:700; font-family:'Orbitron',monospace; margin-left:6px; letter-spacing:2px">HOLD</span>
       </button>
-    </div>
-    <!-- Action Buttons (Right side) -->
-    <div class="nes-actions">
-      <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
-        <span class="material-icons-round">rotate_left</span>
-      </button>
-      <button class="tbtn tbtn-rotate" id="btn-rotate">
-        <span class="material-icons-round">rotate_right</span>
-      </button>
+      <!-- Action Buttons (Side by Side) -->
+      <div class="nes-actions">
+        <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+          <span class="material-icons-round">rotate_left</span>
+        </button>
+        <button class="tbtn tbtn-rotate" id="btn-rotate">
+          <span class="material-icons-round">rotate_right</span>
+        </button>
+      </div>
     </div>
   </div>
 
