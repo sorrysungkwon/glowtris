@@ -792,18 +792,25 @@
       width: 100%;
     }
 
-    #btn-hold {
-      width: 100%; /* Long horizontal */
-      height: 54px;
-      border-radius: 8px;
-      font-size: 22px;
+    .nes-top-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      width: 100%;
     }
-    .hold-text {
-      font-size: 11px;
+    #btn-hold, #btn-rotate-180 {
+      width: 64px;
+      height: 54px;
+      border-radius: 12px;
+      font-size: 22px;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .btn-lbl {
+      font-size: 8px;
       font-weight: 700;
       font-family: 'Orbitron', monospace;
-      margin-left: 6px;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
     }
 
     .nes-actions {
@@ -828,7 +835,9 @@
       grid-template-rows: 60px 60px 60px;
     }
     .nes-right-panel { gap: 26px; }
-    #btn-hold { height: 74px; font-size: 28px; }
+    .nes-top-actions { gap: 14px; }
+    #btn-hold, #btn-rotate-180 { width: 86px; height: 74px; font-size: 32px; }
+    .btn-lbl { font-size: 11px; }
     .nes-actions { gap: 14px; }
     .nes-actions #btn-rotate-ccw, 
     .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
@@ -1372,10 +1381,16 @@
     <div class="control-group">
       <div class="group-label">ACTIONS</div>
       <div class="nes-right-panel">
-        <button class="tbtn tbtn-hold" id="btn-hold">
-          <span class="material-icons-round">swap_horiz</span>
-          <span class="hold-text">HOLD</span>
-        </button>
+        <div class="nes-top-actions">
+          <button class="tbtn tbtn-hold" id="btn-hold">
+            <span class="material-icons-round">swap_horiz</span>
+            <span class="btn-lbl">HOLD</span>
+          </button>
+          <button class="tbtn tbtn-rotate" id="btn-rotate-180">
+            <span class="material-icons-round">sync</span>
+            <span class="btn-lbl">180°</span>
+          </button>
+        </div>
         <div class="nes-actions">
           <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
             <span class="material-icons-round">rotate_left</span>
