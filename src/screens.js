@@ -1,7 +1,7 @@
 import { S, LS, SPRINT_LINES, fmtTime, _getLifetime } from './shared.js';
 import { pauseBGM, resumeBGM, stopBGM, toggleMute } from './audio.js';
 import {
-  updateDAS, updateARR, updateLockDelay, updateGhost, updateColorblind,
+  updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind,
   cycleAnimIntensity, _animLabel, openHowToPlay, openStats, unlockAchievement
 } from './ui.js';
 import {
@@ -120,6 +120,11 @@ export function togglePause(){
             <span class="settings-lbl">ARR</span>
             <input type="range" class="neon-range" min="0" max="100" value="${S.arr}" oninput="updateARR(this.value)">
             <span class="settings-val" id="ov-arr-val">${S.arr}ms</span>
+          </div>
+          <div class="settings-row">
+            <span class="settings-lbl">SDF</span>
+            <input type="range" class="neon-range" min="0" max="40" value="${S.sdf}" oninput="updateSDF(this.value)">
+            <span class="settings-val" id="ov-sdf-val">${S.sdf === 0 ? '∞' : S.sdf + 'x'}</span>
           </div>
           <div class="settings-row">
             <span class="settings-lbl">LOCK</span>

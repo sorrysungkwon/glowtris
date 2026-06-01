@@ -938,6 +938,10 @@ export function updateDAS(v) {
   S.das = parseInt(v); localStorage.setItem(LS.DAS, v);
   const el = document.getElementById('ov-das-val'); if (el) el.textContent = v + 'ms';
 }
+export function updateSDF(v) {
+  S.sdf = parseInt(v); localStorage.setItem(LS.SDF, v);
+  const el = document.getElementById('ov-sdf-val'); if (el) el.textContent = S.sdf === 0 ? '∞' : S.sdf + 'x';
+}
 export function updateARR(v) {
   S.arr = parseInt(v); localStorage.setItem(LS.ARR, v);
   const el = document.getElementById('ov-arr-val'); if (el) el.textContent = v + 'ms';
