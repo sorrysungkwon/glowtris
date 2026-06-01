@@ -405,8 +405,8 @@ function processInput(input){
     case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
     case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
     case'ArrowDown':  softDrop(); S.dasCharge.down=0; break;
-    case'ArrowUp':    rotatePiece();      break;
-    case'ControlLeft':case'ControlRight': rotatePiece(true); break;
+    case'ArrowUp':case'KeyX': rotatePiece();      break;
+    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(true); break;
     case'Space':      hardDrop();         break;
     case'KeyC':case'ShiftLeft': holdPiece(); break;
   }
@@ -473,6 +473,7 @@ makeTouchBtn('btn-left',  ()=>moveX(-1),  'repeat');
 makeTouchBtn('btn-right', ()=>moveX(1),   'repeat');
 makeTouchBtn('btn-soft',  ()=>softDrop(), 'repeat');
 makeTouchBtn('btn-rotate',()=>rotatePiece(),'game');
+makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(true),'game');
 makeTouchBtn('btn-drop',  ()=>hardDrop(), 'game');
 makeTouchBtn('btn-hold',  ()=>holdPiece(),'game');
 makeTouchBtn('btn-pause', ()=>togglePause(),'any');
@@ -714,7 +715,7 @@ window.addEventListener('beforeunload',()=>{
 });
 
 // ─── Error monitoring ─────────────────────────────────────────────────────────
-const _VERSION = 'v0.2.0';
+const _VERSION = 'v0.2.1';
 window.onerror = function(msg, src, line, col, err) {
   console.error('[glowtris ' + _VERSION + '] uncaught error', {
     msg, src: src ? src.replace(window.location.origin, '') : src, line, col,
