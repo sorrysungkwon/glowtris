@@ -718,6 +718,14 @@
     }
     #tc-sys .tbtn .material-icons-round { font-size:18px; }
 
+    /* Row 1 — hard drop: full-width, shorter than action row */
+    #tc-drop .tbtn {
+      flex:1; min-width:0;
+      height:40px;
+      border-radius:10px;
+      font-size:clamp(20px, 5.5vw, 28px);
+    }
+
     /* Row 2 — actions: equal-width, medium height */
     #tc-act .tbtn {
       flex:1; min-width:0;
@@ -743,6 +751,8 @@
     #mobile-header { width: 340px; }
 
     #tc-sys .tbtn  { height:34px; font-size:20px; padding:0 22px; }
+
+    #tc-drop .tbtn { height:46px; font-size:30px; border-radius:12px; }
 
     #tc-act .tbtn  { height:64px; font-size:30px; border-radius:12px; }
 
