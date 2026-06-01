@@ -174,37 +174,42 @@
 
   <!-- Touch controls (all screens) -->
   <div id="touch-controls" class="nes-layout">
-    <!-- D-Pad (Left side) -->
-    <div class="nes-dpad">
-      <button class="tbtn tbtn-drop" id="btn-drop">
-        <span class="material-icons-round">keyboard_double_arrow_down</span>
-      </button>
-      <button class="tbtn" id="btn-left">
-        <span class="material-icons-round">chevron_left</span>
-      </button>
-      <button class="tbtn" id="btn-right">
-        <span class="material-icons-round">chevron_right</span>
-      </button>
-      <button class="tbtn" id="btn-soft">
-        <span class="material-icons-round">keyboard_arrow_down</span>
-      </button>
+    <!-- MOVEMENT GROUP (Gestalt: Common Region) -->
+    <div class="control-group">
+      <div class="group-label">MOVEMENT</div>
+      <div class="nes-dpad">
+        <button class="tbtn tbtn-drop" id="btn-drop">
+          <span class="material-icons-round">keyboard_double_arrow_down</span>
+        </button>
+        <button class="tbtn" id="btn-left">
+          <span class="material-icons-round">chevron_left</span>
+        </button>
+        <div class="dpad-center"></div>
+        <button class="tbtn" id="btn-right">
+          <span class="material-icons-round">chevron_right</span>
+        </button>
+        <button class="tbtn" id="btn-soft">
+          <span class="material-icons-round">keyboard_arrow_down</span>
+        </button>
+      </div>
     </div>
     
-    <!-- Right Panel (Hold + Actions) -->
-    <div class="nes-right-panel">
-      <!-- Hold Button (Long horizontal) -->
-      <button class="tbtn tbtn-hold" id="btn-hold">
-        <span class="material-icons-round">swap_horiz</span>
-        <span class="hold-text" style="font-size:12px; font-weight:700; font-family:'Orbitron',monospace; margin-left:6px; letter-spacing:2px">HOLD</span>
-      </button>
-      <!-- Action Buttons (Side by Side) -->
-      <div class="nes-actions">
-        <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
-          <span class="material-icons-round">rotate_left</span>
+    <!-- ACTION GROUP (Gestalt: Common Region) -->
+    <div class="control-group">
+      <div class="group-label">ACTIONS</div>
+      <div class="nes-right-panel">
+        <button class="tbtn tbtn-hold" id="btn-hold">
+          <span class="material-icons-round">swap_horiz</span>
+          <span class="hold-text">HOLD</span>
         </button>
-        <button class="tbtn tbtn-rotate" id="btn-rotate">
-          <span class="material-icons-round">rotate_right</span>
-        </button>
+        <div class="nes-actions">
+          <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+            <span class="material-icons-round">rotate_left</span>
+          </button>
+          <button class="tbtn tbtn-rotate" id="btn-rotate">
+            <span class="material-icons-round">rotate_right</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -738,44 +738,82 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: stretch;
       gap: 10px;
     }
     #mobile-header { width: min(340px, 92vw); }
 
+    .control-group {
+      flex: 1;
+      background: rgba(4, 4, 30, 0.4);
+      border: 1px solid rgba(0, 200, 255, 0.12);
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 15px rgba(0,0,40,0.5);
+    }
+    .group-label {
+      font-size: 8px;
+      font-weight: 700;
+      color: rgba(0, 200, 255, 0.4);
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
     .nes-dpad {
       display: grid;
-      grid-template-columns: 46px 46px 46px;
-      grid-template-rows: 46px 46px 46px;
-      gap: 2px;
+      grid-template-columns: 44px 44px 44px;
+      grid-template-rows: 44px 44px 44px;
+      gap: 3px;
     }
-    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 8px 8px 4px 4px; }
-    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 8px 4px 4px 8px; }
-    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 8px 8px 4px; }
-    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 8px 8px; }
+    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 10px 10px 4px 4px; }
+    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 10px 4px 4px 10px; }
+    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 10px 10px 4px; }
+    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 10px 10px; }
     .nes-dpad .tbtn { height: 100%; font-size: 26px; }
+    
+    .dpad-center {
+      grid-column: 2; grid-row: 2;
+      background: rgba(2, 2, 22, 0.7);
+      border: 1px solid rgba(0, 200, 255, 0.2);
+      border-radius: 4px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
 
     .nes-right-panel {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: center;
       gap: 12px;
+      width: 100%;
     }
 
     #btn-hold {
-      width: 140px; /* Long horizontal */
-      height: 48px;
+      width: 100%; /* Long horizontal */
+      height: 44px;
       border-radius: 8px;
       font-size: 20px;
+    }
+    .hold-text {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Orbitron', monospace;
+      margin-left: 6px;
+      letter-spacing: 2px;
     }
 
     .nes-actions {
       display: flex;
       gap: 12px;
+      justify-content: center;
     }
     .nes-actions #btn-rotate-ccw, 
     .nes-actions #btn-rotate {
-      width: 64px; height: 64px;
+      width: 60px; height: 60px;
       border-radius: 50%;
       font-size: 30px;
     }
@@ -1309,37 +1347,42 @@
 
   <!-- Touch controls (all screens) -->
   <div id="touch-controls" class="nes-layout">
-    <!-- D-Pad (Left side) -->
-    <div class="nes-dpad">
-      <button class="tbtn tbtn-drop" id="btn-drop">
-        <span class="material-icons-round">keyboard_double_arrow_down</span>
-      </button>
-      <button class="tbtn" id="btn-left">
-        <span class="material-icons-round">chevron_left</span>
-      </button>
-      <button class="tbtn" id="btn-right">
-        <span class="material-icons-round">chevron_right</span>
-      </button>
-      <button class="tbtn" id="btn-soft">
-        <span class="material-icons-round">keyboard_arrow_down</span>
-      </button>
+    <!-- MOVEMENT GROUP (Gestalt: Common Region) -->
+    <div class="control-group">
+      <div class="group-label">MOVEMENT</div>
+      <div class="nes-dpad">
+        <button class="tbtn tbtn-drop" id="btn-drop">
+          <span class="material-icons-round">keyboard_double_arrow_down</span>
+        </button>
+        <button class="tbtn" id="btn-left">
+          <span class="material-icons-round">chevron_left</span>
+        </button>
+        <div class="dpad-center"></div>
+        <button class="tbtn" id="btn-right">
+          <span class="material-icons-round">chevron_right</span>
+        </button>
+        <button class="tbtn" id="btn-soft">
+          <span class="material-icons-round">keyboard_arrow_down</span>
+        </button>
+      </div>
     </div>
     
-    <!-- Right Panel (Hold + Actions) -->
-    <div class="nes-right-panel">
-      <!-- Hold Button (Long horizontal) -->
-      <button class="tbtn tbtn-hold" id="btn-hold">
-        <span class="material-icons-round">swap_horiz</span>
-        <span class="hold-text" style="font-size:12px; font-weight:700; font-family:'Orbitron',monospace; margin-left:6px; letter-spacing:2px">HOLD</span>
-      </button>
-      <!-- Action Buttons (Side by Side) -->
-      <div class="nes-actions">
-        <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
-          <span class="material-icons-round">rotate_left</span>
+    <!-- ACTION GROUP (Gestalt: Common Region) -->
+    <div class="control-group">
+      <div class="group-label">ACTIONS</div>
+      <div class="nes-right-panel">
+        <button class="tbtn tbtn-hold" id="btn-hold">
+          <span class="material-icons-round">swap_horiz</span>
+          <span class="hold-text">HOLD</span>
         </button>
-        <button class="tbtn tbtn-rotate" id="btn-rotate">
-          <span class="material-icons-round">rotate_right</span>
-        </button>
+        <div class="nes-actions">
+          <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+            <span class="material-icons-round">rotate_left</span>
+          </button>
+          <button class="tbtn tbtn-rotate" id="btn-rotate">
+            <span class="material-icons-round">rotate_right</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
