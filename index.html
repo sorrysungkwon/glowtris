@@ -4586,7 +4586,7 @@ ${window.location.origin}`;
   }
   function makePiece(key) {
     const d = PIECES[key];
-    return { key, shape: d.shape.map((r) => [...r]), color: d.color, x: Math.floor(COLS / 2) - Math.floor(d.shape[0].length / 2), y: 0, rot: 0 };
+    return { key, shape: d.shape.map((r) => [...r]), color: d.color, x: Math.floor(COLS / 2) - Math.floor(d.shape[0].length / 2), y: -1, rot: 0 };
   }
   var KICKS_JLSTZ = {
     "0>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
