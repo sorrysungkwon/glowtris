@@ -751,15 +751,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 20px;
       width: 100%;
     }
 
     #btn-hold {
       width: 100%; /* Long horizontal */
-      height: 44px;
+      height: 54px;
       border-radius: 8px;
-      font-size: 20px;
+      font-size: 22px;
     }
     .hold-text {
       font-size: 11px;
@@ -776,24 +776,25 @@
     }
     .nes-actions #btn-rotate-ccw, 
     .nes-actions #btn-rotate {
-      width: 60px; height: 60px;
+      width: 64px; height: 64px;
       border-radius: 50%;
-      font-size: 30px;
+      font-size: 32px;
     }
   }
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
     #touch-controls.nes-layout { width: 500px; padding-bottom: 30px; }
-    #mobile-header { width: 340px; }
-
+    .control-group { padding: 14px; }
     .nes-dpad {
-      grid-template-columns: 65px 65px 65px;
-      grid-template-rows: 65px 65px 65px;
+      grid-template-columns: 60px 60px 60px;
+      grid-template-rows: 60px 60px 60px;
     }
-    #btn-hold { width: 170px; height: 60px; }
+    .nes-right-panel { gap: 26px; }
+    #btn-hold { height: 74px; font-size: 28px; }
+    .nes-actions { gap: 14px; }
     .nes-actions #btn-rotate-ccw, 
-    .nes-actions #btn-rotate { width: 78px; height: 78px; }
+    .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
   }
 
   /* ─── Performance mode indicator ─── */
