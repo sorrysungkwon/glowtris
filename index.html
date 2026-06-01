@@ -755,6 +755,14 @@
     }
     #tc-sys .tbtn .material-icons-round { font-size:18px; }
 
+    /* Row 1 — hard drop: full-width, shorter than action row */
+    #tc-drop .tbtn {
+      flex:1; min-width:0;
+      height:40px;
+      border-radius:10px;
+      font-size:clamp(20px, 5.5vw, 28px);
+    }
+
     /* Row 2 — actions: equal-width, medium height */
     #tc-act .tbtn {
       flex:1; min-width:0;
@@ -780,6 +788,8 @@
     #mobile-header { width: 340px; }
 
     #tc-sys .tbtn  { height:34px; font-size:20px; padding:0 22px; }
+
+    #tc-drop .tbtn { height:46px; font-size:30px; border-radius:12px; }
 
     #tc-act .tbtn  { height:64px; font-size:30px; border-radius:12px; }
 
@@ -1300,7 +1310,13 @@
 
   <!-- Touch controls (all screens) -->
   <div id="touch-controls">
-    <!-- Row 2: actions (hold / CCW / CW / drop) — medium -->
+    <!-- Row 1: hard drop — isolated, full-width to prevent misclick from rotation -->
+    <div id="tc-drop" class="ctrl-row">
+      <button class="tbtn tbtn-drop" id="btn-drop">
+        <span class="material-icons-round">keyboard_double_arrow_down</span>
+      </button>
+    </div>
+    <!-- Row 2: actions (hold / CCW / CW) — medium -->
     <div id="tc-act" class="ctrl-row">
       <button class="tbtn tbtn-hold" id="btn-hold">
         <span class="material-icons-round">swap_horiz</span>
@@ -1310,9 +1326,6 @@
       </button>
       <button class="tbtn tbtn-rotate" id="btn-rotate">
         <span class="material-icons-round">rotate_right</span>
-      </button>
-      <button class="tbtn tbtn-drop" id="btn-drop">
-        <span class="material-icons-round">keyboard_double_arrow_down</span>
       </button>
     </div>
     <!-- Row 3: movement (← / soft / →) — largest, bottom -->
