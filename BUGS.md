@@ -87,18 +87,21 @@ _No open bugs._
 - **Reference implementation:** Raycast to wall via `ΔX_max_to_wall` (paper §4.1). Equivalent loop-in-one-tick implementations are acceptable.
 - **Status:** 🔲 Open
 
-### [ARCH-004] WebGL2 renderer migration
+### [ARCH-004] WebGL2 renderer migration (via PixiJS)
 - **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
 - **Symptom:** Board, current piece, ghost, particles drawn via Canvas2D `fillRect`/`stroke*` each frame. Caps effective framerate at ~60fps regardless of monitor. Suspected source of [BUG-004] state leaks on Chrome. Neon/glow effects bounded by `shadowBlur` performance ceiling.
 - **Acceptance criteria:** Render at the full monitor refresh rate (144Hz+ on capable displays). Particle systems sustain 1000+ active particles with no frame drops. No Canvas2D state-leak regressions. Mobile thermal/battery improvement measurable.
-- **Reference implementation:** WebGL2 VBO + uniform updates + single draw call per layer (paper §5.1). TETR.IO migrated to WebGL2 ~2024 for the same reasons (high-refresh monitors, high PPS rendering load, mobile PWA, signature shader effects).
-- **Why Critical (not Low):** The "fanboy-grade" target shifted our user profile assumption — competitive players bias heavily toward 144Hz+ monitors. Glowtris's identity is neon/glow effects, which are bounded by Canvas2D `shadowBlur` performance. WebGL2 is needed for both ceiling and identity.
+- **Approach: PixiJS** — chosen over raw WebGL2 because the maintainer is not a WebGL specialist. PixiJS gives WebGL2 acceleration with a Canvas2D-grade API, debuggable without GPU-level expertise. Bundle cost ~+400KB (acceptable in our domain).
+- **Reference:** TETR.IO migrated to raw WebGL2 ~2024 for the same reasons (high-refresh monitors, high PPS rendering load, mobile PWA, signature shader effects). PixiJS achieves equivalent results with much lower maintenance burden.
+- **Why Critical (not Low):** The "fanboy-grade" target shifted our user profile assumption — competitive players bias heavily toward 144Hz+ monitors. Glowtris's identity is neon/glow effects, which are bounded by Canvas2D `shadowBlur` performance. GPU rendering is needed for both ceiling and identity.
 - **Staged rollout (planned across v0.5.0~v0.5.3):**
-  - v0.5.0 — board + current piece + ghost on WebGL2; particles/background/UI stay on Canvas2D
-  - v0.5.1 — particle system on WebGL2 (instanced rendering, 1000+ particles)
-  - v0.5.2 — background nebula shader (real-time gradient)
-  - v0.5.3 — line-clear / T-spin / Glowtris shader effects (RGB split, distortion, bloom)
-  - Each substage keeps a Canvas2D fallback path for shader-compile failures
+  - v0.5.0 — PixiJS Application set up; board + current piece + ghost migrated to PIXI.Graphics / sprite cache
+  - v0.5.1 — particle system migrated (PIXI.ParticleContainer, instanced)
+  - v0.5.2 — background nebula via PIXI.Filter (shader gradient)
+  - v0.5.3 — line-clear / T-spin / Glowtris shader effects via PIXI.Filter (bloom, RGB split, distortion)
+  - Render interpolation between 1ms ticks added in v0.5.0 (decoupled from logic)
+  - Each substage keeps a Canvas2D fallback for WebGL-unsupported clients
+- **Complementary high-Hz ideas (under evaluation):** OffscreenCanvas + Worker (PixiJS supported), CSS transform for UI text elements, RAF priority hints.
 - **Status:** 🔲 Open
 
 ### [ARCH-005] Low-latency audio dispatch
