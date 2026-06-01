@@ -4821,9 +4821,9 @@ ${window.location.origin}`;
     updateUI();
     showScorePopup(pts, n, tspin);
   }
-  function spawnPiece() {
+  function spawnPiece(fromHold = false) {
     lastWasRotate = false;
-    if (canHold && (KEYS["KeyC"] || KEYS["ShiftLeft"] || KEYS["ShiftRight"])) {
+    if (!fromHold && canHold && (KEYS["KeyC"] || KEYS["ShiftLeft"] || KEYS["ShiftRight"])) {
       if (!S.held) {
         S.held = makePiece(S.next.key);
         S.current = makePiece(nextFromBag());
@@ -4839,7 +4839,7 @@ ${window.location.origin}`;
     } else {
       S.current = makePiece(S.next.key);
       S.next = makePiece(nextFromBag());
-      canHold = true;
+      if (!fromHold) canHold = true;
     }
     let rotShape = null, rotState = S.current.rot;
     if (KEYS["ArrowUp"] || KEYS["KeyX"]) {
@@ -4865,7 +4865,7 @@ ${window.location.origin}`;
     if (!canHold || !S.gameRunning || S.gamePaused || !S.current || S._countdownVal) return;
     if (!S.held) {
       S.held = makePiece(S.current.key);
-      spawnPiece();
+      spawnPiece(true);
     } else {
       const t = S.current.key;
       S.current = makePiece(S.held.key);

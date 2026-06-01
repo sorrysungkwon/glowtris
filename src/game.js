@@ -270,11 +270,11 @@ function addScore(pts,n,tspin=false){
   updateUI();showScorePopup(pts,n,tspin);
 }
 
-function spawnPiece(){
+function spawnPiece(fromHold = false){
   lastWasRotate=false;
   
   // IHS (Initial Hold System)
-  if (canHold && (KEYS['KeyC'] || KEYS['ShiftLeft'] || KEYS['ShiftRight'])) {
+  if (!fromHold && canHold && (KEYS['KeyC'] || KEYS['ShiftLeft'] || KEYS['ShiftRight'])) {
     if (!S.held) {
       S.held = makePiece(S.next.key);
       S.current = makePiece(nextFromBag());
@@ -290,7 +290,8 @@ function spawnPiece(){
   } else {
     S.current = makePiece(S.next.key);
     S.next = makePiece(nextFromBag());
-    canHold = true;
+    // Only reset canHold if this spawn was not triggered by a mid-game Hold
+    if (!fromHold) canHold = true;
   }
   
   // IRS (Initial Rotation System)
@@ -313,7 +314,7 @@ function spawnPiece(){
 
 function holdPiece(){
   if(!canHold||!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
-  if(!S.held){S.held=makePiece(S.current.key);spawnPiece();}
+  if(!S.held){S.held=makePiece(S.current.key);spawnPiece(true);}
   else{const t=S.current.key;S.current=makePiece(S.held.key);S.held=makePiece(t);if(!validPos(S.current))endGame();}
   S.lowestY = S.current.y; S.lockResets = 0;
   canHold=false;cancelLock();drawHold();
