@@ -308,7 +308,7 @@ function spawnPiece(fromHold = false){
     S.current.shape = rotShape; S.current.rot = rotState;
   }
   
-  S.lowestY = S.current.y; S.lockResets = 0;
+  S.lowestY = S.current.y; S.lockResets = 0; S.dcdTimer = S.dcd || 0;
   drawNext();if(!validPos(S.current))endGame();
 }
 
@@ -480,6 +480,7 @@ function processInput(input){
 // First ARR pulse fires at S.das + S.arr, matching the previous setTimeout/setInterval timing.
 function _tickDAS(slot, key, action, dt){
   if(!KEYS[key]){S.dasCharge[slot]=0;return;}
+  if(S.dcdTimer > 0) return; // Prevent DAS from accumulating/firing during DCD
   const prev=S.dasCharge[slot];
   S.dasCharge[slot]+=dt;
   if(S.dasCharge[slot]<S.das)return;
@@ -491,6 +492,7 @@ function _tickDAS(slot, key, action, dt){
 
 function gameTick(dt){
   if(!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
+  if(S.dcdTimer > 0) S.dcdTimer = Math.max(0, S.dcdTimer - dt);
   if(S.lockActive){
     S.lockTimer-=dt;
     if(S.lockTimer<=0){lockPiece();return;}
