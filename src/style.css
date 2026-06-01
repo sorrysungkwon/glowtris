@@ -1196,3 +1196,4 @@
   .footer-links-wrap .footer-link:hover {
     color: var(--cyan);
   }
+@keyframes text-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 8px rgba(0,200,255,0.8); } }
