@@ -169,6 +169,80 @@ curl "https://api.vercel.com/v13/deployments/DEPLOY_ID?teamId=team_pb1objuXoHlJI
 
 ---
 
+## 📋 Session Notes — 2026-06-01 (Phase A Engine Rebuild — Version Revision)
+
+Major strategic pivot. Read fully before working on any feature. **All Antigravity sessions must adopt this direction.**
+
+### Headline decisions
+
+1. **Official release is deferred.** Previously-shipped v1.0.x ~ v1.1.1 are retroactively classified as **pre-1.0 beta**. The version pipeline restarts at v0.2; **v1.0 is now the engine-complete real release** (was previously labeled "v2.0"). Git tags from the beta era remain in history; displayed version is now `v0.2.0 BETA`.
+2. **DAU-growth roadmap suspended.** All work between now and v1.0 focuses on engine correctness, not growth. Training, Visual Customization, Weekly Events, Ghost & Replay, Social, Multiplayer — all pushed to the v1.x line (post-v1.0).
+3. **Two non-negotiable principles for every Phase A change:**
+   - **Correctness** — output must match standard behavior exactly. No "close enough." If a competitive player would notice the difference, it's wrong.
+   - **Maintainability** — code must stay readable. Prefer simple, well-named modules over clever optimizations. If the cleanest implementation can't meet the correctness bar, isolate the complex part behind a small, documented seam.
+4. **No "TETR.IO" naming in documents.** Use "competitive standard" / "modern competitive clients" instead.
+
+### Why (motivation)
+
+User read an architecture research paper (ultra-responsive Tetris engine, 2026-06) and concluded the current engine would not satisfy "fanboys" — missing Back-to-Back, 180°, IRS/IHS, no sub-frame input handling, no proper SRS+ all-spin, etc. The DAU-growth path was building features on a shaky foundation. Decision: pause growth, rebuild engine to competitive standard, then launch.
+
+### Phase A roadmap (pre-1.0 beta — no public launch)
+
+| Version | Focus | Source items |
+|---|---|---|
+| v0.2 ✅ done | Loop & Input Core | ARCH-001, ARCH-002 |
+| v0.3 next | Movement Standard | FEAT-001/002/003/006/007/008/012, ARCH-003 |
+| v0.4 | Scoring Standard | FEAT-004/005/010 |
+| v0.5 | Renderer & Audio | ARCH-004 (via PixiJS, not raw WebGL2), ARCH-005 |
+| v0.6 | Modes & Metrics | FEAT-009, FEAT-011 |
+| **v1.0** | Standards Compliance Release — official public launch | — |
+
+Full ARCH/FEAT specs with acceptance criteria live in [`BUGS.md`](./BUGS.md).
+
+### v0.2 — what shipped (2026-06-01)
+
+- `src/loop.js` — 1000Hz fixed-timestep tick + accumulator. RAF still drives rendering; logic advances independently of monitor refresh rate.
+- Sub-frame input handling via `performance.now()` timestamp queue. Inputs in the same render frame simulate in true chronological order.
+- DAS/ARR moved from `setTimeout`/`setInterval` to tick-driven `S.dasCharge` counters. Gravity and lock timer now advance per 1ms tick.
+- **WASD removed entirely.** Alphabet keys are function-only now. Final keymap:
+  - Gameplay: `← →` move, `↑` CW, `Ctrl` CCW, `↓` soft drop, `Space` hard drop
+  - Functions: `C` / `Shift` hold, `P` / `Escape` pause, `M` mute
+- Display version bumped back: `v1.1.1` → `v0.2.0 BETA`
+- Branch `feature/v0.2-loop-core` (commits `1b25461`, `38db25f`) — pushed to preview, awaiting verification then PR to master.
+
+### v0.5 — PixiJS, not raw WebGL2 (debated and decided 2026-06-01)
+
+Initial plan was raw WebGL2 to match the reference paper. Reversed because the project maintainer is **not a WebGL specialist**, and Claude's WebGL debugging requires user-side visual feedback for every shader change (slow cycle, 20-40 min per iteration). Raw WebGL2 was rated too risky for the team composition.
+
+**Decision: PixiJS** — Canvas2D-grade API with WebGL2 acceleration underneath. Bundle cost ~+400KB (acceptable in our domain — TETR.IO is multi-MB). Debuggable without GPU expertise. Substages:
+
+| Substage | Scope |
+|---|---|
+| v0.5.0 | PixiJS Application set up; board + current piece + ghost migrated |
+| v0.5.1 | Particle system → `PIXI.ParticleContainer` (1000+ particles) |
+| v0.5.2 | Background nebula → `PIXI.Filter` shader gradient |
+| v0.5.3 | Line-clear / T-spin / Glowtris shader effects → `PIXI.Filter` (bloom, RGB split, distortion) |
+
+Each substage keeps a Canvas2D fallback for clients where WebGL fails to initialize.
+
+**Complementary high-Hz ideas (under evaluation):**
+- Render interpolation between ticks (lerp piece position between two ticks) — leverages v0.2's decoupled loop, sub-frame smoothness on 144Hz+ monitors
+- OffscreenCanvas + Web Worker rendering (PixiJS supports this) — frees main thread for input
+- CSS transform for UI text elements (score popup, combo display) — GPU-accelerated path
+- `requestAnimationFrame` priority hints where supported
+
+### TETR.IO context (for Antigravity reference)
+
+TETR.IO migrated to raw WebGL2 around 2024 because their user base skews heavily toward 144Hz+ monitors, high-PPS competitive play, and PWA mobile. Their team has WebGL specialists and a continuous visual-feedback loop with their fanbase. Our PixiJS choice achieves equivalent quality for our user profile without requiring that expertise.
+
+### Memory / progress recording protocol
+
+User explicitly asked (2026-06-01): record progress after each meaningful work step, either to Claude's persistent memory or by writing back to project docs (TODO.md, BUGS.md, ROBOT.md session notes). Don't rely on conversation context surviving across sessions.
+
+For Antigravity: maintain equivalent progress notes in whichever channel you use. Session-start sync (per `AGENTS.md`) should include reading these session notes.
+
+---
+
 ## 📋 Session Notes — 2026-05-29 Part 2 (Architecture & Infra Hardening)
 
 Decisions and changes made in the second half of 2026-05-29.
