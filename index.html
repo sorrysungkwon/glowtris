@@ -788,21 +788,33 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 18px; /* Clear separation between Hold and Rotations */
       width: 100%;
     }
 
-    .nes-top-actions {
+    #btn-hold {
+      width: 100%;
+      height: 34px;
+      border-radius: 8px; /* 네모에 곡률 */
+      font-size: 18px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .rotation-group {
       display: flex;
       flex-direction: column;
       gap: 8px;
       width: 100%;
     }
-    #btn-hold, #btn-rotate-180 {
+    #btn-rotate-180 {
       width: 100%;
-      height: 38px;
-      border-radius: 8px;
-      font-size: 20px;
+      height: 34px;
+      border-radius: 34px; /* 원통형의 긴 버튼 */
+      font-size: 18px;
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -837,9 +849,10 @@
       grid-template-columns: 60px 60px 60px;
       grid-template-rows: 60px 60px 60px;
     }
-    .nes-right-panel { gap: 20px; }
-    .nes-top-actions { gap: 12px; }
-    #btn-hold, #btn-rotate-180 { width: 100%; height: 52px; font-size: 28px; }
+    .nes-right-panel { gap: 24px; }
+    #btn-hold { height: 48px; font-size: 24px; border-radius: 12px; }
+    .rotation-group { gap: 12px; }
+    #btn-rotate-180 { height: 48px; font-size: 24px; border-radius: 48px; }
     .btn-lbl { font-size: 14px; }
     .nes-actions { gap: 14px; }
     .nes-actions #btn-rotate-ccw, 
@@ -1384,23 +1397,23 @@
     <div class="control-group">
       <div class="group-label">ACTIONS</div>
       <div class="nes-right-panel">
-        <div class="nes-top-actions">
-          <button class="tbtn tbtn-hold" id="btn-hold">
-            <span class="material-icons-round">swap_horiz</span>
-            <span class="btn-lbl">HOLD</span>
-          </button>
+        <button class="tbtn tbtn-hold" id="btn-hold">
+          <span class="material-icons-round">swap_horiz</span>
+          <span class="btn-lbl">HOLD</span>
+        </button>
+        <div class="rotation-group">
           <button class="tbtn tbtn-rotate" id="btn-rotate-180">
             <span class="material-icons-round">sync</span>
             <span class="btn-lbl">180°</span>
           </button>
-        </div>
-        <div class="nes-actions">
-          <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
-            <span class="material-icons-round">rotate_left</span>
-          </button>
-          <button class="tbtn tbtn-rotate" id="btn-rotate">
-            <span class="material-icons-round">rotate_right</span>
-          </button>
+          <div class="nes-actions">
+            <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+              <span class="material-icons-round">rotate_left</span>
+            </button>
+            <button class="tbtn tbtn-rotate" id="btn-rotate">
+              <span class="material-icons-round">rotate_right</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
