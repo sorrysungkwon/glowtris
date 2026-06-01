@@ -57,12 +57,12 @@
     <div id="htp-scroll">
       <div class="htp-section">KEYBOARD</div>
       <div class="htp-row"><span class="htp-key">← →</span><span class="htp-lbl">Move</span></div>
-      <div class="htp-row"><span class="htp-key">↑</span><span class="htp-lbl">Rotate CW</span></div>
-      <div class="htp-row"><span class="htp-key">Ctrl</span><span class="htp-lbl">Rotate CCW</span></div>
+      <div class="htp-row"><span class="htp-key">↑ / X</span><span class="htp-lbl">Rotate CW</span></div>
+      <div class="htp-row"><span class="htp-key">Z / Ctrl</span><span class="htp-lbl">Rotate CCW</span></div>
       <div class="htp-row"><span class="htp-key">↓</span><span class="htp-lbl">Soft Drop</span></div>
       <div class="htp-row"><span class="htp-key">SPC</span><span class="htp-lbl">Hard Drop</span></div>
       <div class="htp-row"><span class="htp-key">C / Shift</span><span class="htp-lbl">Hold</span></div>
-      <div class="htp-row"><span class="htp-key">P</span><span class="htp-lbl">Pause</span></div>
+      <div class="htp-row"><span class="htp-key">P / Esc</span><span class="htp-lbl">Pause</span></div>
       <div class="htp-row"><span class="htp-key">M</span><span class="htp-lbl">Mute</span></div>
       <div class="htp-section">TOUCH</div>
       <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">chevron_left</span><span class="material-icons-round" style="font-size:13px;vertical-align:middle">chevron_right</span></span><span class="htp-lbl">Move</span></div>
@@ -89,7 +89,7 @@
   <!-- Desktop title header -->
   <div id="desktop-header">
     <span class="dh-title">GLOWTRIS</span>
-    <span class="dh-version">v0.2.0 BETA</span>
+    <span class="dh-version">v0.2.1 BETA</span>
   </div>
 
   <!-- Mobile-only compact header -->
@@ -161,12 +161,12 @@
       <div class="panel-title">KEYS</div>
       <div class="key-map">
         <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
-        <div class="key-row" id="key-rotate"><kbd>↑</kbd><span>rotate CW</span></div>
-        <div class="key-row" id="key-rotate-ccw"><kbd>Ctrl</kbd><span>rotate CCW</span></div>
+        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
+        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
         <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
         <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
         <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
-        <div class="key-row" id="key-pause"><kbd>P</kbd><span>pause</span></div>
+        <div class="key-row" id="key-pause"><kbd>P</kbd><kbd>Esc</kbd><span>pause</span></div>
         <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
       </div>
     </div>
@@ -174,16 +174,19 @@
 
   <!-- Touch controls (all screens) -->
   <div id="touch-controls">
-    <!-- Row 2: actions (hold / drop / rotate) — medium -->
+    <!-- Row 2: actions (hold / CCW / CW / drop) — medium -->
     <div id="tc-act" class="ctrl-row">
       <button class="tbtn tbtn-hold" id="btn-hold">
         <span class="material-icons-round">swap_horiz</span>
       </button>
-      <button class="tbtn tbtn-drop" id="btn-drop">
-        <span class="material-icons-round">keyboard_double_arrow_down</span>
+      <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+        <span class="material-icons-round">rotate_left</span>
       </button>
       <button class="tbtn tbtn-rotate" id="btn-rotate">
         <span class="material-icons-round">rotate_right</span>
+      </button>
+      <button class="tbtn tbtn-drop" id="btn-drop">
+        <span class="material-icons-round">keyboard_double_arrow_down</span>
       </button>
     </div>
     <!-- Row 3: movement (← / soft / →) — largest, bottom -->
