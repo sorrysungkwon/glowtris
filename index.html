@@ -1258,6 +1258,7 @@
       <div class="htp-row"><span class="htp-key">← →</span><span class="htp-lbl">Move</span></div>
       <div class="htp-row"><span class="htp-key">↑ / X</span><span class="htp-lbl">Rotate CW</span></div>
       <div class="htp-row"><span class="htp-key">Z / Ctrl</span><span class="htp-lbl">Rotate CCW</span></div>
+      <div class="htp-row"><span class="htp-key">A</span><span class="htp-lbl">Rotate 180°</span></div>
       <div class="htp-row"><span class="htp-key">↓</span><span class="htp-lbl">Soft Drop</span></div>
       <div class="htp-row"><span class="htp-key">SPC</span><span class="htp-lbl">Hard Drop</span></div>
       <div class="htp-row"><span class="htp-key">C / Shift</span><span class="htp-lbl">Hold</span></div>
@@ -1267,7 +1268,9 @@
       <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">chevron_left</span><span class="material-icons-round" style="font-size:13px;vertical-align:middle">chevron_right</span></span><span class="htp-lbl">Move</span></div>
       <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">keyboard_arrow_down</span></span><span class="htp-lbl">Soft Drop</span></div>
       <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">keyboard_double_arrow_down</span></span><span class="htp-lbl">Hard Drop</span></div>
-      <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">rotate_right</span></span><span class="htp-lbl">Rotate</span></div>
+      <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">rotate_right</span></span><span class="htp-lbl">Rotate CW</span></div>
+      <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">rotate_left</span></span><span class="htp-lbl">Rotate CCW</span></div>
+      <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">sync</span></span><span class="htp-lbl">Rotate 180°</span></div>
       <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">swap_horiz</span></span><span class="htp-lbl">Hold</span></div>
     </div>
   </div>
@@ -4940,7 +4943,6 @@ ${window.location.origin}`;
         rotatePiece(-1);
         break;
       case "KeyA":
-      case "ShiftRight":
         rotatePiece(2);
         break;
       case "Space":
