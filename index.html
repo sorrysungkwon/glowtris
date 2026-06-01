@@ -426,7 +426,7 @@
     background:rgba(0,200,255,0.16);
     border-color: var(--cyan);
     box-shadow:0 0 30px rgba(0,200,255,0.6), inset 0 0 15px rgba(0,200,255,0.5);
-    transform:scale(0.90);
+    transform:scale(0.96);
   }
   .tbtn.pressed::after {
     width: 200px; height: 200px;
@@ -726,64 +726,112 @@
     #touch-controls { display:none; }
   }
 
-  /* ── ALL TOUCH DEVICES: iPhone-style 3-row stacked layout ── */
+  /* ── ALL TOUCH DEVICES: NES Style Layout ── */
   @media (pointer:coarse) {
     /* Let the game row fill whatever vertical space remains between header and controls. */
     /* ResizeObserver in JS reads clientHeight and sets CELL — no hardcoded arithmetic. */
     #game-row { flex:1 1 0; min-height:0; align-items:center; justify-content:center; }
 
-    #touch-controls {
-      width: min(340px, 92vw);
-      padding-bottom:16px;
-      gap:8px;
+    #touch-controls.nes-layout {
+      width: min(340px, 98vw); /* Stay within typical mobile width */
+      padding-bottom: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 10px;
     }
     #mobile-header { width: min(340px, 92vw); }
 
-    /* Row 1 — system: small, space-between */
-    #tc-sys {
-      justify-content:space-between;
-      opacity:0.6;
-      transition:opacity .2s;
+    .control-group {
+      flex: 1;
+      background: rgba(4, 4, 30, 0.4);
+      border: 1px solid rgba(0, 200, 255, 0.12);
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 15px rgba(0,0,40,0.5);
     }
-    #tc-sys:hover { opacity:1; }
-    #tc-sys .tbtn {
-      flex:0 0 auto;
-      height:30px;
-      border-radius:8px;
-      padding:0 18px;
-      font-size:18px;
-    }
-    #tc-sys .tbtn .material-icons-round { font-size:18px; }
-
-    /* Row 2 — actions: equal-width, medium height */
-    #tc-act .tbtn {
-      flex:1; min-width:0;
-      height:54px;
-      border-radius:10px;
-      font-size:clamp(20px, 5.5vw, 28px);
+    .group-label {
+      font-size: 8px;
+      font-weight: 700;
+      color: rgba(0, 200, 255, 0.4);
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      text-align: center;
     }
 
-    /* Row 3 — movement: equal-width, tallest */
-    #tc-move .tbtn {
-      flex:1; min-width:0;
-      height:72px;
-      border-radius:12px;
-      font-size:clamp(28px, 9vw, 40px);
+    .nes-dpad {
+      display: grid;
+      grid-template-columns: 44px 44px 44px;
+      grid-template-rows: 44px 44px 44px;
+      gap: 3px;
     }
-    /* ← and → slightly wider than soft-drop */
-    #btn-left, #btn-right { flex:1.35; }
+    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 10px 10px 4px 4px; }
+    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 10px 4px 4px 10px; }
+    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 10px 10px 4px; }
+    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 10px 10px; }
+    .nes-dpad .tbtn { height: 100%; font-size: 26px; }
+    
+    .dpad-center {
+      grid-column: 2; grid-row: 2;
+      background: rgba(2, 2, 22, 0.7);
+      border: 1px solid rgba(0, 200, 255, 0.2);
+      border-radius: 4px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .nes-right-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    #btn-hold {
+      width: 100%; /* Long horizontal */
+      height: 54px;
+      border-radius: 8px;
+      font-size: 22px;
+    }
+    .hold-text {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Orbitron', monospace;
+      margin-left: 6px;
+      letter-spacing: 2px;
+    }
+
+    .nes-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .nes-actions #btn-rotate-ccw, 
+    .nes-actions #btn-rotate {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      font-size: 32px;
+    }
   }
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    #touch-controls { width: 340px; gap:10px; }
-    #mobile-header { width: 340px; }
-
-    #tc-sys .tbtn  { height:34px; font-size:20px; padding:0 22px; }
-
-    #tc-act .tbtn  { height:64px; font-size:30px; border-radius:12px; }
-
-    #tc-move .tbtn { height:84px; font-size:38px; border-radius:14px; }
+    #touch-controls.nes-layout { width: 500px; padding-bottom: 30px; }
+    .control-group { padding: 14px; }
+    .nes-dpad {
+      grid-template-columns: 60px 60px 60px;
+      grid-template-rows: 60px 60px 60px;
+    }
+    .nes-right-panel { gap: 26px; }
+    #btn-hold { height: 74px; font-size: 28px; }
+    .nes-actions { gap: 14px; }
+    .nes-actions #btn-rotate-ccw, 
+    .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
   }
 
   /* ─── Performance mode indicator ─── */
@@ -1183,12 +1231,12 @@
     <div id="htp-scroll">
       <div class="htp-section">KEYBOARD</div>
       <div class="htp-row"><span class="htp-key">← →</span><span class="htp-lbl">Move</span></div>
-      <div class="htp-row"><span class="htp-key">↑</span><span class="htp-lbl">Rotate CW</span></div>
-      <div class="htp-row"><span class="htp-key">Ctrl</span><span class="htp-lbl">Rotate CCW</span></div>
+      <div class="htp-row"><span class="htp-key">↑ / X</span><span class="htp-lbl">Rotate CW</span></div>
+      <div class="htp-row"><span class="htp-key">Z / Ctrl</span><span class="htp-lbl">Rotate CCW</span></div>
       <div class="htp-row"><span class="htp-key">↓</span><span class="htp-lbl">Soft Drop</span></div>
       <div class="htp-row"><span class="htp-key">SPC</span><span class="htp-lbl">Hard Drop</span></div>
       <div class="htp-row"><span class="htp-key">C / Shift</span><span class="htp-lbl">Hold</span></div>
-      <div class="htp-row"><span class="htp-key">P</span><span class="htp-lbl">Pause</span></div>
+      <div class="htp-row"><span class="htp-key">P / Esc</span><span class="htp-lbl">Pause</span></div>
       <div class="htp-row"><span class="htp-key">M</span><span class="htp-lbl">Mute</span></div>
       <div class="htp-section">TOUCH</div>
       <div class="htp-row"><span class="htp-key"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">chevron_left</span><span class="material-icons-round" style="font-size:13px;vertical-align:middle">chevron_right</span></span><span class="htp-lbl">Move</span></div>
@@ -1215,7 +1263,7 @@
   <!-- Desktop title header -->
   <div id="desktop-header">
     <span class="dh-title">GLOWTRIS</span>
-    <span class="dh-version">v0.2.0 BETA</span>
+    <span class="dh-version">v0.2.1 BETA</span>
   </div>
 
   <!-- Mobile-only compact header -->
@@ -1287,42 +1335,56 @@
       <div class="panel-title">KEYS</div>
       <div class="key-map">
         <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
-        <div class="key-row" id="key-rotate"><kbd>↑</kbd><span>rotate CW</span></div>
-        <div class="key-row" id="key-rotate-ccw"><kbd>Ctrl</kbd><span>rotate CCW</span></div>
+        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
+        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
         <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
         <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
         <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
-        <div class="key-row" id="key-pause"><kbd>P</kbd><span>pause</span></div>
+        <div class="key-row" id="key-pause"><kbd>P</kbd><kbd>Esc</kbd><span>pause</span></div>
         <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
       </div>
     </div>
   </div>
 
   <!-- Touch controls (all screens) -->
-  <div id="touch-controls">
-    <!-- Row 2: actions (hold / drop / rotate) — medium -->
-    <div id="tc-act" class="ctrl-row">
-      <button class="tbtn tbtn-hold" id="btn-hold">
-        <span class="material-icons-round">swap_horiz</span>
-      </button>
-      <button class="tbtn tbtn-drop" id="btn-drop">
-        <span class="material-icons-round">keyboard_double_arrow_down</span>
-      </button>
-      <button class="tbtn tbtn-rotate" id="btn-rotate">
-        <span class="material-icons-round">rotate_right</span>
-      </button>
+  <div id="touch-controls" class="nes-layout">
+    <!-- MOVEMENT GROUP (Gestalt: Common Region) -->
+    <div class="control-group">
+      <div class="group-label">MOVEMENT</div>
+      <div class="nes-dpad">
+        <button class="tbtn tbtn-drop" id="btn-drop">
+          <span class="material-icons-round">keyboard_double_arrow_down</span>
+        </button>
+        <button class="tbtn" id="btn-left">
+          <span class="material-icons-round">chevron_left</span>
+        </button>
+        <div class="dpad-center"></div>
+        <button class="tbtn" id="btn-right">
+          <span class="material-icons-round">chevron_right</span>
+        </button>
+        <button class="tbtn" id="btn-soft">
+          <span class="material-icons-round">keyboard_arrow_down</span>
+        </button>
+      </div>
     </div>
-    <!-- Row 3: movement (← / soft / →) — largest, bottom -->
-    <div id="tc-move" class="ctrl-row">
-      <button class="tbtn" id="btn-left">
-        <span class="material-icons-round">chevron_left</span>
-      </button>
-      <button class="tbtn" id="btn-soft">
-        <span class="material-icons-round">keyboard_arrow_down</span>
-      </button>
-      <button class="tbtn" id="btn-right">
-        <span class="material-icons-round">chevron_right</span>
-      </button>
+    
+    <!-- ACTION GROUP (Gestalt: Common Region) -->
+    <div class="control-group">
+      <div class="group-label">ACTIONS</div>
+      <div class="nes-right-panel">
+        <button class="tbtn tbtn-hold" id="btn-hold">
+          <span class="material-icons-round">swap_horiz</span>
+          <span class="hold-text">HOLD</span>
+        </button>
+        <div class="nes-actions">
+          <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+            <span class="material-icons-round">rotate_left</span>
+          </button>
+          <button class="tbtn tbtn-rotate" id="btn-rotate">
+            <span class="material-icons-round">rotate_right</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -4823,8 +4885,10 @@ ${window.location.origin}`;
         S.dasCharge.down = 0;
         break;
       case "ArrowUp":
+      case "KeyX":
         rotatePiece();
         break;
+      case "KeyZ":
       case "ControlLeft":
       case "ControlRight":
         rotatePiece(true);
@@ -4963,6 +5027,7 @@ ${window.location.origin}`;
   makeTouchBtn("btn-right", () => moveX(1), "repeat");
   makeTouchBtn("btn-soft", () => softDrop(), "repeat");
   makeTouchBtn("btn-rotate", () => rotatePiece(), "game");
+  makeTouchBtn("btn-rotate-ccw", () => rotatePiece(true), "game");
   makeTouchBtn("btn-drop", () => hardDrop(), "game");
   makeTouchBtn("btn-hold", () => holdPiece(), "game");
   makeTouchBtn("btn-pause", () => togglePause(), "any");
@@ -5233,7 +5298,7 @@ ${window.location.origin}`;
       animFrame = null;
     }
   });
-  var _VERSION = "v0.2.0";
+  var _VERSION = "v0.2.1";
   window.onerror = function(msg, src, line, col, err) {
     console.error("[glowtris " + _VERSION + "] uncaught error", {
       msg,
