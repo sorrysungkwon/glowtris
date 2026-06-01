@@ -243,6 +243,7 @@ function lockPiece(){
       S.flashLines=new Set();
       // Sprint end: check AFTER board splice so the cleared board is visible
       if(S.isSprintMode&&S.lines>=SPRINT_LINES){endSprint();return;}
+      spawnPiece();
     },120);
   } else {
     if(tspin==='full'){sfxTSpin();addScore(TSPIN_SCORE[0]*S.level,0,'full');unlockAchievement('tspin_1');}
@@ -251,9 +252,10 @@ function lockPiece(){
   }
   lastWasRotate=false;
   spawnLockParticles(S.current);
+  S.current = null;
   // In sprint mode, capture end time immediately when 40 lines reached.
   if(S.isSprintMode&&S.lines>=SPRINT_LINES){S._sprintEndTime=performance.now();return;}
-  spawnPiece();
+  if(cleared.length === 0) spawnPiece();
 }
 
 function addScore(pts,n,tspin=false){

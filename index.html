@@ -4783,6 +4783,7 @@ ${window.location.origin}`;
           endSprint();
           return;
         }
+        spawnPiece();
       }, 120);
     } else {
       if (tspin === "full") {
@@ -4799,11 +4800,12 @@ ${window.location.origin}`;
     }
     lastWasRotate = false;
     spawnLockParticles(S.current);
+    S.current = null;
     if (S.isSprintMode && S.lines >= SPRINT_LINES) {
       S._sprintEndTime = performance.now();
       return;
     }
-    spawnPiece();
+    if (cleared.length === 0) spawnPiece();
   }
   function addScore(pts, n, tspin = false) {
     S.score += pts;
