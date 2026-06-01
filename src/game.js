@@ -90,6 +90,12 @@ const KICKS_I = {
   '3>0':[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
   '0>3':[[0,0],[-1,0],[2,0],[-1,-2],[2,1]],
 };
+const KICKS_180 = {
+  '0>2': [[0,0], [0,-1], [1,-1], [-1,-1], [0,-2], [1,-2], [-1,-2]],
+  '1>3': [[0,0], [1,0], [1,-2], [1,-1], [2,0], [2,-2], [2,-1]],
+  '2>0': [[0,0], [0,1], [-1,1], [1,1], [0,2], [-1,2], [1,2]],
+  '3>1': [[0,0], [-1,0], [-1,-2], [-1,-1], [-2,0], [-2,-2], [-2,-1]],
+};
 
 // ─── Board / Logic ────────────────────────────────────────────────────────────
 function createBoard(){return Array.from({length:ROWS},()=>Array(COLS).fill(null));}
@@ -108,9 +114,14 @@ function validPos(piece,ox=0,oy=0,shape=null){
 function rotateCW(shape){const R=shape.length,C=shape[0].length;return Array.from({length:C},(_,c)=>Array.from({length:R},(_,r)=>shape[R-1-r][c]));}
 function rotateCCW(shape){const R=shape.length,C=shape[0].length;return Array.from({length:C},(_,c)=>Array.from({length:R},(_,r)=>shape[r][C-1-c]));}
 
-function _tryRotate(newShape, fromRot, toRot) {
+function _tryRotate(newShape, fromRot, toRot, is180 = false) {
   const key = `${fromRot}>${toRot}`;
-  const kicks = S.current.key === 'I' ? KICKS_I : S.current.key === 'O' ? [[0,0]] : KICKS_JLSTZ;
+  let kicks;
+  if (is180) {
+    kicks = KICKS_180;
+  } else {
+    kicks = S.current.key === 'I' ? KICKS_I : S.current.key === 'O' ? [[0,0]] : KICKS_JLSTZ;
+  }
   const table = kicks[key] || [[0,0]];
   for (const [dx,dy] of table) {
     if (validPos(S.current, dx, dy, newShape)) {
@@ -125,10 +136,15 @@ function _tryRotate(newShape, fromRot, toRot) {
   return false;
 }
 
-function rotatePiece(ccw=false){
+function rotatePiece(dir = 1) { // 1 = CW, -1 = CCW, 2 = 180
   const from = S.current.rot;
-  const to = ccw ? (from+3)%4 : (from+1)%4;
-  _tryRotate(ccw ? rotateCCW(S.current.shape) : rotateCW(S.current.shape), from, to);
+  const to = (from + dir + 4) % 4;
+  let newShape;
+  if (dir === 1) newShape = rotateCW(S.current.shape);
+  else if (dir === -1) newShape = rotateCCW(S.current.shape);
+  else if (dir === 2) newShape = rotateCW(rotateCW(S.current.shape));
+
+  _tryRotate(newShape, from, to, dir === 2);
 }
 
 function cancelLock(){S.lockActive=false;S.lockTimer=0;}
@@ -405,8 +421,9 @@ function processInput(input){
     case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
     case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
     case'ArrowDown':  softDrop(); S.dasCharge.down=0; break;
-    case'ArrowUp':case'KeyX': rotatePiece();      break;
-    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(true); break;
+    case'ArrowUp':case'KeyX': rotatePiece(1);      break;
+    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1); break;
+    case'KeyA':case'ShiftRight': rotatePiece(2); break;
     case'Space':      hardDrop();         break;
     case'KeyC':case'ShiftLeft': holdPiece(); break;
   }
@@ -472,8 +489,9 @@ function makeTouchBtn(id,onPress,mode='repeat'){
 makeTouchBtn('btn-left',  ()=>moveX(-1),  'repeat');
 makeTouchBtn('btn-right', ()=>moveX(1),   'repeat');
 makeTouchBtn('btn-soft',  ()=>softDrop(), 'repeat');
-makeTouchBtn('btn-rotate',()=>rotatePiece(),'game');
-makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(true),'game');
+makeTouchBtn('btn-rotate',()=>rotatePiece(1),'game');
+makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(-1),'game');
+makeTouchBtn('btn-rotate-180',()=>rotatePiece(2),'game');
 makeTouchBtn('btn-drop',  ()=>hardDrop(), 'game');
 makeTouchBtn('btn-hold',  ()=>holdPiece(),'game');
 makeTouchBtn('btn-pause', ()=>togglePause(),'any');
