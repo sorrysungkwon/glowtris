@@ -28,21 +28,30 @@
 
 ### [BUG-009] Audio dead after backgrounding tab/app while paused
 - **Reported:** 2026-06-02
-- **Symptom:** Pause game → switch to another tab/app → come back → no sound. Toggling mute off/on doesn't recover audio either.
-- **Root cause:** Three compounding issues.
-  1. `resumeBGM` called `audioCtx.resume()` without `await`, then immediately read `audioCtx.currentTime` while the context was still suspended. The stale timestamp caused the BGM scheduler to queue notes in the past.
-  2. `toggleMute` only changed `masterGain.gain.value`; it never resumed a suspended audio context. On iOS/mobile the context cannot resume on its own — it needs a user-gesture handler to call `resume()`. The mute-toggle click was a perfect gesture but went unused.
-  3. `onPageShow` early-returned when the game was paused, so the suspended context was never touched on tab-return.
+- **Symptom:** Pause game → switch to another tab/app → come back → no sound. Toggling mute off/on doesn't recover audio either. (Persisted on iOS PWA even after the first round of fixes.)
+- **Root causes:** Five compounding issues.
+  1. `resumeBGM` called `audioCtx.resume()` without `await`, then immediately read `audioCtx.currentTime` while the context was still suspended → notes scheduled in the past, silent.
+  2. `toggleMute` only changed `masterGain.gain.value`; never resumed a suspended context.
+  3. `onPageShow` early-returned when the game was paused.
+  4. **iOS 16+ uses `'interrupted'` as the backgrounded state**, not `'suspended'`. Our checks only looked for `'suspended'`, so iOS contexts sat in `'interrupted'` forever.
+  5. **`'closed'` state was never recovered.** On long iOS backgrounding the browser can fully close the context — `resume()` does nothing on a closed context, so audio stays dead until page reload.
+  6. **The iOS speaker-routing unlock only ran once** (silent-WAV hack, gated by `_speakerUnlocked` flag). Long backgrounding can lose the speaker routing, leaving Web Audio routed to the earpiece (inaudible without the phone held to your ear).
 - **Fix:**
-  - `resumeBGM` is now `async` and awaits `audioCtx.resume()` before scheduling
-  - `toggleMute` calls `audioCtx.resume()` (user-gesture pathway)
-  - `onPageShow` calls `audioCtx.resume()` regardless of pause state
+  - `resumeBGM` is `async` and awaits `audioCtx.resume()` (and bails if the state never reaches `'running'`).
+  - `toggleMute`, `onPageShow`, and `getAudioCtx` all now handle BOTH `'suspended'` AND `'interrupted'`.
+  - `getAudioCtx` and `toggleMute` detect `'closed'` and recreate the context.
+  - `onPageShow` re-unlocks the speaker on every visibility return (resets `_speakerUnlocked` flag).
 
-### [BUG-008] I-piece rotation fails near walls/floor (had to use 180° to escape)
+### [BUG-008] Wall-rotation fails for several pieces (had to use 180° to escape)
 - **Reported:** 2026-06-02
-- **Symptom:** I-piece in vertical orientation against a wall — CW/CCW rotation back to horizontal fails; only 180° rotation works as an escape.
-- **Root cause:** SRS kick tables for the I-piece had the y-coordinate sign **inverted on 6 of 8 transitions**. The JLSTZ table was correctly negated from wiki (y-up) to canvas (y-down), but the I table was copied straight from wiki without the negation. The result: kicks intended to lift the piece UP (away from the floor/wall obstacle) were instead trying to push it DOWN into the obstacle, so the rotation failed to find a valid kick.
-- **Fix:** y-signs corrected in `KICKS_I` for transitions `0>1`, `1>0`, `1>2`, `2>1`, `2>3`, `3>2`. `3>0` and `0>3` were already correct.
+- **Symptom:** Pieces against a wall in certain orientations could not rotate 90° CW/CCW — only 180° worked. First seen on I-piece, later reproduced on S-piece (and likely affects T/J/L/Z too).
+- **Root causes (two layers):**
+  1. **I-piece kick y-signs (initial fix).** `KICKS_I` had wiki (y-up) values copied straight in instead of being negated for canvas (y-down). Kicks intended to lift UP pushed DOWN into the obstacle, so no kick succeeded. Fixed `0>1`, `1>0`, `1>2`, `2>1`, `2>3`, `3>2`.
+  2. **Non-SRS bounding boxes (real underlying bug).** `PIECES` stored JLSTZ as 2×3/3×2 and I as 1×4/4×1 — the bbox SIZE changed across rotations. The wiki SRS kick tables assume a fixed 3×3 (JLSTZ) or 4×4 (I) bbox, with the visible blocks positioned WITHIN that fixed bbox. Because our bbox shrank/grew with each rotation, the piece's "natural" position shifted by 1 cell relative to where SRS expects it. The result: against a wall, the basic (0,0) kick failed AND every kick attempt moved AWAY from the wall direction we needed.
+- **Fix (both layers):**
+  1. Negated I-piece kick y-signs (done in earlier commit).
+  2. Padded `PIECES` to SRS-standard 3×3 for JLSTZ and 4×4 for I; rotation now operates on a stable bbox and the wiki kick tables work as designed.
+  3. Updated T-spin detection to use `S.current.rot` directly (was inferring orientation from the 2-row/3-row shape, which no longer distinguishes them now that all bboxes are 3×3).
 
 ### [BUG-007] Leaderboard list starts from rank 3 / 9 instead of 1
 - **Reported:** 2026-06-02

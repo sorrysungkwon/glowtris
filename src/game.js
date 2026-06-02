@@ -335,17 +335,18 @@ function getGhostY(){let d=0;while(validPos(S.current,0,d+1))d++;return S.curren
 function checkTSpin(){
   if(!S.current||S.current.key!=='T'||!lastWasRotate)return false;
   const x=S.current.x,y=S.current.y;
+  // Corners of the T-piece 3x3 bounding box (TL, TR, BL, BR).
   const corners=[[x,y],[x+2,y],[x,y+2],[x+2,y+2]];
   function blocked(cx,cy){return cx<0||cx>=COLS||cy>=ROWS||(cy>=0&&S.board[cy][cx]);}
   const f=corners.map(([cx,cy])=>blocked(cx,cy)?1:0);
   if(f[0]+f[1]+f[2]+f[3]<3)return false;
-  const sh=S.current.shape;
-  let front;
-  if(sh.length===2){
-    front=sh[0][0]===0?[0,1]:[2,3];
-  }else{
-    front=sh[0][1]===0?[1,3]:[0,2];
-  }
+  // The two "front" corners depend on the T's current orientation (rot):
+  //   rot 0 (N, point up)    → top corners    [TL, TR]    = [0, 1]
+  //   rot 1 (E, point right) → right corners  [TR, BR]    = [1, 3]
+  //   rot 2 (S, point down)  → bottom corners [BL, BR]    = [2, 3]
+  //   rot 3 (W, point left)  → left corners   [TL, BL]    = [0, 2]
+  const fronts=[[0,1],[1,3],[2,3],[0,2]];
+  const front=fronts[S.current.rot];
   const frontFilled=f[front[0]]+f[front[1]];
   if(frontFilled===2)return'full';
   if(frontFilled===1)return'mini';
@@ -932,7 +933,7 @@ window.addEventListener('beforeunload',()=>{
 });
 
 // ─── Error monitoring ─────────────────────────────────────────────────────────
-const _VERSION = 'v0.3.1';
+const _VERSION = 'v0.3.2';
 window.onerror = function(msg, src, line, col, err) {
   console.error('[glowtris ' + _VERSION + '] uncaught error', {
     msg, src: src ? src.replace(window.location.origin, '') : src, line, col,
