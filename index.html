@@ -752,48 +752,42 @@
     #game-row { flex:1 1 0; min-height:0; align-items:center; justify-content:center; }
 
     #touch-controls.nes-layout {
-      width: min(340px, 98vw); /* Stay within typical mobile width */
-      padding-bottom: 20px;
+      /* Container = D-pad (182) + gap (~32) + action panel (136) = 350.
+         96vw ceiling keeps a screen-edge margin on tiny phones. */
+      width: min(350px, 96vw);
+      padding-bottom: 10px;
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
-      align-items: stretch;
-      gap: 10px;
+      justify-content: space-between; /* D-pad left edge, ACTIONS right edge */
+      align-items: flex-start;
+      gap: 16px;
     }
-    #mobile-header { width: min(340px, 92vw); }
+    #mobile-header { width: min(350px, 92vw); }
 
+    /* Intrinsic width — each group sizes to its content (D-pad 182px,
+       action panel 136px). justify-content: space-between on the parent
+       pushes them to opposite edges of the touch-controls container. */
     .control-group {
-      flex: 1;
-      background: rgba(4, 4, 30, 0.4);
-      border: 1px solid rgba(0, 200, 255, 0.12);
-      border-radius: 16px;
-      padding: 10px 12px;
+      flex: 0 0 auto;
+      padding: 4px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      box-shadow: inset 0 0 15px rgba(0,0,40,0.5);
-    }
-    .group-label {
-      font-size: 8px;
-      font-weight: 700;
-      color: rgba(0, 200, 255, 0.4);
-      letter-spacing: 2px;
-      margin-bottom: 12px;
-      text-align: center;
     }
 
     .nes-dpad {
       display: grid;
-      grid-template-columns: 46px 46px 46px;
-      grid-template-rows: 46px 46px 46px;
-      gap: 3px;
+      grid-template-columns: 58px 58px 58px;
+      grid-template-rows: 58px 58px 58px;
+      gap: 4px;
+      margin-top: 16px;
+      touch-action: none;
     }
-    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 10px 10px 4px 4px; }
-    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 10px 4px 4px 10px; }
-    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 10px 10px 4px; }
-    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 10px 10px; }
-    .nes-dpad .tbtn { height: 100%; font-size: 28px; }
+    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 12px 12px 4px 4px; }
+    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 12px 4px 4px 12px; }
+    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 12px 12px 4px; }
+    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 12px 12px; }
+    .nes-dpad .tbtn { height: 100%; font-size: 30px; touch-action: none; }
     
     .dpad-center {
       grid-column: 2; grid-row: 2;
@@ -803,56 +797,49 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
+    /* Right action panel: fixed width = CCW + gap + CW = 62*2 + 12 = 136 px.
+       HOLD sits on top, then the rotation cluster (180° + CCW/CW pair)
+       below — Gestalt grouping keeps all rotations together. */
     .nes-right-panel {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px; /* Clear separation between Hold and Rotations */
-      width: 100%;
+      gap: 18px;       /* separation between HOLD and rotation cluster */
+      width: 136px;    /* = CCW(62) + gap(12) + CW(62) */
+      margin-top: 16px;
     }
-
-    #btn-hold {
-      width: 100%;
-      height: 34px;
-      border-radius: 8px; /* 네모에 곡률 */
-      font-size: 18px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
     .rotation-group {
       display: flex;
       flex-direction: column;
       gap: 8px;
       width: 100%;
     }
+    .nes-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    /* HOLD and 180° span the full panel width (= rotation pair width). */
+    #btn-hold,
     #btn-rotate-180 {
       width: 100%;
-      height: 34px;
-      border-radius: 34px; /* 원통형의 긴 버튼 */
-      font-size: 18px;
+      height: 44px;
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      font-size: 20px;
     }
+    #btn-hold { border-radius: 10px; }
+    #btn-rotate-180 { border-radius: 44px; }
     .btn-lbl {
       font-size: 11px;
       font-weight: 700;
       font-family: 'Orbitron', monospace;
       letter-spacing: 2px;
     }
-
-    .nes-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-    .nes-actions #btn-rotate-ccw, 
+    .nes-actions #btn-rotate-ccw,
     .nes-actions #btn-rotate {
       width: 62px; height: 62px;
       border-radius: 50%;
@@ -862,19 +849,31 @@
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    #touch-controls.nes-layout { width: 500px; padding-bottom: 30px; }
-    .control-group { padding: 14px; }
+    /* Container = D-pad (242) + gap (~32) + action panel (186) = 460. */
+    #touch-controls.nes-layout { width: 460px; padding-bottom: 16px; }
+    .control-group { padding: 6px 0; }
     .nes-dpad {
-      grid-template-columns: 60px 60px 60px;
-      grid-template-rows: 60px 60px 60px;
+      grid-template-columns: 78px 78px 78px;
+      grid-template-rows: 78px 78px 78px;
+      margin-top: 24px;
     }
-    .nes-right-panel { gap: 24px; }
-    #btn-hold { height: 48px; font-size: 24px; border-radius: 12px; }
+    .nes-dpad .tbtn { font-size: 40px; }
+    .nes-right-panel {
+      width: 186px; /* = 86*2 + 14 (CCW + gap + CW) */
+      margin-top: 24px;
+      gap: 24px;
+    }
     .rotation-group { gap: 12px; }
-    #btn-rotate-180 { height: 48px; font-size: 24px; border-radius: 48px; }
-    .btn-lbl { font-size: 14px; }
     .nes-actions { gap: 14px; }
-    .nes-actions #btn-rotate-ccw, 
+    #btn-hold,
+    #btn-rotate-180 {
+      height: 60px;
+      font-size: 26px;
+      gap: 10px;
+    }
+    #btn-rotate-180 { border-radius: 60px; }
+    .btn-lbl { font-size: 14px; }
+    .nes-actions #btn-rotate-ccw,
     .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
   }
 
@@ -1312,7 +1311,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   <!-- Desktop title header -->
   <div id="desktop-header">
     <span class="dh-title">GLOWTRIS</span>
-    <span class="dh-version">v0.3.0 BETA</span>
+    <span class="dh-version">v0.3.3 BETA</span>
   </div>
 
   <!-- Mobile-only compact header -->
@@ -1397,9 +1396,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 
   <!-- Touch controls (all screens) -->
   <div id="touch-controls" class="nes-layout">
-    <!-- MOVEMENT GROUP (Gestalt: Common Region) -->
+    <!-- MOVEMENT GROUP -->
     <div class="control-group">
-      <div class="group-label">MOVEMENT</div>
       <div class="nes-dpad">
         <button class="tbtn tbtn-drop" id="btn-drop">
           <span class="material-icons-round">keyboard_double_arrow_down</span>
@@ -1417,14 +1415,14 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       </div>
     </div>
     
-    <!-- ACTION GROUP (Gestalt: Common Region) -->
+    <!-- ACTION GROUP -->
     <div class="control-group">
-      <div class="group-label">ACTIONS</div>
       <div class="nes-right-panel">
         <button class="tbtn tbtn-hold" id="btn-hold">
           <span class="material-icons-round">swap_horiz</span>
           <span class="btn-lbl">HOLD</span>
         </button>
+        <!-- 180° grouped with CCW/CW (Gestalt: same rotation family) -->
         <div class="rotation-group">
           <button class="tbtn tbtn-rotate" id="btn-rotate-180">
             <span class="material-icons-round">sync</span>
@@ -1451,13 +1449,13 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   var COLS = 10;
   var ROWS = 20;
   var PIECES = {
-    I: { shape: [[1, 1, 1, 1]], color: "#00d8ff" },
+    I: { shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], color: "#00d8ff" },
     O: { shape: [[1, 1], [1, 1]], color: "#ffe000" },
-    T: { shape: [[0, 1, 0], [1, 1, 1]], color: "#cc00ff" },
-    S: { shape: [[0, 1, 1], [1, 1, 0]], color: "#00ffaa" },
-    Z: { shape: [[1, 1, 0], [0, 1, 1]], color: "#ff2040" },
-    J: { shape: [[1, 0, 0], [1, 1, 1]], color: "#2979ff" },
-    L: { shape: [[0, 0, 1], [1, 1, 1]], color: "#ff8c00" }
+    T: { shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], color: "#cc00ff" },
+    S: { shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], color: "#00ffaa" },
+    Z: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], color: "#ff2040" },
+    J: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], color: "#2979ff" },
+    L: { shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], color: "#ff8c00" }
   };
   var SCORE_TABLE = [0, 100, 300, 500, 800];
   var TSPIN_SCORE = [400, 800, 1200, 1600];
@@ -1657,6 +1655,10 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     });
   }
   function getAudioCtx() {
+    if (audioCtx && audioCtx.state === "closed") {
+      audioCtx = null;
+      masterGain = null;
+    }
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       masterGain = audioCtx.createGain();
@@ -1664,11 +1666,25 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       masterGain.gain.value = S.muteAudio ? 0 : 1;
     }
     unlockSpeaker();
-    if (audioCtx.state === "suspended") audioCtx.resume();
+    if (audioCtx.state === "suspended" || audioCtx.state === "interrupted") {
+      audioCtx.resume().catch(() => {
+      });
+    }
     return audioCtx;
   }
   function toggleMute() {
     S.muteAudio = !S.muteAudio;
+    if (audioCtx) {
+      if (audioCtx.state === "closed") {
+        audioCtx = null;
+        masterGain = null;
+      } else if (audioCtx.state === "suspended" || audioCtx.state === "interrupted") {
+        audioCtx.resume().catch(() => {
+        });
+        _speakerUnlocked = false;
+        unlockSpeaker();
+      }
+    }
     if (masterGain) masterGain.gain.value = S.muteAudio ? 0 : 1;
     localStorage.setItem(LS.MUTE, S.muteAudio ? "1" : "0");
     const icon = document.getElementById("mute-icon");
@@ -2149,9 +2165,15 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   function pauseBGM() {
     stopBGM();
   }
-  function resumeBGM() {
+  async function resumeBGM() {
     if (!audioCtx) return;
-    if (audioCtx.state === "suspended") audioCtx.resume();
+    if (audioCtx.state === "suspended" || audioCtx.state === "interrupted") {
+      try {
+        await audioCtx.resume();
+      } catch (e) {
+      }
+    }
+    if (audioCtx.state !== "running") return;
     bgmPlaying = true;
     bgmNextTime = audioCtx.currentTime + 0.1;
     bgmScheduleLoop();
@@ -2236,6 +2258,12 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     pauseBGM();
   }
   function onPageShow() {
+    _speakerUnlocked = false;
+    if (audioCtx) unlockSpeaker();
+    if (audioCtx && (audioCtx.state === "suspended" || audioCtx.state === "interrupted")) {
+      audioCtx.resume().catch(() => {
+      });
+    }
     if (S.gameRunning && !S.gamePaused) resumeBGM();
   }
   function closeAudio() {
@@ -4495,7 +4523,9 @@ ${window.location.origin}`;
     }
     document.querySelectorAll(".lb-tab[data-tab]").forEach((t) => t.classList.toggle("active", t.dataset.tab === tab));
     const myVal = isSprintTab ? S._lbCache.mySprintTime : S._lbCache.myScore;
+    inner.removeAttribute("style");
     inner.innerHTML = lbHTML(entries, S._lbCache.myName, myRank, myVal, isSprintTab);
+    inner.scrollTop = 0;
   }
   function setLbMode(mode) {
     S.lbMode = mode;
@@ -4617,20 +4647,24 @@ ${window.location.origin}`;
     "0>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
   };
   var KICKS_I = {
-    "0>1": [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],
-    "1>0": [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]],
-    "1>2": [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]],
-    "2>1": [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]],
-    "2>3": [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]],
-    "3>2": [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],
+    "0>1": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
+    "1>0": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
+    "1>2": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],
+    "2>1": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
+    "2>3": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
+    "3>2": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
     "3>0": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
     "0>3": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]]
   };
   var KICKS_180 = {
-    "0>2": [[0, 0], [0, -1], [1, -1], [-1, -1], [0, -2], [1, -2], [-1, -2]],
-    "1>3": [[0, 0], [1, 0], [1, -2], [1, -1], [2, 0], [2, -2], [2, -1]],
-    "2>0": [[0, 0], [0, 1], [-1, 1], [1, 1], [0, 2], [-1, 2], [1, 2]],
-    "3>1": [[0, 0], [-1, 0], [-1, -2], [-1, -1], [-2, 0], [-2, -2], [-2, -1]]
+    "0>2": [[0, 0], [1, 0], [-1, 0], [0, -1], [1, -1], [-1, -1]],
+    // N→S: horiz first, up 1 last
+    "2>0": [[0, 0], [-1, 0], [1, 0], [0, 1], [-1, 1], [1, 1]],
+    // S→N: horiz first, down 1 last
+    "1>3": [[0, 0], [0, -1], [1, -1], [-1, -1], [1, 0], [-1, 0]],
+    // E→W
+    "3>1": [[0, 0], [0, -1], [-1, -1], [1, -1], [-1, 0], [1, 0]]
+    // W→E
   };
   function createBoard() {
     return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -4923,13 +4957,8 @@ ${window.location.origin}`;
     }
     const f = corners.map(([cx, cy]) => blocked(cx, cy) ? 1 : 0);
     if (f[0] + f[1] + f[2] + f[3] < 3) return false;
-    const sh = S.current.shape;
-    let front;
-    if (sh.length === 2) {
-      front = sh[0][0] === 0 ? [0, 1] : [2, 3];
-    } else {
-      front = sh[0][1] === 0 ? [1, 3] : [0, 2];
-    }
+    const fronts = [[0, 1], [1, 3], [2, 3], [0, 2]];
+    const front = fronts[S.current.rot];
     const frontFilled = f[front[0]] + f[front[1]];
     if (frontFilled === 2) return "full";
     if (frontFilled === 1) return "mini";
@@ -5227,13 +5256,100 @@ ${window.location.origin}`;
     el.addEventListener("mouseup", rel);
     el.addEventListener("mouseleave", rel);
   }
-  makeTouchBtn("btn-left", () => moveX(-1), "repeat");
-  makeTouchBtn("btn-right", () => moveX(1), "repeat");
-  makeTouchBtn("btn-soft", null, "state", "ArrowDown");
+  function makeDpadSlide(containerSelector, buttons) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    let activeId = null;
+    let touchId = null;
+    function btnAt(x, y) {
+      const el = document.elementFromPoint(x, y);
+      if (!el) return null;
+      const btn = el.closest(".tbtn");
+      return btn && buttons[btn.id] ? btn.id : null;
+    }
+    function gateOpen() {
+      return S.gameRunning && !S.gamePaused && !S._countdownVal;
+    }
+    function activate(id) {
+      if (id === activeId) return;
+      if (activeId) deactivate();
+      if (!id) return;
+      activeId = id;
+      const el = document.getElementById(id);
+      if (el) el.classList.add("pressed");
+      if (!gateOpen()) return;
+      const cfg = buttons[id];
+      if (cfg.keyTarget) KEYS[cfg.keyTarget] = true;
+      if (cfg.press) cfg.press();
+    }
+    function deactivate() {
+      if (!activeId) return;
+      const id = activeId;
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("pressed");
+      const cfg = buttons[id];
+      if (cfg.keyTarget) KEYS[cfg.keyTarget] = false;
+      activeId = null;
+    }
+    container.addEventListener("touchstart", (e) => {
+      if (touchId !== null) return;
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      touchId = t.identifier;
+      activate(btnAt(t.clientX, t.clientY));
+    }, { passive: false });
+    container.addEventListener("touchmove", (e) => {
+      for (const t of e.changedTouches) {
+        if (t.identifier === touchId) {
+          e.preventDefault();
+          activate(btnAt(t.clientX, t.clientY));
+          break;
+        }
+      }
+    }, { passive: false });
+    function endTouch(e) {
+      for (const t of e.changedTouches) {
+        if (t.identifier === touchId) {
+          touchId = null;
+          deactivate();
+          break;
+        }
+      }
+    }
+    container.addEventListener("touchend", endTouch, { passive: false });
+    container.addEventListener("touchcancel", endTouch, { passive: false });
+    container.addEventListener("mousedown", (e) => {
+      const id = btnAt(e.clientX, e.clientY);
+      if (!id) return;
+      e.preventDefault();
+      activate(id);
+      const move = (ev) => activate(btnAt(ev.clientX, ev.clientY));
+      const up = () => {
+        deactivate();
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", up);
+      };
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", up);
+    });
+  }
+  makeDpadSlide(".nes-dpad", {
+    "btn-left": { press: () => {
+      moveX(-1);
+      S.dasCharge.left = 0;
+    }, keyTarget: "ArrowLeft" },
+    "btn-right": { press: () => {
+      moveX(1);
+      S.dasCharge.right = 0;
+    }, keyTarget: "ArrowRight" },
+    "btn-soft": { press: () => {
+      S.dasCharge.down = 0;
+    }, keyTarget: "ArrowDown" },
+    "btn-drop": { press: () => hardDrop() }
+  });
   makeTouchBtn("btn-rotate", () => rotatePiece(1), "game");
   makeTouchBtn("btn-rotate-ccw", () => rotatePiece(-1), "game");
   makeTouchBtn("btn-rotate-180", () => rotatePiece(2), "game");
-  makeTouchBtn("btn-drop", () => hardDrop(), "game");
   makeTouchBtn("btn-hold", () => holdPiece(), "game");
   makeTouchBtn("btn-pause", () => togglePause(), "any");
   function gameLoop(ts) {
@@ -5506,7 +5622,7 @@ ${window.location.origin}`;
       animFrame = null;
     }
   });
-  var _VERSION = "v0.3.0";
+  var _VERSION = "v0.3.3";
   window.onerror = function(msg, src, line, col, err) {
     console.error("[glowtris " + _VERSION + "] uncaught error", {
       msg,

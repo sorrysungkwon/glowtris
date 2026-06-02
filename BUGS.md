@@ -19,6 +19,53 @@
 
 ## ✅ Fixed
 
+### [BUG-011] 180° rotation lifts piece up to 2 cells from the floor
+- **Reported:** 2026-06-02
+- **Symptom:** Pressing 180° on a piece sitting on the floor lifts it up 1-2 cells. Multiple presses accumulate the lift.
+- **Root cause:** The initial `KICKS_180` table tried vertical kicks (y=-1, then y=-2) before horizontal nudges, and went as far as 2 cells up. The competitive-standard pattern tries horizontal kicks first and caps vertical lift at 1 cell.
+- **Fix:** Rewrote `KICKS_180` in the competitive-standard order — basic, then horizontal nudges, then ±1 vertical as last resort. Symmetric for 0↔2 (N↔S) and 1↔3 (E↔W) transitions.
+- **Note:** A 1-cell net drift over a 180→180 press pair is *inherent* to SRS+ rules (the basic kick is always tried first, so 2>0 stays in place after 0>2 lifted the piece). This is standard competitive behavior.
+
+### [BUG-010] D-pad buttons too small + no slide-between-buttons
+- **Reported:** 2026-06-02
+- **Symptom:** D-pad arrow buttons were 46×46 px (mobile) / 60×60 px (tablet) — too small for confident thumb taps. Also, sliding the finger from one D-pad button to another did nothing — players had to lift and re-tap to change direction.
+- **Fix:**
+  - Bumped D-pad button size: mobile 46→64 px, tablet 60→84 px (+ container width 340→380 px to fit)
+  - Replaced per-button touch handlers on the D-pad with a single container-level slide handler (`makeDpadSlide`). The handler tracks the active touch by `identifier`, uses `elementFromPoint` on each `touchmove` to detect which D-pad cell the finger is currently over, and transitions the press/release events accordingly. Held-state goes through `KEYS[]` so the same tick-based DAS path used by the keyboard handles soft drop and L/R repeat.
+
+### [BUG-009] Audio dead after backgrounding tab/app while paused
+- **Reported:** 2026-06-02
+- **Symptom:** Pause game → switch to another tab/app → come back → no sound. Toggling mute off/on doesn't recover audio either. (Persisted on iOS PWA even after the first round of fixes.)
+- **Root causes:** Five compounding issues.
+  1. `resumeBGM` called `audioCtx.resume()` without `await`, then immediately read `audioCtx.currentTime` while the context was still suspended → notes scheduled in the past, silent.
+  2. `toggleMute` only changed `masterGain.gain.value`; never resumed a suspended context.
+  3. `onPageShow` early-returned when the game was paused.
+  4. **iOS 16+ uses `'interrupted'` as the backgrounded state**, not `'suspended'`. Our checks only looked for `'suspended'`, so iOS contexts sat in `'interrupted'` forever.
+  5. **`'closed'` state was never recovered.** On long iOS backgrounding the browser can fully close the context — `resume()` does nothing on a closed context, so audio stays dead until page reload.
+  6. **The iOS speaker-routing unlock only ran once** (silent-WAV hack, gated by `_speakerUnlocked` flag). Long backgrounding can lose the speaker routing, leaving Web Audio routed to the earpiece (inaudible without the phone held to your ear).
+- **Fix:**
+  - `resumeBGM` is `async` and awaits `audioCtx.resume()` (and bails if the state never reaches `'running'`).
+  - `toggleMute`, `onPageShow`, and `getAudioCtx` all now handle BOTH `'suspended'` AND `'interrupted'`.
+  - `getAudioCtx` and `toggleMute` detect `'closed'` and recreate the context.
+  - `onPageShow` re-unlocks the speaker on every visibility return (resets `_speakerUnlocked` flag).
+
+### [BUG-008] Wall-rotation fails for several pieces (had to use 180° to escape)
+- **Reported:** 2026-06-02
+- **Symptom:** Pieces against a wall in certain orientations could not rotate 90° CW/CCW — only 180° worked. First seen on I-piece, later reproduced on S-piece (and likely affects T/J/L/Z too).
+- **Root causes (two layers):**
+  1. **I-piece kick y-signs (initial fix).** `KICKS_I` had wiki (y-up) values copied straight in instead of being negated for canvas (y-down). Kicks intended to lift UP pushed DOWN into the obstacle, so no kick succeeded. Fixed `0>1`, `1>0`, `1>2`, `2>1`, `2>3`, `3>2`.
+  2. **Non-SRS bounding boxes (real underlying bug).** `PIECES` stored JLSTZ as 2×3/3×2 and I as 1×4/4×1 — the bbox SIZE changed across rotations. The wiki SRS kick tables assume a fixed 3×3 (JLSTZ) or 4×4 (I) bbox, with the visible blocks positioned WITHIN that fixed bbox. Because our bbox shrank/grew with each rotation, the piece's "natural" position shifted by 1 cell relative to where SRS expects it. The result: against a wall, the basic (0,0) kick failed AND every kick attempt moved AWAY from the wall direction we needed.
+- **Fix (both layers):**
+  1. Negated I-piece kick y-signs (done in earlier commit).
+  2. Padded `PIECES` to SRS-standard 3×3 for JLSTZ and 4×4 for I; rotation now operates on a stable bbox and the wiki kick tables work as designed.
+  3. Updated T-spin detection to use `S.current.rot` directly (was inferring orientation from the 2-row/3-row shape, which no longer distinguishes them now that all bboxes are 3×3).
+
+### [BUG-007] Leaderboard list starts from rank 3 / 9 instead of 1
+- **Reported:** 2026-06-02
+- **Symptom:** Start-screen leaderboard sometimes displays starting from rank 3 (🥉) or 9, with top entries cut off
+- **Root cause:** `.lb-inner` carried inline `display:flex; align-items:center; justify-content:center;` styles from the LOADING placeholder. After data loaded, `renderLbTab` only replaced the inner HTML — the inline flex centering remained. The new `<table>` was rendered as a flex item, vertically centered, and the top rows were clipped because the table height exceeded the 180px max-height
+- **Fix:** `renderLbTab` now calls `inner.removeAttribute('style')` before setting innerHTML, and resets `scrollTop=0` for tab switches
+
 ### [BUG-006] WASD keys blocked in text inputs
 - **Reported:** 2026-05-31
 - **Symptom:** Cannot type W, A, S, or D when entering a name in the leaderboard submission form. Focus jumps to other buttons instead.

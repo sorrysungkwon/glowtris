@@ -17,7 +17,7 @@ import {
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
   applyShake, _enableKbMode, _disableKbMode,
   updateUI, updateSprintTimer, showScorePopup,
-  updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel,
+  updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel, togglePerfMode,
   triggerScreenFlash, triggerAllClearFlash, triggerLevelUpVisuals, spawnGoldBurst,
   showAchievementToast, unlockAchievement,
   openHowToPlay, closeHowToPlay, openStats, closeStats, showAchTooltip, hideAchTooltip,
@@ -81,20 +81,25 @@ const KICKS_JLSTZ = {
   '0>3':[[0,0],[1,0],[1,-1],[0,2],[1,2]],
 };
 const KICKS_I = {
-  '0>1':[[0,0],[-2,0],[1,0],[-2,-1],[1,2]],
-  '1>0':[[0,0],[2,0],[-1,0],[2,1],[-1,-2]],
-  '1>2':[[0,0],[-1,0],[2,0],[-1,2],[2,-1]],
-  '2>1':[[0,0],[1,0],[-2,0],[1,-2],[-2,1]],
-  '2>3':[[0,0],[2,0],[-1,0],[2,1],[-1,-2]],
-  '3>2':[[0,0],[-2,0],[1,0],[-2,-1],[1,2]],
+  '0>1':[[0,0],[-2,0],[1,0],[-2,1],[1,-2]],
+  '1>0':[[0,0],[2,0],[-1,0],[2,-1],[-1,2]],
+  '1>2':[[0,0],[-1,0],[2,0],[-1,-2],[2,1]],
+  '2>1':[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
+  '2>3':[[0,0],[2,0],[-1,0],[2,-1],[-1,2]],
+  '3>2':[[0,0],[-2,0],[1,0],[-2,1],[1,-2]],
   '3>0':[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
   '0>3':[[0,0],[-1,0],[2,0],[-1,-2],[2,1]],
 };
+// 180° rotation kicks — competitive-standard pattern (max ±1 vertical).
+// Horizontal nudge is tried before any vertical lift so a piece on the floor
+// doesn't shoot up 2 cells when 180° is pressed. A 1-cell net drift over a
+// 180→180 pair is inherent to SRS+ (basic kick is always tried first, so
+// 2>0 stays in place after 0>2 lifted) and is accepted by the standard.
 const KICKS_180 = {
-  '0>2': [[0,0], [0,-1], [1,-1], [-1,-1], [0,-2], [1,-2], [-1,-2]],
-  '1>3': [[0,0], [1,0], [1,-2], [1,-1], [2,0], [2,-2], [2,-1]],
-  '2>0': [[0,0], [0,1], [-1,1], [1,1], [0,2], [-1,2], [1,2]],
-  '3>1': [[0,0], [-1,0], [-1,-2], [-1,-1], [-2,0], [-2,-2], [-2,-1]],
+  '0>2': [[0,0], [1,0], [-1,0], [0,-1], [1,-1], [-1,-1]],  // N→S: horiz first, up 1 last
+  '2>0': [[0,0], [-1,0], [1,0], [0,1], [-1,1], [1,1]],     // S→N: horiz first, down 1 last
+  '1>3': [[0,0], [0,-1], [1,-1], [-1,-1], [1,0], [-1,0]],  // E→W
+  '3>1': [[0,0], [0,-1], [-1,-1], [1,-1], [-1,0], [1,0]],  // W→E
 };
 
 // ─── Board / Logic ────────────────────────────────────────────────────────────
@@ -335,17 +340,18 @@ function getGhostY(){let d=0;while(validPos(S.current,0,d+1))d++;return S.curren
 function checkTSpin(){
   if(!S.current||S.current.key!=='T'||!lastWasRotate)return false;
   const x=S.current.x,y=S.current.y;
+  // Corners of the T-piece 3x3 bounding box (TL, TR, BL, BR).
   const corners=[[x,y],[x+2,y],[x,y+2],[x+2,y+2]];
   function blocked(cx,cy){return cx<0||cx>=COLS||cy>=ROWS||(cy>=0&&S.board[cy][cx]);}
   const f=corners.map(([cx,cy])=>blocked(cx,cy)?1:0);
   if(f[0]+f[1]+f[2]+f[3]<3)return false;
-  const sh=S.current.shape;
-  let front;
-  if(sh.length===2){
-    front=sh[0][0]===0?[0,1]:[2,3];
-  }else{
-    front=sh[0][1]===0?[1,3]:[0,2];
-  }
+  // The two "front" corners depend on the T's current orientation (rot):
+  //   rot 0 (N, point up)    → top corners    [TL, TR]    = [0, 1]
+  //   rot 1 (E, point right) → right corners  [TR, BR]    = [1, 3]
+  //   rot 2 (S, point down)  → bottom corners [BL, BR]    = [2, 3]
+  //   rot 3 (W, point left)  → left corners   [TL, BL]    = [0, 2]
+  const fronts=[[0,1],[1,3],[2,3],[0,2]];
+  const front=fronts[S.current.rot];
   const frontFilled=f[front[0]]+f[front[1]];
   if(frontFilled===2)return'full';
   if(frontFilled===1)return'mini';
@@ -596,13 +602,100 @@ function makeTouchBtn(id,onPress,mode='repeat',keyTarget=null){
   el.addEventListener('mouseleave',rel);
 }
 
-makeTouchBtn('btn-left',  ()=>moveX(-1),  'repeat');
-makeTouchBtn('btn-right', ()=>moveX(1),   'repeat');
-makeTouchBtn('btn-soft',  null,           'state', 'ArrowDown');
+// D-pad: container-level handler so the finger can slide between buttons
+// (left ↔ right ↔ down ↔ drop) without lifting. Each button has a `press`
+// (initial action on activation) and a `keyTarget` (sets KEYS[code] so the
+// tick-based DAS handles the held-state automatically — same path as keyboard).
+function makeDpadSlide(containerSelector, buttons){
+  const container = document.querySelector(containerSelector);
+  if (!container) return;
+  let activeId = null;
+  let touchId  = null;
+
+  function btnAt(x, y){
+    const el = document.elementFromPoint(x, y);
+    if (!el) return null;
+    const btn = el.closest('.tbtn');
+    return btn && buttons[btn.id] ? btn.id : null;
+  }
+  function gateOpen(){
+    return S.gameRunning && !S.gamePaused && !S._countdownVal;
+  }
+  function activate(id){
+    if (id === activeId) return;
+    if (activeId) deactivate();
+    if (!id) return;
+    activeId = id;
+    const el = document.getElementById(id);
+    if (el) el.classList.add('pressed');
+    if (!gateOpen()) return;
+    const cfg = buttons[id];
+    if (cfg.keyTarget) KEYS[cfg.keyTarget] = true;
+    if (cfg.press) cfg.press();
+  }
+  function deactivate(){
+    if (!activeId) return;
+    const id = activeId;
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('pressed');
+    const cfg = buttons[id];
+    if (cfg.keyTarget) KEYS[cfg.keyTarget] = false;
+    activeId = null;
+  }
+
+  container.addEventListener('touchstart', (e) => {
+    if (touchId !== null) return;       // ignore secondary touches
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    touchId = t.identifier;
+    activate(btnAt(t.clientX, t.clientY));
+  }, { passive: false });
+
+  container.addEventListener('touchmove', (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === touchId) {
+        e.preventDefault();
+        activate(btnAt(t.clientX, t.clientY));
+        break;
+      }
+    }
+  }, { passive: false });
+
+  function endTouch(e){
+    for (const t of e.changedTouches) {
+      if (t.identifier === touchId) {
+        touchId = null;
+        deactivate();
+        break;
+      }
+    }
+  }
+  container.addEventListener('touchend',    endTouch, { passive: false });
+  container.addEventListener('touchcancel', endTouch, { passive: false });
+
+  // Mouse fallback (desktop testing only).
+  container.addEventListener('mousedown', (e) => {
+    const id = btnAt(e.clientX, e.clientY);
+    if (!id) return;
+    e.preventDefault();
+    activate(id);
+    const move = (ev) => activate(btnAt(ev.clientX, ev.clientY));
+    const up   = () => { deactivate(); window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  });
+}
+
+makeDpadSlide('.nes-dpad', {
+  'btn-left':  { press: () => { moveX(-1); S.dasCharge.left = 0; },  keyTarget: 'ArrowLeft'  },
+  'btn-right': { press: () => { moveX(1);  S.dasCharge.right = 0; }, keyTarget: 'ArrowRight' },
+  'btn-soft':  { press: () => { S.dasCharge.down = 0; },              keyTarget: 'ArrowDown'  },
+  'btn-drop':  { press: () => hardDrop() },
+});
+
 makeTouchBtn('btn-rotate',()=>rotatePiece(1),'game');
 makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(-1),'game');
 makeTouchBtn('btn-rotate-180',()=>rotatePiece(2),'game');
-makeTouchBtn('btn-drop',  ()=>hardDrop(), 'game');
 makeTouchBtn('btn-hold',  ()=>holdPiece(),'game');
 makeTouchBtn('btn-pause', ()=>togglePause(),'any');
 
@@ -845,7 +938,7 @@ window.addEventListener('beforeunload',()=>{
 });
 
 // ─── Error monitoring ─────────────────────────────────────────────────────────
-const _VERSION = 'v0.3.0';
+const _VERSION = 'v0.3.3';
 window.onerror = function(msg, src, line, col, err) {
   console.error('[glowtris ' + _VERSION + '] uncaught error', {
     msg, src: src ? src.replace(window.location.origin, '') : src, line, col,
@@ -869,7 +962,7 @@ Object.assign(window, {
   submitScore, submitSprintScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
   toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,
-  updateGhost, updateColorblind, cycleAnimIntensity,
+  updateGhost, updateColorblind, cycleAnimIntensity, togglePerfMode,
   openHowToPlay, closeHowToPlay, openStats, closeStats,
   showAchTooltip, hideAchTooltip,
   _openDonation,
