@@ -380,3 +380,28 @@ feature/xxx  →  preview (verify)  →  PR to master  →  production
 - **ONE push to preview per feature** — no iterative preview pushes
 - **NEVER merge directly to master** — always via PR
 - **NEVER run `vercel` CLI** for deploys
+
+---
+
+## 📋 Session Notes — 2026-06-02 (v0.3.4 UI Aesthetics & Perf Toggle)
+
+### UI Aesthetics Overhaul
+- **D-pad Redesign**: Unified into a cohesive glassmorphic cross. Removed blocky borders.
+- **Button Sizing & Alignment**: Adjusted action buttons to align perfectly with D-pad boundaries. Grouped HOLD and 180° at the top, CCW and CW at the bottom.
+- **Glowing Colors (Mobile/Tablet)**: 
+  - All rotation buttons (CCW, CW, 180) now glow **Purple** (`#a000ff`) when pressed.
+  - Hard drop button glows **Red** (`#ff1e50`).
+  - Hold button glows **Yellow** (`#ffe600`).
+  - Implemented CSS variables (`--ripple-color`) to tint the ripple effect (`.tbtn::after`) with the respective button's active color.
+  - *Bug Fix*: Moved glowing overrides OUTSIDE of the tablet media query (`min-width: 600px`) to ensure they apply globally across all touch screens (phones & iPads).
+
+### Performance Mode Fixes
+- **False Positive Triggers**: Mobile browsers (Safari/Chrome) suspending tabs or displaying UI overlays (e.g. address bar) caused `requestAnimationFrame` delays, artificially dropping FPS and incorrectly triggering Performance Mode.
+- **Solution**: 
+  - Updated `measureFPS` to ignore frame drops where `dt > 1500ms` (tab suspension/UI pause).
+  - Increased threshold to 5 consecutive seconds of low FPS (<30 FPS) before triggering Performance Mode.
+- **Manual Toggle**: Added a manual `PERF: FULL / LOW` toggle button in the pause settings menu (`ov-perf-btn`). Toggling this locks the mode to prevent auto-detection from overriding user preference.
+
+### Pending Tasks for Next Agent
+- Proceed to `v0.4` milestone: Back-to-Back, All-spin detection, expanding Next queue to 5.
+- **180° Rotation Bug**: Continue investigating the bug where the 180° rotation (A key) sometimes fails after a hard drop, soft drop, or natural lock. IRS duplicate prevention was added but requires further testing.
