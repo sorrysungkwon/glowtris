@@ -752,7 +752,7 @@
     #game-row { flex:1 1 0; min-height:0; align-items:center; justify-content:center; }
 
     #touch-controls.nes-layout {
-      width: min(340px, 98vw); /* Stay within typical mobile width */
+      width: min(380px, 98vw); /* Wider to fit larger D-pad */
       padding-bottom: 20px;
       display: flex;
       flex-direction: row;
@@ -760,7 +760,7 @@
       align-items: stretch;
       gap: 10px;
     }
-    #mobile-header { width: min(340px, 92vw); }
+    #mobile-header { width: min(380px, 92vw); }
 
     .control-group {
       flex: 1;
@@ -785,15 +785,16 @@
 
     .nes-dpad {
       display: grid;
-      grid-template-columns: 46px 46px 46px;
-      grid-template-rows: 46px 46px 46px;
-      gap: 3px;
+      grid-template-columns: 64px 64px 64px;
+      grid-template-rows: 64px 64px 64px;
+      gap: 4px;
+      touch-action: none;
     }
-    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 10px 10px 4px 4px; }
-    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 10px 4px 4px 10px; }
-    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 10px 10px 4px; }
-    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 10px 10px; }
-    .nes-dpad .tbtn { height: 100%; font-size: 28px; }
+    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 12px 12px 4px 4px; }
+    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 12px 4px 4px 12px; }
+    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 12px 12px 4px; }
+    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 12px 12px; }
+    .nes-dpad .tbtn { height: 100%; font-size: 34px; touch-action: none; }
     
     .dpad-center {
       grid-column: 2; grid-row: 2;
@@ -865,9 +866,10 @@
     #touch-controls.nes-layout { width: 500px; padding-bottom: 30px; }
     .control-group { padding: 14px; }
     .nes-dpad {
-      grid-template-columns: 60px 60px 60px;
-      grid-template-rows: 60px 60px 60px;
+      grid-template-columns: 84px 84px 84px;
+      grid-template-rows: 84px 84px 84px;
     }
+    .nes-dpad .tbtn { font-size: 44px; }
     .nes-right-panel { gap: 24px; }
     #btn-hold { height: 48px; font-size: 24px; border-radius: 12px; }
     .rotation-group { gap: 12px; }
@@ -5238,13 +5240,100 @@ ${window.location.origin}`;
     el.addEventListener("mouseup", rel);
     el.addEventListener("mouseleave", rel);
   }
-  makeTouchBtn("btn-left", () => moveX(-1), "repeat");
-  makeTouchBtn("btn-right", () => moveX(1), "repeat");
-  makeTouchBtn("btn-soft", null, "state", "ArrowDown");
+  function makeDpadSlide(containerSelector, buttons) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    let activeId = null;
+    let touchId = null;
+    function btnAt(x, y) {
+      const el = document.elementFromPoint(x, y);
+      if (!el) return null;
+      const btn = el.closest(".tbtn");
+      return btn && buttons[btn.id] ? btn.id : null;
+    }
+    function gateOpen() {
+      return S.gameRunning && !S.gamePaused && !S._countdownVal;
+    }
+    function activate(id) {
+      if (id === activeId) return;
+      if (activeId) deactivate();
+      if (!id) return;
+      activeId = id;
+      const el = document.getElementById(id);
+      if (el) el.classList.add("pressed");
+      if (!gateOpen()) return;
+      const cfg = buttons[id];
+      if (cfg.keyTarget) KEYS[cfg.keyTarget] = true;
+      if (cfg.press) cfg.press();
+    }
+    function deactivate() {
+      if (!activeId) return;
+      const id = activeId;
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("pressed");
+      const cfg = buttons[id];
+      if (cfg.keyTarget) KEYS[cfg.keyTarget] = false;
+      activeId = null;
+    }
+    container.addEventListener("touchstart", (e) => {
+      if (touchId !== null) return;
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      touchId = t.identifier;
+      activate(btnAt(t.clientX, t.clientY));
+    }, { passive: false });
+    container.addEventListener("touchmove", (e) => {
+      for (const t of e.changedTouches) {
+        if (t.identifier === touchId) {
+          e.preventDefault();
+          activate(btnAt(t.clientX, t.clientY));
+          break;
+        }
+      }
+    }, { passive: false });
+    function endTouch(e) {
+      for (const t of e.changedTouches) {
+        if (t.identifier === touchId) {
+          touchId = null;
+          deactivate();
+          break;
+        }
+      }
+    }
+    container.addEventListener("touchend", endTouch, { passive: false });
+    container.addEventListener("touchcancel", endTouch, { passive: false });
+    container.addEventListener("mousedown", (e) => {
+      const id = btnAt(e.clientX, e.clientY);
+      if (!id) return;
+      e.preventDefault();
+      activate(id);
+      const move = (ev) => activate(btnAt(ev.clientX, ev.clientY));
+      const up = () => {
+        deactivate();
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", up);
+      };
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", up);
+    });
+  }
+  makeDpadSlide(".nes-dpad", {
+    "btn-left": { press: () => {
+      moveX(-1);
+      S.dasCharge.left = 0;
+    }, keyTarget: "ArrowLeft" },
+    "btn-right": { press: () => {
+      moveX(1);
+      S.dasCharge.right = 0;
+    }, keyTarget: "ArrowRight" },
+    "btn-soft": { press: () => {
+      S.dasCharge.down = 0;
+    }, keyTarget: "ArrowDown" },
+    "btn-drop": { press: () => hardDrop() }
+  });
   makeTouchBtn("btn-rotate", () => rotatePiece(1), "game");
   makeTouchBtn("btn-rotate-ccw", () => rotatePiece(-1), "game");
   makeTouchBtn("btn-rotate-180", () => rotatePiece(2), "game");
-  makeTouchBtn("btn-drop", () => hardDrop(), "game");
   makeTouchBtn("btn-hold", () => holdPiece(), "game");
   makeTouchBtn("btn-pause", () => togglePause(), "any");
   function gameLoop(ts) {

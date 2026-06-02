@@ -596,13 +596,100 @@ function makeTouchBtn(id,onPress,mode='repeat',keyTarget=null){
   el.addEventListener('mouseleave',rel);
 }
 
-makeTouchBtn('btn-left',  ()=>moveX(-1),  'repeat');
-makeTouchBtn('btn-right', ()=>moveX(1),   'repeat');
-makeTouchBtn('btn-soft',  null,           'state', 'ArrowDown');
+// D-pad: container-level handler so the finger can slide between buttons
+// (left ↔ right ↔ down ↔ drop) without lifting. Each button has a `press`
+// (initial action on activation) and a `keyTarget` (sets KEYS[code] so the
+// tick-based DAS handles the held-state automatically — same path as keyboard).
+function makeDpadSlide(containerSelector, buttons){
+  const container = document.querySelector(containerSelector);
+  if (!container) return;
+  let activeId = null;
+  let touchId  = null;
+
+  function btnAt(x, y){
+    const el = document.elementFromPoint(x, y);
+    if (!el) return null;
+    const btn = el.closest('.tbtn');
+    return btn && buttons[btn.id] ? btn.id : null;
+  }
+  function gateOpen(){
+    return S.gameRunning && !S.gamePaused && !S._countdownVal;
+  }
+  function activate(id){
+    if (id === activeId) return;
+    if (activeId) deactivate();
+    if (!id) return;
+    activeId = id;
+    const el = document.getElementById(id);
+    if (el) el.classList.add('pressed');
+    if (!gateOpen()) return;
+    const cfg = buttons[id];
+    if (cfg.keyTarget) KEYS[cfg.keyTarget] = true;
+    if (cfg.press) cfg.press();
+  }
+  function deactivate(){
+    if (!activeId) return;
+    const id = activeId;
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('pressed');
+    const cfg = buttons[id];
+    if (cfg.keyTarget) KEYS[cfg.keyTarget] = false;
+    activeId = null;
+  }
+
+  container.addEventListener('touchstart', (e) => {
+    if (touchId !== null) return;       // ignore secondary touches
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    touchId = t.identifier;
+    activate(btnAt(t.clientX, t.clientY));
+  }, { passive: false });
+
+  container.addEventListener('touchmove', (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === touchId) {
+        e.preventDefault();
+        activate(btnAt(t.clientX, t.clientY));
+        break;
+      }
+    }
+  }, { passive: false });
+
+  function endTouch(e){
+    for (const t of e.changedTouches) {
+      if (t.identifier === touchId) {
+        touchId = null;
+        deactivate();
+        break;
+      }
+    }
+  }
+  container.addEventListener('touchend',    endTouch, { passive: false });
+  container.addEventListener('touchcancel', endTouch, { passive: false });
+
+  // Mouse fallback (desktop testing only).
+  container.addEventListener('mousedown', (e) => {
+    const id = btnAt(e.clientX, e.clientY);
+    if (!id) return;
+    e.preventDefault();
+    activate(id);
+    const move = (ev) => activate(btnAt(ev.clientX, ev.clientY));
+    const up   = () => { deactivate(); window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  });
+}
+
+makeDpadSlide('.nes-dpad', {
+  'btn-left':  { press: () => { moveX(-1); S.dasCharge.left = 0; },  keyTarget: 'ArrowLeft'  },
+  'btn-right': { press: () => { moveX(1);  S.dasCharge.right = 0; }, keyTarget: 'ArrowRight' },
+  'btn-soft':  { press: () => { S.dasCharge.down = 0; },              keyTarget: 'ArrowDown'  },
+  'btn-drop':  { press: () => hardDrop() },
+});
+
 makeTouchBtn('btn-rotate',()=>rotatePiece(1),'game');
 makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(-1),'game');
 makeTouchBtn('btn-rotate-180',()=>rotatePiece(2),'game');
-makeTouchBtn('btn-drop',  ()=>hardDrop(), 'game');
 makeTouchBtn('btn-hold',  ()=>holdPiece(),'game');
 makeTouchBtn('btn-pause', ()=>togglePause(),'any');
 

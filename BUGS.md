@@ -19,6 +19,13 @@
 
 ## ✅ Fixed
 
+### [BUG-010] D-pad buttons too small + no slide-between-buttons
+- **Reported:** 2026-06-02
+- **Symptom:** D-pad arrow buttons were 46×46 px (mobile) / 60×60 px (tablet) — too small for confident thumb taps. Also, sliding the finger from one D-pad button to another did nothing — players had to lift and re-tap to change direction.
+- **Fix:**
+  - Bumped D-pad button size: mobile 46→64 px, tablet 60→84 px (+ container width 340→380 px to fit)
+  - Replaced per-button touch handlers on the D-pad with a single container-level slide handler (`makeDpadSlide`). The handler tracks the active touch by `identifier`, uses `elementFromPoint` on each `touchmove` to detect which D-pad cell the finger is currently over, and transitions the press/release events accordingly. Held-state goes through `KEYS[]` so the same tick-based DAS path used by the keyboard handles soft drop and L/R repeat.
+
 ### [BUG-009] Audio dead after backgrounding tab/app while paused
 - **Reported:** 2026-06-02
 - **Symptom:** Pause game → switch to another tab/app → come back → no sound. Toggling mute off/on doesn't recover audio either.
