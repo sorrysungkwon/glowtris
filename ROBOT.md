@@ -403,5 +403,5 @@ feature/xxx  →  preview (verify)  →  PR to master  →  production
 - **Manual Toggle**: Added a manual `PERF: FULL / LOW` toggle button in the pause settings menu (`ov-perf-btn`). Toggling this locks the mode to prevent auto-detection from overriding user preference.
 
 ### Pending Tasks for Next Agent
-- Proceed to `v0.4` milestone: Back-to-Back, All-spin detection, expanding Next queue to 5.
-- **180° Rotation Bug**: Continue investigating the bug where the 180° rotation (A key) sometimes fails after a hard drop, soft drop, or natural lock. IRS duplicate prevention was added but requires further testing.
+- Proceed to \`v0.4\` milestone: Back-to-Back, All-spin detection, expanding Next queue to 5.
+- *Note: The 180° rotation (A key) failure bug has been fully resolved.*

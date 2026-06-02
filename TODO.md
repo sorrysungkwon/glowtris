@@ -669,4 +669,4 @@ Root cause: Vercel Analytics reported INP 568ms ("poor" — threshold is >500ms)
 - [ ] Task 7: Update docs, push version tag `v2.0`, upgrade infrastructure (Vercel Pro + Pusher).
 
 ## 🐛 Pending Bugs
-- [ ] **180도 회전 버그 (진행중)**: 유저 제보 - 하드드랍 뿐만 아니라 소프트드랍이나 가만히 두어 블록이 바닥에 닿아 고정될 때도 180도 회전(A키)이 가끔 씹히는 현상이 있음. (위에서 IRS 중복 회전 방지 처리를 했으나, 다음 세션에서 추가 검증 필요)
+- [x] **180도 회전 버그 (해결됨)**: 유저 제보 - 하드드랍 뿐만 아니라 소프트드랍이나 가만히 두어 블록이 바닥에 닿아 고정될 때도 180도 회전(A키)이 가끔 씹히는 현상이 있었으나 IRS 중복 회전 방지 및 판정 수정을 통해 해결 완료.
