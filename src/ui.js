@@ -67,12 +67,26 @@ const PAL = ['#00c8ff','#a000ff','#ff0080','#ffe600','#00ff88'];
 // ─── Performance detection ────────────────────────────────────────────────────
 export function measureFPS(ts) {
   _fpsCnt++;
-  if (ts - _fpsLast >= 1000) {
-    const fps = _fpsCnt; _fpsCnt = 0; _fpsLast = ts;
+  const dt = ts - _fpsLast;
+  if (dt >= 1000) {
+    const fps = Math.round((_fpsCnt / dt) * 1000);
+    _fpsCnt = 0; _fpsLast = ts;
     if (_perfHold > 0) { _perfHold--; _fpsLowCount = 0; return; }
+    
+    // Ignore frame drops caused by browser tab suspension or UI interaction pauses (Safari address bar etc.)
+    if (dt > 1500) { _fpsLowCount = 0; return; }
+
     if (!S.lowPerfMode) {
-      if (fps < 28) { _fpsLowCount++; if (_fpsLowCount >= 2) { setLowPerfMode(true); S._perfLocked = true; _perfHold = 1; } }
-      else { _fpsLowCount = 0; }
+      if (fps < 30) { 
+        _fpsLowCount++; 
+        if (_fpsLowCount >= 5) { 
+          setLowPerfMode(true); 
+          S._perfLocked = true; 
+          _perfHold = 1; 
+        } 
+      } else if (fps >= 45) { 
+        _fpsLowCount = 0; 
+      }
     }
   }
 }
