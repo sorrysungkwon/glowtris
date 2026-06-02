@@ -845,6 +845,24 @@
       margin-top: 16px;
     }
     .nes-dpad .tbtn { font-size: 32px; }
+    .nes-right-panel {
+      width: 154px; /* = 70*2 + 14 */
+      margin-top: 16px;
+      gap: 16px;
+    }
+    .rotation-group { gap: 12px; }
+    .nes-actions { gap: 14px; }
+    #btn-hold,
+    #btn-rotate-180 {
+      height: 52px;
+      font-size: 22px;
+      gap: 8px;
+    }
+    #btn-rotate-180 { border-radius: 52px; }
+    .btn-lbl { font-size: 13px; }
+    .nes-actions #btn-rotate-ccw,
+    .nes-actions #btn-rotate { width: 70px; height: 70px; font-size: 36px; }
+  }
 
   /* ── Specific Button Active Glow Colors & Ripple Tint ── */
   .nes-dpad .tbtn {
@@ -882,25 +900,6 @@
     border-color: rgba(160, 0, 255, 0.8) !important;
     box-shadow: inset 0 0 20px rgba(160, 0, 255, 0.5), 0 0 15px rgba(160, 0, 255, 0.4) !important;
     color: #a000ff !important;
-  }
-
-    .nes-right-panel {
-      width: 154px; /* = 70*2 + 14 */
-      margin-top: 16px;
-      gap: 16px;
-    }
-    .rotation-group { gap: 12px; }
-    .nes-actions { gap: 14px; }
-    #btn-hold,
-    #btn-rotate-180 {
-      height: 52px;
-      font-size: 22px;
-      gap: 8px;
-    }
-    #btn-rotate-180 { border-radius: 52px; }
-    .btn-lbl { font-size: 13px; }
-    .nes-actions #btn-rotate-ccw,
-    .nes-actions #btn-rotate { width: 70px; height: 70px; font-size: 36px; }
   }
 
   /* ─── Performance mode indicator ─── */
