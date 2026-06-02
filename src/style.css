@@ -546,8 +546,8 @@
   .new-best-badge { font-size:14px; font-weight:900; letter-spacing:4px; color:#ffe600; text-shadow:0 0 18px #ffe600,0 0 36px #ffaa00; margin-bottom:10px; animation:pulse 0.7s ease-in-out infinite; }
   .history-row { display:flex; align-items:center; gap:6px; margin-bottom:6px; font-size:10px; color:rgba(0,200,255,0.5); letter-spacing:1px; }
   .hist-sep { opacity:0.3; }
-  .lb-inner { width:100%; max-height:180px; overflow-y:auto; margin:8px 0 14px; }
-  @media (max-width:600px) { .lb-inner { max-height:130px; } }
+  .lb-inner { width:100%; min-height:180px; max-height:180px; overflow-y:auto; margin:8px 0 14px; }
+  @media (max-width:600px) { .lb-inner { min-height:130px; max-height:130px; } }
   .lb-table { width:100%; border-collapse:collapse; display:table; table-layout:fixed; }
   .lb-table tr { border-bottom:1px solid rgba(0,200,255,0.08); }
   .lb-table td { padding:8px 4px; font-size:11px; letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -583,6 +583,25 @@
   .action-btn.sm { font-size:10px; padding:9px 18px; letter-spacing:2px; border-radius:6px; }
   .action-btn.ghost { background:transparent; border-color:rgba(255,255,255,0.22); color:rgba(255,255,255,0.55); }
   .action-btn.ghost:hover { border-color:rgba(0,200,255,0.45); color:var(--cyan); background:rgba(0,200,255,0.08); }
+  
+  .action-btn.play-btn {
+    font-size: 16px;
+    padding: 14px 24px;
+    letter-spacing: 5px;
+    background: linear-gradient(135deg, rgba(0,200,255,0.45), rgba(160,0,255,0.45));
+    border: 2px solid rgba(255,255,255,0.6);
+    text-shadow: 0 0 10px rgba(255,255,255,0.7);
+    animation: play-pulse 2s infinite alternate;
+  }
+  @keyframes play-pulse {
+    0% { box-shadow: 0 0 15px rgba(0,200,255,0.4), inset 0 0 8px rgba(160,0,255,0.2); transform: scale(1); }
+    100% { box-shadow: 0 0 25px rgba(0,200,255,0.7), inset 0 0 15px rgba(160,0,255,0.5); transform: scale(1.02); border-color: rgba(255,255,255,0.9); }
+  }
+  .action-btn.play-btn:hover {
+    transform: scale(1.06) !important;
+    box-shadow: 0 0 40px rgba(0,200,255,0.8), inset 0 0 20px rgba(255,255,255,0.6) !important;
+    background: linear-gradient(135deg, rgba(0,200,255,0.7), rgba(160,0,255,0.7));
+  }
   #daily-challenge-btn, #daily-launch-btn {
     background: linear-gradient(90deg, #ffe600, #ffaa00);
     box-shadow: 0 0 25px rgba(255, 170, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
@@ -729,15 +748,15 @@
 
     .nes-dpad {
       display: grid;
-      grid-template-columns: 44px 44px 44px;
-      grid-template-rows: 44px 44px 44px;
+      grid-template-columns: 46px 46px 46px;
+      grid-template-rows: 46px 46px 46px;
       gap: 3px;
     }
     .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 10px 10px 4px 4px; }
     .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 10px 4px 4px 10px; }
     .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 10px 10px 4px; }
     .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 10px 10px; }
-    .nes-dpad .tbtn { height: 100%; font-size: 26px; }
+    .nes-dpad .tbtn { height: 100%; font-size: 28px; }
     
     .dpad-center {
       grid-column: 2; grid-row: 2;
@@ -751,21 +770,43 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 18px; /* Clear separation between Hold and Rotations */
       width: 100%;
     }
 
     #btn-hold {
-      width: 100%; /* Long horizontal */
-      height: 54px;
-      border-radius: 8px;
-      font-size: 22px;
+      width: 100%;
+      height: 34px;
+      border-radius: 8px; /* 네모에 곡률 */
+      font-size: 18px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .hold-text {
+
+    .rotation-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    #btn-rotate-180 {
+      width: 100%;
+      height: 34px;
+      border-radius: 34px; /* 원통형의 긴 버튼 */
+      font-size: 18px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-lbl {
       font-size: 11px;
       font-weight: 700;
       font-family: 'Orbitron', monospace;
-      margin-left: 6px;
       letter-spacing: 2px;
     }
 
@@ -776,9 +817,9 @@
     }
     .nes-actions #btn-rotate-ccw, 
     .nes-actions #btn-rotate {
-      width: 64px; height: 64px;
+      width: 62px; height: 62px;
       border-radius: 50%;
-      font-size: 32px;
+      font-size: 30px;
     }
   }
 
@@ -790,8 +831,11 @@
       grid-template-columns: 60px 60px 60px;
       grid-template-rows: 60px 60px 60px;
     }
-    .nes-right-panel { gap: 26px; }
-    #btn-hold { height: 74px; font-size: 28px; }
+    .nes-right-panel { gap: 24px; }
+    #btn-hold { height: 48px; font-size: 24px; border-radius: 12px; }
+    .rotation-group { gap: 12px; }
+    #btn-rotate-180 { height: 48px; font-size: 24px; border-radius: 48px; }
+    .btn-lbl { font-size: 14px; }
     .nes-actions { gap: 14px; }
     .nes-actions #btn-rotate-ccw, 
     .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
@@ -1171,3 +1215,5 @@
   .footer-links-wrap .footer-link:hover {
     color: var(--cyan);
   }
+@keyframes text-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 8px rgba(0,200,255,0.8); } }
+html.low-perf .action-btn.play-btn { animation: none !important; }

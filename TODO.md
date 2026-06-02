@@ -23,7 +23,7 @@
 |---|---|---|---|
 | v1.0.9.4 ~ v1.1.1 *(now reframed as v0.1.x beta)* | Sprint, domain, UX polish | — | ✅ Done |
 | **v0.2 Loop & Input Core** | Decoupled fixed-timestep loop, ordered sub-frame input handling | ARCH-001, ARCH-002 | ✅ Done |
-| **v0.3 Movement Standard** | 180° rotation, custom keybinds, SDF (+ ∞), lock-delay reset cap, IRS, IHS, DCD, instant ARR=0 | FEAT-001/002/003/006/007/008/012, ARCH-003 | 🔲 Next |
+| **v0.3 Movement Standard** | ~~180° rotation~~, custom keybinds, ~~SDF (+ ∞)~~, ~~lock-delay reset cap~~, ~~IRS~~, ~~IHS~~, ~~DCD~~, ~~instant ARR=0~~ | FEAT-001/002/003/006/007/008/012, ARCH-003 | ✅ Done |
 | **v0.4 Scoring Standard** | Back-to-Back, 5-piece next queue, all-spin (SRS+) | FEAT-004/005/010 | 🔲 |
 | **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3 substages — see BUGS.md ARCH-004), render interpolation between ticks, low-latency audio dispatch | ARCH-004/005 | 🔲 |
 | **v0.6 Modes & Metrics** | Ultra/Blitz mode, in-game APM/PPS | FEAT-009/011 | 🔲 |
@@ -667,3 +667,6 @@ Root cause: Vercel Analytics reported INP 568ms ("poor" — threshold is >500ms)
 - [ ] Task 5: **Live spectator mode** — watch any ongoing public match; spectator count shown on match screen.
 - [ ] Task 6: **Battle leaderboard** — ranked by Elo; TODAY (most battles) / ALL TIME (highest Elo) tabs.
 - [ ] Task 7: Update docs, push version tag `v2.0`, upgrade infrastructure (Vercel Pro + Pusher).
+
+## 🐛 Pending Bugs
+- [ ] **180도 회전 버그 (진행중)**: 유저 제보 - 하드드랍 뿐만 아니라 소프트드랍이나 가만히 두어 블록이 바닥에 닿아 고정될 때도 180도 회전(A키)이 가끔 씹히는 현상이 있음. (위에서 IRS 중복 회전 방지 처리를 했으나, 다음 세션에서 추가 검증 필요)

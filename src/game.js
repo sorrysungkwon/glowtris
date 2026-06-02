@@ -17,7 +17,7 @@ import {
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
   applyShake, _enableKbMode, _disableKbMode,
   updateUI, updateSprintTimer, showScorePopup,
-  updateDAS, updateARR, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel,
+  updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel,
   triggerScreenFlash, triggerAllClearFlash, triggerLevelUpVisuals, spawnGoldBurst,
   showAchievementToast, unlockAchievement,
   openHowToPlay, closeHowToPlay, openStats, closeStats, showAchTooltip, hideAchTooltip,
@@ -67,7 +67,7 @@ const $combo    = document.getElementById('combo-display');
 // ─── Bag / Pieces ─────────────────────────────────────────────────────────────
 function refillBag(){bag=[...Object.keys(PIECES)];for(let i=bag.length-1;i>0;i--){const randVal=_prng?_prng():Math.random();const j=Math.floor(randVal*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}}
 function nextFromBag(){if(!bag.length)refillBag();return bag.pop();}
-function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor(COLS/2)-Math.floor(d.shape[0].length/2),y:0,rot:0};}
+function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor(COLS/2)-Math.floor(d.shape[0].length/2),y:-1,rot:0};}
 
 // SRS kick tables — canvas y-down (wiki y-up values with y negated)
 const KICKS_JLSTZ = {
@@ -90,6 +90,12 @@ const KICKS_I = {
   '3>0':[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
   '0>3':[[0,0],[-1,0],[2,0],[-1,-2],[2,1]],
 };
+const KICKS_180 = {
+  '0>2': [[0,0], [0,-1], [1,-1], [-1,-1], [0,-2], [1,-2], [-1,-2]],
+  '1>3': [[0,0], [1,0], [1,-2], [1,-1], [2,0], [2,-2], [2,-1]],
+  '2>0': [[0,0], [0,1], [-1,1], [1,1], [0,2], [-1,2], [1,2]],
+  '3>1': [[0,0], [-1,0], [-1,-2], [-1,-1], [-2,0], [-2,-2], [-2,-1]],
+};
 
 // ─── Board / Logic ────────────────────────────────────────────────────────────
 function createBoard(){return Array.from({length:ROWS},()=>Array(COLS).fill(null));}
@@ -108,9 +114,14 @@ function validPos(piece,ox=0,oy=0,shape=null){
 function rotateCW(shape){const R=shape.length,C=shape[0].length;return Array.from({length:C},(_,c)=>Array.from({length:R},(_,r)=>shape[R-1-r][c]));}
 function rotateCCW(shape){const R=shape.length,C=shape[0].length;return Array.from({length:C},(_,c)=>Array.from({length:R},(_,r)=>shape[r][C-1-c]));}
 
-function _tryRotate(newShape, fromRot, toRot) {
+function _tryRotate(newShape, fromRot, toRot, is180 = false) {
   const key = `${fromRot}>${toRot}`;
-  const kicks = S.current.key === 'I' ? KICKS_I : S.current.key === 'O' ? [[0,0]] : KICKS_JLSTZ;
+  let kicks;
+  if (is180) {
+    kicks = KICKS_180;
+  } else {
+    kicks = S.current.key === 'I' ? KICKS_I : S.current.key === 'O' ? [[0,0]] : KICKS_JLSTZ;
+  }
   const table = kicks[key] || [[0,0]];
   for (const [dx,dy] of table) {
     if (validPos(S.current, dx, dy, newShape)) {
@@ -118,20 +129,35 @@ function _tryRotate(newShape, fromRot, toRot) {
       S.current.x += dx;
       S.current.y += dy;
       S.current.rot = toRot;
-      cancelLock(); lastWasRotate = true; sfxRotate();
+      if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
+      cancelLock(); lastWasRotate=true; sfxRotate();
       return true;
     }
   }
   return false;
 }
 
-function rotatePiece(ccw=false){
+function rotatePiece(dir = 1) { // 1 = CW, -1 = CCW, 2 = 180
+  if (!S.current) return;
   const from = S.current.rot;
-  const to = ccw ? (from+3)%4 : (from+1)%4;
-  _tryRotate(ccw ? rotateCCW(S.current.shape) : rotateCW(S.current.shape), from, to);
+  const to = (from + dir + 4) % 4;
+  let newShape;
+  if (dir === 1) newShape = rotateCW(S.current.shape);
+  else if (dir === -1) newShape = rotateCCW(S.current.shape);
+  else if (dir === 2) newShape = rotateCW(rotateCW(S.current.shape));
+
+  _tryRotate(newShape, from, to, dir === 2);
 }
 
-function cancelLock(){S.lockActive=false;S.lockTimer=0;}
+function cancelLock(){
+  if (S.lockActive) {
+    if (S.lockResets < 15) {
+      S.lockActive = false; S.lockTimer = 0; S.lockResets++;
+    }
+  } else {
+    S.lockActive = false; S.lockTimer = 0;
+  }
+}
 
 function lockPiece(){
   const tspin=checkTSpin();
@@ -218,6 +244,7 @@ function lockPiece(){
       S.flashLines=new Set();
       // Sprint end: check AFTER board splice so the cleared board is visible
       if(S.isSprintMode&&S.lines>=SPRINT_LINES){endSprint();return;}
+      spawnPiece();
     },120);
   } else {
     if(tspin==='full'){sfxTSpin();addScore(TSPIN_SCORE[0]*S.level,0,'full');unlockAchievement('tspin_1');}
@@ -226,9 +253,10 @@ function lockPiece(){
   }
   lastWasRotate=false;
   spawnLockParticles(S.current);
+  S.current = null;
   // In sprint mode, capture end time immediately when 40 lines reached.
   if(S.isSprintMode&&S.lines>=SPRINT_LINES){S._sprintEndTime=performance.now();return;}
-  spawnPiece();
+  if(cleared.length === 0) spawnPiece();
 }
 
 function addScore(pts,n,tspin=false){
@@ -243,18 +271,61 @@ function addScore(pts,n,tspin=false){
   updateUI();showScorePopup(pts,n,tspin);
 }
 
-function spawnPiece(){
+function spawnPiece(fromHold = false){
   lastWasRotate=false;
-  S.current=makePiece(S.next.key);S.next=makePiece(nextFromBag());canHold=true;
+  
+  // IHS (Initial Hold System)
+  if (!fromHold && canHold && (KEYS['KeyC'] || KEYS['ShiftLeft'] || KEYS['ShiftRight'])) {
+    if (!S.held) {
+      S.held = makePiece(S.next.key);
+      S.current = makePiece(nextFromBag());
+      S.next = makePiece(nextFromBag());
+    } else {
+      S.current = makePiece(S.held.key);
+      S.held = makePiece(S.next.key);
+      S.next = makePiece(nextFromBag());
+    }
+    canHold = false;
+    sfxHold();
+    drawHold();
+  } else {
+    S.current = makePiece(S.next.key);
+    S.next = makePiece(nextFromBag());
+    // Only reset canHold if this spawn was not triggered by a mid-game Hold
+    if (!fromHold) canHold = true;
+  }
+  
+  // IRS (Initial Rotation System) + pendingRot from inputs that arrived while
+  // S.current was null (line-clear pause). pendingRot takes priority because
+  // it represents an explicit tap, not just a held key.
+  let rotShape = null, rotState = S.current.rot, irsDir = 0;
+  if (S.pendingRot === 1)      irsDir = 1;
+  else if (S.pendingRot === -1) irsDir = -1;
+  else if (S.pendingRot === 2)  irsDir = 2;
+  else if (KEYS['ArrowUp'] || KEYS['KeyX']) irsDir = 1;
+  else if (KEYS['KeyZ'])                    irsDir = -1;
+  else if (KEYS['KeyA'])                    irsDir = 2;
+  S.pendingRot = 0;
+
+  if (irsDir === 1)       { rotShape = rotateCW(S.current.shape);                   rotState = (rotState + 1) % 4; S.current.irsDir = 1; }
+  else if (irsDir === -1) { rotShape = rotateCCW(S.current.shape);                  rotState = (rotState + 3) % 4; S.current.irsDir = -1; }
+  else if (irsDir === 2)  { rotShape = rotateCW(rotateCW(S.current.shape));         rotState = (rotState + 2) % 4; S.current.irsDir = 2; }
+
+  if (rotShape && validPos(S.current, 0, 0, rotShape)) {
+    S.current.shape = rotShape; S.current.rot = rotState;
+  }
+  
+  S.current.justSpawned = true;
+  S.lowestY = S.current.y; S.lockResets = 0; S.dcdTimer = S.dcd || 0;
   drawNext();if(!validPos(S.current))endGame();
 }
 
 function holdPiece(){
-  if(!canHold||!S.gameRunning||S.gamePaused)return;
-  canHold=false;sfxHold();
-  if(S.held){const pk=S.held.key;S.held=makePiece(S.current.key);S.current=makePiece(pk);}
-  else{S.held=makePiece(S.current.key);S.current=makePiece(S.next.key);S.next=makePiece(nextFromBag());drawNext();}
-  cancelLock();drawHold();
+  if(!canHold||!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
+  if(!S.held){S.held=makePiece(S.current.key);spawnPiece(true);}
+  else{const t=S.current.key;S.current=makePiece(S.held.key);S.held=makePiece(t);if(!validPos(S.current))endGame();}
+  S.lowestY = S.current.y; S.lockResets = 0;
+  canHold=false;cancelLock();drawHold();
 }
 
 // ─── Ghost ────────────────────────────────────────────────────────────────────
@@ -401,12 +472,30 @@ document.addEventListener('keyup',e=>{
 // ─── Tick callbacks ───────────────────────────────────────────────────────────
 function processInput(input){
   if(input.type!=='down')return;
+
+  // During the 120ms line-clear pause S.current is null. Rotation taps in this
+  // window would be silently dropped, so we buffer the intent for the next
+  // spawn (acts like IRS even after the player released the key).
+  if (!S.current) {
+    if (input.code === 'ArrowUp' || input.code === 'KeyX') S.pendingRot = 1;
+    else if (input.code === 'KeyZ' || input.code === 'ControlLeft' || input.code === 'ControlRight') S.pendingRot = -1;
+    else if (input.code === 'KeyA') S.pendingRot = 2;
+    return;
+  }
+
+  if (S.current.justSpawned) {
+    if ((input.code === 'ArrowUp' || input.code === 'KeyX') && S.current.irsDir === 1) return;
+    if ((input.code === 'KeyZ' || input.code === 'ControlLeft' || input.code === 'ControlRight') && S.current.irsDir === -1) return;
+    if (input.code === 'KeyA' && S.current.irsDir === 2) return;
+  }
+
   switch(input.code){
     case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
     case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
-    case'ArrowDown':  softDrop(); S.dasCharge.down=0; break;
-    case'ArrowUp':case'KeyX': rotatePiece();      break;
-    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(true); break;
+    case'ArrowDown':  /* handled in gameTick */       break;
+    case'ArrowUp':case'KeyX': rotatePiece(1);      break;
+    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1); break;
+    case'KeyA': rotatePiece(2); break;
     case'Space':      hardDrop();         break;
     case'KeyC':case'ShiftLeft': holdPiece(); break;
   }
@@ -416,6 +505,7 @@ function processInput(input){
 // First ARR pulse fires at S.das + S.arr, matching the previous setTimeout/setInterval timing.
 function _tickDAS(slot, key, action, dt){
   if(!KEYS[key]){S.dasCharge[slot]=0;return;}
+  if(S.dcdTimer > 0) return; // Prevent DAS from accumulating/firing during DCD
   const prev=S.dasCharge[slot];
   S.dasCharge[slot]+=dt;
   if(S.dasCharge[slot]<S.das)return;
@@ -427,24 +517,51 @@ function _tickDAS(slot, key, action, dt){
 
 function gameTick(dt){
   if(!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
+  S.current.justSpawned = false;
+  if(S.dcdTimer > 0) S.dcdTimer = Math.max(0, S.dcdTimer - dt);
   if(S.lockActive){
-    S.lockTimer-=dt;
-    if(S.lockTimer<=0){lockPiece();return;}
-  }else{
-    S.gravityTimer+=dt;
+    // If the piece slid into open air (e.g. after hitting the 15-reset cap),
+    // drop the lock immediately instead of locking mid-air.
+    if(validPos(S.current,0,1)){
+      S.lockActive=false; S.lockTimer=0;
+    }else{
+      S.lockTimer-=dt;
+      if(S.lockTimer<=0){lockPiece();return;}
+    }
+  }
+  if(!S.lockActive){
+    let gTimer=dt;
+    if(KEYS['ArrowDown']){
+      if(S.sdf===0){
+        const gy=getGhostY();
+        if(S.current.y<gy){
+          S.score+=(gy-S.current.y); S.current.y=gy;
+          if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
+          spawnDropTrail(S.current); cancelLock(); lastWasRotate=false; updateUI();
+        }
+        gTimer=dropInterval;
+      }else{
+        gTimer+=dt*S.sdf;
+      }
+    }
+    S.gravityTimer+=gTimer;
     while(S.gravityTimer>=dropInterval){
       S.gravityTimer-=dropInterval;
-      if(validPos(S.current,0,1)){S.current.y++;spawnDropTrail(S.current);}
-      else{S.lockActive=true;S.lockTimer=S.lockMs;S.gravityTimer=0;break;}
+      if(validPos(S.current,0,1)){
+        S.current.y++;
+        if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
+        if(KEYS['ArrowDown'])S.score+=1;
+        spawnDropTrail(S.current);
+        if(S.gravityTimer<dropInterval) updateUI();
+      }
+      else{S.lockActive=true;S.lockTimer=S.lockMs;S.gravityTimer=0; updateUI(); break;}
     }
   }
   _tickDAS('left', 'ArrowLeft', ()=>moveX(-1), dt);
   _tickDAS('right','ArrowRight',()=>moveX(1),  dt);
-  _tickDAS('down', 'ArrowDown', softDrop,      dt);
 }
 
 function moveX(d){if(!S.current)return;if(validPos(S.current,d)){S.current.x+=d;cancelLock();lastWasRotate=false;sfxMove();}}
-function softDrop(){if(!S.current)return;if(validPos(S.current,0,1)){S.current.y++;S.score+=1;updateUI();cancelLock();lastWasRotate=false;spawnDropTrail(S.current);}else{if(!S.lockActive){S.lockActive=true;S.lockTimer=S.lockMs;}}}
 function hardDrop(){
   if(!S.current)return;
   let d=0;while(validPos(S.current,0,1)){S.current.y++;d++;}
@@ -456,11 +573,21 @@ function hardDrop(){
 }
 
 // ─── Touch buttons ────────────────────────────────────────────────────────────
-function makeTouchBtn(id,onPress,mode='repeat'){
+function makeTouchBtn(id,onPress,mode='repeat',keyTarget=null){
   const el=document.getElementById(id);if(!el)return;
   let iv=null,to=null,on=false;
-  function press(e){e.preventDefault();e.stopPropagation();if(on)return;on=true;el.classList.add('pressed');if(!S.gameRunning&&mode!=='any')return;if((S.gamePaused||S._countdownVal)&&mode!=='any')return;onPress();if(mode==='repeat'){to=setTimeout(()=>{iv=setInterval(()=>{if(S.gameRunning&&!S.gamePaused&&!S._countdownVal)onPress();},S.arr);},S.das);}}
-  function rel(e){if(e)e.preventDefault();if(!on)return;on=false;el.classList.remove('pressed');clearTimeout(to);clearInterval(iv);to=null;iv=null;}
+  function press(e){
+    e.preventDefault();e.stopPropagation();if(on)return;on=true;el.classList.add('pressed');
+    if(!S.gameRunning&&mode!=='any')return;if((S.gamePaused||S._countdownVal)&&mode!=='any')return;
+    if(keyTarget) KEYS[keyTarget] = true;
+    if(onPress) onPress();
+    if(mode==='repeat'){to=setTimeout(()=>{iv=setInterval(()=>{if(S.gameRunning&&!S.gamePaused&&!S._countdownVal&&onPress)onPress();},S.arr);},S.das);}
+  }
+  function rel(e){
+    if(e)e.preventDefault();if(!on)return;on=false;el.classList.remove('pressed');
+    if(keyTarget) KEYS[keyTarget] = false;
+    clearTimeout(to);clearInterval(iv);to=null;iv=null;
+  }
   el.addEventListener('touchstart',press,{passive:false});
   el.addEventListener('touchend',rel,{passive:false});
   el.addEventListener('touchcancel',rel,{passive:false});
@@ -471,9 +598,10 @@ function makeTouchBtn(id,onPress,mode='repeat'){
 
 makeTouchBtn('btn-left',  ()=>moveX(-1),  'repeat');
 makeTouchBtn('btn-right', ()=>moveX(1),   'repeat');
-makeTouchBtn('btn-soft',  ()=>softDrop(), 'repeat');
-makeTouchBtn('btn-rotate',()=>rotatePiece(),'game');
-makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(true),'game');
+makeTouchBtn('btn-soft',  null,           'state', 'ArrowDown');
+makeTouchBtn('btn-rotate',()=>rotatePiece(1),'game');
+makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(-1),'game');
+makeTouchBtn('btn-rotate-180',()=>rotatePiece(2),'game');
 makeTouchBtn('btn-drop',  ()=>hardDrop(), 'game');
 makeTouchBtn('btn-hold',  ()=>holdPiece(),'game');
 makeTouchBtn('btn-pause', ()=>togglePause(),'any');
@@ -493,7 +621,9 @@ function gameLoop(ts){
 function loadSettings(){
   S.muteAudio=localStorage.getItem(LS.MUTE)==='1';
   S.das=parseInt(localStorage.getItem(LS.DAS)||'150');
-  S.arr=parseInt(localStorage.getItem(LS.ARR)||'50');
+  S.arr=parseInt(localStorage.getItem(LS.ARR)||'33');
+  S.sdf=parseInt(localStorage.getItem(LS.SDF)||'40');
+  S.dcd=parseInt(localStorage.getItem(LS.DCD)||'16');
   S.lockMs=parseInt(localStorage.getItem(LS.LOCK)||'500');
   S.ghostVisible=localStorage.getItem(LS.GHOST)!=='0';
   S.colorblindMode=localStorage.getItem(LS.COLORBLIND)==='1';
@@ -527,7 +657,7 @@ function _doStartGame(){
   S.board=createBoard();S.score=0;S.lines=0;S.level=1;S.combo=0;S.maxCombo=0;dropInterval=800;
   S.particles=[];S.shakeFrames=0;S.shakeMag=0.4;S.shakeAllDir=false;S.flashLines=new Set();S.flashTimer=0;
   S.lockTimer=0;S.lockActive=false;lastWasRotate=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
-  S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};
+  S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};S.pendingRot=0;
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
   bag=[];refillBag();S.next=makePiece(nextFromBag());S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
@@ -715,7 +845,7 @@ window.addEventListener('beforeunload',()=>{
 });
 
 // ─── Error monitoring ─────────────────────────────────────────────────────────
-const _VERSION = 'v0.2.1';
+const _VERSION = 'v0.3.0';
 window.onerror = function(msg, src, line, col, err) {
   console.error('[glowtris ' + _VERSION + '] uncaught error', {
     msg, src: src ? src.replace(window.location.origin, '') : src, line, col,
@@ -738,7 +868,7 @@ Object.assign(window, {
   togglePause, showStartScreen, showModeSelector,
   submitScore, submitSprintScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
-  toggleMute, updateDAS, updateARR, updateLockDelay,
+  toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,
   updateGhost, updateColorblind, cycleAnimIntensity,
   openHowToPlay, closeHowToPlay, openStats, closeStats,
   showAchTooltip, hideAchTooltip,

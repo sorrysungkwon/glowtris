@@ -92,7 +92,7 @@ _No open bugs._
 - **Symptom:** Board, current piece, ghost, particles drawn via Canvas2D `fillRect`/`stroke*` each frame. Caps effective framerate at ~60fps regardless of monitor. Suspected source of [BUG-004] state leaks on Chrome. Neon/glow effects bounded by `shadowBlur` performance ceiling.
 - **Acceptance criteria:** Render at the full monitor refresh rate (144Hz+ on capable displays). Particle systems sustain 1000+ active particles with no frame drops. No Canvas2D state-leak regressions. Mobile thermal/battery improvement measurable.
 - **Approach: PixiJS** — chosen over raw WebGL2 because the maintainer is not a WebGL specialist. PixiJS gives WebGL2 acceleration with a Canvas2D-grade API, debuggable without GPU-level expertise. Bundle cost ~+400KB (acceptable in our domain).
-- **Reference:** TETR.IO migrated to raw WebGL2 ~2024 for the same reasons (high-refresh monitors, high PPS rendering load, mobile PWA, signature shader effects). PixiJS achieves equivalent results with much lower maintenance burden.
+- **Reference:** the leading competitive web-tetris client migrated to raw WebGL2 ~2024 for the same reasons (high-refresh monitors, high PPS rendering load, mobile PWA, signature shader effects). PixiJS achieves equivalent results with much lower maintenance burden.
 - **Why Critical (not Low):** The "fanboy-grade" target shifted our user profile assumption — competitive players bias heavily toward 144Hz+ monitors. Glowtris's identity is neon/glow effects, which are bounded by Canvas2D `shadowBlur` performance. GPU rendering is needed for both ceiling and identity.
 - **Staged rollout (planned across v0.5.0~v0.5.3):**
   - v0.5.0 — PixiJS Application set up; board + current piece + ghost migrated to PIXI.Graphics / sprite cache
