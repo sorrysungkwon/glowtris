@@ -30,6 +30,10 @@ function getAudioCtx(){
 
 export function toggleMute(){
   S.muteAudio=!S.muteAudio;
+  // User gesture — also use this opportunity to wake a suspended audio context
+  // (iOS / mobile browsers suspend the context when the tab is backgrounded
+  // and only allow resume from within a user-gesture handler).
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
   if(masterGain)masterGain.gain.value=S.muteAudio?0:1;
   localStorage.setItem(LS.MUTE,S.muteAudio?'1':'0');
   const icon=document.getElementById('mute-icon');
@@ -234,9 +238,14 @@ export function stopBGM(){
 export function pauseBGM(){
   stopBGM();
 }
-export function resumeBGM(){
+export async function resumeBGM(){
   if(!audioCtx)return;
-  if(audioCtx.state==='suspended')audioCtx.resume();
+  // Await the resume — without this we read audioCtx.currentTime while the
+  // context is still suspended, get a stale value, and schedule a burst of
+  // notes that play in the past (i.e. silently).
+  if(audioCtx.state==='suspended'){
+    try { await audioCtx.resume(); } catch(e) {}
+  }
   bgmPlaying = true;
   bgmNextTime = audioCtx.currentTime + 0.1;
   bgmScheduleLoop();
@@ -293,7 +302,14 @@ export function applyMuteToGain(){
   if(masterGain)masterGain.gain.value=S.muteAudio?0:1;
 }
 export function onPageHide(){pauseBGM();}
-export function onPageShow(){if(S.gameRunning&&!S.gamePaused)resumeBGM();}
+export function onPageShow(){
+  // Try to wake the suspended context regardless of pause state so that any
+  // user action after returning (mute toggle, RESUME click, hover SFX) is
+  // not blocked. Resume may still no-op on iOS without a user gesture; the
+  // gesture-driven resume in toggleMute / togglePause covers that case.
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
+  if(S.gameRunning&&!S.gamePaused)resumeBGM();
+}
 export function closeAudio(){
   stopBGM();
   if(audioCtx){audioCtx.close();audioCtx=null;masterGain=null;}

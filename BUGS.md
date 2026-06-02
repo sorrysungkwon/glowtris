@@ -19,6 +19,24 @@
 
 ## ✅ Fixed
 
+### [BUG-009] Audio dead after backgrounding tab/app while paused
+- **Reported:** 2026-06-02
+- **Symptom:** Pause game → switch to another tab/app → come back → no sound. Toggling mute off/on doesn't recover audio either.
+- **Root cause:** Three compounding issues.
+  1. `resumeBGM` called `audioCtx.resume()` without `await`, then immediately read `audioCtx.currentTime` while the context was still suspended. The stale timestamp caused the BGM scheduler to queue notes in the past.
+  2. `toggleMute` only changed `masterGain.gain.value`; it never resumed a suspended audio context. On iOS/mobile the context cannot resume on its own — it needs a user-gesture handler to call `resume()`. The mute-toggle click was a perfect gesture but went unused.
+  3. `onPageShow` early-returned when the game was paused, so the suspended context was never touched on tab-return.
+- **Fix:**
+  - `resumeBGM` is now `async` and awaits `audioCtx.resume()` before scheduling
+  - `toggleMute` calls `audioCtx.resume()` (user-gesture pathway)
+  - `onPageShow` calls `audioCtx.resume()` regardless of pause state
+
+### [BUG-008] I-piece rotation fails near walls/floor (had to use 180° to escape)
+- **Reported:** 2026-06-02
+- **Symptom:** I-piece in vertical orientation against a wall — CW/CCW rotation back to horizontal fails; only 180° rotation works as an escape.
+- **Root cause:** SRS kick tables for the I-piece had the y-coordinate sign **inverted on 6 of 8 transitions**. The JLSTZ table was correctly negated from wiki (y-up) to canvas (y-down), but the I table was copied straight from wiki without the negation. The result: kicks intended to lift the piece UP (away from the floor/wall obstacle) were instead trying to push it DOWN into the obstacle, so the rotation failed to find a valid kick.
+- **Fix:** y-signs corrected in `KICKS_I` for transitions `0>1`, `1>0`, `1>2`, `2>1`, `2>3`, `3>2`. `3>0` and `0>3` were already correct.
+
 ### [BUG-007] Leaderboard list starts from rank 3 / 9 instead of 1
 - **Reported:** 2026-06-02
 - **Symptom:** Start-screen leaderboard sometimes displays starting from rank 3 (🥉) or 9, with top entries cut off

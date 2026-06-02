@@ -1312,7 +1312,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   <!-- Desktop title header -->
   <div id="desktop-header">
     <span class="dh-title">GLOWTRIS</span>
-    <span class="dh-version">v0.3.0 BETA</span>
+    <span class="dh-version">v0.3.1 BETA</span>
   </div>
 
   <!-- Mobile-only compact header -->
@@ -1669,6 +1669,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   }
   function toggleMute() {
     S.muteAudio = !S.muteAudio;
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {
+    });
     if (masterGain) masterGain.gain.value = S.muteAudio ? 0 : 1;
     localStorage.setItem(LS.MUTE, S.muteAudio ? "1" : "0");
     const icon = document.getElementById("mute-icon");
@@ -2149,9 +2151,14 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   function pauseBGM() {
     stopBGM();
   }
-  function resumeBGM() {
+  async function resumeBGM() {
     if (!audioCtx) return;
-    if (audioCtx.state === "suspended") audioCtx.resume();
+    if (audioCtx.state === "suspended") {
+      try {
+        await audioCtx.resume();
+      } catch (e) {
+      }
+    }
     bgmPlaying = true;
     bgmNextTime = audioCtx.currentTime + 0.1;
     bgmScheduleLoop();
@@ -2236,6 +2243,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     pauseBGM();
   }
   function onPageShow() {
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {
+    });
     if (S.gameRunning && !S.gamePaused) resumeBGM();
   }
   function closeAudio() {
@@ -4619,12 +4628,12 @@ ${window.location.origin}`;
     "0>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
   };
   var KICKS_I = {
-    "0>1": [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],
-    "1>0": [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]],
-    "1>2": [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]],
-    "2>1": [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]],
-    "2>3": [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]],
-    "3>2": [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],
+    "0>1": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
+    "1>0": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
+    "1>2": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],
+    "2>1": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
+    "2>3": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
+    "3>2": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
     "3>0": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
     "0>3": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]]
   };
@@ -5508,7 +5517,7 @@ ${window.location.origin}`;
       animFrame = null;
     }
   });
-  var _VERSION = "v0.3.0";
+  var _VERSION = "v0.3.1";
   window.onerror = function(msg, src, line, col, err) {
     console.error("[glowtris " + _VERSION + "] uncaught error", {
       msg,
