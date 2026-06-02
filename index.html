@@ -4495,7 +4495,9 @@ ${window.location.origin}`;
     }
     document.querySelectorAll(".lb-tab[data-tab]").forEach((t) => t.classList.toggle("active", t.dataset.tab === tab));
     const myVal = isSprintTab ? S._lbCache.mySprintTime : S._lbCache.myScore;
+    inner.removeAttribute("style");
     inner.innerHTML = lbHTML(entries, S._lbCache.myName, myRank, myVal, isSprintTab);
+    inner.scrollTop = 0;
   }
   function setLbMode(mode) {
     S.lbMode = mode;

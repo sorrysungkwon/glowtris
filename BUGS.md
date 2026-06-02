@@ -19,6 +19,12 @@
 
 ## ✅ Fixed
 
+### [BUG-007] Leaderboard list starts from rank 3 / 9 instead of 1
+- **Reported:** 2026-06-02
+- **Symptom:** Start-screen leaderboard sometimes displays starting from rank 3 (🥉) or 9, with top entries cut off
+- **Root cause:** `.lb-inner` carried inline `display:flex; align-items:center; justify-content:center;` styles from the LOADING placeholder. After data loaded, `renderLbTab` only replaced the inner HTML — the inline flex centering remained. The new `<table>` was rendered as a flex item, vertically centered, and the top rows were clipped because the table height exceeded the 180px max-height
+- **Fix:** `renderLbTab` now calls `inner.removeAttribute('style')` before setting innerHTML, and resets `scrollTop=0` for tab switches
+
 ### [BUG-006] WASD keys blocked in text inputs
 - **Reported:** 2026-05-31
 - **Symptom:** Cannot type W, A, S, or D when entering a name in the leaderboard submission form. Focus jumps to other buttons instead.
