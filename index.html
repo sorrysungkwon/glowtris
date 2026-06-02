@@ -752,23 +752,27 @@
     #game-row { flex:1 1 0; min-height:0; align-items:center; justify-content:center; }
 
     #touch-controls.nes-layout {
-      width: min(360px, 96vw); /* slight side margin so we don't touch the screen edge */
-      padding-bottom: 10px; /* PWA bottom bump — small so dock area doesn't waste space */
+      /* Container = D-pad (182) + gap (~32) + action panel (136) = 350.
+         96vw ceiling keeps a screen-edge margin on tiny phones. */
+      width: min(350px, 96vw);
+      padding-bottom: 10px;
       display: flex;
       flex-direction: row;
-      justify-content: space-between; /* D-pad left, ACTIONS right; gap fills middle */
+      justify-content: space-between; /* D-pad left edge, ACTIONS right edge */
       align-items: flex-start;
       gap: 16px;
     }
-    #mobile-header { width: min(360px, 92vw); }
+    #mobile-header { width: min(350px, 92vw); }
 
+    /* Intrinsic width — each group sizes to its content (D-pad 182px,
+       action panel 136px). justify-content: space-between on the parent
+       pushes them to opposite edges of the touch-controls container. */
     .control-group {
-      flex: 1;
+      flex: 0 0 auto;
       padding: 4px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
 
     .nes-dpad {
@@ -793,42 +797,50 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
-    /* Right action panel matches D-pad height exactly so HOLD/180° align
-       with the D-pad TOP and CCW/CW align with the D-pad BOTTOM. */
+    /* Right action panel: fixed width = CCW + gap + CW = 62*2 + 12 = 136 px.
+       HOLD sits on top, then the rotation cluster (180° + CCW/CW pair)
+       below — Gestalt grouping keeps all rotations together. */
     .nes-right-panel {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 16px;     /* same as .nes-dpad margin-top */
-      height: 182px;        /* same as D-pad grid: 58*3 + 4*2 */
-      justify-content: space-between;
+      gap: 18px;       /* separation between HOLD and rotation cluster */
+      width: 136px;    /* = CCW(62) + gap(12) + CW(62) */
+      margin-top: 16px;
     }
-    .top-cluster {
+    .rotation-group {
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 8px;
+      width: 100%;
     }
-    .bottom-cluster {
+    .nes-actions {
       display: flex;
-      align-items: center;
       gap: 12px;
+      justify-content: center;
     }
-    /* HOLD and 180° share the same width as one CCW/CW circle; slightly
-       taller than before so they're easy to thumb-tap. */
+    /* HOLD and 180° span the full panel width (= rotation pair width). */
     #btn-hold,
     #btn-rotate-180 {
-      width: 62px;
+      width: 100%;
       height: 44px;
       display: flex;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
+      gap: 8px;
+      font-size: 20px;
     }
     #btn-hold { border-radius: 10px; }
-    #btn-rotate-180 { border-radius: 22px; }
-    .bottom-cluster #btn-rotate-ccw,
-    .bottom-cluster #btn-rotate {
+    #btn-rotate-180 { border-radius: 44px; }
+    .btn-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 2px;
+    }
+    .nes-actions #btn-rotate-ccw,
+    .nes-actions #btn-rotate {
       width: 62px; height: 62px;
       border-radius: 50%;
       font-size: 30px;
@@ -837,7 +849,8 @@
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    #touch-controls.nes-layout { width: 480px; padding-bottom: 16px; gap: 24px; }
+    /* Container = D-pad (242) + gap (~32) + action panel (186) = 460. */
+    #touch-controls.nes-layout { width: 460px; padding-bottom: 16px; }
     .control-group { padding: 6px 0; }
     .nes-dpad {
       grid-template-columns: 78px 78px 78px;
@@ -846,20 +859,22 @@
     }
     .nes-dpad .tbtn { font-size: 40px; }
     .nes-right-panel {
+      width: 186px; /* = 86*2 + 14 (CCW + gap + CW) */
       margin-top: 24px;
-      height: 242px; /* same as tablet D-pad: 78*3 + 4*2 */
+      gap: 24px;
     }
-    .top-cluster { gap: 12px; }
-    .bottom-cluster { gap: 14px; }
+    .rotation-group { gap: 12px; }
+    .nes-actions { gap: 14px; }
     #btn-hold,
     #btn-rotate-180 {
-      width: 86px;
       height: 60px;
-      font-size: 34px;
+      font-size: 26px;
+      gap: 10px;
     }
-    #btn-rotate-180 { border-radius: 30px; }
-    .bottom-cluster #btn-rotate-ccw,
-    .bottom-cluster #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
+    #btn-rotate-180 { border-radius: 60px; }
+    .btn-lbl { font-size: 14px; }
+    .nes-actions #btn-rotate-ccw,
+    .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
   }
 
   /* ─── Performance mode indicator ─── */
@@ -1403,23 +1418,24 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     <!-- ACTION GROUP -->
     <div class="control-group">
       <div class="nes-right-panel">
-        <!-- top-cluster aligns with D-pad TOP -->
-        <div class="top-cluster">
-          <button class="tbtn tbtn-hold" id="btn-hold">
-            <span class="material-icons-round">swap_horiz</span>
-          </button>
+        <button class="tbtn tbtn-hold" id="btn-hold">
+          <span class="material-icons-round">swap_horiz</span>
+          <span class="btn-lbl">HOLD</span>
+        </button>
+        <!-- 180° grouped with CCW/CW (Gestalt: same rotation family) -->
+        <div class="rotation-group">
           <button class="tbtn tbtn-rotate" id="btn-rotate-180">
             <span class="material-icons-round">sync</span>
+            <span class="btn-lbl">180°</span>
           </button>
-        </div>
-        <!-- bottom-cluster aligns with D-pad BOTTOM -->
-        <div class="bottom-cluster">
-          <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
-            <span class="material-icons-round">rotate_left</span>
-          </button>
-          <button class="tbtn tbtn-rotate" id="btn-rotate">
-            <span class="material-icons-round">rotate_right</span>
-          </button>
+          <div class="nes-actions">
+            <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+              <span class="material-icons-round">rotate_left</span>
+            </button>
+            <button class="tbtn tbtn-rotate" id="btn-rotate">
+              <span class="material-icons-round">rotate_right</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
