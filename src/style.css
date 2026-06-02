@@ -850,6 +850,9 @@
   .nes-dpad .tbtn {
     --ripple-color: rgba(0, 200, 255, 0.4);
   }
+  #btn-drop {
+    --ripple-color: rgba(255, 30, 80, 0.4);
+  }
   #btn-hold {
     --ripple-color: rgba(255, 230, 0, 0.4);
   }
@@ -862,6 +865,13 @@
     border-color: rgba(255, 230, 0, 0.8) !important;
     box-shadow: inset 0 0 20px rgba(255, 230, 0, 0.5), 0 0 15px rgba(255, 230, 0, 0.4) !important;
     color: #ffe600 !important;
+  }
+  
+  .nes-dpad #btn-drop:active {
+    background: rgba(255, 30, 80, 0.25) !important;
+    border-color: rgba(255, 30, 80, 0.8) !important;
+    box-shadow: inset 0 0 20px rgba(255, 30, 80, 0.5), 0 0 15px rgba(255, 30, 80, 0.4) !important;
+    color: #ff1e50 !important;
   }
   
   /* Unified Purple for all rotation buttons */
