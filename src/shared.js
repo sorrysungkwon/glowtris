@@ -41,6 +41,7 @@ export const LS = {
   MUTE:         'glowTrisMute',
   DAS:          'glowTrisDAS',
   SDF:          'glowTrisSDF',
+  DCD:          'glowTrisDCD',
   ARR:          'glowTrisARR',
   LOCK:         'glowTrisLock',
   GHOST:        'glowTrisGhost',

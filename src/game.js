@@ -295,19 +295,22 @@ function spawnPiece(fromHold = false){
     if (!fromHold) canHold = true;
   }
   
-  // IRS (Initial Rotation System)
-  let rotShape = null, rotState = S.current.rot;
-  if (KEYS['ArrowUp'] || KEYS['KeyX']) {
-    rotShape = rotateCW(S.current.shape); rotState = (rotState + 1) % 4;
-    S.current.irsDir = 1;
-  } else if (KEYS['KeyZ']) {
-    rotShape = rotateCCW(S.current.shape); rotState = (rotState + 3) % 4;
-    S.current.irsDir = -1;
-  } else if (KEYS['KeyA']) {
-    rotShape = rotateCW(rotateCW(S.current.shape)); rotState = (rotState + 2) % 4;
-    S.current.irsDir = 2;
-  }
-  
+  // IRS (Initial Rotation System) + pendingRot from inputs that arrived while
+  // S.current was null (line-clear pause). pendingRot takes priority because
+  // it represents an explicit tap, not just a held key.
+  let rotShape = null, rotState = S.current.rot, irsDir = 0;
+  if (S.pendingRot === 1)      irsDir = 1;
+  else if (S.pendingRot === -1) irsDir = -1;
+  else if (S.pendingRot === 2)  irsDir = 2;
+  else if (KEYS['ArrowUp'] || KEYS['KeyX']) irsDir = 1;
+  else if (KEYS['KeyZ'])                    irsDir = -1;
+  else if (KEYS['KeyA'])                    irsDir = 2;
+  S.pendingRot = 0;
+
+  if (irsDir === 1)       { rotShape = rotateCW(S.current.shape);                   rotState = (rotState + 1) % 4; S.current.irsDir = 1; }
+  else if (irsDir === -1) { rotShape = rotateCCW(S.current.shape);                  rotState = (rotState + 3) % 4; S.current.irsDir = -1; }
+  else if (irsDir === 2)  { rotShape = rotateCW(rotateCW(S.current.shape));         rotState = (rotState + 2) % 4; S.current.irsDir = 2; }
+
   if (rotShape && validPos(S.current, 0, 0, rotShape)) {
     S.current.shape = rotShape; S.current.rot = rotState;
   }
@@ -469,8 +472,18 @@ document.addEventListener('keyup',e=>{
 // ─── Tick callbacks ───────────────────────────────────────────────────────────
 function processInput(input){
   if(input.type!=='down')return;
-  
-  if (S.current && S.current.justSpawned) {
+
+  // During the 120ms line-clear pause S.current is null. Rotation taps in this
+  // window would be silently dropped, so we buffer the intent for the next
+  // spawn (acts like IRS even after the player released the key).
+  if (!S.current) {
+    if (input.code === 'ArrowUp' || input.code === 'KeyX') S.pendingRot = 1;
+    else if (input.code === 'KeyZ' || input.code === 'ControlLeft' || input.code === 'ControlRight') S.pendingRot = -1;
+    else if (input.code === 'KeyA') S.pendingRot = 2;
+    return;
+  }
+
+  if (S.current.justSpawned) {
     if ((input.code === 'ArrowUp' || input.code === 'KeyX') && S.current.irsDir === 1) return;
     if ((input.code === 'KeyZ' || input.code === 'ControlLeft' || input.code === 'ControlRight') && S.current.irsDir === -1) return;
     if (input.code === 'KeyA' && S.current.irsDir === 2) return;
@@ -507,9 +520,16 @@ function gameTick(dt){
   S.current.justSpawned = false;
   if(S.dcdTimer > 0) S.dcdTimer = Math.max(0, S.dcdTimer - dt);
   if(S.lockActive){
-    S.lockTimer-=dt;
-    if(S.lockTimer<=0){lockPiece();return;}
-  }else{
+    // If the piece slid into open air (e.g. after hitting the 15-reset cap),
+    // drop the lock immediately instead of locking mid-air.
+    if(validPos(S.current,0,1)){
+      S.lockActive=false; S.lockTimer=0;
+    }else{
+      S.lockTimer-=dt;
+      if(S.lockTimer<=0){lockPiece();return;}
+    }
+  }
+  if(!S.lockActive){
     let gTimer=dt;
     if(KEYS['ArrowDown']){
       if(S.sdf===0){
@@ -601,7 +621,9 @@ function gameLoop(ts){
 function loadSettings(){
   S.muteAudio=localStorage.getItem(LS.MUTE)==='1';
   S.das=parseInt(localStorage.getItem(LS.DAS)||'150');
-  S.arr=parseInt(localStorage.getItem(LS.ARR)||'50');
+  S.arr=parseInt(localStorage.getItem(LS.ARR)||'33');
+  S.sdf=parseInt(localStorage.getItem(LS.SDF)||'40');
+  S.dcd=parseInt(localStorage.getItem(LS.DCD)||'16');
   S.lockMs=parseInt(localStorage.getItem(LS.LOCK)||'500');
   S.ghostVisible=localStorage.getItem(LS.GHOST)!=='0';
   S.colorblindMode=localStorage.getItem(LS.COLORBLIND)==='1';
@@ -635,7 +657,7 @@ function _doStartGame(){
   S.board=createBoard();S.score=0;S.lines=0;S.level=1;S.combo=0;S.maxCombo=0;dropInterval=800;
   S.particles=[];S.shakeFrames=0;S.shakeMag=0.4;S.shakeAllDir=false;S.flashLines=new Set();S.flashTimer=0;
   S.lockTimer=0;S.lockActive=false;lastWasRotate=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
-  S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};
+  S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};S.pendingRot=0;
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
   bag=[];refillBag();S.next=makePiece(nextFromBag());S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
@@ -823,7 +845,7 @@ window.addEventListener('beforeunload',()=>{
 });
 
 // ─── Error monitoring ─────────────────────────────────────────────────────────
-const _VERSION = 'v0.2.1';
+const _VERSION = 'v0.3.0';
 window.onerror = function(msg, src, line, col, err) {
   console.error('[glowtris ' + _VERSION + '] uncaught error', {
     msg, src: src ? src.replace(window.location.origin, '') : src, line, col,
