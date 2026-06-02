@@ -100,6 +100,16 @@ export function setLowPerfMode(on) {
   else    localStorage.removeItem(LS.LOW_PERF);
 }
 
+export function togglePerfMode() {
+  setLowPerfMode(!S.lowPerfMode);
+  S._perfLocked = true; // Lock it manually
+  const btn = document.getElementById('ov-perf-btn');
+  if (btn) {
+    btn.className = `toggle-btn${S.lowPerfMode ? ' muted' : ''}`;
+    btn.textContent = S.lowPerfMode ? '🚀 PERF: LOW' : '✨ PERF: FULL';
+  }
+}
+
 export function resetPerfHold(locked, savedPerf) {
   _fpsCnt = 0; _fpsLast = 0; _fpsLowCount = 0;
   _perfHold = (locked || savedPerf) ? 0 : 3;

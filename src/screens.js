@@ -111,6 +111,7 @@ export function togglePause(){
           <button class="toggle-btn${S.ghostVisible?'':' muted'}" id="ov-ghost-btn" onclick="updateGhost()">${S.ghostVisible?'👻 GHOST ON':'👻 GHOST OFF'}</button>
           <button class="toggle-btn${S.colorblindMode?' cb-active':' muted'}" id="ov-cb-btn" onclick="updateColorblind()">${S.colorblindMode?'🔳 CB MODE ON':'🔳 CB MODE OFF'}</button>
           <button class="toggle-btn${S.animIntensity==='off'?' muted':''}" id="ov-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
+          <button class="toggle-btn${S.lowPerfMode?' muted':''}" id="ov-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'🚀 PERF: LOW':'✨ PERF: FULL'}</button>
           <div class="settings-row">
             <span class="settings-lbl">DAS</span>
             <input type="range" class="neon-range" min="50" max="300" value="${S.das}" oninput="updateDAS(this.value)">
