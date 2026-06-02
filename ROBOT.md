@@ -169,6 +169,46 @@ curl "https://api.vercel.com/v13/deployments/DEPLOY_ID?teamId=team_pb1objuXoHlJI
 
 ---
 
+## 📋 Session Notes — 2026-06-02 (v0.3 retrospective — workflow & QA gaps)
+
+> **For Antigravity:** read this before working in this repo. These are patterns observed in the v0.3 work cycle (2026-06-01 → 2026-06-02) that need to change.
+
+### Workflow rule violations to stop repeating
+
+1. **Never commit directly to local `master`.** v0.3 work landed as 20 linear commits on local master without pushing. This bypassed `feature → preview → PR → master` and froze production at v0.2.0 while local master diverged. The rule (already in this file): "NEVER merge directly to master — always via PR". Every change goes on a `feature/*` branch, merges into `preview`, gets verified, then a PR is opened to `master`.
+
+2. **Push as you commit on a feature branch.** Don't accumulate 20 unpushed commits even on a feature branch — the user has no visibility into in-progress work, and a rollback or hand-off becomes painful. Per-feature batching to preview is fine; per-feature batching to **local-only** is not.
+
+3. **Don't mark a Phase A version "✅ Done" in TODO.md without a code-review pass.** v0.3 was marked done while four engine-level bugs were live (see below). Phase A's correctness principle (TODO.md top) requires explicit review of the diff before marking done.
+
+### Code-review issues missed in v0.3
+
+When you implement a setting (slider, toggle, keybind) follow the full read/write loop. The pattern that broke in v0.3:
+
+- **SDF persistence (write-only)** — `updateSDF` wrote `localStorage.setItem(LS.SDF, v)` but `loadSettings()` never read `LS.SDF` back. Every page reload reverted SDF to the in-memory default. Checklist for any setting:
+  1. LS key declared in `shared.js`
+  2. `loadSettings()` reads it with a sensible default
+  3. Setter writes both the in-memory state and LS
+  4. Read-back tested with `localStorage.clear()` → set → reload → verify
+
+- **DCD had no LS key at all.** The setter wrote to `S.dcd` but the constant `LS.DCD` was never added to `shared.js`. Same checklist applies.
+
+When you fix a reported user bug, dig until you find the actual code path. The 180° rotation bug was logged in TODO.md with the note "IRS 중복 회전 방지 처리를 했으나 추가 검증 필요" — but the real cause was unrelated to IRS. The bug was that `lockPiece` schedules `spawnPiece` via `setTimeout(120)` on line clears; during that 120 ms window `S.current` is `null` and rotation taps are silently dropped by `rotatePiece`'s null-guard. IRS only catches keys *still held at spawn time*, so a tap during the pause was lost forever. The fix was to buffer rotation intent into `S.pendingRot` when `S.current` is null, then have `spawnPiece` consume it ahead of IRS.
+
+When you add a state cap (15-reset lockdown, etc.) check every code path the state can change through. The 15-reset lock cap stopped `cancelLock` from clearing the timer (correct), but `gameTick` then kept counting down even if the piece slid into open air — locking the piece mid-air. Cap fixes need a follow-up airborne check in the tick loop.
+
+### General review checklist before declaring a version done
+
+- [ ] Run a code-review pass on the full diff vs the previous version tag
+- [ ] For every new setting: write/read symmetry, LS persistence verified by `localStorage.clear()` test
+- [ ] For every new state field: initialised in `_doStartGame` reset block
+- [ ] For every new keybind: keymap consistent across keyboard handler, touch button, HTP overlay, desktop key panel
+- [ ] Version label bumped in `game.js _VERSION` AND `template.html dh-version`
+- [ ] Build clean, no console errors on `npm run build`
+- [ ] Feature branch pushed; preview merged and verified at prevglow.vercel.app
+
+---
+
 ## 📋 Session Notes — 2026-06-01 (Phase A Engine Rebuild — Version Revision)
 
 Major strategic pivot. Read fully before working on any feature. **All Antigravity sessions must adopt this direction.**
