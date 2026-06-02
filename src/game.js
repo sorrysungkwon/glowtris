@@ -90,11 +90,16 @@ const KICKS_I = {
   '3>0':[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
   '0>3':[[0,0],[-1,0],[2,0],[-1,-2],[2,1]],
 };
+// 180° rotation kicks — competitive-standard pattern (max ±1 vertical).
+// Horizontal nudge is tried before any vertical lift so a piece on the floor
+// doesn't shoot up 2 cells when 180° is pressed. A 1-cell net drift over a
+// 180→180 pair is inherent to SRS+ (basic kick is always tried first, so
+// 2>0 stays in place after 0>2 lifted) and is accepted by the standard.
 const KICKS_180 = {
-  '0>2': [[0,0], [0,-1], [1,-1], [-1,-1], [0,-2], [1,-2], [-1,-2]],
-  '1>3': [[0,0], [1,0], [1,-2], [1,-1], [2,0], [2,-2], [2,-1]],
-  '2>0': [[0,0], [0,1], [-1,1], [1,1], [0,2], [-1,2], [1,2]],
-  '3>1': [[0,0], [-1,0], [-1,-2], [-1,-1], [-2,0], [-2,-2], [-2,-1]],
+  '0>2': [[0,0], [1,0], [-1,0], [0,-1], [1,-1], [-1,-1]],  // N→S: horiz first, up 1 last
+  '2>0': [[0,0], [-1,0], [1,0], [0,1], [-1,1], [1,1]],     // S→N: horiz first, down 1 last
+  '1>3': [[0,0], [0,-1], [1,-1], [-1,-1], [1,0], [-1,0]],  // E→W
+  '3>1': [[0,0], [0,-1], [-1,-1], [1,-1], [-1,0], [1,0]],  // W→E
 };
 
 // ─── Board / Logic ────────────────────────────────────────────────────────────
@@ -933,7 +938,7 @@ window.addEventListener('beforeunload',()=>{
 });
 
 // ─── Error monitoring ─────────────────────────────────────────────────────────
-const _VERSION = 'v0.3.2';
+const _VERSION = 'v0.3.3';
 window.onerror = function(msg, src, line, col, err) {
   console.error('[glowtris ' + _VERSION + '] uncaught error', {
     msg, src: src ? src.replace(window.location.origin, '') : src, line, col,

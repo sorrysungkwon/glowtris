@@ -19,6 +19,13 @@
 
 ## ✅ Fixed
 
+### [BUG-011] 180° rotation lifts piece up to 2 cells from the floor
+- **Reported:** 2026-06-02
+- **Symptom:** Pressing 180° on a piece sitting on the floor lifts it up 1-2 cells. Multiple presses accumulate the lift.
+- **Root cause:** The initial `KICKS_180` table tried vertical kicks (y=-1, then y=-2) before horizontal nudges, and went as far as 2 cells up. The competitive-standard pattern tries horizontal kicks first and caps vertical lift at 1 cell.
+- **Fix:** Rewrote `KICKS_180` in the competitive-standard order — basic, then horizontal nudges, then ±1 vertical as last resort. Symmetric for 0↔2 (N↔S) and 1↔3 (E↔W) transitions.
+- **Note:** A 1-cell net drift over a 180→180 press pair is *inherent* to SRS+ rules (the basic kick is always tried first, so 2>0 stays in place after 0>2 lifted the piece). This is standard competitive behavior.
+
 ### [BUG-010] D-pad buttons too small + no slide-between-buttons
 - **Reported:** 2026-06-02
 - **Symptom:** D-pad arrow buttons were 46×46 px (mobile) / 60×60 px (tablet) — too small for confident thumb taps. Also, sliding the finger from one D-pad button to another did nothing — players had to lift and re-tap to change direction.
