@@ -67,12 +67,26 @@ const PAL = ['#00c8ff','#a000ff','#ff0080','#ffe600','#00ff88'];
 // ─── Performance detection ────────────────────────────────────────────────────
 export function measureFPS(ts) {
   _fpsCnt++;
-  if (ts - _fpsLast >= 1000) {
-    const fps = _fpsCnt; _fpsCnt = 0; _fpsLast = ts;
+  const dt = ts - _fpsLast;
+  if (dt >= 1000) {
+    const fps = Math.round((_fpsCnt / dt) * 1000);
+    _fpsCnt = 0; _fpsLast = ts;
     if (_perfHold > 0) { _perfHold--; _fpsLowCount = 0; return; }
+    
+    // Ignore frame drops caused by browser tab suspension or UI interaction pauses (Safari address bar etc.)
+    if (dt > 1500) { _fpsLowCount = 0; return; }
+
     if (!S.lowPerfMode) {
-      if (fps < 28) { _fpsLowCount++; if (_fpsLowCount >= 2) { setLowPerfMode(true); S._perfLocked = true; _perfHold = 1; } }
-      else { _fpsLowCount = 0; }
+      if (fps < 30) { 
+        _fpsLowCount++; 
+        if (_fpsLowCount >= 5) { 
+          setLowPerfMode(true); 
+          S._perfLocked = true; 
+          _perfHold = 1; 
+        } 
+      } else if (fps >= 45) { 
+        _fpsLowCount = 0; 
+      }
     }
   }
 }
@@ -86,6 +100,16 @@ export function setLowPerfMode(on) {
   else    localStorage.removeItem(LS.LOW_PERF);
 }
 
+export function togglePerfMode() {
+  setLowPerfMode(!S.lowPerfMode);
+  S._perfLocked = true; // Lock it manually
+  const btn = document.getElementById('ov-perf-btn');
+  if (btn) {
+    btn.className = `toggle-btn${S.lowPerfMode ? ' muted' : ''}`;
+    btn.textContent = S.lowPerfMode ? '🚀 PERF: LOW' : '✨ PERF: FULL';
+  }
+}
+
 export function resetPerfHold(locked, savedPerf) {
   _fpsCnt = 0; _fpsLast = 0; _fpsLowCount = 0;
   _perfHold = (locked || savedPerf) ? 0 : 3;
@@ -95,9 +119,10 @@ export function resetPerfHold(locked, savedPerf) {
 export function _applyTouchCELL() {
   const W = window.innerWidth, H = window.innerHeight;
   S.isMobile = W < 600 || window.matchMedia('(pointer:coarse)').matches;
-  const availW  = W - (S.isMobile ? 32 : 56);
-  const headerH = S.isMobile ? 52 : 30;
-  const ctrlH   = S.isMobile ? 188 : 218;
+  const isPhone = W < 600;
+  const availW  = W - (isPhone ? 32 : 56);
+  const headerH = isPhone ? 52 : 30;
+  const ctrlH   = isPhone ? 188 : 224;
 
   const isIOSPWA = navigator.standalone === true;
   let safeTop = 0, safeBottom = 0;
@@ -701,9 +726,25 @@ function drawMiniPiece(ctx, piece, cw, ch) {
   ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
   if (!piece) return;
   const s  = piece.shape;
-  const cs = S.isMobile ? Math.max(7, Math.floor(Math.min(cw/4, ch/3))) : 18;
-  const ox = Math.floor((cw - s[0].length*cs)/2);
-  const oy = Math.floor((ch - s.length*cs)/2);
+  
+  let minC = 9, maxC = -1, minR = 9, maxR = -1;
+  for (let r = 0; r < s.length; r++) {
+    for (let c = 0; c < s[r].length; c++) {
+      if (s[r][c]) {
+        if (c < minC) minC = c;
+        if (c > maxC) maxC = c;
+        if (r < minR) minR = r;
+        if (r > maxR) maxR = r;
+      }
+    }
+  }
+  if (maxC === -1) return;
+
+  const bw = maxC - minC + 1;
+  const bh = maxR - minR + 1;
+  const cs = S.isMobile ? Math.max(6, Math.floor(Math.min(cw/4, ch/3) * 0.85)) : 15;
+  const ox = Math.floor((cw - bw * cs) / 2) - minC * cs;
+  const oy = Math.floor((ch - bh * cs) / 2) - minR * cs;
   const {r,g,b} = hexToRgb(piece.color);
   for (let row = 0; row < s.length; row++) for (let col = 0; col < s[row].length; col++) {
     if (!s[row][col]) continue;

@@ -406,7 +406,12 @@ export function renderLbTab(tab){
 
   document.querySelectorAll('.lb-tab[data-tab]').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   const myVal=isSprintTab?S._lbCache.mySprintTime:S._lbCache.myScore;
+  // Clear inline flex/centering styles left over from the LOADING placeholder.
+  // Without this, the table is rendered as a flex item with align-items:center,
+  // clipping the top rows so the visible list starts mid-rank.
+  inner.removeAttribute('style');
   inner.innerHTML=lbHTML(entries,S._lbCache.myName,myRank,myVal,isSprintTab);
+  inner.scrollTop=0;
 }
 
 export function setLbMode(mode) {

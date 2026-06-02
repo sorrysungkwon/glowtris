@@ -17,6 +17,11 @@ function unlockSpeaker(){
 }
 
 function getAudioCtx(){
+  // If the browser fully closed the context (rare — long backgrounding on iOS
+  // can do this), recreate it. resume() does nothing on a closed context.
+  if(audioCtx && audioCtx.state==='closed'){
+    audioCtx=null; masterGain=null;
+  }
   if(!audioCtx){
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
     masterGain=audioCtx.createGain();
@@ -24,12 +29,29 @@ function getAudioCtx(){
     masterGain.gain.value=S.muteAudio?0:1;
   }
   unlockSpeaker();
-  if(audioCtx.state==='suspended')audioCtx.resume();
+  // 'suspended' = standard pause; 'interrupted' = iOS 16+ backgrounding state.
+  // Both need an explicit resume() inside a user-gesture handler to recover.
+  if(audioCtx.state==='suspended' || audioCtx.state==='interrupted'){
+    audioCtx.resume().catch(()=>{});
+  }
   return audioCtx;
 }
 
 export function toggleMute(){
   S.muteAudio=!S.muteAudio;
+  // User gesture — also use this opportunity to wake a suspended/interrupted
+  // audio context. iOS PWAs in particular can only resume from within a
+  // gesture handler, and the routing to speaker may also need re-unlocking
+  // after a long backgrounding.
+  if(audioCtx){
+    if(audioCtx.state==='closed'){
+      // Force recreation on next playBeep — masterGain is gone too.
+      audioCtx=null; masterGain=null;
+    } else if(audioCtx.state==='suspended' || audioCtx.state==='interrupted'){
+      audioCtx.resume().catch(()=>{});
+      _speakerUnlocked=false; unlockSpeaker();
+    }
+  }
   if(masterGain)masterGain.gain.value=S.muteAudio?0:1;
   localStorage.setItem(LS.MUTE,S.muteAudio?'1':'0');
   const icon=document.getElementById('mute-icon');
@@ -234,9 +256,16 @@ export function stopBGM(){
 export function pauseBGM(){
   stopBGM();
 }
-export function resumeBGM(){
-  if(!audioCtx)return;
-  if(audioCtx.state==='suspended')audioCtx.resume();
+export async function resumeBGM(){
+  if(!audioCtx) return;
+  // Await the resume — without this we read audioCtx.currentTime while the
+  // context is still suspended, get a stale value, and schedule a burst of
+  // notes that play in the past (i.e. silently). 'interrupted' is iOS 16+.
+  if(audioCtx.state==='suspended' || audioCtx.state==='interrupted'){
+    try { await audioCtx.resume(); } catch(e) {}
+  }
+  // If the context never returned to 'running' (rare iOS edge case), bail.
+  if(audioCtx.state !== 'running') return;
   bgmPlaying = true;
   bgmNextTime = audioCtx.currentTime + 0.1;
   bgmScheduleLoop();
@@ -293,7 +322,22 @@ export function applyMuteToGain(){
   if(masterGain)masterGain.gain.value=S.muteAudio?0:1;
 }
 export function onPageHide(){pauseBGM();}
-export function onPageShow(){if(S.gameRunning&&!S.gamePaused)resumeBGM();}
+export function onPageShow(){
+  // Re-unlock the speaker on every visibility return — iOS PWA loses the
+  // routing after a long background. The flag-reset + unlockSpeaker call is
+  // safe to invoke even when already unlocked (idempotent: it creates one
+  // silent <audio>, plays for 1s, then stops).
+  _speakerUnlocked = false;
+  if(audioCtx) unlockSpeaker();
+  // Try to wake suspended/interrupted contexts so the next gesture (mute,
+  // RESUME, hover SFX) sees a running ctx. iOS may still ignore this without
+  // a user gesture; the gesture-driven resume in toggleMute / togglePause
+  // covers that.
+  if(audioCtx && (audioCtx.state==='suspended' || audioCtx.state==='interrupted')){
+    audioCtx.resume().catch(()=>{});
+  }
+  if(S.gameRunning && !S.gamePaused) resumeBGM();
+}
 export function closeAudio(){
   stopBGM();
   if(audioCtx){audioCtx.close();audioCtx=null;masterGain=null;}

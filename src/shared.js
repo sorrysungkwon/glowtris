@@ -1,14 +1,20 @@
 // ─── Constants ───────────────────────────────────────────────────────────────
 export const COLS = 10, ROWS = 20;
 
+// SRS-standard bounding boxes — 4x4 for I, 3x3 for JLSTZ, 2x2 for O.
+// Padding the JLSTZ pieces from 2x3/3x2 to 3x3 keeps the bounding box stable
+// across rotations, which is what the wiki SRS kick tables assume. Without
+// this padding, rotation against a wall could fail (e.g. S-piece in East
+// state could not kick back to North) because the implicit centering of the
+// piece within its bbox shifts when the bbox size changes.
 export const PIECES = {
-  I:{shape:[[1,1,1,1]],color:'#00d8ff'},
+  I:{shape:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],color:'#00d8ff'},
   O:{shape:[[1,1],[1,1]],color:'#ffe000'},
-  T:{shape:[[0,1,0],[1,1,1]],color:'#cc00ff'},
-  S:{shape:[[0,1,1],[1,1,0]],color:'#00ffaa'},
-  Z:{shape:[[1,1,0],[0,1,1]],color:'#ff2040'},
-  J:{shape:[[1,0,0],[1,1,1]],color:'#2979ff'},
-  L:{shape:[[0,0,1],[1,1,1]],color:'#ff8c00'},
+  T:{shape:[[0,1,0],[1,1,1],[0,0,0]],color:'#cc00ff'},
+  S:{shape:[[0,1,1],[1,1,0],[0,0,0]],color:'#00ffaa'},
+  Z:{shape:[[1,1,0],[0,1,1],[0,0,0]],color:'#ff2040'},
+  J:{shape:[[1,0,0],[1,1,1],[0,0,0]],color:'#2979ff'},
+  L:{shape:[[0,0,1],[1,1,1],[0,0,0]],color:'#ff8c00'},
 };
 
 export const SCORE_TABLE     = [0,100,300,500,800];
