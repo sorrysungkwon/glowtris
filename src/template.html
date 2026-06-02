@@ -199,23 +199,23 @@
     <!-- ACTION GROUP -->
     <div class="control-group">
       <div class="nes-right-panel">
-        <button class="tbtn tbtn-hold" id="btn-hold">
-          <span class="material-icons-round">swap_horiz</span>
-          <span class="btn-lbl">HOLD</span>
-        </button>
-        <div class="rotation-group">
+        <!-- top-cluster aligns with D-pad TOP -->
+        <div class="top-cluster">
+          <button class="tbtn tbtn-hold" id="btn-hold">
+            <span class="material-icons-round">swap_horiz</span>
+          </button>
           <button class="tbtn tbtn-rotate" id="btn-rotate-180">
             <span class="material-icons-round">sync</span>
-            <span class="btn-lbl">180°</span>
           </button>
-          <div class="nes-actions">
-            <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
-              <span class="material-icons-round">rotate_left</span>
-            </button>
-            <button class="tbtn tbtn-rotate" id="btn-rotate">
-              <span class="material-icons-round">rotate_right</span>
-            </button>
-          </div>
+        </div>
+        <!-- bottom-cluster aligns with D-pad BOTTOM -->
+        <div class="bottom-cluster">
+          <button class="tbtn tbtn-rotate" id="btn-rotate-ccw">
+            <span class="material-icons-round">rotate_left</span>
+          </button>
+          <button class="tbtn tbtn-rotate" id="btn-rotate">
+            <span class="material-icons-round">rotate_right</span>
+          </button>
         </div>
       </div>
     </div>

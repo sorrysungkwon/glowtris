@@ -715,15 +715,15 @@
     #game-row { flex:1 1 0; min-height:0; align-items:center; justify-content:center; }
 
     #touch-controls.nes-layout {
-      width: min(380px, 98vw); /* Wider to fit larger D-pad */
-      padding-bottom: 10px; /* PWA bottom bump — kept small so the dock area doesn't waste space */
+      width: min(360px, 96vw); /* slight side margin so we don't touch the screen edge */
+      padding-bottom: 10px; /* PWA bottom bump — small so dock area doesn't waste space */
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
-      align-items: stretch;
+      justify-content: space-between; /* D-pad left, ACTIONS right; gap fills middle */
+      align-items: flex-start;
       gap: 16px;
     }
-    #mobile-header { width: min(380px, 92vw); }
+    #mobile-header { width: min(360px, 92vw); }
 
     .control-group {
       flex: 1;
@@ -756,57 +756,42 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
+    /* Right action panel matches D-pad height exactly so HOLD/180° align
+       with the D-pad TOP and CCW/CW align with the D-pad BOTTOM. */
     .nes-right-panel {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px; /* Clear separation between Hold and Rotations */
-      width: 100%;
+      margin-top: 16px;     /* same as .nes-dpad margin-top */
+      height: 182px;        /* same as D-pad grid: 58*3 + 4*2 */
+      justify-content: space-between;
     }
-
-    #btn-hold {
-      width: 100%;
-      height: 34px;
-      border-radius: 8px; /* 네모에 곡률 */
-      font-size: 18px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .rotation-group {
+    .top-cluster {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 8px;
-      width: 100%;
     }
-    #btn-rotate-180 {
-      width: 100%;
-      height: 34px;
-      border-radius: 34px; /* 원통형의 긴 버튼 */
-      font-size: 18px;
+    .bottom-cluster {
       display: flex;
-      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+    /* HOLD and 180° share the same width as one CCW/CW circle; slightly
+       taller than before so they're easy to thumb-tap. */
+    #btn-hold,
+    #btn-rotate-180 {
+      width: 62px;
+      height: 44px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      font-size: 26px;
     }
-    .btn-lbl {
-      font-size: 11px;
-      font-weight: 700;
-      font-family: 'Orbitron', monospace;
-      letter-spacing: 2px;
-    }
-
-    .nes-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-    .nes-actions #btn-rotate-ccw, 
-    .nes-actions #btn-rotate {
+    #btn-hold { border-radius: 10px; }
+    #btn-rotate-180 { border-radius: 22px; }
+    .bottom-cluster #btn-rotate-ccw,
+    .bottom-cluster #btn-rotate {
       width: 62px; height: 62px;
       border-radius: 50%;
       font-size: 30px;
@@ -815,7 +800,7 @@
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    #touch-controls.nes-layout { width: 500px; padding-bottom: 16px; }
+    #touch-controls.nes-layout { width: 480px; padding-bottom: 16px; gap: 24px; }
     .control-group { padding: 6px 0; }
     .nes-dpad {
       grid-template-columns: 78px 78px 78px;
@@ -823,14 +808,21 @@
       margin-top: 24px;
     }
     .nes-dpad .tbtn { font-size: 40px; }
-    .nes-right-panel { gap: 24px; }
-    #btn-hold { height: 48px; font-size: 24px; border-radius: 12px; }
-    .rotation-group { gap: 12px; }
-    #btn-rotate-180 { height: 48px; font-size: 24px; border-radius: 48px; }
-    .btn-lbl { font-size: 14px; }
-    .nes-actions { gap: 14px; }
-    .nes-actions #btn-rotate-ccw, 
-    .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
+    .nes-right-panel {
+      margin-top: 24px;
+      height: 242px; /* same as tablet D-pad: 78*3 + 4*2 */
+    }
+    .top-cluster { gap: 12px; }
+    .bottom-cluster { gap: 14px; }
+    #btn-hold,
+    #btn-rotate-180 {
+      width: 86px;
+      height: 60px;
+      font-size: 34px;
+    }
+    #btn-rotate-180 { border-radius: 30px; }
+    .bottom-cluster #btn-rotate-ccw,
+    .bottom-cluster #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
   }
 
   /* ─── Performance mode indicator ─── */
