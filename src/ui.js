@@ -702,9 +702,25 @@ function drawMiniPiece(ctx, piece, cw, ch) {
   ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
   if (!piece) return;
   const s  = piece.shape;
-  const cs = S.isMobile ? Math.max(7, Math.floor(Math.min(cw/4, ch/3))) : 18;
-  const ox = Math.floor((cw - s[0].length*cs)/2);
-  const oy = Math.floor((ch - s.length*cs)/2);
+  
+  let minC = 9, maxC = -1, minR = 9, maxR = -1;
+  for (let r = 0; r < s.length; r++) {
+    for (let c = 0; c < s[r].length; c++) {
+      if (s[r][c]) {
+        if (c < minC) minC = c;
+        if (c > maxC) maxC = c;
+        if (r < minR) minR = r;
+        if (r > maxR) maxR = r;
+      }
+    }
+  }
+  if (maxC === -1) return;
+
+  const bw = maxC - minC + 1;
+  const bh = maxR - minR + 1;
+  const cs = S.isMobile ? Math.max(6, Math.floor(Math.min(cw/4, ch/3) * 0.85)) : 15;
+  const ox = Math.floor((cw - bw * cs) / 2) - minC * cs;
+  const oy = Math.floor((ch - bh * cs) / 2) - minR * cs;
   const {r,g,b} = hexToRgb(piece.color);
   for (let row = 0; row < s.length; row++) for (let col = 0; col < s[row].length; col++) {
     if (!s[row][col]) continue;
