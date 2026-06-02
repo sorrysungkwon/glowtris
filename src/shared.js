@@ -40,6 +40,8 @@ export const LS = {
   NAME:         'glowTrisName',
   MUTE:         'glowTrisMute',
   DAS:          'glowTrisDAS',
+  SDF:          'glowTrisSDF',
+  DCD:          'glowTrisDCD',
   ARR:          'glowTrisARR',
   LOCK:         'glowTrisLock',
   GHOST:        'glowTrisGhost',
@@ -120,6 +122,8 @@ export const S = {
   // Live board data (game.js writes, ui.js reads each frame)
   board:   null,
   current: null,
+  lockResets: 0,
+  lowestY: 0,
   next:    null,
   held:    null,
 
@@ -173,7 +177,8 @@ export const S = {
 
   // Input settings (ui.js settings fns write, game.js DAS timer reads)
   das: 150,
-  arr: 50,
+  sdf: 40, // 0 = Infinity
+  arr: 50, dcd: 16, dcdTimer: 0,
 
   // Sprint timing (game.js writes, ui.js updateUI/updateSprintTimer reads)
   _sprintStartTime: 0,
