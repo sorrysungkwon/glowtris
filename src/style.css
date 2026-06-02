@@ -812,32 +812,31 @@
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    /* Container = D-pad (242) + gap (~32) + action panel (186) = 460. */
-    #touch-controls.nes-layout { width: 460px; padding-bottom: 16px; }
+    #touch-controls.nes-layout { width: 380px; padding-bottom: 16px; }
     .control-group { padding: 6px 0; }
     .nes-dpad {
-      grid-template-columns: 78px 78px 78px;
-      grid-template-rows: 78px 78px 78px;
-      margin-top: 24px;
+      grid-template-columns: 64px 64px 64px;
+      grid-template-rows: 64px 64px 64px;
+      margin-top: 16px;
     }
-    .nes-dpad .tbtn { font-size: 40px; }
+    .nes-dpad .tbtn { font-size: 32px; }
     .nes-right-panel {
-      width: 186px; /* = 86*2 + 14 (CCW + gap + CW) */
-      margin-top: 24px;
-      gap: 24px;
+      width: 154px; /* = 70*2 + 14 */
+      margin-top: 16px;
+      gap: 16px;
     }
     .rotation-group { gap: 12px; }
     .nes-actions { gap: 14px; }
     #btn-hold,
     #btn-rotate-180 {
-      height: 60px;
-      font-size: 26px;
-      gap: 10px;
+      height: 52px;
+      font-size: 22px;
+      gap: 8px;
     }
-    #btn-rotate-180 { border-radius: 60px; }
-    .btn-lbl { font-size: 14px; }
+    #btn-rotate-180 { border-radius: 52px; }
+    .btn-lbl { font-size: 13px; }
     .nes-actions #btn-rotate-ccw,
-    .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
+    .nes-actions #btn-rotate { width: 70px; height: 70px; font-size: 36px; }
   }
 
   /* ─── Performance mode indicator ─── */

@@ -95,9 +95,10 @@ export function resetPerfHold(locked, savedPerf) {
 export function _applyTouchCELL() {
   const W = window.innerWidth, H = window.innerHeight;
   S.isMobile = W < 600 || window.matchMedia('(pointer:coarse)').matches;
-  const availW  = W - (S.isMobile ? 32 : 56);
-  const headerH = S.isMobile ? 52 : 30;
-  const ctrlH   = S.isMobile ? 188 : 218;
+  const isPhone = W < 600;
+  const availW  = W - (isPhone ? 32 : 56);
+  const headerH = isPhone ? 52 : 30;
+  const ctrlH   = isPhone ? 188 : 224;
 
   const isIOSPWA = navigator.standalone === true;
   let safeTop = 0, safeBottom = 0;
