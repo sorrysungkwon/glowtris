@@ -220,7 +220,7 @@ Major strategic pivot. Read fully before working on any feature. **All Antigravi
 3. **Two non-negotiable principles for every Phase A change:**
    - **Correctness** — output must match standard behavior exactly. No "close enough." If a competitive player would notice the difference, it's wrong.
    - **Maintainability** — code must stay readable. Prefer simple, well-named modules over clever optimizations. If the cleanest implementation can't meet the correctness bar, isolate the complex part behind a small, documented seam.
-4. **No "TETR.IO" naming in documents.** Use "competitive standard" / "modern competitive clients" instead.
+4. **No naming of specific external competitive clients in documents.** Use "competitive standard" / "modern competitive clients" instead.
 
 ### Why (motivation)
 
@@ -254,7 +254,7 @@ Full ARCH/FEAT specs with acceptance criteria live in [`BUGS.md`](./BUGS.md).
 
 Initial plan was raw WebGL2 to match the reference paper. Reversed because the project maintainer is **not a WebGL specialist**, and Claude's WebGL debugging requires user-side visual feedback for every shader change (slow cycle, 20-40 min per iteration). Raw WebGL2 was rated too risky for the team composition.
 
-**Decision: PixiJS** — Canvas2D-grade API with WebGL2 acceleration underneath. Bundle cost ~+400KB (acceptable in our domain — TETR.IO is multi-MB). Debuggable without GPU expertise. Substages:
+**Decision: PixiJS** — Canvas2D-grade API with WebGL2 acceleration underneath. Bundle cost ~+400KB (acceptable in our domain — comparable competitive clients ship multi-MB bundles). Debuggable without GPU expertise. Substages:
 
 | Substage | Scope |
 |---|---|
@@ -271,9 +271,9 @@ Each substage keeps a Canvas2D fallback for clients where WebGL fails to initial
 - CSS transform for UI text elements (score popup, combo display) — GPU-accelerated path
 - `requestAnimationFrame` priority hints where supported
 
-### TETR.IO context (for Antigravity reference)
+### Reference-client context (for Antigravity reference)
 
-TETR.IO migrated to raw WebGL2 around 2024 because their user base skews heavily toward 144Hz+ monitors, high-PPS competitive play, and PWA mobile. Their team has WebGL specialists and a continuous visual-feedback loop with their fanbase. Our PixiJS choice achieves equivalent quality for our user profile without requiring that expertise.
+The leading competitive web-tetris client migrated to raw WebGL2 around 2024 because their user base skews heavily toward 144Hz+ monitors, high-PPS competitive play, and PWA mobile. Their team has WebGL specialists and a continuous visual-feedback loop with their fanbase. Our PixiJS choice achieves equivalent quality for our user profile without requiring that expertise.
 
 ### Memory / progress recording protocol
 
