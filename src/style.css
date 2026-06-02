@@ -716,7 +716,7 @@
 
     #touch-controls.nes-layout {
       width: min(380px, 98vw); /* Wider to fit larger D-pad */
-      padding-bottom: 20px;
+      padding-bottom: 10px; /* PWA bottom bump — kept small so the dock area doesn't waste space */
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -727,23 +727,11 @@
 
     .control-group {
       flex: 1;
-      background: rgba(4, 4, 30, 0.4);
-      border: 1px solid rgba(0, 200, 255, 0.12);
-      border-radius: 16px;
-      padding: 10px 12px;
+      padding: 4px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 0 15px rgba(0,0,40,0.5);
-    }
-    .group-label {
-      font-size: 8px;
-      font-weight: 700;
-      color: rgba(0, 200, 255, 0.4);
-      letter-spacing: 2px;
-      margin-bottom: 12px;
-      text-align: center;
     }
 
     .nes-dpad {
@@ -827,8 +815,8 @@
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    #touch-controls.nes-layout { width: 500px; padding-bottom: 30px; }
-    .control-group { padding: 14px; }
+    #touch-controls.nes-layout { width: 500px; padding-bottom: 16px; }
+    .control-group { padding: 6px 0; }
     .nes-dpad {
       grid-template-columns: 78px 78px 78px;
       grid-template-rows: 78px 78px 78px;
