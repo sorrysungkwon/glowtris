@@ -7,18 +7,20 @@
 
 ## 🔲 Open
 
-### [BUG-004] Piece transparency after ~5 games (Chrome/Windows)
-- **Reported:** 2026-05-31 | **Priority:** 🔴 Critical
-- **Symptom:** Pieces gradually become transparent/invisible after playing ~5 games without refresh
-- **Reproduce:** Chrome/Windows — play 5+ consecutive games
-- **Root cause (suspected):** Canvas 2D state (globalAlpha, shadowBlur, lineDash) leaking across game resets in Chrome's GPU-accelerated canvas path. `gctx.clearRect()` clears pixels but not context state.
-- **Fix:** Add explicit `gctx.globalAlpha=1; gctx.shadowBlur=0; gctx.setLineDash([])` reset at top of `drawBoard()` each frame.
-- **Status:** Under investigation
+_No open bugs._
 
 ---
 
 ## ✅ Fixed
 
+### [BUG-004] Piece transparency after ~5 games (Chrome/Windows)
+- **Reported:** 2026-05-31 | **Fixed:** 2026-06-03
+- **Priority:** 🔴 Critical
+- **Symptom:** Pieces gradually become transparent/invisible after playing ~5 games without refresh
+- **Reproduce:** Chrome/Windows — play 5+ consecutive games
+- **Root cause (suspected):** Canvas 2D state (globalAlpha, shadowBlur, lineDash) leaking across game resets in Chrome's GPU-accelerated canvas path. `gctx.clearRect()` clears pixels but not context state.
+- **Fix:** Add explicit `gctx.globalAlpha=1; gctx.shadowBlur=0; gctx.setLineDash([])` reset at top of `drawBoard()` each frame.
+- **Status:** ✅ Fixed (Added context reset in `drawBoard()`)
 ### [BUG-013] JLSTZ pieces spawn one column too far right
 - **Reported:** 2026-06-03 | **Fixed:** 2026-06-03 | **Source:** Reddit u/DelayProfessional345 (r/vibecoding)
 - **Symptom:** Every piece except I and O spawned one column to the right of the SRS guideline position.
@@ -114,11 +116,7 @@
 
 ---
 
-## 🔲 Open
 
-_No open bugs._
-
----
 
 ## 🏛️ Engine Architecture (Competitive standard responsiveness)
 
@@ -130,21 +128,21 @@ _No open bugs._
 - **Symptom:** Game loop is single-RAF; gravity, DAS, lock delay all evaluated once per render frame → 60Hz-bound jitter (16.7ms granularity).
 - **Acceptance criteria:** Input-to-state latency ≤ 4 ms p99, independent of monitor refresh rate. Logic timers (gravity, DAS, ARR, lock delay) advance on a fixed tick decoupled from RAF.
 - **Reference implementation:** Accumulator pattern at 1000 Hz (1 ms tick) per paper §3.1. A larger tick (e.g. 4 ms / 250 Hz) is acceptable if the criteria above hold.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.2 (1000Hz fixed-timestep accumulator loop, RAF decoupled from logic)
 
 ### [ARCH-002] Ordered sub-frame input handling
 - **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
 - **Symptom:** Inputs are processed at the moment of the keydown event; two inputs within one frame are not ordered by their actual sub-frame timing.
 - **Acceptance criteria:** Two inputs arriving inside the same render frame are simulated in true chronological order, not in event-listener arrival order. No input is silently dropped or coalesced.
 - **Reference implementation:** Input queue carrying `performance.now()` timestamps, drained per tick in ARCH-001 loop.
-- **Status:** 🔲 Open (depends on ARCH-001)
+- **Status:** ✅ Fixed — v0.2 (input queue with performance.now() timestamps, drained per tick)
 
 ### [ARCH-003] Instant ARR=0 transition
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** ARR is implemented with `setInterval` repeating `moveX(d)`; even ARR=0 requires CPU-bound iteration.
 - **Acceptance criteria:** With ARR=0, holding a direction snaps the piece to the wall within one tick of ARCH-001.
 - **Reference implementation:** Raycast to wall via `ΔX_max_to_wall` (paper §4.1). Equivalent loop-in-one-tick implementations are acceptable.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (ARR=0 snaps piece to wall in one tick)
 
 ### [ARCH-004] WebGL2 renderer migration (via PixiJS)
 - **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
@@ -180,17 +178,17 @@ _No open bugs._
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** No way to flip a piece 180° in one action
 - **Note:** Standard in modern Tetris guideline clients. Typically bound to a dedicated key.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (180° rotation with Tetr.io-standard kick table)
 
 ### [FEAT-002] Custom key bindings
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** Key layout is hardcoded — no way to remap controls
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (keybind settings panel)
 
 ### [FEAT-003] SDF (Soft Drop Factor) adjustment
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** Soft drop speed is hardcoded; no separate SDF slider (distinct from ARR). Standard: configurable from 1× to instant.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (SDF slider in settings)
 
 ### [FEAT-004] Back-to-Back (B2B) bonus
 - **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
@@ -208,19 +206,19 @@ _No open bugs._
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** `cancelLock()` resets the lock timer unconditionally on every move/rotation. Players can stall a piece indefinitely.
 - **Note:** Tetris guideline caps lock delay resets at 15 per piece. Requires a `lockResetCount` counter reset on `spawnPiece()`.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (15-move lock delay reset cap)
 
 ### [FEAT-007] IRS (Initial Rotation System)
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** Holding a rotation key while a piece is locking does not pre-rotate the next piece on spawn.
 - **Note:** `spawnPiece()` ignores held key state. IRS is expected by competitive players for high-speed play continuity.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (IRS implemented in spawnPiece())
 
 ### [FEAT-008] IHS (Initial Hold System)
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** Holding the hold key (C) while a piece is locking does not immediately hold the next piece on spawn.
 - **Note:** Same as IRS — `spawnPiece()` ignores held key state.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (IHS implemented in spawnPiece())
 
 ### [FEAT-009] In-game APM / PPS stats
 - **Reported:** 2026-06-01 | **Priority:** 🔵 Low
@@ -245,4 +243,4 @@ _No open bugs._
 - **Symptom:** When the player presses rotate or hold while moving (DAS active), the DAS charge state is not explicitly preserved with a configurable decay window.
 - **Required:** Add a `dcd` parameter (ms) — during DCD window, DAS charge persists through rotation/hold inputs to prevent unintended movement stalls.
 - **Note:** Standard parameter in modern competitive clients. Required to feel correct at high speeds.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.3.0 (DCD implemented in input handling)
