@@ -187,12 +187,16 @@
     box-shadow: 0 0 10px var(--pink);
   }
   .key-row.key-pressed#key-hard span { color: var(--pink); }
-  .key-row.key-pressed#key-rotate kbd {
+  .key-row.key-pressed#key-rotate kbd,
+  .key-row.key-pressed#key-rotate-ccw kbd,
+  .key-row.key-pressed#key-rotate-180 kbd {
     background: rgba(160, 0, 255, 0.22);
     border-color: var(--purple);
     box-shadow: 0 0 10px var(--purple);
   }
-  .key-row.key-pressed#key-rotate span { color: var(--purple); }
+  .key-row.key-pressed#key-rotate span,
+  .key-row.key-pressed#key-rotate-ccw span,
+  .key-row.key-pressed#key-rotate-180 span { color: var(--purple); }
 
   @keyframes scale-pop {
     0% { transform: scale(1); }
