@@ -746,7 +746,7 @@ function _renderPiece(ctx, piece, cw, ch) {
 
   const bw = maxC - minC + 1;
   const bh = maxR - minR + 1;
-  const cs = S.isMobile ? Math.max(6, Math.floor(Math.min(cw/4, ch/3) * 0.85)) : 15;
+  const cs = (cw >= 80) ? 15 : Math.max(6, Math.floor(Math.min(cw/4, ch/3) * 0.85));
   const ox = Math.floor((cw - bw * cs) / 2) - minC * cs;
   const oy = Math.floor((ch - bh * cs) / 2) - minR * cs;
   const {r,g,b} = hexToRgb(piece.color);
