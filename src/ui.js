@@ -120,7 +120,7 @@ let _lastTouchCELL = 0;   // CELL saved just before kb mode activates
 let _restoringTouchCELL = 0; // non-zero: _applyTouchCELL should use this value instead of recomputing
 export function _applyTouchCELL() {
   const W = window.innerWidth, H = window.innerHeight;
-  S.isMobile = W < 600 || window.matchMedia('(pointer:coarse)').matches;
+  S.isMobile = W < 600 || window.matchMedia('(any-pointer:coarse)').matches;
   const isPhone = W < 600;
   const availW  = W - (isPhone ? 32 : 56);
   const headerH = isPhone ? 52 : 30;
@@ -182,7 +182,7 @@ export function _applyTouchCELL() {
 
 export function initLayout() {
   const W = window.innerWidth, H = window.innerHeight;
-  const isCoarse = window.matchMedia('(pointer:coarse)').matches;
+  const isCoarse = window.matchMedia('(any-pointer:coarse)').matches;
   S.isMobile = (W < 600) || (isCoarse && !S._kbMode);
   bgc.width = W; bgc.height = H;
 
