@@ -3,6 +3,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".",
   "alias": ["prevglow.vercel.app"],
+  "crons": [
+    { "path": "/api/keepalive", "schedule": "0 0 * * *" }
+  ],
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
