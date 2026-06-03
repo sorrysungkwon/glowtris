@@ -70,7 +70,7 @@ const $combo    = document.getElementById('combo-display');
 // ─── Bag / Pieces ─────────────────────────────────────────────────────────────
 function refillBag(){bag=[...Object.keys(PIECES)];for(let i=bag.length-1;i>0;i--){const randVal=_prng?_prng():Math.random();const j=Math.floor(randVal*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}}
 function nextFromBag(){if(!bag.length)refillBag();return bag.pop();}
-function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor(COLS/2)-Math.floor(d.shape[0].length/2),y:-1,rot:0};}
+function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor((COLS-d.shape[0].length)/2),y:-1,rot:0};}
 
 // SRS kick tables — canvas y-down (wiki y-up values with y negated)
 const KICKS_JLSTZ = {

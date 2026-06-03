@@ -7,38 +7,6 @@
 
 ## 🔲 Open
 
-### [BUG-013] JLSTZ pieces spawn one column too far right
-- **Reported:** 2026-06-03 | **Priority:** 🔴 High | **Source:** Reddit u/DelayProfessional345 (r/vibecoding)
-- **Symptom:** Every piece except I and O spawns one unit to the right of the standard Tetris guideline spawn position. Affects every game from the very first piece.
-- **Root cause:** `makePiece()` computes spawn X as `Math.floor(COLS/2) - Math.floor(width/2)`. For odd-width pieces (JLSTZ, width=3): `5 - 1 = 4`. The correct formula is `Math.floor((COLS - width) / 2)` = `Math.floor(7/2) = 3`. The two formulas diverge when COLS is even and width is odd — I (width=4) and O (width=2) are even-width so they are unaffected.
-- **Fix:** In `makePiece()` (`game.js` line 73), change spawn x from `Math.floor(COLS/2)-Math.floor(d.shape[0].length/2)` → `Math.floor((COLS-d.shape[0].length)/2)`.
-- **Reporter's note:** Reporter is not an SRS player and doesn't personally care about the kick system. However, they note that SRS players are very particular about exact parity — if 1:1 guideline compliance is the goal, the kick tables are publicly documented.
-- **Tetris context (from reporter):** The Tetris Company didn't design spins intentionally. They built the SRS system, and techniques like T-spin were discovered organically by players. Spins are a byproduct of the kick system, not an explicit design decision — which is why 1:1 SRS implementation matters to competitive players.
-- **Status:** 🔲 Open
-
-### [BUG-012] iPad: next/hold panel size inconsistent between kb mode and touch mode
-- **Reported:** 2026-06-03 | **Priority:** 🟡 Medium | **Device:** iPad (any, portrait)
-- **Symptom:** In keyboard mode (kb-mode CSS class applied), the NEXT and HOLD canvases (`ncD`, `hcD`) appear at the correct size (4×30 = 120px wide, 9×30 = 270px tall for NEXT; 4×30 × 3×30 for HOLD). When the user switches back to touch mode (or on initial load without a keyboard), the NEXT/HOLD panels appear at a different size — visually inconsistent with keyboard mode.
-- **Reproduce:**
-  1. Open on iPad (portrait) without keyboard → note NEXT/HOLD panel size
-  2. Connect Bluetooth/Smart keyboard, press any key → kb mode activates (touch controls hide)
-  3. Tap screen → touch mode restores
-  4. Compare NEXT/HOLD panel sizes between step 1 and step 3 — they differ
-- **Root cause:**
-  - `initLayout()` has two branches: (A) `isCoarse && !S._kbMode` → `_applyTouchCELL()`, (B) else → CELL=30, sizes all canvases.
-  - Branch (B) (kb mode) sets `ncD`/`hcD` to `4*30 × 9*30` and `4*30 × 3*30`.
-  - Branch (A) (touch mode) calls `_applyTouchCELL()` which sizes `gc`/`pc` to the computed CELL but does NOT size `ncD`/`hcD` — they retain previous values or HTML-attribute defaults (`width="108" height="96"`).
-  - Additionally: `pointer:coarse` returns false on iPad with Magic Keyboard (trackpad = fine pointer is primary). This caused `initLayout()` to always take branch (B) even in touch mode, setting CELL=30 for everything — explaining the large-canvas overflow visible in screenshot. Fixed by switching to `any-pointer:coarse` (true whenever *any* input device is coarse, i.e., touchscreen exists).
-  - Secondary: after kb→touch, iOS Safari may change `window.innerHeight` if address bar was collapsed during keyboard interaction — but this user's address bar is fixed-height (non-issue on this device).
-- **Attempted fixes (all partial):**
-  1. `_savedTouchCELL` — module-level var to save and restore the initial touch CELL. Broken: var removed from declaration but inner code still referenced it (ReferenceError).
-  2. `capCELL = isPhone ? 30 : 24` — hard cap for non-phone. Did not match initial load CELL when viewport height differed.
-  3. `_lastTouchCELL` / `_restoringTouchCELL` — snapshot CELL before kb mode, restore after. Failed: `pointer:coarse=false` on Magic Keyboard iPad meant `_enableKbMode()` never fired → `_lastTouchCELL` stayed 0.
-  4. Non-phone always CELL=30 — iPad always uses 30. Caused overflow: CELL=30 + visible touch controls (224px) exceeds viewport height.
-  5. `any-pointer:coarse` + `ncD`/`hcD` hardcoded to CELL=30 in `_applyTouchCELL()` — current state. `ncD`/`hcD` match kb mode size, but the game board CELL in touch mode may differ from 30 (depends on viewport), creating a piece-size mismatch between the board and panels.
-- **Ideal fix:** Compute a single CELL that fits the viewport with touch controls visible, use it for both the board AND the panels (ncD/hcD). The kb→touch switch should produce the same CELL as initial touch-mode load. With `any-pointer:coarse` now correct and a fixed-height address bar, a simple `_applyTouchCELL()` recompute should be deterministic — but the panel sizing in `_applyTouchCELL()` must include ncD/hcD at that same CELL, not hardcoded 30.
-- **Status:** 🔧 In Progress
-
 ### [BUG-004] Piece transparency after ~5 games (Chrome/Windows)
 - **Reported:** 2026-05-31 | **Priority:** 🔴 Critical
 - **Symptom:** Pieces gradually become transparent/invisible after playing ~5 games without refresh
@@ -50,6 +18,18 @@
 ---
 
 ## ✅ Fixed
+
+### [BUG-013] JLSTZ pieces spawn one column too far right
+- **Reported:** 2026-06-03 | **Fixed:** 2026-06-03 | **Source:** Reddit u/DelayProfessional345 (r/vibecoding)
+- **Symptom:** Every piece except I and O spawned one column to the right of the SRS guideline position.
+- **Root cause:** `makePiece()` used `Math.floor(COLS/2) - Math.floor(width/2)` → gives 4 for 3-wide pieces. Correct: `Math.floor((COLS-width)/2)` → gives 3. I and O are even-width and were unaffected.
+- **Fix:** `game.js` line 73 — changed spawn x formula to `Math.floor((COLS-d.shape[0].length)/2)`.
+
+### [BUG-012] iPad: next/hold panel size inconsistent between kb mode and touch mode
+- **Reported:** 2026-06-03 | **Fixed:** 2026-06-03 | **Device:** iPad with Magic Keyboard
+- **Symptom:** Switching kb→touch on iPad left NEXT/HOLD panels at the wrong size.
+- **Root cause:** `pointer:coarse` returns false on iPad with Magic Keyboard (trackpad is primary fine pointer), so `_applyTouchCELL()` was never called on that device. Also, `_applyTouchCELL()` did not size `ncD`/`hcD`.
+- **Fix:** Switched to `any-pointer:coarse` (true when any device input is coarse, including touchscreen). Added ncD/hcD sizing in `_applyTouchCELL()` using `newCELL`. `_disableKbMode()` sets `gc.width=0` to bypass early-return before calling `initLayout()`.
 
 ### [BUG-011] 180° rotation lifts piece up to 2 cells from the floor
 - **Reported:** 2026-06-02
@@ -216,13 +196,13 @@ _No open bugs._
 - **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
 - **Symptom:** No score multiplier for consecutive difficult clears (T-spin → T-spin, Tetris → Tetris, etc.)
 - **Note:** Tetris guideline requires 1.5× bonus on back-to-back difficult clears. Currently `lockPiece()` scores each clear independently with no `S.b2b` state.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.4 (S.b2b state, isDifficult check, 1.5× multiplier in lockPiece)
 
-### [FEAT-005] Next queue: show 5 previews
+### [FEAT-005] Next queue: show 3 previews
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** Only 1 next piece shown. Standard is 5–6 pieces from the upcoming bag.
 - **Note:** `S.next` holds a single piece. Requires expanding to an array and rendering multiple mini-canvases or a single stacked preview.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.4 (S.next=[] array, 3-piece queue, _drawQueue renderer)
 
 ### [FEAT-006] Lock delay reset cap (15-move limit)
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
@@ -252,7 +232,7 @@ _No open bugs._
 - **Reported:** 2026-06-01 | **Priority:** 🔵 Low
 - **Symptom:** Only T-piece spins are detected and rewarded. S/Z/J/L/I spins with kick are not recognized.
 - **Note:** SRS+ treats any piece that uses a non-zero kick as a spin. Adds score bonus for creative play.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.4 (lastKickNonZero tracked in _tryRotate, checkAllSpin() wraps checkTSpin)
 
 ### [FEAT-011] Ultra / Blitz mode (2-minute timed)
 - **Reported:** 2026-06-01 | **Priority:** 🔵 Low
