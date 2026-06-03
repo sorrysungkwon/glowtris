@@ -116,8 +116,6 @@ export function resetPerfHold(locked, savedPerf) {
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
-let _savedTouchCELL = 0;
-
 export function _applyTouchCELL() {
   const W = window.innerWidth, H = window.innerHeight;
   S.isMobile = W < 600 || window.matchMedia('(pointer:coarse)').matches;
@@ -150,9 +148,8 @@ export function _applyTouchCELL() {
   const availH = H - appPaddingV - headerH - ctrlH - gapsAndBreathing;
   if (availH <= 0) return;
 
-  const computedCELL = Math.max(10, Math.min(30, Math.floor(Math.min(availW / COLS, availH / ROWS))));
-  if (!_savedTouchCELL) _savedTouchCELL = computedCELL;
-  const newCELL = _savedTouchCELL;
+  const capCELL = isPhone ? 30 : 24;
+  const newCELL = Math.max(10, Math.min(capCELL, Math.floor(Math.min(availW / COLS, availH / ROWS))));
   const gameW = COLS * newCELL;
   const gameH = ROWS * newCELL;
 
@@ -235,7 +232,6 @@ document.addEventListener('touchstart', () => { if (S._kbMode && !S.gamePaused) 
 
 let _resizeTimer;
 window.addEventListener('resize', () => {
-  _savedTouchCELL = 0;
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => { initLayout(); initStars(); if (S.gameRunning) drawBoard(); }, 150);
 });
