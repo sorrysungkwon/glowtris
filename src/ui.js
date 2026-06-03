@@ -181,7 +181,7 @@ export function initLayout() {
   S.isMobile = (W < 600) || (isCoarse && !S._kbMode);
   bgc.width = W; bgc.height = H;
 
-  if (isCoarse && !S._kbMode && W < 600) {
+  if (isCoarse && !S._kbMode) {
     _applyTouchCELL();
   } else {
     if (S.CELL !== 30) { _cellSprites = {}; }
@@ -223,6 +223,7 @@ export function _disableKbMode() {
   if (!S._kbMode) return;
   S._kbMode = false;
   document.documentElement.classList.remove('kb-mode');
+  gc.width = 0;
   initLayout(); initStars();
   if (S.gameRunning) { drawBoard(); drawNext(); drawHold(); }
 }
