@@ -172,10 +172,10 @@ export function _applyTouchCELL() {
   _cellSprites = {};
   gc.width  = gameW; gc.height = gameH;
   pc.width  = gameW; pc.height = gameH;
-  ncD.width = 4 * newCELL; ncD.height = 9 * newCELL;
-  ncD.style.width = (4 * newCELL) + 'px'; ncD.style.height = (9 * newCELL) + 'px';
-  hcD.width = 4 * newCELL; hcD.height = 3 * newCELL;
-  hcD.style.width = (4 * newCELL) + 'px'; hcD.style.height = (3 * newCELL) + 'px';
+  ncD.width = 4 * 30; ncD.height = 9 * 30;
+  ncD.style.width = (4 * 30) + 'px'; ncD.style.height = (9 * 30) + 'px';
+  hcD.width = 4 * 30; hcD.height = 3 * 30;
+  hcD.style.width = (4 * 30) + 'px'; hcD.style.height = (3 * 30) + 'px';
   if (S.gameRunning) { drawBoard(); drawNext(); drawHold(); }
 }
 
