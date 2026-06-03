@@ -19,6 +19,18 @@
 
 ## ✅ Fixed
 
+### [BUG-013] JLSTZ pieces spawn one column too far right
+- **Reported:** 2026-06-03 | **Fixed:** 2026-06-03 | **Source:** Reddit u/DelayProfessional345 (r/vibecoding)
+- **Symptom:** Every piece except I and O spawned one column to the right of the SRS guideline position.
+- **Root cause:** `makePiece()` used `Math.floor(COLS/2) - Math.floor(width/2)` → gives 4 for 3-wide pieces. Correct: `Math.floor((COLS-width)/2)` → gives 3. I and O are even-width and were unaffected.
+- **Fix:** `game.js` line 73 — changed spawn x formula to `Math.floor((COLS-d.shape[0].length)/2)`.
+
+### [BUG-012] iPad: next/hold panel size inconsistent between kb mode and touch mode
+- **Reported:** 2026-06-03 | **Fixed:** 2026-06-03 | **Device:** iPad with Magic Keyboard
+- **Symptom:** Switching kb→touch on iPad left NEXT/HOLD panels at the wrong size.
+- **Root cause:** `pointer:coarse` returns false on iPad with Magic Keyboard (trackpad is primary fine pointer), so `_applyTouchCELL()` was never called on that device. Also, `_applyTouchCELL()` did not size `ncD`/`hcD`.
+- **Fix:** Switched to `any-pointer:coarse` (true when any device input is coarse, including touchscreen). Added ncD/hcD sizing in `_applyTouchCELL()` using `newCELL`. `_disableKbMode()` sets `gc.width=0` to bypass early-return before calling `initLayout()`.
+
 ### [BUG-011] 180° rotation lifts piece up to 2 cells from the floor
 - **Reported:** 2026-06-02
 - **Symptom:** Pressing 180° on a piece sitting on the floor lifts it up 1-2 cells. Multiple presses accumulate the lift.
@@ -184,13 +196,13 @@ _No open bugs._
 - **Reported:** 2026-06-01 | **Priority:** 🔴 Critical
 - **Symptom:** No score multiplier for consecutive difficult clears (T-spin → T-spin, Tetris → Tetris, etc.)
 - **Note:** Tetris guideline requires 1.5× bonus on back-to-back difficult clears. Currently `lockPiece()` scores each clear independently with no `S.b2b` state.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.4 (S.b2b state, isDifficult check, 1.5× multiplier in lockPiece)
 
-### [FEAT-005] Next queue: show 5 previews
+### [FEAT-005] Next queue: show 3 previews
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
 - **Symptom:** Only 1 next piece shown. Standard is 5–6 pieces from the upcoming bag.
 - **Note:** `S.next` holds a single piece. Requires expanding to an array and rendering multiple mini-canvases or a single stacked preview.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.4 (S.next=[] array, 3-piece queue, _drawQueue renderer)
 
 ### [FEAT-006] Lock delay reset cap (15-move limit)
 - **Reported:** 2026-06-01 | **Priority:** 🟡 Medium
@@ -220,7 +232,7 @@ _No open bugs._
 - **Reported:** 2026-06-01 | **Priority:** 🔵 Low
 - **Symptom:** Only T-piece spins are detected and rewarded. S/Z/J/L/I spins with kick are not recognized.
 - **Note:** SRS+ treats any piece that uses a non-zero kick as a spin. Adds score bonus for creative play.
-- **Status:** 🔲 Open
+- **Status:** ✅ Fixed — v0.4 (lastKickNonZero tracked in _tryRotate, checkAllSpin() wraps checkTSpin)
 
 ### [FEAT-011] Ultra / Blitz mode (2-minute timed)
 - **Reported:** 2026-06-01 | **Priority:** 🔵 Low

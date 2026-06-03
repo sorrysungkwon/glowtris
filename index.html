@@ -32,9 +32,7 @@
 <meta name="twitter:image:alt" content="GLOWTRIS — Neon Block Stacking Game">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" as="style">
-<link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" as="style">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=optional" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -181,8 +179,9 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     text-align:center; margin-top:2px; margin-bottom:8px;
   }
-  #level-bar-wrap { width:100%; height:5px; background:rgba(255,255,255,0.06); border-radius:3px; margin:6px 0 4px; overflow:hidden; }
-  #level-bar { height:100%; background:linear-gradient(90deg,var(--cyan),var(--purple)); border-radius:3px; transition:width .5s; box-shadow:0 0 8px var(--cyan); }
+  #level-bar-wrap { position:relative; width:100%; height:5px; margin:6px 0 4px; }
+  #level-bar-wrap::before { content:""; position:absolute; top:50%; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); transform:translateY(-50%); z-index:0; }
+  #level-bar { position:relative; z-index:1; height:100%; background:linear-gradient(90deg,var(--cyan),var(--purple)); border-radius:3px; transition:width .5s; box-shadow:0 0 8px var(--cyan); }
   .divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:10px 0; }
   #combo-display { text-align:center; font-size:9px; color:var(--pink); letter-spacing:2px; min-height:14px; text-shadow:0 0 8px var(--pink); }
 
@@ -226,12 +225,16 @@
     box-shadow: 0 0 10px var(--pink);
   }
   .key-row.key-pressed#key-hard span { color: var(--pink); }
-  .key-row.key-pressed#key-rotate kbd {
+  .key-row.key-pressed#key-rotate kbd,
+  .key-row.key-pressed#key-rotate-ccw kbd,
+  .key-row.key-pressed#key-rotate-180 kbd {
     background: rgba(160, 0, 255, 0.22);
     border-color: var(--purple);
     box-shadow: 0 0 10px var(--purple);
   }
-  .key-row.key-pressed#key-rotate span { color: var(--purple); }
+  .key-row.key-pressed#key-rotate span,
+  .key-row.key-pressed#key-rotate-ccw span,
+  .key-row.key-pressed#key-rotate-180 span { color: var(--purple); }
 
   @keyframes scale-pop {
     0% { transform: scale(1); }
@@ -339,7 +342,8 @@
     #mobile-header {
       display:flex;
       align-items:center;
-      gap:8px;
+      justify-content:space-between;
+      position:relative;
       width:100%;
       background:var(--panel-bg);
       border:1px solid var(--border);
@@ -351,7 +355,7 @@
     }
     .mh-preview { display:flex; flex-direction:column; align-items:center; gap:2px; flex:0 0 auto; }
     .mh-preview span { font-size:9px; letter-spacing:2px; color:rgba(0,200,255,0.55); }
-    .mh-info { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0; overflow:hidden; }
+    .mh-info { position:absolute; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:3px; pointer-events:none; }
     .mh-score { font-size:clamp(15px,4vw,22px); font-weight:900; text-shadow:0 0 14px var(--cyan); letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
     .mh-meta { display:flex; gap:6px; }
     .mh-meta span { font-size:clamp(9px,1.9vw,11px); color:rgba(0,200,255,0.5); letter-spacing:0; }
@@ -408,7 +412,7 @@
     content: '';
     position: absolute;
     top: 50%; left: 50%; width: 0; height: 0;
-    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--ripple-color, rgba(255,255,255,0.6)) 0%, transparent 70%);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     opacity: 0;
@@ -781,22 +785,47 @@
       display: grid;
       grid-template-columns: 58px 58px 58px;
       grid-template-rows: 58px 58px 58px;
-      gap: 4px;
+      gap: 0px;
       margin-top: 16px;
       touch-action: none;
+      filter: drop-shadow(0 4px 16px rgba(0, 200, 255, 0.15));
     }
-    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 12px 12px 4px 4px; }
-    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 12px 4px 4px 12px; }
-    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 4px 12px 12px 4px; }
-    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 4px 4px 12px 12px; }
-    .nes-dpad .tbtn { height: 100%; font-size: 30px; touch-action: none; }
-    
+    .nes-dpad .tbtn { 
+      height: 100%; 
+      font-size: 30px; 
+      touch-action: none; 
+      background: rgba(8, 12, 32, 0.75);
+      border: 1px solid rgba(0, 200, 255, 0.35);
+      box-shadow: inset 0 0 12px rgba(0, 200, 255, 0.08);
+      border-radius: 0;
+    }
+    .nes-dpad #btn-drop { grid-column: 2; grid-row: 1; border-radius: 12px 12px 0 0; border-bottom: none; }
+    .nes-dpad #btn-left { grid-column: 1; grid-row: 2; border-radius: 12px 0 0 12px; border-right: none; }
+    .nes-dpad #btn-right { grid-column: 3; grid-row: 2; border-radius: 0 12px 12px 0; border-left: none; }
+    .nes-dpad #btn-soft { grid-column: 2; grid-row: 3; border-radius: 0 0 12px 12px; border-top: none; }
+
     .dpad-center {
       grid-column: 2; grid-row: 2;
-      background: rgba(2, 2, 22, 0.7);
-      border: 1px solid rgba(0, 200, 255, 0.2);
-      border-radius: 4px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      background: rgba(8, 12, 32, 0.75);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dpad-center::after {
+      content: '';
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0, 200, 255, 0.06);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+    }
+    .nes-dpad .tbtn:active {
+      transform: none !important;
+      background: rgba(0, 200, 255, 0.25) !important;
+      box-shadow: inset 0 0 20px rgba(0, 200, 255, 0.5) !important;
+      border-color: rgba(0, 200, 255, 0.8) !important;
+      z-index: 2;
     }
 
     /* Right action panel: fixed width = CCW + gap + CW = 62*2 + 12 = 136 px.
@@ -851,32 +880,69 @@
 
   /* ── TABLET (≥ 600px touch): scale up buttons ── */
   @media (min-width:600px) and (pointer:coarse) {
-    /* Container = D-pad (242) + gap (~32) + action panel (186) = 460. */
-    #touch-controls.nes-layout { width: 460px; padding-bottom: 16px; }
+    #touch-controls.nes-layout { width: 380px; padding-bottom: 16px; }
     .control-group { padding: 6px 0; }
     .nes-dpad {
-      grid-template-columns: 78px 78px 78px;
-      grid-template-rows: 78px 78px 78px;
-      margin-top: 24px;
+      grid-template-columns: 64px 64px 64px;
+      grid-template-rows: 64px 64px 64px;
+      margin-top: 16px;
     }
-    .nes-dpad .tbtn { font-size: 40px; }
+    .nes-dpad .tbtn { font-size: 32px; }
     .nes-right-panel {
-      width: 186px; /* = 86*2 + 14 (CCW + gap + CW) */
-      margin-top: 24px;
-      gap: 24px;
+      width: 154px; /* = 70*2 + 14 */
+      margin-top: 16px;
+      gap: 16px;
     }
     .rotation-group { gap: 12px; }
     .nes-actions { gap: 14px; }
     #btn-hold,
     #btn-rotate-180 {
-      height: 60px;
-      font-size: 26px;
-      gap: 10px;
+      height: 52px;
+      font-size: 22px;
+      gap: 8px;
     }
-    #btn-rotate-180 { border-radius: 60px; }
-    .btn-lbl { font-size: 14px; }
+    #btn-rotate-180 { border-radius: 52px; }
+    .btn-lbl { font-size: 13px; }
     .nes-actions #btn-rotate-ccw,
-    .nes-actions #btn-rotate { width: 86px; height: 86px; font-size: 42px; }
+    .nes-actions #btn-rotate { width: 70px; height: 70px; font-size: 36px; }
+  }
+
+  /* ── Specific Button Active Glow Colors & Ripple Tint ── */
+  .nes-dpad .tbtn {
+    --ripple-color: rgba(0, 200, 255, 0.4);
+  }
+  #btn-drop {
+    --ripple-color: rgba(255, 30, 80, 0.4);
+  }
+  #btn-hold {
+    --ripple-color: rgba(255, 230, 0, 0.4);
+  }
+  #btn-rotate-ccw, #btn-rotate, #btn-rotate-180 {
+    --ripple-color: rgba(160, 0, 255, 0.4);
+  }
+
+  #btn-hold:active {
+    background: rgba(255, 230, 0, 0.25) !important;
+    border-color: rgba(255, 230, 0, 0.8) !important;
+    box-shadow: inset 0 0 20px rgba(255, 230, 0, 0.5), 0 0 15px rgba(255, 230, 0, 0.4) !important;
+    color: #ffe600 !important;
+  }
+  
+  .nes-dpad #btn-drop:active {
+    background: rgba(255, 30, 80, 0.25) !important;
+    border-color: rgba(255, 30, 80, 0.8) !important;
+    box-shadow: inset 0 0 20px rgba(255, 30, 80, 0.5), 0 0 15px rgba(255, 30, 80, 0.4) !important;
+    color: #ff1e50 !important;
+  }
+  
+  /* Unified Purple for all rotation buttons */
+  #btn-rotate-ccw:active,
+  #btn-rotate:active,
+  #btn-rotate-180:active {
+    background: rgba(160, 0, 255, 0.25) !important;
+    border-color: rgba(160, 0, 255, 0.8) !important;
+    box-shadow: inset 0 0 20px rgba(160, 0, 255, 0.5), 0 0 15px rgba(160, 0, 255, 0.4) !important;
+    color: #a000ff !important;
   }
 
   /* ─── Performance mode indicator ─── */
@@ -1313,7 +1379,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   <!-- Desktop title header -->
   <div id="desktop-header">
     <span class="dh-title">GLOWTRIS</span>
-    <span class="dh-version">v0.3.3 BETA</span>
+    <span class="dh-version">v0.4.0 BETA</span>
   </div>
 
   <!-- Mobile-only compact header -->
@@ -1347,16 +1413,28 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       <div class="panel-title">LINES</div>
       <div class="score-val" id="lines-display">0</div>
       <div class="score-sub" id="lines-sub-label">CLEARED</div>
+      <div class="divider"></div>
       <div class="panel-title">LEVEL</div>
       <div class="score-val" id="level-display">1</div>
       <div id="level-bar-wrap"><div id="level-bar" style="width:0%"></div></div>
       <div class="panel-title" style="margin-top:8px">SPEED</div>
       <div id="bpm-display">140 BPM</div>
-      <div class="divider"></div>
+      <div class="panel-title" style="margin-top:8px">BEST</div>
+      <div class="score-val" id="hi-score" style="font-size:12px">0</div>
       <div id="combo-display"></div>
       <div class="divider"></div>
-      <div class="panel-title">BEST</div>
-      <div class="score-val" id="hi-score" style="font-size:16px">0</div>
+      <div class="panel-title">KEYS</div>
+      <div class="key-map">
+        <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
+        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
+        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
+        <div class="key-row" id="key-rotate-180"><kbd>A</kbd><span>rotate 180°</span></div>
+        <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
+        <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
+        <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
+        <div class="key-row" id="key-pause"><kbd>P</kbd><kbd>Esc</kbd><span>pause</span></div>
+        <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
+      </div>
     </div>
 
     <!-- Game canvas -->
@@ -1378,21 +1456,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     <div class="panel" id="right-panel" style="margin-top:6px">
       <div class="panel-title">NEXT</div>
       <canvas id="next-canvas" class="mini-cv" width="108" height="96"></canvas>
-      <div class="divider"></div>
-      <div class="panel-title">HOLD</div>
+      <div class="panel-title" style="margin-top: 12px;">HOLD</div>
       <canvas id="hold-canvas" class="mini-cv" width="108" height="80"></canvas>
-      <div class="divider"></div>
-      <div class="panel-title">KEYS</div>
-      <div class="key-map">
-        <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
-        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
-        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
-        <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
-        <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
-        <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
-        <div class="key-row" id="key-pause"><kbd>P</kbd><kbd>Esc</kbd><span>pause</span></div>
-        <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
-      </div>
     </div>
   </div>
 
@@ -1555,7 +1620,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     current: null,
     lockResets: 0,
     lowestY: 0,
-    next: null,
+    next: [],
     held: null,
     // Score HUD (game.js writes, ui.js updateUI reads)
     score: 0,
@@ -1563,6 +1628,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     level: 1,
     combo: 0,
     hiScore: 0,
+    b2b: false,
     // Game control flags (game.js writes, audio.js + ui.js read)
     gameRunning: false,
     gamePaused: false,
@@ -2331,8 +2397,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   var PAL = ["#00c8ff", "#a000ff", "#ff0080", "#ffe600", "#00ff88"];
   function measureFPS(ts) {
     _fpsCnt++;
-    if (ts - _fpsLast >= 1e3) {
-      const fps = _fpsCnt;
+    const dt = ts - _fpsLast;
+    if (dt >= 1e3) {
+      const fps = Math.round(_fpsCnt / dt * 1e3);
       _fpsCnt = 0;
       _fpsLast = ts;
       if (_perfHold > 0) {
@@ -2340,15 +2407,19 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
         _fpsLowCount = 0;
         return;
       }
+      if (dt > 1500) {
+        _fpsLowCount = 0;
+        return;
+      }
       if (!S.lowPerfMode) {
-        if (fps < 28) {
+        if (fps < 30) {
           _fpsLowCount++;
-          if (_fpsLowCount >= 2) {
+          if (_fpsLowCount >= 5) {
             setLowPerfMode(true);
             S._perfLocked = true;
             _perfHold = 1;
           }
-        } else {
+        } else if (fps >= 45) {
           _fpsLowCount = 0;
         }
       }
@@ -2362,6 +2433,15 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     if (on) localStorage.setItem(LS.LOW_PERF, "1");
     else localStorage.removeItem(LS.LOW_PERF);
   }
+  function togglePerfMode() {
+    setLowPerfMode(!S.lowPerfMode);
+    S._perfLocked = true;
+    const btn = document.getElementById("ov-perf-btn");
+    if (btn) {
+      btn.className = `toggle-btn${S.lowPerfMode ? " muted" : ""}`;
+      btn.textContent = S.lowPerfMode ? "\u{1F680} PERF: LOW" : "\u2728 PERF: FULL";
+    }
+  }
   function resetPerfHold(locked, savedPerf) {
     _fpsCnt = 0;
     _fpsLast = 0;
@@ -2370,10 +2450,11 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   }
   function _applyTouchCELL() {
     const W = window.innerWidth, H = window.innerHeight;
-    S.isMobile = W < 600 || window.matchMedia("(pointer:coarse)").matches;
-    const availW = W - (S.isMobile ? 32 : 56);
-    const headerH = S.isMobile ? 52 : 30;
-    const ctrlH = S.isMobile ? 188 : 218;
+    S.isMobile = W < 600 || window.matchMedia("(any-pointer:coarse)").matches;
+    const isPhone = W < 600;
+    const availW = W - (isPhone ? 32 : 56);
+    const headerH = isPhone ? 52 : 30;
+    const ctrlH = isPhone ? 188 : 224;
     const isIOSPWA = navigator.standalone === true;
     let safeTop = 0, safeBottom = 0;
     if (isIOSPWA) {
@@ -2412,17 +2493,18 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     gc.style.height = gameH + "px";
     pc.style.width = gameW + "px";
     pc.style.height = gameH + "px";
-    const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.1)));
-    const miniH = Math.round(miniW * 0.8);
-    if (ncM.width !== miniW || ncM.height !== miniH) {
-      ncM.width = miniW;
-      ncM.height = miniH;
-      ncM.style.width = miniW + "px";
-      ncM.style.height = miniH + "px";
-      hcM.width = miniW;
-      hcM.height = miniH;
-      hcM.style.width = miniW + "px";
-      hcM.style.height = miniH + "px";
+    const MINI_W = 32, MINI_H = 26;
+    if (ncM.width !== MINI_W * 3 || ncM.height !== MINI_H) {
+      ncM.width = MINI_W * 3;
+      ncM.height = MINI_H;
+      ncM.style.width = MINI_W * 3 + "px";
+      ncM.style.height = MINI_H + "px";
+    }
+    if (hcM.width !== MINI_W || hcM.height !== MINI_H) {
+      hcM.width = MINI_W;
+      hcM.height = MINI_H;
+      hcM.style.width = MINI_W + "px";
+      hcM.style.height = MINI_H + "px";
     }
     if (newCELL === S.CELL && gc.width === gameW && gc.height === gameH) return;
     S.CELL = newCELL;
@@ -2431,6 +2513,14 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     gc.height = gameH;
     pc.width = gameW;
     pc.height = gameH;
+    ncD.width = 4 * newCELL;
+    ncD.height = 9 * newCELL;
+    ncD.style.width = 4 * newCELL + "px";
+    ncD.style.height = 9 * newCELL + "px";
+    hcD.width = 4 * newCELL;
+    hcD.height = 3 * newCELL;
+    hcD.style.width = 4 * newCELL + "px";
+    hcD.style.height = 3 * newCELL + "px";
     if (S.gameRunning) {
       drawBoard();
       drawNext();
@@ -2439,7 +2529,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   }
   function initLayout() {
     const W = window.innerWidth, H = window.innerHeight;
-    const isCoarse = window.matchMedia("(pointer:coarse)").matches;
+    const isCoarse = window.matchMedia("(any-pointer:coarse)").matches;
     S.isMobile = W < 600 || isCoarse && !S._kbMode;
     bgc.width = W;
     bgc.height = H;
@@ -2459,9 +2549,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       pc.style.width = COLS * S.CELL + "px";
       pc.style.height = ROWS * S.CELL + "px";
       ncD.width = 4 * S.CELL;
-      ncD.height = 3 * S.CELL;
+      ncD.height = 9 * S.CELL;
       ncD.style.width = 4 * S.CELL + "px";
-      ncD.style.height = 3 * S.CELL + "px";
+      ncD.style.height = 9 * S.CELL + "px";
       hcD.width = 4 * S.CELL;
       hcD.height = 3 * S.CELL;
       hcD.style.width = 4 * S.CELL + "px";
@@ -2485,6 +2575,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     if (!S._kbMode) return;
     S._kbMode = false;
     document.documentElement.classList.remove("kb-mode");
+    gc.width = 0;
     initLayout();
     initStars();
     if (S.gameRunning) {
@@ -3102,15 +3193,26 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     }
     return true;
   }
-  function drawMiniPiece(ctx, piece, cw, ch) {
-    ctx.clearRect(0, 0, cw, ch);
-    ctx.fillStyle = "rgba(0,0,15,0.55)";
-    ctx.fillRect(0, 0, cw, ch);
+  function _renderPiece(ctx, piece, cw, ch) {
     if (!piece) return;
     const s = piece.shape;
-    const cs = S.isMobile ? Math.max(7, Math.floor(Math.min(cw / 4, ch / 3))) : 18;
-    const ox = Math.floor((cw - s[0].length * cs) / 2);
-    const oy = Math.floor((ch - s.length * cs) / 2);
+    let minC = 9, maxC = -1, minR = 9, maxR = -1;
+    for (let r2 = 0; r2 < s.length; r2++) {
+      for (let c = 0; c < s[r2].length; c++) {
+        if (s[r2][c]) {
+          if (c < minC) minC = c;
+          if (c > maxC) maxC = c;
+          if (r2 < minR) minR = r2;
+          if (r2 > maxR) maxR = r2;
+        }
+      }
+    }
+    if (maxC === -1) return;
+    const bw = maxC - minC + 1;
+    const bh = maxR - minR + 1;
+    const cs = cw >= 80 ? 15 : Math.max(6, Math.floor(Math.min(cw / 4, ch / 3) * 0.85));
+    const ox = Math.floor((cw - bw * cs) / 2) - minC * cs;
+    const oy = Math.floor((ch - bh * cs) / 2) - minR * cs;
     const { r, g, b } = hexToRgb(piece.color);
     for (let row = 0; row < s.length; row++) for (let col = 0; col < s[row].length; col++) {
       if (!s[row][col]) continue;
@@ -3129,9 +3231,38 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       if (S.colorblindMode && piece.key) drawCBPattern(ctx, ox + col * cs, oy + row * cs, cs, piece.key);
     }
   }
+  function drawMiniPiece(ctx, piece, cw, ch) {
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.fillStyle = "rgba(0,0,15,0.55)";
+    ctx.fillRect(0, 0, cw, ch);
+    _renderPiece(ctx, piece, cw, ch);
+  }
+  function _drawQueue(ctx, queue, cw, ch) {
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.fillStyle = "rgba(0,0,15,0.55)";
+    ctx.fillRect(0, 0, cw, ch);
+    if (!queue || !queue.length) return;
+    const n = Math.min(queue.length, 3);
+    const horiz = cw > ch;
+    const slotW = horiz ? Math.floor(cw / n) : cw;
+    const slotH = horiz ? ch : Math.floor(ch / n);
+    for (let i = 0; i < n; i++) {
+      ctx.save();
+      ctx.translate(horiz ? i * slotW : 0, horiz ? 0 : i * slotH);
+      ctx.beginPath();
+      ctx.rect(0, 0, slotW, slotH);
+      ctx.clip();
+      _renderPiece(ctx, queue[i], slotW, slotH);
+      if (i > 0) {
+        ctx.fillStyle = i === 1 ? "rgba(0,0,15,0.5)" : "rgba(0,0,15,0.7)";
+        ctx.fillRect(0, 0, slotW, slotH);
+      }
+      ctx.restore();
+    }
+  }
   function drawNext() {
-    drawMiniPiece(ncDx, S.next, ncD.width, ncD.height);
-    drawMiniPiece(ncMx, S.next, ncM.width, ncM.height);
+    _drawQueue(ncDx, S.next, ncD.width, ncD.height);
+    _drawQueue(ncMx, S.next, ncM.width, ncM.height);
   }
   function drawHold() {
     drawMiniPiece(hcDx, S.held, hcD.width, hcD.height);
@@ -3367,11 +3498,13 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     $score.textContent = fmt;
     if ($scoreM) $scoreM.textContent = fmt;
   }
-  function showScorePopup(pts, n, tspin = false) {
+  function showScorePopup(pts, n, tspin = false, b2b = false) {
     const popup = $scorePopup;
     const tspinLabels = ["T-SPIN!", "T-SPIN SINGLE", "T-SPIN DOUBLE!!", "T-SPIN TRIPLE!!!"];
+    const spinLabels = ["SPIN!", "SPIN SINGLE", "SPIN DOUBLE!!", "SPIN TRIPLE!!!"];
     const miniLabels = ["T-SPIN MINI", "T-SPIN MINI+", "T-SPIN MINI DBL"];
     const labels = ["", "", "DOUBLE!", "TRIPLE!", "GLOWTRIS!!"];
+    const b2bTag = b2b ? "B2B " : "";
     let txt, color, sz, glow;
     if (n === -1) {
       txt = `\u2726 ALL CLEAR \u2726 +${pts}`;
@@ -3379,20 +3512,25 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       sz = "22px";
       glow = "0 0 32px #ffe600";
     } else if (tspin === "full") {
-      txt = `${tspinLabels[Math.min(n, 3)]} +${pts}`;
-      color = "#a000ff";
+      txt = `${b2bTag}${tspinLabels[Math.min(n, 3)]} +${pts}`;
+      color = b2b ? "#ff8800" : "#a000ff";
       sz = n >= 2 ? "19px" : "14px";
-      glow = "0 0 24px #a000ff";
+      glow = b2b ? "0 0 24px #ff8800" : "0 0 24px #a000ff";
+    } else if (tspin === "allspin") {
+      txt = `${b2bTag}${spinLabels[Math.min(n, 3)]} +${pts}`;
+      color = b2b ? "#ff8800" : "#00ffaa";
+      sz = n >= 2 ? "19px" : "14px";
+      glow = b2b ? "0 0 24px #ff8800" : "0 0 24px #00ffaa";
     } else if (tspin === "mini") {
-      txt = `${miniLabels[Math.min(n, 2)]}${pts > 0 ? " +" + pts : ""}`;
+      txt = `${b2bTag}${miniLabels[Math.min(n, 2)]}${pts > 0 ? " +" + pts : ""}`;
       color = "#7700cc";
       sz = "13px";
       glow = "0 0 16px #7700cc";
     } else if (n >= 4) {
-      txt = `\u2605 GLOWTRIS \u2605 +${pts}`;
-      color = "#ff0080";
+      txt = b2b ? `\u2605 B2B GLOWTRIS \u2605 +${pts}` : `\u2605 GLOWTRIS \u2605 +${pts}`;
+      color = b2b ? "#ff8800" : "#ff0080";
       sz = "24px";
-      glow = "0 0 28px #ff0080";
+      glow = b2b ? "0 0 28px #ff8800" : "0 0 28px #ff0080";
     } else {
       txt = n >= 2 ? `${labels[n]} +${pts}` : `+${pts}`;
       color = "#fff";
@@ -3786,6 +3924,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
           <button class="toggle-btn${S.ghostVisible ? "" : " muted"}" id="ov-ghost-btn" onclick="updateGhost()">${S.ghostVisible ? "\u{1F47B} GHOST ON" : "\u{1F47B} GHOST OFF"}</button>
           <button class="toggle-btn${S.colorblindMode ? " cb-active" : " muted"}" id="ov-cb-btn" onclick="updateColorblind()">${S.colorblindMode ? "\u{1F533} CB MODE ON" : "\u{1F533} CB MODE OFF"}</button>
           <button class="toggle-btn${S.animIntensity === "off" ? " muted" : ""}" id="ov-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
+          <button class="toggle-btn${S.lowPerfMode ? " muted" : ""}" id="ov-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode ? "\u{1F680} PERF: LOW" : "\u2728 PERF: FULL"}</button>
           <div class="settings-row">
             <span class="settings-lbl">DAS</span>
             <input type="range" class="neon-range" min="50" max="300" value="${S.das}" oninput="updateDAS(this.value)">
@@ -4611,9 +4750,12 @@ ${window.location.origin}`;
   var _countdownTimer = null;
   var _prng = null;
   var lastWasRotate = false;
+  var lastKickNonZero = false;
   var _keyGuide = {
     move: document.getElementById("key-move"),
     rotate: document.getElementById("key-rotate"),
+    rotateCcw: document.getElementById("key-rotate-ccw"),
+    rotate180: document.getElementById("key-rotate-180"),
     soft: document.getElementById("key-soft"),
     hard: document.getElementById("key-hard"),
     hold: document.getElementById("key-hold"),
@@ -4698,7 +4840,8 @@ ${window.location.origin}`;
       kicks = S.current.key === "I" ? KICKS_I : S.current.key === "O" ? [[0, 0]] : KICKS_JLSTZ;
     }
     const table = kicks[key] || [[0, 0]];
-    for (const [dx, dy] of table) {
+    for (let _ki = 0; _ki < table.length; _ki++) {
+      const [dx, dy] = table[_ki];
       if (validPos(S.current, dx, dy, newShape)) {
         S.current.shape = newShape;
         S.current.x += dx;
@@ -4710,6 +4853,7 @@ ${window.location.origin}`;
         }
         cancelLock();
         lastWasRotate = true;
+        lastKickNonZero = _ki > 0;
         sfxRotate();
         return true;
       }
@@ -4739,7 +4883,7 @@ ${window.location.origin}`;
     }
   }
   function lockPiece() {
-    const tspin = checkTSpin();
+    const tspin = checkAllSpin();
     S.lockActive = false;
     S.lockTimer = 0;
     for (let r = 0; r < S.current.shape.length; r++) for (let c = 0; c < S.current.shape[r].length; c++) {
@@ -4761,7 +4905,15 @@ ${window.location.origin}`;
       S.combo++;
       if (S.combo > S.maxCombo) S.maxCombo = S.combo;
       const mul = S.combo > 1 ? S.combo : 1;
-      const pts = tspin === "full" ? TSPIN_SCORE[Math.min(cleared.length, 3)] * S.level * mul : tspin === "mini" ? TSPIN_MINI_SCORE[Math.min(cleared.length, 2)] * S.level * mul : SCORE_TABLE[Math.min(cleared.length, 4)] * S.level * mul;
+      const basePts = tspin === "full" || tspin === "allspin" ? TSPIN_SCORE[Math.min(cleared.length, 3)] * S.level * mul : tspin === "mini" ? TSPIN_MINI_SCORE[Math.min(cleared.length, 2)] * S.level * mul : SCORE_TABLE[Math.min(cleared.length, 4)] * S.level * mul;
+      const isDifficult = cleared.length === 4 || !!tspin;
+      const b2bBonus = isDifficult && S.b2b;
+      const pts = b2bBonus ? Math.floor(basePts * 1.5) : basePts;
+      if (isDifficult) {
+        S.b2b = true;
+      } else {
+        S.b2b = false;
+      }
       sfxLineClear(cleared.length);
       if (tspin) {
         sfxTSpin();
@@ -4779,7 +4931,7 @@ ${window.location.origin}`;
           S.shakeAllDir = true;
         }
       }
-      addScore(pts, cleared.length, tspin);
+      addScore(pts, cleared.length, tspin, b2bBonus);
       S.lines += cleared.length;
       const lifetime = _getLifetime();
       lifetime.totalLines = (lifetime.totalLines || 0) + cleared.length;
@@ -4788,9 +4940,9 @@ ${window.location.origin}`;
         unlockAchievement("glowtris_1");
       }
       localStorage.setItem(LS.LIFETIME, JSON.stringify(lifetime));
-      if (tspin) {
+      if (tspin === "full" || tspin === "mini") {
         unlockAchievement("tspin_1");
-        if (cleared.length === 3) unlockAchievement("tspin_triple");
+        if (cleared.length === 3 && tspin === "full") unlockAchievement("tspin_triple");
       }
       if (S.combo >= 5) unlockAchievement("combo_5");
       if (S.combo >= 10) unlockAchievement("combo_10");
@@ -4844,16 +4996,20 @@ ${window.location.origin}`;
       if (tspin === "full") {
         sfxTSpin();
         addScore(TSPIN_SCORE[0] * S.level, 0, "full");
+        S.b2b = true;
         unlockAchievement("tspin_1");
       } else if (tspin === "mini") {
         sfxTSpin();
+        S.b2b = true;
         unlockAchievement("tspin_1");
       } else {
         S.combo = 0;
+        S.b2b = false;
         $combo2.textContent = "";
       }
     }
     lastWasRotate = false;
+    lastKickNonZero = false;
     spawnLockParticles(S.current);
     S.current = null;
     if (S.isSprintMode && S.lines >= SPRINT_LINES) {
@@ -4862,7 +5018,7 @@ ${window.location.origin}`;
     }
     if (cleared.length === 0) spawnPiece();
   }
-  function addScore(pts, n, tspin = false) {
+  function addScore(pts, n, tspin = false, b2b = false) {
     S.score += pts;
     if (!S.isSprintMode) {
       if (S.score > S.hiScore) {
@@ -4874,26 +5030,31 @@ ${window.location.origin}`;
       if (S.score >= 25e4) unlockAchievement("score_250k");
     }
     updateUI();
-    showScorePopup(pts, n, tspin);
+    showScorePopup(pts, n, tspin, b2b);
   }
   function spawnPiece(fromHold = false) {
     lastWasRotate = false;
+    lastKickNonZero = false;
     if (!fromHold && canHold && (KEYS["KeyC"] || KEYS["ShiftLeft"] || KEYS["ShiftRight"])) {
       if (!S.held) {
-        S.held = makePiece(S.next.key);
-        S.current = makePiece(nextFromBag());
-        S.next = makePiece(nextFromBag());
+        S.held = makePiece(S.next[0].key);
+        S.next.shift();
+        S.next.push(makePiece(nextFromBag()));
+        S.current = makePiece(S.next[0].key);
+        S.next.shift();
+        S.next.push(makePiece(nextFromBag()));
       } else {
         S.current = makePiece(S.held.key);
-        S.held = makePiece(S.next.key);
-        S.next = makePiece(nextFromBag());
+        S.held = makePiece(S.next[0].key);
+        S.next.shift();
+        S.next.push(makePiece(nextFromBag()));
       }
       canHold = false;
       sfxHold();
       drawHold();
     } else {
-      S.current = makePiece(S.next.key);
-      S.next = makePiece(nextFromBag());
+      S.current = makePiece(S.next.shift().key);
+      S.next.push(makePiece(nextFromBag()));
       if (!fromHold) canHold = true;
     }
     let rotShape = null, rotState = S.current.rot, irsDir = 0;
@@ -4966,15 +5127,23 @@ ${window.location.origin}`;
     if (frontFilled === 1) return "mini";
     return false;
   }
+  function checkAllSpin() {
+    if (!S.current || !lastWasRotate) return false;
+    if (S.current.key === "T") return checkTSpin();
+    if (S.current.key === "O") return false;
+    return lastKickNonZero ? "allspin" : false;
+  }
   var KEYS = {};
   function updateKeyGuideState(code, isPressed) {
     let el = null;
     if (code === "ArrowLeft" || code === "ArrowRight") el = _keyGuide.move;
-    else if (code === "ArrowUp") el = _keyGuide.rotate;
+    else if (code === "ArrowUp" || code === "KeyX") el = _keyGuide.rotate;
+    else if (code === "KeyZ" || code === "ControlLeft" || code === "ControlRight") el = _keyGuide.rotateCcw;
+    else if (code === "KeyA") el = _keyGuide.rotate180;
     else if (code === "ArrowDown") el = _keyGuide.soft;
     else if (code === "Space") el = _keyGuide.hard;
     else if (code === "KeyC" || code === "ShiftLeft") el = _keyGuide.hold;
-    else if (code === "KeyP") el = _keyGuide.pause;
+    else if (code === "KeyP" || code === "Escape") el = _keyGuide.pause;
     else if (code === "KeyM") el = _keyGuide.mute;
     if (el) el.classList.toggle("key-pressed", isPressed);
   }
@@ -5054,7 +5223,7 @@ ${window.location.origin}`;
     if (e.code === "KeyM") toggleMute();
     if (handleUINavigation(e)) return;
     updateKeyGuideState(e.code, true);
-    if (!S._kbMode && window.matchMedia("(pointer:coarse)").matches) _enableKbMode();
+    if (!S._kbMode && window.matchMedia("(any-pointer:coarse)").matches) _enableKbMode();
     if (KEYS[e.code]) return;
     KEYS[e.code] = true;
     if (!S.gameRunning) return;
@@ -5160,6 +5329,7 @@ ${window.location.origin}`;
             spawnDropTrail(S.current);
             cancelLock();
             lastWasRotate = false;
+            lastKickNonZero = false;
             updateUI();
           }
           gTimer = dropInterval;
@@ -5197,6 +5367,7 @@ ${window.location.origin}`;
       S.current.x += d;
       cancelLock();
       lastWasRotate = false;
+      lastKickNonZero = false;
       sfxMove();
     }
   }
@@ -5411,6 +5582,7 @@ ${window.location.origin}`;
     S.combo = 0;
     S.maxCombo = 0;
     dropInterval = 800;
+    S.b2b = false;
     S.particles = [];
     S.shakeFrames = 0;
     S.shakeMag = 0.4;
@@ -5420,6 +5592,7 @@ ${window.location.origin}`;
     S.lockTimer = 0;
     S.lockActive = false;
     lastWasRotate = false;
+    lastKickNonZero = false;
     S.rainbowBorder = 0;
     S.comboFlash = 0;
     S.comboFlashColor = "#00c8ff";
@@ -5431,7 +5604,8 @@ ${window.location.origin}`;
     S.hiScore = parseInt(localStorage.getItem(LS.HI) || "0");
     bag = [];
     refillBag();
-    S.next = makePiece(nextFromBag());
+    S.next = [];
+    for (let i = 0; i < 3; i++) S.next.push(makePiece(nextFromBag()));
     S.held = null;
     canHold = true;
     S.gameRunning = true;
@@ -5664,6 +5838,7 @@ ${window.location.origin}`;
     updateGhost,
     updateColorblind,
     cycleAnimIntensity,
+    togglePerfMode,
     openHowToPlay,
     closeHowToPlay,
     openStats,
