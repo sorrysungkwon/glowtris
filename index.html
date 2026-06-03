@@ -324,9 +324,9 @@
   .mini-cv { border:1px solid var(--border); border-radius:3px; display:block; margin:0 auto; background:rgba(0,0,15,0.55); }
 
   /* ════════════════════════════════
-     MOBILE  (< 600 px)
+     MOBILE  (< 600 px OR touch device)
   ════════════════════════════════ */
-  @media (max-width:600px) {
+  @media (max-width:600px), (pointer:coarse) {
     #desktop-header { display:none; }
     #left-panel, #right-panel { display:none; }
 
