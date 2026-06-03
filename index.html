@@ -1412,6 +1412,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       <div class="panel-title">LINES</div>
       <div class="score-val" id="lines-display">0</div>
       <div class="score-sub" id="lines-sub-label">CLEARED</div>
+      <div class="divider"></div>
       <div class="panel-title">LEVEL</div>
       <div class="score-val" id="level-display">1</div>
       <div id="level-bar-wrap"><div id="level-bar" style="width:0%"></div></div>
@@ -1421,6 +1422,19 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       <div id="combo-display"></div>
       <div class="panel-title">BEST</div>
       <div class="score-val" id="hi-score" style="font-size:16px">0</div>
+      <div class="divider"></div>
+      <div class="panel-title">KEYS</div>
+      <div class="key-map">
+        <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
+        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
+        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
+        <div class="key-row" id="key-rotate-180"><kbd>A</kbd><span>rotate 180°</span></div>
+        <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
+        <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
+        <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
+        <div class="key-row" id="key-pause"><kbd>P</kbd><kbd>Esc</kbd><span>pause</span></div>
+        <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
+      </div>
     </div>
 
     <!-- Game canvas -->
@@ -1445,19 +1459,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       <div class="divider"></div>
       <div class="panel-title">HOLD</div>
       <canvas id="hold-canvas" class="mini-cv" width="108" height="80"></canvas>
-      <div class="divider"></div>
-      <div class="panel-title">KEYS</div>
-      <div class="key-map">
-        <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
-        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
-        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
-        <div class="key-row" id="key-rotate-180"><kbd>A</kbd><span>rotate 180°</span></div>
-        <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
-        <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
-        <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
-        <div class="key-row" id="key-pause"><kbd>P</kbd><kbd>Esc</kbd><span>pause</span></div>
-        <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
-      </div>
     </div>
   </div>
 
