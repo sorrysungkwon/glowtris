@@ -118,7 +118,7 @@ export function resetPerfHold(locked, savedPerf) {
 // ─── Layout ───────────────────────────────────────────────────────────────────
 export function _applyTouchCELL() {
   const W = window.innerWidth, H = window.innerHeight;
-  S.isMobile = W < 600 || window.matchMedia('(pointer:coarse)').matches;
+  S.isMobile = W < 600 || window.matchMedia('(any-pointer:coarse)').matches;
   const isPhone = W < 600;
   const availW  = W - (isPhone ? 32 : 56);
   const headerH = isPhone ? 52 : 30;
@@ -156,13 +156,14 @@ export function _applyTouchCELL() {
   gc.style.width  = gameW + 'px';  gc.style.height = gameH + 'px';
   pc.style.width  = gameW + 'px';  pc.style.height = gameH + 'px';
 
-  const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.10)));
-  const miniH = Math.round(miniW * 0.8);
-  if (ncM.width !== miniW || ncM.height !== miniH) {
-    ncM.width = miniW; ncM.height = miniH;
-    ncM.style.width = miniW + 'px'; ncM.style.height = miniH + 'px';
-    hcM.width = miniW; hcM.height = miniH;
-    hcM.style.width = miniW + 'px'; hcM.style.height = miniH + 'px';
+  const MINI_W = 32, MINI_H = 26;
+  if (ncM.width !== MINI_W * 3 || ncM.height !== MINI_H) {
+    ncM.width = MINI_W * 3; ncM.height = MINI_H;
+    ncM.style.width = (MINI_W * 3) + 'px'; ncM.style.height = MINI_H + 'px';
+  }
+  if (hcM.width !== MINI_W || hcM.height !== MINI_H) {
+    hcM.width = MINI_W; hcM.height = MINI_H;
+    hcM.style.width = MINI_W + 'px'; hcM.style.height = MINI_H + 'px';
   }
 
   if (newCELL === S.CELL && gc.width === gameW && gc.height === gameH) return;
@@ -171,12 +172,16 @@ export function _applyTouchCELL() {
   _cellSprites = {};
   gc.width  = gameW; gc.height = gameH;
   pc.width  = gameW; pc.height = gameH;
+  ncD.width = 4 * newCELL; ncD.height = 9 * newCELL;
+  ncD.style.width = (4 * newCELL) + 'px'; ncD.style.height = (9 * newCELL) + 'px';
+  hcD.width = 4 * newCELL; hcD.height = 3 * newCELL;
+  hcD.style.width = (4 * newCELL) + 'px'; hcD.style.height = (3 * newCELL) + 'px';
   if (S.gameRunning) { drawBoard(); drawNext(); drawHold(); }
 }
 
 export function initLayout() {
   const W = window.innerWidth, H = window.innerHeight;
-  const isCoarse = window.matchMedia('(pointer:coarse)').matches;
+  const isCoarse = window.matchMedia('(any-pointer:coarse)').matches;
   S.isMobile = (W < 600) || (isCoarse && !S._kbMode);
   bgc.width = W; bgc.height = H;
 
@@ -189,8 +194,8 @@ export function initLayout() {
     gc.style.width  = (COLS * S.CELL) + 'px'; gc.style.height = (ROWS * S.CELL) + 'px';
     pc.width  = COLS * S.CELL; pc.height = ROWS * S.CELL;
     pc.style.width  = (COLS * S.CELL) + 'px'; pc.style.height = (ROWS * S.CELL) + 'px';
-    ncD.width = 4 * S.CELL; ncD.height = 3 * S.CELL;
-    ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (3 * S.CELL) + 'px';
+    ncD.width = 4 * S.CELL; ncD.height = 9 * S.CELL;
+    ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (9 * S.CELL) + 'px';
     hcD.width = 4 * S.CELL; hcD.height = 3 * S.CELL;
     hcD.style.width = (4 * S.CELL) + 'px'; hcD.style.height = (3 * S.CELL) + 'px';
   }
@@ -222,6 +227,7 @@ export function _disableKbMode() {
   if (!S._kbMode) return;
   S._kbMode = false;
   document.documentElement.classList.remove('kb-mode');
+  gc.width = 0;
   initLayout(); initStars();
   if (S.gameRunning) { drawBoard(); drawNext(); drawHold(); }
 }
@@ -721,9 +727,7 @@ function _validPos(piece, ox=0, oy=0, shape=null) {
   return true;
 }
 
-function drawMiniPiece(ctx, piece, cw, ch) {
-  ctx.clearRect(0, 0, cw, ch);
-  ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
+function _renderPiece(ctx, piece, cw, ch) {
   if (!piece) return;
   const s  = piece.shape;
   
@@ -742,7 +746,7 @@ function drawMiniPiece(ctx, piece, cw, ch) {
 
   const bw = maxC - minC + 1;
   const bh = maxR - minR + 1;
-  const cs = S.isMobile ? Math.max(6, Math.floor(Math.min(cw/4, ch/3) * 0.85)) : 15;
+  const cs = (cw >= 80) ? 15 : Math.max(6, Math.floor(Math.min(cw/4, ch/3) * 0.85));
   const ox = Math.floor((cw - bw * cs) / 2) - minC * cs;
   const oy = Math.floor((ch - bh * cs) / 2) - minR * cs;
   const {r,g,b} = hexToRgb(piece.color);
@@ -760,9 +764,36 @@ function drawMiniPiece(ctx, piece, cw, ch) {
   }
 }
 
+function drawMiniPiece(ctx, piece, cw, ch) {
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
+  _renderPiece(ctx, piece, cw, ch);
+}
+
+function _drawQueue(ctx, queue, cw, ch) {
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
+  if (!queue || !queue.length) return;
+  const n = Math.min(queue.length, 3);
+  const horiz = cw > ch;
+  const slotW = horiz ? Math.floor(cw / n) : cw;
+  const slotH = horiz ? ch : Math.floor(ch / n);
+  for (let i = 0; i < n; i++) {
+    ctx.save();
+    ctx.translate(horiz ? i * slotW : 0, horiz ? 0 : i * slotH);
+    ctx.beginPath(); ctx.rect(0, 0, slotW, slotH); ctx.clip();
+    _renderPiece(ctx, queue[i], slotW, slotH);
+    if (i > 0) {
+      ctx.fillStyle = i === 1 ? 'rgba(0,0,15,0.5)' : 'rgba(0,0,15,0.7)';
+      ctx.fillRect(0, 0, slotW, slotH);
+    }
+    ctx.restore();
+  }
+}
+
 export function drawNext() {
-  drawMiniPiece(ncDx, S.next, ncD.width, ncD.height);
-  drawMiniPiece(ncMx, S.next, ncM.width, ncM.height);
+  _drawQueue(ncDx, S.next, ncD.width, ncD.height);
+  _drawQueue(ncMx, S.next, ncM.width, ncM.height);
 }
 export function drawHold() {
   drawMiniPiece(hcDx, S.held, hcD.width, hcD.height);
@@ -968,20 +999,24 @@ export function updateSprintTimer() {
   $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
 }
 
-export function showScorePopup(pts, n, tspin=false) {
+export function showScorePopup(pts, n, tspin=false, b2b=false) {
   const popup = $scorePopup;
-  const tspinLabels = ['T-SPIN!','T-SPIN SINGLE','T-SPIN DOUBLE!!','T-SPIN TRIPLE!!!'];
-  const miniLabels  = ['T-SPIN MINI','T-SPIN MINI+','T-SPIN MINI DBL'];
-  const labels      = ['','','DOUBLE!','TRIPLE!','GLOWTRIS!!'];
+  const tspinLabels  = ['T-SPIN!','T-SPIN SINGLE','T-SPIN DOUBLE!!','T-SPIN TRIPLE!!!'];
+  const spinLabels   = ['SPIN!','SPIN SINGLE','SPIN DOUBLE!!','SPIN TRIPLE!!!'];
+  const miniLabels   = ['T-SPIN MINI','T-SPIN MINI+','T-SPIN MINI DBL'];
+  const labels       = ['','','DOUBLE!','TRIPLE!','GLOWTRIS!!'];
+  const b2bTag = b2b ? 'B2B ' : '';
   let txt, color, sz, glow;
   if (n === -1) {
     txt = `✦ ALL CLEAR ✦ +${pts}`; color = '#ffe600'; sz = '22px'; glow = '0 0 32px #ffe600';
   } else if (tspin === 'full') {
-    txt = `${tspinLabels[Math.min(n,3)]} +${pts}`; color = '#a000ff'; sz = n>=2 ? '19px' : '14px'; glow = '0 0 24px #a000ff';
+    txt = `${b2bTag}${tspinLabels[Math.min(n,3)]} +${pts}`; color = b2b?'#ff8800':'#a000ff'; sz = n>=2 ? '19px' : '14px'; glow = b2b?'0 0 24px #ff8800':'0 0 24px #a000ff';
+  } else if (tspin === 'allspin') {
+    txt = `${b2bTag}${spinLabels[Math.min(n,3)]} +${pts}`; color = b2b?'#ff8800':'#00ffaa'; sz = n>=2 ? '19px' : '14px'; glow = b2b?'0 0 24px #ff8800':'0 0 24px #00ffaa';
   } else if (tspin === 'mini') {
-    txt = `${miniLabels[Math.min(n,2)]}${pts>0?' +'+pts:''}`; color = '#7700cc'; sz = '13px'; glow = '0 0 16px #7700cc';
+    txt = `${b2bTag}${miniLabels[Math.min(n,2)]}${pts>0?' +'+pts:''}`; color = '#7700cc'; sz = '13px'; glow = '0 0 16px #7700cc';
   } else if (n >= 4) {
-    txt = `★ GLOWTRIS ★ +${pts}`; color = '#ff0080'; sz = '24px'; glow = '0 0 28px #ff0080';
+    txt = b2b ? `★ B2B GLOWTRIS ★ +${pts}` : `★ GLOWTRIS ★ +${pts}`; color = b2b?'#ff8800':'#ff0080'; sz = '24px'; glow = b2b?'0 0 28px #ff8800':'0 0 28px #ff0080';
   } else {
     txt = n>=2 ? `${labels[n]} +${pts}` : `+${pts}`; color = '#fff'; sz = '16px'; glow = '0 0 16px #00c8ff';
   }
