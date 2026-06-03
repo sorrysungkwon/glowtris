@@ -766,7 +766,7 @@ function _doStartGame(){
   S.lockTimer=0;S.lockActive=false;lastWasRotate=false;lastKickNonZero=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
   S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};S.pendingRot=0;
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
-  bag=[];refillBag();S.next=[];for(let i=0;i<5;i++)S.next.push(makePiece(nextFromBag()));S.held=null;canHold=true;
+  bag=[];refillBag();S.next=[];for(let i=0;i<3;i++)S.next.push(makePiece(nextFromBag()));S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
 
   // ── Sprint mode init ──────────────────────────────────────────────────────

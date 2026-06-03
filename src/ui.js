@@ -158,7 +158,7 @@ export function _applyTouchCELL() {
 
   const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.10)));
   const miniH = Math.round(miniW * 0.8);
-  const nextMH = miniH * 5;
+  const nextMH = miniH * 3;
   if (ncM.width !== miniW || ncM.height !== nextMH) {
     ncM.width = miniW; ncM.height = nextMH;
     ncM.style.width = miniW + 'px'; ncM.style.height = nextMH + 'px';
@@ -192,8 +192,8 @@ export function initLayout() {
     gc.style.width  = (COLS * S.CELL) + 'px'; gc.style.height = (ROWS * S.CELL) + 'px';
     pc.width  = COLS * S.CELL; pc.height = ROWS * S.CELL;
     pc.style.width  = (COLS * S.CELL) + 'px'; pc.style.height = (ROWS * S.CELL) + 'px';
-    ncD.width = 4 * S.CELL; ncD.height = 15 * S.CELL;
-    ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (15 * S.CELL) + 'px';
+    ncD.width = 4 * S.CELL; ncD.height = 9 * S.CELL;
+    ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (9 * S.CELL) + 'px';
     hcD.width = 4 * S.CELL; hcD.height = 3 * S.CELL;
     hcD.style.width = (4 * S.CELL) + 'px'; hcD.style.height = (3 * S.CELL) + 'px';
   }
@@ -771,7 +771,7 @@ function _drawQueue(ctx, queue, cw, ch) {
   ctx.clearRect(0, 0, cw, ch);
   ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
   if (!queue || !queue.length) return;
-  const n = Math.min(queue.length, 5);
+  const n = Math.min(queue.length, 3);
   const slotH = Math.floor(ch / n);
   for (let i = 0; i < n; i++) {
     ctx.save();
