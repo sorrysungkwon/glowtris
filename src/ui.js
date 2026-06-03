@@ -116,6 +116,8 @@ export function resetPerfHold(locked, savedPerf) {
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
+let _lastTouchCELL = 0;   // CELL saved just before kb mode activates
+let _restoringTouchCELL = 0; // non-zero: _applyTouchCELL should use this value instead of recomputing
 export function _applyTouchCELL() {
   const W = window.innerWidth, H = window.innerHeight;
   S.isMobile = W < 600 || window.matchMedia('(pointer:coarse)').matches;
@@ -149,7 +151,9 @@ export function _applyTouchCELL() {
   if (availH <= 0) return;
 
   const capCELL = isPhone ? 30 : 24;
-  const newCELL = Math.max(10, Math.min(capCELL, Math.floor(Math.min(availW / COLS, availH / ROWS))));
+  const computedCELL = Math.max(10, Math.min(capCELL, Math.floor(Math.min(availW / COLS, availH / ROWS))));
+  const newCELL = _restoringTouchCELL || computedCELL;
+  _restoringTouchCELL = 0;
   const gameW = COLS * newCELL;
   const gameH = ROWS * newCELL;
 
@@ -215,6 +219,7 @@ export function nudgeUI(dx, dy) {
 export function _enableKbMode() {
   if (S._kbMode) return;
   if (Math.min(window.innerWidth, window.innerHeight) <= 600) return;
+  _lastTouchCELL = S.CELL;  // snapshot before kb mode overrides S.CELL
   S._kbMode = true;
   document.documentElement.classList.add('kb-mode');
   initLayout(); initStars();
@@ -224,7 +229,8 @@ export function _disableKbMode() {
   if (!S._kbMode) return;
   S._kbMode = false;
   document.documentElement.classList.remove('kb-mode');
-  gc.width = 0; // force _applyTouchCELL to bypass early-return and redraw at saved touch CELL
+  _restoringTouchCELL = _lastTouchCELL;  // tell _applyTouchCELL to use saved CELL
+  gc.width = 0;
   initLayout(); initStars();
   if (S.gameRunning) { drawBoard(); drawNext(); drawHold(); }
 }
@@ -232,6 +238,7 @@ document.addEventListener('touchstart', () => { if (S._kbMode && !S.gamePaused) 
 
 let _resizeTimer;
 window.addEventListener('resize', () => {
+  _lastTouchCELL = 0;  // invalidate saved CELL on viewport change (rotation, etc.)
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => { initLayout(); initStars(); if (S.gameRunning) drawBoard(); }, 150);
 });
