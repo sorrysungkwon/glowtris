@@ -32,8 +32,9 @@
 <meta name="twitter:image:alt" content="GLOWTRIS — Neon Block Stacking Game">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=optional" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -2913,6 +2914,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   function drawBoard() {
     const W = COLS * S.CELL, H = ROWS * S.CELL;
     gctx.clearRect(0, 0, W, H);
+    gctx.globalAlpha = 1;
+    gctx.shadowBlur = 0;
+    gctx.setLineDash([]);
     gctx.fillStyle = "rgba(0,0,15,0.88)";
     gctx.fillRect(0, 0, W, H);
     const gridGlow = 0.05 + 0.03 * Math.sin(Date.now() / 400);
@@ -4778,7 +4782,7 @@ ${window.location.origin}`;
   }
   function makePiece(key) {
     const d = PIECES[key];
-    return { key, shape: d.shape.map((r) => [...r]), color: d.color, x: Math.floor(COLS / 2) - Math.floor(d.shape[0].length / 2), y: -1, rot: 0 };
+    return { key, shape: d.shape.map((r) => [...r]), color: d.color, x: Math.floor((COLS - d.shape[0].length) / 2), y: -1, rot: 0 };
   }
   var KICKS_JLSTZ = {
     "0>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
@@ -5684,9 +5688,9 @@ ${window.location.origin}`;
       cancelAnimationFrame(animFrame);
       animFrame = null;
     }
-    animFrame = requestAnimationFrame(function bgOnly2(ts) {
+    animFrame = requestAnimationFrame(function bgOnly(ts) {
       drawBackground();
-      if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly2);
+      if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly);
     });
   }
   function endGame() {
@@ -5774,11 +5778,13 @@ ${window.location.origin}`;
   var $hiScoreM2 = document.getElementById("hi-score-m");
   if ($hiScore2) $hiScore2.textContent = S.hiScore.toLocaleString();
   if ($hiScoreM2) $hiScoreM2.textContent = S.hiScore.toLocaleString();
-  animFrame = requestAnimationFrame(function bgOnly(ts) {
-    drawBackground();
-    if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly);
+  document.fonts.ready.then(() => {
+    animFrame = requestAnimationFrame(function bgOnly(ts) {
+      drawBackground();
+      if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly);
+    });
+    showStartScreen();
   });
-  showStartScreen();
   (window.requestIdleCallback || function(cb) {
     setTimeout(cb, 200);
   })(function() {
