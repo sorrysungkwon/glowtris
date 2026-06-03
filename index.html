@@ -2444,8 +2444,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     _fpsLowCount = 0;
     _perfHold = locked || savedPerf ? 0 : 3;
   }
-  var _lastTouchCELL = 0;
-  var _restoringTouchCELL = 0;
   function _applyTouchCELL() {
     const W = window.innerWidth, H = window.innerHeight;
     S.isMobile = W < 600 || window.matchMedia("(any-pointer:coarse)").matches;
@@ -2483,10 +2481,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     const gapsAndBreathing = 16 + 8;
     const availH = H - appPaddingV - headerH - ctrlH - gapsAndBreathing;
     if (availH <= 0) return;
-    const capCELL = isPhone ? 30 : 24;
-    const computedCELL = Math.max(10, Math.min(capCELL, Math.floor(Math.min(availW / COLS, availH / ROWS))));
-    const newCELL = _restoringTouchCELL || computedCELL;
-    _restoringTouchCELL = 0;
+    const newCELL = Math.max(10, Math.min(30, Math.floor(Math.min(availW / COLS, availH / ROWS))));
     const gameW = COLS * newCELL;
     const gameH = ROWS * newCELL;
     document.documentElement.style.setProperty("--game-w", gameW + "px");
@@ -2554,7 +2549,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   function _enableKbMode() {
     if (S._kbMode) return;
     if (Math.min(window.innerWidth, window.innerHeight) <= 600) return;
-    _lastTouchCELL = S.CELL;
     S._kbMode = true;
     document.documentElement.classList.add("kb-mode");
     initLayout();
@@ -2569,7 +2563,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     if (!S._kbMode) return;
     S._kbMode = false;
     document.documentElement.classList.remove("kb-mode");
-    _restoringTouchCELL = _lastTouchCELL;
     gc.width = 0;
     initLayout();
     initStars();
@@ -2584,7 +2577,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   }, { passive: true });
   var _resizeTimer;
   window.addEventListener("resize", () => {
-    _lastTouchCELL = 0;
     clearTimeout(_resizeTimer);
     _resizeTimer = setTimeout(() => {
       initLayout();
