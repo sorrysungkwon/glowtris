@@ -27,7 +27,7 @@
 | **v0.4 Scoring Standard** | B2B 1.5×, 3-piece next queue, all-spin (SRS+), BUG-012/013 | FEAT-004/005/010 | ✅ Done |
 | **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3), render interpolation, low-latency audio | ARCH-004/005 | 🔄 In Progress |
 | **v0.6 Modes & Metrics** | Ultra/Blitz mode, in-game APM/PPS | FEAT-009/011 | 🔲 |
-| **v0.7 Social Ranking** | Percentile display, rival system, async challenge links, weekly tournament, score push notifications | SOCIAL-001~005 | 🔲 |
+| **v0.7 Social Ranking + Account** | Anonymous UUID on first visit → optional Google backup (Clerk/NextAuth); percentile display, rival system, async challenge links, weekly tournament, push notifications | SOCIAL-001~005 | 🔲 |
 
 ### Phase B: Public Launch & Growth (gated by Phase A completion)
 
@@ -39,7 +39,7 @@
 | **v1.0 Launch** | Public launch — competitive-standard engine live, SEO, share mechanics | 700 | 🔲 |
 | **v1.1 Retention Core** | Daily streak, comeback nudges, PWA push notifications, "you're X away from top 10" | 1,200 | 🔲 |
 | **v1.2 Social Hooks** | Percentile badge on share, challenge links, rival system, "friend beat you" trigger | 1,800 | 🔲 |
-| **v1.3 Progression + Account** | Anonymous UUID auto-assigned on first visit → optional Google backup; achievements depth, milestone unlocks, personal stats timeline, improvement graph — all tied to account | 2,500 | 🔲 |
+| **v1.3 Progression** | Achievements depth, milestone unlocks, personal stats timeline, improvement graph — powered by v0.7 account system | 2,500 | 🔲 |
 | **v1.4 Visual Identity** | Custom board skins, block themes, neon color palettes (premium unlock or free) | 3,500 | 🔲 |
 | **v1.5 Tournaments** | Weekly seeded tournament, seasonal rankings, end-of-season reward badge | 4,500 | 🔲 |
 | **v1.6 CRM & Re-engagement** | "You haven't played in 3 days" push, personalized challenge ("beat your Tuesday score"), lapsed user flow | 6,000 | 🔲 |
