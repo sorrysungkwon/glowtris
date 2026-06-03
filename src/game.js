@@ -54,6 +54,8 @@ let lastKickNonZero=false;
 const _keyGuide={
   move:   document.getElementById('key-move'),
   rotate: document.getElementById('key-rotate'),
+  rotateCcw: document.getElementById('key-rotate-ccw'),
+  rotate180: document.getElementById('key-rotate-180'),
   soft:   document.getElementById('key-soft'),
   hard:   document.getElementById('key-hard'),
   hold:   document.getElementById('key-hold'),
@@ -378,11 +380,13 @@ const KEYS={};
 function updateKeyGuideState(code, isPressed) {
   let el = null;
   if (code === 'ArrowLeft' || code === 'ArrowRight') el = _keyGuide.move;
-  else if (code === 'ArrowUp')   el = _keyGuide.rotate;
+  else if (code === 'ArrowUp' || code === 'KeyX')   el = _keyGuide.rotate;
+  else if (code === 'KeyZ' || code === 'ControlLeft' || code === 'ControlRight') el = _keyGuide.rotateCcw;
+  else if (code === 'KeyA') el = _keyGuide.rotate180;
   else if (code === 'ArrowDown') el = _keyGuide.soft;
   else if (code === 'Space')                          el = _keyGuide.hard;
   else if (code === 'KeyC' || code === 'ShiftLeft')   el = _keyGuide.hold;
-  else if (code === 'KeyP')                           el = _keyGuide.pause;
+  else if (code === 'KeyP' || code === 'Escape')      el = _keyGuide.pause;
   else if (code === 'KeyM')                           el = _keyGuide.mute;
   if (el) el.classList.toggle('key-pressed', isPressed);
 }
