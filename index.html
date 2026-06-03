@@ -337,7 +337,8 @@
     #mobile-header {
       display:flex;
       align-items:center;
-      gap:8px;
+      justify-content:space-between;
+      position:relative;
       width:100%;
       background:var(--panel-bg);
       border:1px solid var(--border);
@@ -349,7 +350,7 @@
     }
     .mh-preview { display:flex; flex-direction:column; align-items:center; gap:2px; flex:0 0 auto; }
     .mh-preview span { font-size:9px; letter-spacing:2px; color:rgba(0,200,255,0.55); }
-    .mh-info { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0; overflow:hidden; }
+    .mh-info { position:absolute; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:3px; pointer-events:none; }
     .mh-score { font-size:clamp(15px,4vw,22px); font-weight:900; text-shadow:0 0 14px var(--cyan); letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
     .mh-meta { display:flex; gap:6px; }
     .mh-meta span { font-size:clamp(9px,1.9vw,11px); color:rgba(0,200,255,0.5); letter-spacing:0; }
@@ -2488,20 +2489,18 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     gc.style.height = gameH + "px";
     pc.style.width = gameW + "px";
     pc.style.height = gameH + "px";
-    const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.1)));
-    const miniH = Math.round(miniW * 0.8);
-    const nextMW = miniW * 3;
-    if (ncM.width !== nextMW || ncM.height !== miniH) {
-      ncM.width = nextMW;
-      ncM.height = miniH;
-      ncM.style.width = nextMW + "px";
-      ncM.style.height = miniH + "px";
+    const MINI_W = 32, MINI_H = 26;
+    if (ncM.width !== MINI_W * 3 || ncM.height !== MINI_H) {
+      ncM.width = MINI_W * 3;
+      ncM.height = MINI_H;
+      ncM.style.width = MINI_W * 3 + "px";
+      ncM.style.height = MINI_H + "px";
     }
-    if (hcM.width !== miniW || hcM.height !== miniH) {
-      hcM.width = miniW;
-      hcM.height = miniH;
-      hcM.style.width = miniW + "px";
-      hcM.style.height = miniH + "px";
+    if (hcM.width !== MINI_W || hcM.height !== MINI_H) {
+      hcM.width = MINI_W;
+      hcM.height = MINI_H;
+      hcM.style.width = MINI_W + "px";
+      hcM.style.height = MINI_H + "px";
     }
     if (newCELL === S.CELL && gc.width === gameW && gc.height === gameH) return;
     S.CELL = newCELL;
@@ -3226,7 +3225,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     _renderPiece(ctx, piece, cw, ch);
   }
   function _drawQueue(ctx, queue, cw, ch) {
-    var _a;
     ctx.clearRect(0, 0, cw, ch);
     ctx.fillStyle = "rgba(0,0,15,0.55)";
     ctx.fillRect(0, 0, cw, ch);
@@ -3237,12 +3235,15 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     const slotH = horiz ? ch : Math.floor(ch / n);
     for (let i = 0; i < n; i++) {
       ctx.save();
-      ctx.globalAlpha = (_a = [1, 0.55, 0.35][i]) != null ? _a : 0.35;
       ctx.translate(horiz ? i * slotW : 0, horiz ? 0 : i * slotH);
       ctx.beginPath();
       ctx.rect(0, 0, slotW, slotH);
       ctx.clip();
       _renderPiece(ctx, queue[i], slotW, slotH);
+      if (i > 0) {
+        ctx.fillStyle = i === 1 ? "rgba(0,0,15,0.5)" : "rgba(0,0,15,0.7)";
+        ctx.fillRect(0, 0, slotW, slotH);
+      }
       ctx.restore();
     }
   }
