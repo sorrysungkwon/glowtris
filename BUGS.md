@@ -7,6 +7,29 @@
 
 ## 🔲 Open
 
+### [BUG-012] iPad: next/hold panel size inconsistent between kb mode and touch mode
+- **Reported:** 2026-06-03 | **Priority:** 🟡 Medium | **Device:** iPad (any, portrait)
+- **Symptom:** In keyboard mode (kb-mode CSS class applied), the NEXT and HOLD canvases (`ncD`, `hcD`) appear at the correct size (4×30 = 120px wide, 9×30 = 270px tall for NEXT; 4×30 × 3×30 for HOLD). When the user switches back to touch mode (or on initial load without a keyboard), the NEXT/HOLD panels appear at a different size — visually inconsistent with keyboard mode.
+- **Reproduce:**
+  1. Open on iPad (portrait) without keyboard → note NEXT/HOLD panel size
+  2. Connect Bluetooth/Smart keyboard, press any key → kb mode activates (touch controls hide)
+  3. Tap screen → touch mode restores
+  4. Compare NEXT/HOLD panel sizes between step 1 and step 3 — they differ
+- **Root cause:**
+  - `initLayout()` has two branches: (A) `isCoarse && !S._kbMode` → `_applyTouchCELL()`, (B) else → CELL=30, sizes all canvases.
+  - Branch (B) (kb mode) sets `ncD`/`hcD` to `4*30 × 9*30` and `4*30 × 3*30`.
+  - Branch (A) (touch mode) calls `_applyTouchCELL()` which sizes `gc`/`pc` to the computed CELL but does NOT size `ncD`/`hcD` — they retain previous values or HTML-attribute defaults (`width="108" height="96"`).
+  - Additionally: `pointer:coarse` returns false on iPad with Magic Keyboard (trackpad = fine pointer is primary). This caused `initLayout()` to always take branch (B) even in touch mode, setting CELL=30 for everything — explaining the large-canvas overflow visible in screenshot. Fixed by switching to `any-pointer:coarse` (true whenever *any* input device is coarse, i.e., touchscreen exists).
+  - Secondary: after kb→touch, iOS Safari may change `window.innerHeight` if address bar was collapsed during keyboard interaction — but this user's address bar is fixed-height (non-issue on this device).
+- **Attempted fixes (all partial):**
+  1. `_savedTouchCELL` — module-level var to save and restore the initial touch CELL. Broken: var removed from declaration but inner code still referenced it (ReferenceError).
+  2. `capCELL = isPhone ? 30 : 24` — hard cap for non-phone. Did not match initial load CELL when viewport height differed.
+  3. `_lastTouchCELL` / `_restoringTouchCELL` — snapshot CELL before kb mode, restore after. Failed: `pointer:coarse=false` on Magic Keyboard iPad meant `_enableKbMode()` never fired → `_lastTouchCELL` stayed 0.
+  4. Non-phone always CELL=30 — iPad always uses 30. Caused overflow: CELL=30 + visible touch controls (224px) exceeds viewport height.
+  5. `any-pointer:coarse` + `ncD`/`hcD` hardcoded to CELL=30 in `_applyTouchCELL()` — current state. `ncD`/`hcD` match kb mode size, but the game board CELL in touch mode may differ from 30 (depends on viewport), creating a piece-size mismatch between the board and panels.
+- **Ideal fix:** Compute a single CELL that fits the viewport with touch controls visible, use it for both the board AND the panels (ncD/hcD). The kb→touch switch should produce the same CELL as initial touch-mode load. With `any-pointer:coarse` now correct and a fixed-height address bar, a simple `_applyTouchCELL()` recompute should be deterministic — but the panel sizing in `_applyTouchCELL()` must include ncD/hcD at that same CELL, not hardcoded 30.
+- **Status:** 🔧 In Progress
+
 ### [BUG-004] Piece transparency after ~5 games (Chrome/Windows)
 - **Reported:** 2026-05-31 | **Priority:** 🔴 Critical
 - **Symptom:** Pieces gradually become transparent/invisible after playing ~5 games without refresh
