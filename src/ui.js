@@ -158,10 +158,10 @@ export function _applyTouchCELL() {
 
   const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.10)));
   const miniH = Math.round(miniW * 0.8);
-  const nextMH = miniH * 3;
-  if (ncM.width !== miniW || ncM.height !== nextMH) {
-    ncM.width = miniW; ncM.height = nextMH;
-    ncM.style.width = miniW + 'px'; ncM.style.height = nextMH + 'px';
+  const nextMW = miniW * 3;
+  if (ncM.width !== nextMW || ncM.height !== miniH) {
+    ncM.width = nextMW; ncM.height = miniH;
+    ncM.style.width = nextMW + 'px'; ncM.style.height = miniH + 'px';
   }
   if (hcM.width !== miniW || hcM.height !== miniH) {
     hcM.width = miniW; hcM.height = miniH;
@@ -772,13 +772,15 @@ function _drawQueue(ctx, queue, cw, ch) {
   ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
   if (!queue || !queue.length) return;
   const n = Math.min(queue.length, 3);
-  const slotH = Math.floor(ch / n);
+  const horiz = cw > ch;
+  const slotW = horiz ? Math.floor(cw / n) : cw;
+  const slotH = horiz ? ch : Math.floor(ch / n);
   for (let i = 0; i < n; i++) {
     ctx.save();
-    ctx.globalAlpha = i === 0 ? 1.0 : 0.55;
-    ctx.translate(0, i * slotH);
-    ctx.beginPath(); ctx.rect(0, 0, cw, slotH); ctx.clip();
-    _renderPiece(ctx, queue[i], cw, slotH);
+    ctx.globalAlpha = [1.0, 0.55, 0.35][i] ?? 0.35;
+    ctx.translate(horiz ? i * slotW : 0, horiz ? 0 : i * slotH);
+    ctx.beginPath(); ctx.rect(0, 0, slotW, slotH); ctx.clip();
+    _renderPiece(ctx, queue[i], slotW, slotH);
     ctx.restore();
   }
 }
