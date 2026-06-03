@@ -12,6 +12,8 @@
 - **Symptom:** Every piece except I and O spawns one unit to the right of the standard Tetris guideline spawn position. Affects every game from the very first piece.
 - **Root cause:** `makePiece()` computes spawn X as `Math.floor(COLS/2) - Math.floor(width/2)`. For odd-width pieces (JLSTZ, width=3): `5 - 1 = 4`. The correct formula is `Math.floor((COLS - width) / 2)` = `Math.floor(7/2) = 3`. The two formulas diverge when COLS is even and width is odd — I (width=4) and O (width=2) are even-width so they are unaffected.
 - **Fix:** In `makePiece()` (`game.js` line 73), change spawn x from `Math.floor(COLS/2)-Math.floor(d.shape[0].length/2)` → `Math.floor((COLS-d.shape[0].length)/2)`.
+- **Reporter's note:** Reporter is not an SRS player and doesn't personally care about the kick system. However, they note that SRS players are very particular about exact parity — if 1:1 guideline compliance is the goal, the kick tables are publicly documented.
+- **Tetris context (from reporter):** The Tetris Company didn't design spins intentionally. They built the SRS system, and techniques like T-spin were discovered organically by players. Spins are a byproduct of the kick system, not an explicit design decision — which is why 1:1 SRS implementation matters to competitive players.
 - **Status:** 🔲 Open
 
 ### [BUG-012] iPad: next/hold panel size inconsistent between kb mode and touch mode
