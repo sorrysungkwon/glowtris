@@ -2490,7 +2490,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     pc.style.height = gameH + "px";
     const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.1)));
     const miniH = Math.round(miniW * 0.8);
-    const nextMH = miniH * 5;
+    const nextMH = miniH * 3;
     if (ncM.width !== miniW || ncM.height !== nextMH) {
       ncM.width = miniW;
       ncM.height = nextMH;
@@ -2538,9 +2538,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       pc.style.width = COLS * S.CELL + "px";
       pc.style.height = ROWS * S.CELL + "px";
       ncD.width = 4 * S.CELL;
-      ncD.height = 15 * S.CELL;
+      ncD.height = 9 * S.CELL;
       ncD.style.width = 4 * S.CELL + "px";
-      ncD.style.height = 15 * S.CELL + "px";
+      ncD.style.height = 9 * S.CELL + "px";
       hcD.width = 4 * S.CELL;
       hcD.height = 3 * S.CELL;
       hcD.style.width = 4 * S.CELL + "px";
@@ -3230,7 +3230,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     ctx.fillStyle = "rgba(0,0,15,0.55)";
     ctx.fillRect(0, 0, cw, ch);
     if (!queue || !queue.length) return;
-    const n = Math.min(queue.length, 5);
+    const n = Math.min(queue.length, 3);
     const slotH = Math.floor(ch / n);
     for (let i = 0; i < n; i++) {
       ctx.save();
@@ -5584,7 +5584,7 @@ ${window.location.origin}`;
     bag = [];
     refillBag();
     S.next = [];
-    for (let i = 0; i < 5; i++) S.next.push(makePiece(nextFromBag()));
+    for (let i = 0; i < 3; i++) S.next.push(makePiece(nextFromBag()));
     S.held = null;
     canHold = true;
     S.gameRunning = true;
