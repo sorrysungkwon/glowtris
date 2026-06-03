@@ -7,17 +7,20 @@
 
 ## 🔲 Open
 
-### [BUG-004] Piece transparency after ~5 games (Chrome/Windows)
-- **Reported:** 2026-05-31 | **Priority:** 🔴 Critical
-- **Symptom:** Pieces gradually become transparent/invisible after playing ~5 games without refresh
-- **Reproduce:** Chrome/Windows — play 5+ consecutive games
-- **Root cause (suspected):** Canvas 2D state (globalAlpha, shadowBlur, lineDash) leaking across game resets in Chrome's GPU-accelerated canvas path. `gctx.clearRect()` clears pixels but not context state.
-- **Fix:** Add explicit `gctx.globalAlpha=1; gctx.shadowBlur=0; gctx.setLineDash([])` reset at top of `drawBoard()` each frame.
-- **Status:** Under investigation
+_No open bugs._
 
 ---
 
 ## ✅ Fixed
+
+### [BUG-004] Piece transparency after ~5 games (Chrome/Windows)
+- **Reported:** 2026-05-31 | **Fixed:** 2026-06-03
+- **Priority:** 🔴 Critical
+- **Symptom:** Pieces gradually become transparent/invisible after playing ~5 games without refresh
+- **Reproduce:** Chrome/Windows — play 5+ consecutive games
+- **Root cause (suspected):** Canvas 2D state (globalAlpha, shadowBlur, lineDash) leaking across game resets in Chrome's GPU-accelerated canvas path. `gctx.clearRect()` clears pixels but not context state.
+- **Fix:** Add explicit `gctx.globalAlpha=1; gctx.shadowBlur=0; gctx.setLineDash([])` reset at top of `drawBoard()` each frame.
+- **Status:** ✅ Fixed (Added context reset in `drawBoard()`)
 
 ### [BUG-013] JLSTZ pieces spawn one column too far right
 - **Reported:** 2026-06-03 | **Fixed:** 2026-06-03 | **Source:** Reddit u/DelayProfessional345 (r/vibecoding)
@@ -114,11 +117,7 @@
 
 ---
 
-## 🔲 Open
 
-_No open bugs._
-
----
 
 ## 🏛️ Engine Architecture (Competitive standard responsiveness)
 

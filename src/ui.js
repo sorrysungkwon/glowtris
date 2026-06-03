@@ -505,6 +505,9 @@ let _lastPieceRef = null;
 export function drawBoard() {
   const W = COLS*S.CELL, H = ROWS*S.CELL;
   gctx.clearRect(0, 0, W, H);
+  gctx.globalAlpha = 1;
+  gctx.shadowBlur = 0;
+  gctx.setLineDash([]);
   gctx.fillStyle = 'rgba(0,0,15,0.88)'; gctx.fillRect(0, 0, W, H);
   const gridGlow = 0.05 + 0.03*Math.sin(Date.now()/400);
   gctx.save();
