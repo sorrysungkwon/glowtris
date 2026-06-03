@@ -2448,7 +2448,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   var _restoringTouchCELL = 0;
   function _applyTouchCELL() {
     const W = window.innerWidth, H = window.innerHeight;
-    S.isMobile = W < 600 || window.matchMedia("(pointer:coarse)").matches;
+    S.isMobile = W < 600 || window.matchMedia("(any-pointer:coarse)").matches;
     const isPhone = W < 600;
     const availW = W - (isPhone ? 32 : 56);
     const headerH = isPhone ? 52 : 30;
@@ -2522,7 +2522,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   }
   function initLayout() {
     const W = window.innerWidth, H = window.innerHeight;
-    const isCoarse = window.matchMedia("(pointer:coarse)").matches;
+    const isCoarse = window.matchMedia("(any-pointer:coarse)").matches;
     S.isMobile = W < 600 || isCoarse && !S._kbMode;
     bgc.width = W;
     bgc.height = H;
@@ -5215,7 +5215,7 @@ ${window.location.origin}`;
     if (e.code === "KeyM") toggleMute();
     if (handleUINavigation(e)) return;
     updateKeyGuideState(e.code, true);
-    if (!S._kbMode && window.matchMedia("(pointer:coarse)").matches) _enableKbMode();
+    if (!S._kbMode && window.matchMedia("(any-pointer:coarse)").matches) _enableKbMode();
     if (KEYS[e.code]) return;
     KEYS[e.code] = true;
     if (!S.gameRunning) return;

@@ -476,7 +476,7 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyM') toggleMute();
   if (handleUINavigation(e)) return;
   updateKeyGuideState(e.code, true);
-  if(!S._kbMode && window.matchMedia('(pointer:coarse)').matches) _enableKbMode();
+  if(!S._kbMode && window.matchMedia('(any-pointer:coarse)').matches) _enableKbMode();
   if(KEYS[e.code])return;KEYS[e.code]=true;
   if(!S.gameRunning)return;
   if(e.code==='KeyP' || e.code==='Escape'){togglePause();return;}
