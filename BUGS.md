@@ -7,6 +7,13 @@
 
 ## 🔲 Open
 
+### [BUG-013] JLSTZ pieces spawn one column too far right
+- **Reported:** 2026-06-03 | **Priority:** 🔴 High | **Source:** Reddit u/DelayProfessional345 (r/vibecoding)
+- **Symptom:** Every piece except I and O spawns one unit to the right of the standard Tetris guideline spawn position. Affects every game from the very first piece.
+- **Root cause:** `makePiece()` computes spawn X as `Math.floor(COLS/2) - Math.floor(width/2)`. For odd-width pieces (JLSTZ, width=3): `5 - 1 = 4`. The correct formula is `Math.floor((COLS - width) / 2)` = `Math.floor(7/2) = 3`. The two formulas diverge when COLS is even and width is odd — I (width=4) and O (width=2) are even-width so they are unaffected.
+- **Fix:** In `makePiece()` (`game.js` line 73), change spawn x from `Math.floor(COLS/2)-Math.floor(d.shape[0].length/2)` → `Math.floor((COLS-d.shape[0].length)/2)`.
+- **Status:** 🔲 Open
+
 ### [BUG-012] iPad: next/hold panel size inconsistent between kb mode and touch mode
 - **Reported:** 2026-06-03 | **Priority:** 🟡 Medium | **Device:** iPad (any, portrait)
 - **Symptom:** In keyboard mode (kb-mode CSS class applied), the NEXT and HOLD canvases (`ncD`, `hcD`) appear at the correct size (4×30 = 120px wide, 9×30 = 270px tall for NEXT; 4×30 × 3×30 for HOLD). When the user switches back to touch mode (or on initial load without a keyboard), the NEXT/HOLD panels appear at a different size — visually inconsistent with keyboard mode.
