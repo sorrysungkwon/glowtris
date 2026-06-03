@@ -158,9 +158,12 @@ export function _applyTouchCELL() {
 
   const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.10)));
   const miniH = Math.round(miniW * 0.8);
-  if (ncM.width !== miniW || ncM.height !== miniH) {
-    ncM.width = miniW; ncM.height = miniH;
-    ncM.style.width = miniW + 'px'; ncM.style.height = miniH + 'px';
+  const nextMH = miniH * 5;
+  if (ncM.width !== miniW || ncM.height !== nextMH) {
+    ncM.width = miniW; ncM.height = nextMH;
+    ncM.style.width = miniW + 'px'; ncM.style.height = nextMH + 'px';
+  }
+  if (hcM.width !== miniW || hcM.height !== miniH) {
     hcM.width = miniW; hcM.height = miniH;
     hcM.style.width = miniW + 'px'; hcM.style.height = miniH + 'px';
   }
@@ -189,8 +192,8 @@ export function initLayout() {
     gc.style.width  = (COLS * S.CELL) + 'px'; gc.style.height = (ROWS * S.CELL) + 'px';
     pc.width  = COLS * S.CELL; pc.height = ROWS * S.CELL;
     pc.style.width  = (COLS * S.CELL) + 'px'; pc.style.height = (ROWS * S.CELL) + 'px';
-    ncD.width = 4 * S.CELL; ncD.height = 3 * S.CELL;
-    ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (3 * S.CELL) + 'px';
+    ncD.width = 4 * S.CELL; ncD.height = 15 * S.CELL;
+    ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (15 * S.CELL) + 'px';
     hcD.width = 4 * S.CELL; hcD.height = 3 * S.CELL;
     hcD.style.width = (4 * S.CELL) + 'px'; hcD.style.height = (3 * S.CELL) + 'px';
   }
@@ -721,9 +724,7 @@ function _validPos(piece, ox=0, oy=0, shape=null) {
   return true;
 }
 
-function drawMiniPiece(ctx, piece, cw, ch) {
-  ctx.clearRect(0, 0, cw, ch);
-  ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
+function _renderPiece(ctx, piece, cw, ch) {
   if (!piece) return;
   const s  = piece.shape;
   
@@ -760,9 +761,31 @@ function drawMiniPiece(ctx, piece, cw, ch) {
   }
 }
 
+function drawMiniPiece(ctx, piece, cw, ch) {
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
+  _renderPiece(ctx, piece, cw, ch);
+}
+
+function _drawQueue(ctx, queue, cw, ch) {
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.fillStyle = 'rgba(0,0,15,0.55)'; ctx.fillRect(0, 0, cw, ch);
+  if (!queue || !queue.length) return;
+  const n = Math.min(queue.length, 5);
+  const slotH = Math.floor(ch / n);
+  for (let i = 0; i < n; i++) {
+    ctx.save();
+    ctx.globalAlpha = i === 0 ? 1.0 : 0.55;
+    ctx.translate(0, i * slotH);
+    ctx.beginPath(); ctx.rect(0, 0, cw, slotH); ctx.clip();
+    _renderPiece(ctx, queue[i], cw, slotH);
+    ctx.restore();
+  }
+}
+
 export function drawNext() {
-  drawMiniPiece(ncDx, S.next, ncD.width, ncD.height);
-  drawMiniPiece(ncMx, S.next, ncM.width, ncM.height);
+  _drawQueue(ncDx, S.next, ncD.width, ncD.height);
+  _drawQueue(ncMx, S.next, ncM.width, ncM.height);
 }
 export function drawHold() {
   drawMiniPiece(hcDx, S.held, hcD.width, hcD.height);
@@ -968,20 +991,24 @@ export function updateSprintTimer() {
   $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
 }
 
-export function showScorePopup(pts, n, tspin=false) {
+export function showScorePopup(pts, n, tspin=false, b2b=false) {
   const popup = $scorePopup;
-  const tspinLabels = ['T-SPIN!','T-SPIN SINGLE','T-SPIN DOUBLE!!','T-SPIN TRIPLE!!!'];
-  const miniLabels  = ['T-SPIN MINI','T-SPIN MINI+','T-SPIN MINI DBL'];
-  const labels      = ['','','DOUBLE!','TRIPLE!','GLOWTRIS!!'];
+  const tspinLabels  = ['T-SPIN!','T-SPIN SINGLE','T-SPIN DOUBLE!!','T-SPIN TRIPLE!!!'];
+  const spinLabels   = ['SPIN!','SPIN SINGLE','SPIN DOUBLE!!','SPIN TRIPLE!!!'];
+  const miniLabels   = ['T-SPIN MINI','T-SPIN MINI+','T-SPIN MINI DBL'];
+  const labels       = ['','','DOUBLE!','TRIPLE!','GLOWTRIS!!'];
+  const b2bTag = b2b ? 'B2B ' : '';
   let txt, color, sz, glow;
   if (n === -1) {
     txt = `✦ ALL CLEAR ✦ +${pts}`; color = '#ffe600'; sz = '22px'; glow = '0 0 32px #ffe600';
   } else if (tspin === 'full') {
-    txt = `${tspinLabels[Math.min(n,3)]} +${pts}`; color = '#a000ff'; sz = n>=2 ? '19px' : '14px'; glow = '0 0 24px #a000ff';
+    txt = `${b2bTag}${tspinLabels[Math.min(n,3)]} +${pts}`; color = b2b?'#ff8800':'#a000ff'; sz = n>=2 ? '19px' : '14px'; glow = b2b?'0 0 24px #ff8800':'0 0 24px #a000ff';
+  } else if (tspin === 'allspin') {
+    txt = `${b2bTag}${spinLabels[Math.min(n,3)]} +${pts}`; color = b2b?'#ff8800':'#00ffaa'; sz = n>=2 ? '19px' : '14px'; glow = b2b?'0 0 24px #ff8800':'0 0 24px #00ffaa';
   } else if (tspin === 'mini') {
-    txt = `${miniLabels[Math.min(n,2)]}${pts>0?' +'+pts:''}`; color = '#7700cc'; sz = '13px'; glow = '0 0 16px #7700cc';
+    txt = `${b2bTag}${miniLabels[Math.min(n,2)]}${pts>0?' +'+pts:''}`; color = '#7700cc'; sz = '13px'; glow = '0 0 16px #7700cc';
   } else if (n >= 4) {
-    txt = `★ GLOWTRIS ★ +${pts}`; color = '#ff0080'; sz = '24px'; glow = '0 0 28px #ff0080';
+    txt = b2b ? `★ B2B GLOWTRIS ★ +${pts}` : `★ GLOWTRIS ★ +${pts}`; color = b2b?'#ff8800':'#ff0080'; sz = '24px'; glow = b2b?'0 0 28px #ff8800':'0 0 28px #ff0080';
   } else {
     txt = n>=2 ? `${labels[n]} +${pts}` : `+${pts}`; color = '#fff'; sz = '16px'; glow = '0 0 16px #00c8ff';
   }
