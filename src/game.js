@@ -48,6 +48,7 @@ let _countdownTimer=null;
 let _prng=null;
 
 let lastWasRotate=false;
+let lastKickNonZero=false;
 
 // ─── Keyboard guide DOM refs ───────────────────────────────────────────────────
 const _keyGuide={
@@ -128,14 +129,15 @@ function _tryRotate(newShape, fromRot, toRot, is180 = false) {
     kicks = S.current.key === 'I' ? KICKS_I : S.current.key === 'O' ? [[0,0]] : KICKS_JLSTZ;
   }
   const table = kicks[key] || [[0,0]];
-  for (const [dx,dy] of table) {
+  for (let _ki = 0; _ki < table.length; _ki++) {
+    const [dx, dy] = table[_ki];
     if (validPos(S.current, dx, dy, newShape)) {
       S.current.shape = newShape;
       S.current.x += dx;
       S.current.y += dy;
       S.current.rot = toRot;
       if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
-      cancelLock(); lastWasRotate=true; sfxRotate();
+      cancelLock(); lastWasRotate=true; lastKickNonZero=(_ki>0); sfxRotate();
       return true;
     }
   }
@@ -165,7 +167,7 @@ function cancelLock(){
 }
 
 function lockPiece(){
-  const tspin=checkTSpin();
+  const tspin=checkAllSpin();
   S.lockActive=false;S.lockTimer=0;
   for(let r=0;r<S.current.shape.length;r++) for(let c=0;c<S.current.shape[r].length;c++){
     if(!S.current.shape[r][c])continue;
@@ -178,11 +180,15 @@ function lockPiece(){
   if(cleared.length>0){
     S.flashLines=new Set(cleared);S.flashTimer=12;S.combo++;if(S.combo>S.maxCombo)S.maxCombo=S.combo;
     const mul=S.combo>1?S.combo:1;
-    const pts=tspin==='full'
+    const basePts=(tspin==='full'||tspin==='allspin')
       ?TSPIN_SCORE[Math.min(cleared.length,3)]*S.level*mul
       :tspin==='mini'
       ?TSPIN_MINI_SCORE[Math.min(cleared.length,2)]*S.level*mul
       :SCORE_TABLE[Math.min(cleared.length,4)]*S.level*mul;
+    const isDifficult=cleared.length===4||!!tspin;
+    const b2bBonus=isDifficult&&S.b2b;
+    const pts=b2bBonus?Math.floor(basePts*1.5):basePts;
+    if(isDifficult){S.b2b=true;}else{S.b2b=false;}
     sfxLineClear(cleared.length);
     if(tspin){sfxTSpin();if(S.animIntensity==='full'){S.shakeFrames=Math.max(S.shakeFrames,12+cleared.length*6);S.shakeMag=Math.max(S.shakeMag,0.55);}}
     if(S.combo>1&&S.animIntensity!=='off'){
@@ -194,7 +200,7 @@ function lockPiece(){
         S.shakeAllDir=true;
       }
     }
-    addScore(pts,cleared.length,tspin);
+    addScore(pts,cleared.length,tspin,b2bBonus);
     S.lines+=cleared.length;
 
     // Update lifetime stats and achievements (in-memory cache — no JSON.parse per line clear)
@@ -206,9 +212,9 @@ function lockPiece(){
     }
     localStorage.setItem(LS.LIFETIME, JSON.stringify(lifetime));
 
-    if (tspin) {
+    if (tspin==='full'||tspin==='mini') {
       unlockAchievement('tspin_1');
-      if (cleared.length === 3) unlockAchievement('tspin_triple');
+      if (cleared.length === 3 && tspin==='full') unlockAchievement('tspin_triple');
     }
     if (S.combo >= 5) unlockAchievement('combo_5');
     if (S.combo >= 10) unlockAchievement('combo_10');
@@ -252,11 +258,11 @@ function lockPiece(){
       spawnPiece();
     },120);
   } else {
-    if(tspin==='full'){sfxTSpin();addScore(TSPIN_SCORE[0]*S.level,0,'full');unlockAchievement('tspin_1');}
-    else if(tspin==='mini'){sfxTSpin();unlockAchievement('tspin_1');}
-    else{S.combo=0;$combo.textContent='';}
+    if(tspin==='full'){sfxTSpin();addScore(TSPIN_SCORE[0]*S.level,0,'full');S.b2b=true;unlockAchievement('tspin_1');}
+    else if(tspin==='mini'){sfxTSpin();S.b2b=true;unlockAchievement('tspin_1');}
+    else{S.combo=0;S.b2b=false;$combo.textContent='';}
   }
-  lastWasRotate=false;
+  lastWasRotate=false;lastKickNonZero=false;
   spawnLockParticles(S.current);
   S.current = null;
   // In sprint mode, capture end time immediately when 40 lines reached.
@@ -264,7 +270,7 @@ function lockPiece(){
   if(cleared.length === 0) spawnPiece();
 }
 
-function addScore(pts,n,tspin=false){
+function addScore(pts,n,tspin=false,b2b=false){
   S.score+=pts;
   // In sprint mode score is cosmetic only — don't update marathon hi-score or achievements
   if(!S.isSprintMode){
@@ -273,29 +279,30 @@ function addScore(pts,n,tspin=false){
     if(S.score>=100000)unlockAchievement('score_100k');
     if(S.score>=250000)unlockAchievement('score_250k');
   }
-  updateUI();showScorePopup(pts,n,tspin);
+  updateUI();showScorePopup(pts,n,tspin,b2b);
 }
 
 function spawnPiece(fromHold = false){
-  lastWasRotate=false;
-  
+  lastWasRotate=false;lastKickNonZero=false;
+
   // IHS (Initial Hold System)
   if (!fromHold && canHold && (KEYS['KeyC'] || KEYS['ShiftLeft'] || KEYS['ShiftRight'])) {
     if (!S.held) {
-      S.held = makePiece(S.next.key);
-      S.current = makePiece(nextFromBag());
-      S.next = makePiece(nextFromBag());
+      S.held = makePiece(S.next[0].key);
+      S.next.shift(); S.next.push(makePiece(nextFromBag()));
+      S.current = makePiece(S.next[0].key);
+      S.next.shift(); S.next.push(makePiece(nextFromBag()));
     } else {
       S.current = makePiece(S.held.key);
-      S.held = makePiece(S.next.key);
-      S.next = makePiece(nextFromBag());
+      S.held = makePiece(S.next[0].key);
+      S.next.shift(); S.next.push(makePiece(nextFromBag()));
     }
     canHold = false;
     sfxHold();
     drawHold();
   } else {
-    S.current = makePiece(S.next.key);
-    S.next = makePiece(nextFromBag());
+    S.current = makePiece(S.next.shift().key);
+    S.next.push(makePiece(nextFromBag()));
     // Only reset canHold if this spawn was not triggered by a mid-game Hold
     if (!fromHold) canHold = true;
   }
@@ -356,6 +363,13 @@ function checkTSpin(){
   if(frontFilled===2)return'full';
   if(frontFilled===1)return'mini';
   return false;
+}
+
+function checkAllSpin(){
+  if(!S.current||!lastWasRotate)return false;
+  if(S.current.key==='T')return checkTSpin();
+  if(S.current.key==='O')return false;
+  return lastKickNonZero?'allspin':false;
 }
 
 // ─── Keyboard ─────────────────────────────────────────────────────────────────
@@ -543,7 +557,7 @@ function gameTick(dt){
         if(S.current.y<gy){
           S.score+=(gy-S.current.y); S.current.y=gy;
           if (S.current.y > S.lowestY) { S.lowestY = S.current.y; S.lockResets = 0; }
-          spawnDropTrail(S.current); cancelLock(); lastWasRotate=false; updateUI();
+          spawnDropTrail(S.current); cancelLock(); lastWasRotate=false;lastKickNonZero=false; updateUI();
         }
         gTimer=dropInterval;
       }else{
@@ -567,7 +581,7 @@ function gameTick(dt){
   _tickDAS('right','ArrowRight',()=>moveX(1),  dt);
 }
 
-function moveX(d){if(!S.current)return;if(validPos(S.current,d)){S.current.x+=d;cancelLock();lastWasRotate=false;sfxMove();}}
+function moveX(d){if(!S.current)return;if(validPos(S.current,d)){S.current.x+=d;cancelLock();lastWasRotate=false;lastKickNonZero=false;sfxMove();}}
 function hardDrop(){
   if(!S.current)return;
   let d=0;while(validPos(S.current,0,1)){S.current.y++;d++;}
@@ -747,12 +761,12 @@ function _doStartGame(){
   resetPerfHold(S._perfLocked, savedPerf);
   // Sprites are pre-warmed at idle time (page load); this is a fast cache hit
   for(const k of Object.keys(PIECES))getCellSprite(PIECES[k].color);
-  S.board=createBoard();S.score=0;S.lines=0;S.level=1;S.combo=0;S.maxCombo=0;dropInterval=800;
+  S.board=createBoard();S.score=0;S.lines=0;S.level=1;S.combo=0;S.maxCombo=0;dropInterval=800;S.b2b=false;
   S.particles=[];S.shakeFrames=0;S.shakeMag=0.4;S.shakeAllDir=false;S.flashLines=new Set();S.flashTimer=0;
-  S.lockTimer=0;S.lockActive=false;lastWasRotate=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
+  S.lockTimer=0;S.lockActive=false;lastWasRotate=false;lastKickNonZero=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
   S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};S.pendingRot=0;
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
-  bag=[];refillBag();S.next=makePiece(nextFromBag());S.held=null;canHold=true;
+  bag=[];refillBag();S.next=[];for(let i=0;i<5;i++)S.next.push(makePiece(nextFromBag()));S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
 
   // ── Sprint mode init ──────────────────────────────────────────────────────

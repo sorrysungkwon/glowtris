@@ -130,11 +130,11 @@ export const S = {
   current: null,
   lockResets: 0,
   lowestY: 0,
-  next:    null,
+  next:    [],
   held:    null,
 
   // Score HUD (game.js writes, ui.js updateUI reads)
-  score: 0, lines: 0, level: 1, combo: 0, hiScore: 0,
+  score: 0, lines: 0, level: 1, combo: 0, hiScore: 0, b2b: false,
 
   // Game control flags (game.js writes, audio.js + ui.js read)
   gameRunning: false,
