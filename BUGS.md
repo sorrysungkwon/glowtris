@@ -21,7 +21,6 @@ _No open bugs._
 - **Root cause (suspected):** Canvas 2D state (globalAlpha, shadowBlur, lineDash) leaking across game resets in Chrome's GPU-accelerated canvas path. `gctx.clearRect()` clears pixels but not context state.
 - **Fix:** Add explicit `gctx.globalAlpha=1; gctx.shadowBlur=0; gctx.setLineDash([])` reset at top of `drawBoard()` each frame.
 - **Status:** ✅ Fixed (Added context reset in `drawBoard()`)
-
 ### [BUG-013] JLSTZ pieces spawn one column too far right
 - **Reported:** 2026-06-03 | **Fixed:** 2026-06-03 | **Source:** Reddit u/DelayProfessional345 (r/vibecoding)
 - **Symptom:** Every piece except I and O spawned one column to the right of the SRS guideline position.
