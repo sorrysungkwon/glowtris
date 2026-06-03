@@ -135,10 +135,16 @@ async function deduplicateAndAddSprint(key, cleanName, newTime, newMember) {
   return true;
 }
 
+const ALLOWED_ORIGINS = ['https://glowtris.com', 'https://www.glowtris.com', 'https://prevglow.vercel.app'];
+const RESERVED_NAMES = ['admin', 'glowtris', 'moderator', 'mod', 'operator', 'system', 'bot', '운영자', '관리자'];
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Vary', 'Origin');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -182,7 +188,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     // --- Rate limiting ---
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
+    const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
     if (await checkRateLimit(ip)) {
       return res.status(429).json({ error: 'too many requests' });
     }
@@ -193,8 +199,9 @@ export default async function handler(req, res) {
     if (!name || typeof score !== 'number') {
       return res.status(400).json({ error: 'name and score required' });
     }
-    const clean = String(name).slice(0, 12).replace(/[^\w가-힣ㄱ-ㅎㅏ-ㅣ\s\-_.]/g, '');
+    const clean = String(name).trim().slice(0, 12).replace(/[^\w가-힣ㄱ-ㅎㅏ-ㅣ\s\-_.]/g, '').trim();
     if (!clean) return res.status(400).json({ error: 'invalid name' });
+    if (RESERVED_NAMES.includes(clean.toLowerCase())) return res.status(400).json({ error: 'reserved name' });
 
     const member = encodeURIComponent(`${clean}#${Date.now()}`);
     const isChallenge = mode === 'daily' || req.body.challenge === 1;
