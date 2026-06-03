@@ -156,16 +156,14 @@ export function _applyTouchCELL() {
   gc.style.width  = gameW + 'px';  gc.style.height = gameH + 'px';
   pc.style.width  = gameW + 'px';  pc.style.height = gameH + 'px';
 
-  const miniW = Math.max(26, Math.min(30, Math.round(gameW * 0.10)));
-  const miniH = Math.round(miniW * 0.8);
-  const nextMW = miniW * 3;
-  if (ncM.width !== nextMW || ncM.height !== miniH) {
-    ncM.width = nextMW; ncM.height = miniH;
-    ncM.style.width = nextMW + 'px'; ncM.style.height = miniH + 'px';
+  const MINI_W = 32, MINI_H = 26;
+  if (ncM.width !== MINI_W * 3 || ncM.height !== MINI_H) {
+    ncM.width = MINI_W * 3; ncM.height = MINI_H;
+    ncM.style.width = (MINI_W * 3) + 'px'; ncM.style.height = MINI_H + 'px';
   }
-  if (hcM.width !== miniW || hcM.height !== miniH) {
-    hcM.width = miniW; hcM.height = miniH;
-    hcM.style.width = miniW + 'px'; hcM.style.height = miniH + 'px';
+  if (hcM.width !== MINI_W || hcM.height !== MINI_H) {
+    hcM.width = MINI_W; hcM.height = MINI_H;
+    hcM.style.width = MINI_W + 'px'; hcM.style.height = MINI_H + 'px';
   }
 
   if (newCELL === S.CELL && gc.width === gameW && gc.height === gameH) return;
@@ -777,10 +775,13 @@ function _drawQueue(ctx, queue, cw, ch) {
   const slotH = horiz ? ch : Math.floor(ch / n);
   for (let i = 0; i < n; i++) {
     ctx.save();
-    ctx.globalAlpha = [1.0, 0.55, 0.35][i] ?? 0.35;
     ctx.translate(horiz ? i * slotW : 0, horiz ? 0 : i * slotH);
     ctx.beginPath(); ctx.rect(0, 0, slotW, slotH); ctx.clip();
     _renderPiece(ctx, queue[i], slotW, slotH);
+    if (i > 0) {
+      ctx.fillStyle = i === 1 ? 'rgba(0,0,15,0.5)' : 'rgba(0,0,15,0.7)';
+      ctx.fillRect(0, 0, slotW, slotH);
+    }
     ctx.restore();
   }
 }
