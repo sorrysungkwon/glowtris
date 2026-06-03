@@ -939,8 +939,10 @@ const $hiScore  = document.getElementById('hi-score');
 const $hiScoreM = document.getElementById('hi-score-m');
 if($hiScore)$hiScore.textContent=S.hiScore.toLocaleString();
 if($hiScoreM)$hiScoreM.textContent=S.hiScore.toLocaleString();
-animFrame=requestAnimationFrame(function bgOnly(ts){drawBackground();if(!S.gameRunning)animFrame=requestAnimationFrame(bgOnly);});
-showStartScreen();
+document.fonts.ready.then(() => {
+  animFrame=requestAnimationFrame(function bgOnly(ts){drawBackground();if(!S.gameRunning)animFrame=requestAnimationFrame(bgOnly);});
+  showStartScreen();
+});
 // Pre-warm cell sprites during idle so startGame() click doesn't block (INP fix)
 (window.requestIdleCallback||function(cb){setTimeout(cb,200);})(function(){
   for(var k in PIECES)getCellSprite(PIECES[k].color);
