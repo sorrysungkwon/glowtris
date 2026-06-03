@@ -39,7 +39,7 @@
 | **v1.0 Launch** | Public launch — competitive-standard engine live, SEO, share mechanics | 700 | 🔲 |
 | **v1.1 Retention Core** | Daily streak, comeback nudges, PWA push notifications, "you're X away from top 10" | 1,200 | 🔲 |
 | **v1.2 Social Hooks** | Percentile badge on share, challenge links, rival system, "friend beat you" trigger | 1,800 | 🔲 |
-| **v1.3 Progression** | Achievements depth, milestone unlocks, personal stats timeline, improvement graph | 2,500 | 🔲 |
+| **v1.3 Progression + Account** | Anonymous UUID auto-assigned on first visit → optional Google backup; achievements depth, milestone unlocks, personal stats timeline, improvement graph — all tied to account | 2,500 | 🔲 |
 | **v1.4 Visual Identity** | Custom board skins, block themes, neon color palettes (premium unlock or free) | 3,500 | 🔲 |
 | **v1.5 Tournaments** | Weekly seeded tournament, seasonal rankings, end-of-season reward badge | 4,500 | 🔲 |
 | **v1.6 CRM & Re-engagement** | "You haven't played in 3 days" push, personalized challenge ("beat your Tuesday score"), lapsed user flow | 6,000 | 🔲 |
