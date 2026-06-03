@@ -24,8 +24,8 @@
 | v1.0.9.4 ~ v1.1.1 *(now reframed as v0.1.x beta)* | Sprint, domain, UX polish | — | ✅ Done |
 | **v0.2 Loop & Input Core** | Decoupled fixed-timestep loop, ordered sub-frame input handling | ARCH-001, ARCH-002 | ✅ Done |
 | **v0.3 Movement Standard** | ~~180° rotation~~, custom keybinds, ~~SDF (+ ∞)~~, ~~lock-delay reset cap~~, ~~IRS~~, ~~IHS~~, ~~DCD~~, ~~instant ARR=0~~ | FEAT-001/002/003/006/007/008/012, ARCH-003 | ✅ Done |
-| **v0.4 Scoring Standard** | Back-to-Back, 5-piece next queue, all-spin (SRS+) | FEAT-004/005/010 | 🔲 |
-| **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3 substages — see BUGS.md ARCH-004), render interpolation between ticks, low-latency audio dispatch | ARCH-004/005 | 🔲 |
+| **v0.4 Scoring Standard** | B2B 1.5×, 3-piece next queue, all-spin (SRS+), BUG-012/013 | FEAT-004/005/010 | ✅ Done |
+| **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3), render interpolation, low-latency audio | ARCH-004/005 | 🔄 In Progress |
 | **v0.6 Modes & Metrics** | Ultra/Blitz mode, in-game APM/PPS | FEAT-009/011 | 🔲 |
 
 ### Phase B: Public Launch & Growth (gated by Phase A completion)
@@ -44,6 +44,41 @@
 
 > Full roadmap, DAU milestones, and infrastructure upgrade triggers → see `README.md`.
 > Marketing strategy and growth plan → see `GROWTHPLAN.md` (local only).
+
+---
+
+## 🔄 In Progress: v0.5 Renderer & Audio — staged PixiJS migration
+
+> **Division of labor:**
+> - **Claude Code** — architecture, PixiJS app setup, scene structure, render loop wiring, Canvas2D → PixiJS logic migration. Game logic (`game.js`) untouched.
+> - **Antigravity** — visual polish: colors, glow/bloom shaders, particle effects, neon aesthetics on top of Claude's skeleton.
+>
+> Each substage: Claude ships skeleton → Antigravity polishes → merge to preview → verify → next substage.
+
+### v0.5.0 — PixiJS foundation + board render (Claude)
+- [ ] Add PixiJS to build pipeline (esbuild bundle, no CDN)
+- [ ] `PIXI.Application` setup replacing game canvas; Canvas2D fallback branch for WebGL-unsupported devices
+- [ ] Board, current piece, ghost piece migrated to `PIXI.Graphics` (solid colors, no effects yet)
+- [ ] `drawBoard()` rewritten to use PixiJS scene; `game.js` logic untouched
+- [ ] Render interpolation between 1ms logic ticks (smooth motion at 144Hz+)
+- [ ] `npm run build` passes; gameplay identical to Canvas2D baseline
+
+### v0.5.1 — Particle system (Claude skeleton → Antigravity polish)
+- [ ] `PIXI.ParticleContainer` replacing current Canvas2D particle loop (Claude)
+- [ ] Antigravity: particle color/size/lifetime tuning, spark trails, hard drop impact
+
+### v0.5.2 — Background nebula (Claude skeleton → Antigravity polish)
+- [ ] Background migrated to `PIXI.Filter` (shader gradient replacing Canvas2D nebula) (Claude)
+- [ ] Antigravity: nebula hue, pulse animation, color scheme
+
+### v0.5.3 — Glow/neon shader effects (Claude skeleton → Antigravity polish)
+- [ ] Line-clear / T-spin / Glowtris effects via `PIXI.Filter` (bloom, RGB split, distortion) (Claude)
+- [ ] Antigravity: shader parameter tuning, signature neon glow identity
+
+### v0.5.4 — ARCH-005 Low-latency audio
+- [ ] Audit current audio dispatch path; pre-decode all SFX to `AudioBuffer`
+- [ ] SFX triggered via `AudioBufferSourceNode` + `AudioContext.currentTime` scheduling
+- [ ] Verify trigger-to-output latency < 5ms
 
 ---
 
