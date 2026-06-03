@@ -224,12 +224,16 @@
     box-shadow: 0 0 10px var(--pink);
   }
   .key-row.key-pressed#key-hard span { color: var(--pink); }
-  .key-row.key-pressed#key-rotate kbd {
+  .key-row.key-pressed#key-rotate kbd,
+  .key-row.key-pressed#key-rotate-ccw kbd,
+  .key-row.key-pressed#key-rotate-180 kbd {
     background: rgba(160, 0, 255, 0.22);
     border-color: var(--purple);
     box-shadow: 0 0 10px var(--purple);
   }
-  .key-row.key-pressed#key-rotate span { color: var(--purple); }
+  .key-row.key-pressed#key-rotate span,
+  .key-row.key-pressed#key-rotate-ccw span,
+  .key-row.key-pressed#key-rotate-180 span { color: var(--purple); }
 
   @keyframes scale-pop {
     0% { transform: scale(1); }
@@ -1415,7 +1419,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       <div id="bpm-display">140 BPM</div>
       <div class="divider"></div>
       <div id="combo-display"></div>
-      <div class="divider"></div>
       <div class="panel-title">BEST</div>
       <div class="score-val" id="hi-score" style="font-size:16px">0</div>
     </div>
@@ -1448,6 +1451,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
         <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
         <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
         <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
+        <div class="key-row" id="key-rotate-180"><kbd>A</kbd><span>rotate 180°</span></div>
         <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
         <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
         <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
