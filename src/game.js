@@ -30,7 +30,7 @@ import {
 } from './leaderboard.js';
 import {
   showDailyGateOverlay, startDailyChallenge, togglePause, _saveGameStats, _renderGameOverScreen,
-  _renderSprintScreen, showStartScreen, showModeSelector, openSettings
+  _renderSprintScreen, showStartScreen, showModeSelector, openSettings, _showPauseOverlay
 } from './screens.js';
 import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
 
@@ -1001,7 +1001,7 @@ window.onunhandledrejection = function(e) {
 // HTML template uses onclick="fn()" style which requires window.fn.
 Object.assign(window, {
   startGame, startSprintMode, startDailyChallenge, launchDailyChallenge,
-  togglePause, showStartScreen, showModeSelector, openSettings,
+  togglePause, showStartScreen, showModeSelector, openSettings, _showPauseOverlay,
   submitScore, submitSprintScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
   toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,
