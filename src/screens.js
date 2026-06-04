@@ -98,33 +98,43 @@ export function startDailyChallenge() {
   $overlay.style.display = 'flex';
 }
 
-function _settingsHTML(sliderIdPrefix) {
+function _settingsHTML(p) {
   return `
-    <button class="toggle-btn${S.muteAudio?' muted':''}" id="${sliderIdPrefix}-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON'}</button>
-    <button class="toggle-btn${S.ghostVisible?'':' muted'}" id="${sliderIdPrefix}-ghost-btn" onclick="updateGhost()">${S.ghostVisible?'👻 GHOST ON':'👻 GHOST OFF'}</button>
-    <button class="toggle-btn${S.colorblindMode?' cb-active':' muted'}" id="${sliderIdPrefix}-cb-btn" onclick="updateColorblind()">${S.colorblindMode?'🔳 CB MODE ON':'🔳 CB MODE OFF'}</button>
-    <button class="toggle-btn${S.animIntensity==='off'?' muted':''}" id="${sliderIdPrefix}-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
+    <div class="sg-label">AUDIO</div>
+    <button class="toggle-btn${S.muteAudio?' muted':''}" id="${p}-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON'}</button>
+
+    <div class="sg-sep"></div>
+    <div class="sg-label">VISUAL</div>
+    <button class="toggle-btn${S.ghostVisible?'':' muted'}" id="${p}-ghost-btn" onclick="updateGhost()">${S.ghostVisible?'👻 GHOST ON':'👻 GHOST OFF'}</button>
+    <button class="toggle-btn${S.animIntensity==='off'?' muted':''}" id="${p}-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
+    <button class="toggle-btn${S.colorblindMode?' cb-active':' muted'}" id="${p}-cb-btn" onclick="updateColorblind()">${S.colorblindMode?'🔳 CB MODE ON':'🔳 CB MODE OFF'}</button>
+
+    <div class="sg-sep"></div>
+    <div class="sg-label">CONTROLS</div>
     <div class="settings-row">
       <span class="settings-lbl">DAS</span>
       <input type="range" class="neon-range" min="50" max="300" value="${S.das}" oninput="updateDAS(this.value)">
-      <span class="settings-val" id="${sliderIdPrefix}-das-val">${S.das}ms</span>
+      <span class="settings-val" id="${p}-das-val">${S.das}ms</span>
     </div>
     <div class="settings-row">
       <span class="settings-lbl">ARR</span>
       <input type="range" class="neon-range" min="0" max="100" value="${S.arr}" oninput="updateARR(this.value)">
-      <span class="settings-val" id="${sliderIdPrefix}-arr-val">${S.arr}ms</span>
+      <span class="settings-val" id="${p}-arr-val">${S.arr}ms</span>
     </div>
     <div class="settings-row">
       <span class="settings-lbl">SDF</span>
       <input type="range" class="neon-range" min="0" max="40" value="${S.sdf}" oninput="updateSDF(this.value)">
-      <span class="settings-val" id="${sliderIdPrefix}-sdf-val">${S.sdf === 0 ? '∞' : S.sdf + 'x'}</span>
+      <span class="settings-val" id="${p}-sdf-val">${S.sdf===0?'∞':S.sdf+'x'}</span>
     </div>
     <div class="settings-row">
       <span class="settings-lbl">LOCK</span>
       <input type="range" class="neon-range" min="100" max="1000" step="50" value="${S.lockMs}" oninput="updateLockDelay(this.value)">
-      <span class="settings-val" id="${sliderIdPrefix}-lock-val">${S.lockMs}ms</span>
+      <span class="settings-val" id="${p}-lock-val">${S.lockMs}ms</span>
     </div>
-    ${S.lowPerfMode ? `<div class="low-spec-warning">⚠️ LOW-SPEC MODE IS ON<button class="low-spec-off-btn" onclick="togglePerfMode()">TURN OFF</button></div>` : ''}`;
+
+    <div class="sg-sep"></div>
+    <div class="sg-label">PERFORMANCE</div>
+    <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>`;
 }
 
 export function openSettings() {

@@ -58,8 +58,10 @@ export function toggleMute(){
   const btn=document.getElementById('btn-mute');
   if(icon)icon.textContent=S.muteAudio?'volume_off':'volume_up';
   if(btn)btn.classList.toggle('muted',S.muteAudio);
-  const ovBtn=document.getElementById('ov-mute-btn');
-  if(ovBtn){ovBtn.textContent=S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON';ovBtn.classList.toggle('muted',S.muteAudio);}
+  ['ov','st'].forEach(p=>{
+    const b=document.getElementById(p+'-mute-btn');
+    if(b){b.textContent=S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON';b.classList.toggle('muted',S.muteAudio);}
+  });
 }
 
 const _n=s=>440*Math.pow(2,s/12);
