@@ -1013,5 +1013,5 @@ Object.assign(window, {
   updateGhost, updateColorblind, cycleAnimIntensity, togglePerfMode,
   openHowToPlay, closeHowToPlay, openStats, closeStats,
   showAchTooltip, hideAchTooltip,
-  _openDonation,
+  _openDonation, _debugSprint: endSprint,
 });
