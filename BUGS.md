@@ -5,9 +5,14 @@
 
 ---
 
-## 🔲 Open
+## ✅ Fixed
 
-_No open bugs._
+### BUG-014 — Samsung Browser / in-app browser: buttons unresponsive or double-firing
+- **Environment**: Samsung Internet, Instagram in-app browser, Naver in-app browser (Android)
+- **Symptom**: Buttons require multiple taps to register; occasionally fire twice on a single tap
+- **Root cause**: In-app browsers and Samsung Internet retain a 300ms tap delay for double-tap-zoom detection. Without `touch-action: manipulation`, each tap triggers `touchend` + a synthetic `click` 300ms later, causing double-fire or perceived lag.
+- **Fix**: Added `touch-action: manipulation` to `.action-btn`, `.toggle-btn`, `.lb-tab`, `.mode-card` — eliminates the 300ms delay and suppresses double-tap zoom on all interactive overlay elements. Game canvas controls (`tbtn`) already had `touch-action: none`.
+- **PR**: preview push (no separate PR)
 
 ---
 
