@@ -352,9 +352,6 @@ export function showStartScreen(){
         <button class="action-btn ghost" onclick="openStats()">STATS</button>
         <button class="action-btn ghost" onclick="openSettings()">SETTINGS</button>
       </div>
-      <div class="btn-row sub-actions">
-        <button class="action-btn ghost full-width" onclick="openSettings()">SETTINGS</button>
-      </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
         <a href="/privacy.html" class="footer-link">PRIVACY</a>
