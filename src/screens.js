@@ -350,7 +350,9 @@ export function showStartScreen(){
       <div class="btn-row sub-actions">
         <button class="action-btn ghost" onclick="openHowToPlay()">HOW TO PLAY</button>
         <button class="action-btn ghost" onclick="openStats()">STATS</button>
-        <button class="action-btn ghost" onclick="openSettings()">SETTINGS</button>
+      </div>
+      <div class="btn-row sub-actions">
+        <button class="action-btn ghost full-width" onclick="openSettings()">SETTINGS</button>
       </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
