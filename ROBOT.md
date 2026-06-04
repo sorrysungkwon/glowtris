@@ -37,12 +37,14 @@
 - `feature/*` — regular feature branches; Vercel auto-creates random preview URLs per push.
 
 **Workflow (mandatory — no exceptions)**:
-1. Work on `feature/xxx`
-2. Merge into `preview` and verify at **https://prevglow.vercel.app**
+1. Work on `preview` directly (or a `feature/xxx` branch merged into `preview`)
+2. Push freely to `preview` — verify at **https://prevglow.vercel.app**
 3. Only after preview is confirmed OK → open PR to `master`
 4. Production deploys automatically on merge
 
-> ⚠️ NEVER open a PR to `master` without first verifying on `preview`. Always confirm with the user that preview looks good before proceeding.
+> ⚠️ **PRs are only ever opened to `master`. Never open a PR targeting `preview` or any other branch.**
+> Pushing to `preview` directly (no PR) is the correct and expected workflow.
+> NEVER open a PR to `master` without first verifying on `preview`. Always confirm with the user that preview looks good before proceeding.
 
 ---
 
