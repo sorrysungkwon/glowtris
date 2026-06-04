@@ -11,7 +11,7 @@ document.addEventListener('pointerdown', (e) => {
 }, {passive: true});
 import {
   gc, gctx, pc, ncD, ncDx, hcD, hcDx, ncM, hcM, bgc,
-  measureFPS, setLowPerfMode, resetPerfHold, _detectLowEndGPU,
+  measureFPS, setLowPerfMode, resetPerfHold,
   initLayout, initStars, drawBackground,
   drawBoard, drawNext, drawHold, getCellSprite,
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
@@ -30,7 +30,7 @@ import {
 } from './leaderboard.js';
 import {
   showDailyGateOverlay, startDailyChallenge, togglePause, _saveGameStats, _renderGameOverScreen,
-  _renderSprintScreen, showStartScreen, showModeSelector
+  _renderSprintScreen, showStartScreen, showModeSelector, openSettings
 } from './screens.js';
 import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
 
@@ -791,27 +791,11 @@ function _doStartGame(){
   if(animFrame)cancelAnimationFrame(animFrame);
   resetLoop(performance.now());
   startBGM();
-  // 3-2-1 countdown before pieces start falling
-  S._countdownGo=0;
-  S._countdownVal=3;
-  S._countdownTs=performance.now();
-  clearInterval(_countdownTimer);
-  if(!S.muteAudio)playBeep(440,'square',.13,.18,0);
-  _countdownTimer=setInterval(()=>{
-    S._countdownVal--;
-    S._countdownTs=performance.now();
-    if(S._countdownVal<=0){
-      clearInterval(_countdownTimer);_countdownTimer=null;S._countdownVal=0;
-      S._countdownGo=55;
-      S.gravityTimer=0;
-      if(S.isSprintMode)S._sprintStartTime=performance.now();
-      if(!S.muteAudio){[523,659,784].forEach((f,i)=>playBeep(f,'sawtooth',.16,.3,i*.04));}
-    }else{
-      const pitch={2:550,1:660}[S._countdownVal]||440;
-      if(!S.muteAudio)playBeep(pitch,'square',.13,.18,0);
-    }
-  },1000);
   animFrame=requestAnimationFrame(gameLoop);
+  startCountdown(()=>{
+    S.gravityTimer=0;
+    if(S.isSprintMode)S._sprintStartTime=performance.now();
+  });
 }
 
 export function launchDailyChallenge() {
@@ -833,6 +817,40 @@ export function resumeGameTiming() {
     _sprintPauseTs = 0;
   }
   resetLoop(performance.now());
+}
+
+// Unpause with countdown. Resets the loop immediately (prevents tick accumulation),
+// then runs 3-2-1. Sprint timer compensation is deferred to countdown end so the
+// 3 countdown seconds are also excluded from sprint time.
+export function resumeWithCountdown() {
+  resetLoop(performance.now());
+  startCountdown(() => {
+    if (S.isSprintMode && _sprintPauseTs > 0) {
+      S._sprintStartTime += performance.now() - _sprintPauseTs;
+      _sprintPauseTs = 0;
+    }
+  });
+}
+
+export function startCountdown(onComplete) {
+  S._countdownGo=0;
+  S._countdownVal=3;
+  S._countdownTs=performance.now();
+  clearInterval(_countdownTimer);
+  if(!S.muteAudio)playBeep(440,'square',.13,.18,0);
+  _countdownTimer=setInterval(()=>{
+    S._countdownVal--;
+    S._countdownTs=performance.now();
+    if(S._countdownVal<=0){
+      clearInterval(_countdownTimer);_countdownTimer=null;S._countdownVal=0;
+      S._countdownGo=55;
+      if(onComplete)onComplete();
+      if(!S.muteAudio){[523,659,784].forEach((f,i)=>playBeep(f,'sawtooth',.16,.3,i*.04));}
+    }else{
+      const pitch={2:550,1:660}[S._countdownVal]||440;
+      if(!S.muteAudio)playBeep(pitch,'square',.13,.18,0);
+    }
+  },1000);
 }
 
 export function stopGameAndReset() {
@@ -905,6 +923,16 @@ function endSprint(){
   unlockAchievement('sprint_finish');
 
   if(S.animIntensity!=='off'){
+    if(isNewBest){
+      triggerAllClearFlash();
+      spawnGoldBurst((COLS/2)*S.CELL, (ROWS/2)*S.CELL);
+      spawnGoldBurst((COLS/2)*S.CELL - 60, (ROWS/2)*S.CELL + 40);
+      spawnGoldBurst((COLS/2)*S.CELL + 60, (ROWS/2)*S.CELL - 20);
+    } else {
+      triggerScreenFlash();
+      spawnGoldBurst((COLS/2)*S.CELL, (ROWS/2)*S.CELL);
+    }
+
     for(let i=0;i<60;i++){
       const a=Math.random()*Math.PI*2,sp=Math.random()*10+3;
       S.particles.push({x:(Math.random()*COLS)*S.CELL,y:(Math.random()*ROWS*0.5)*S.CELL,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:Math.random()*.01+.005,color:['#00ff88','#00c8ff','#ffe600','#ffffff'][Math.floor(Math.random()*4)],size:Math.random()*6+2,type:'star'});
@@ -928,11 +956,6 @@ initLayout();
 initStars();
 loadSettings();
 
-// Auto low-perf: if integrated GPU detected and user has not manually set preference
-if(!localStorage.getItem(LS.LOW_PERF)&&_detectLowEndGPU()){
-  setLowPerfMode(true);
-  S._perfLocked=true;
-}
 
 S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
 const $hiScore  = document.getElementById('hi-score');
@@ -978,7 +1001,7 @@ window.onunhandledrejection = function(e) {
 // HTML template uses onclick="fn()" style which requires window.fn.
 Object.assign(window, {
   startGame, startSprintMode, startDailyChallenge, launchDailyChallenge,
-  togglePause, showStartScreen, showModeSelector,
+  togglePause, showStartScreen, showModeSelector, openSettings,
   submitScore, submitSprintScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
   toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,

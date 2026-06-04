@@ -9,6 +9,7 @@ The user will say **"sync"** at the start of a session. When this happens (or at
    - `AGENTS.md` (this file) — Antigravity-specific instructions
    - `ROBOT.md` — all shared project rules, deployment config, and workflow
    - `TODO.md` — active tasks and version pipeline
+   - `WALKTHROUGH.md` — technical handoff notes from Claude (architecture decisions, implementation details, what to polish next)
    - `README.md` — optional, for high-level feature/roadmap context only
 2. **Check recent changes**: `git log --oneline -10`
 3. **Report to the user**:

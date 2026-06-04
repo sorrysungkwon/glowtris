@@ -27,20 +27,24 @@
 | **v0.4 Scoring Standard** | B2B 1.5×, 3-piece next queue, all-spin (SRS+), BUG-012/013 | FEAT-004/005/010 | ✅ Done |
 | **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3), render interpolation, low-latency audio | ARCH-004/005 | 🔄 In Progress |
 | **v0.6 Modes & Metrics** | Ultra/Blitz mode, in-game APM/PPS | FEAT-009/011 | 🔲 |
+| **v0.7 Social Ranking + Account** | Anonymous UUID on first visit → optional Google backup (Clerk/NextAuth); percentile display, rival system, async challenge links, weekly tournament, push notifications | SOCIAL-001~005 | 🔲 |
 
 ### Phase B: Public Launch & Growth (gated by Phase A completion)
 
+> **Strategy:** No multiplayer. Growth through retention loops, social comparison, and CRM nudges.
+> Hook model: Trigger (notification/rival) → Action (one game) → Variable reward (rank change) → Investment (streak/record).
+
 | Version | Focus | DAU Goal | Status |
 |---|---|---:|---|
-| **v1.0 Standards Compliance Release** | Official competitive-standard public launch (the real 1.0) | 700 | 🔲 |
-| v1.1 Training & Finesse | — | 1,200 | 🔲 |
-| v1.2 Visual Customization | — | 1,800 | 🔲 |
-| v1.3 Weekly Events | — | 2,500 | 🔲 |
-| v1.4 Ghost & Replay | — | 3,500 | 🔲 |
-| v1.5 Advanced Stats | — | 4,500 | 🔲 |
-| v1.6 Season & Rank | — | 6,000 | 🔲 |
-| v1.7 Social Layer | — | 8,000 | 🔲 |
-| v2.0 Multiplayer | — | 15,000+ | 🔲 |
+| **v1.0 Launch** | Public launch — competitive-standard engine live, SEO, share mechanics | 700 | 🔲 |
+| **v1.1 Retention Core** | Daily streak, comeback nudges, PWA push notifications, "you're X away from top 10" | 1,200 | 🔲 |
+| **v1.2 Social Hooks** | Percentile badge on share, challenge links, rival system, "friend beat you" trigger | 1,800 | 🔲 |
+| **v1.3 Progression** | Achievements depth, milestone unlocks, personal stats timeline, improvement graph — powered by v0.7 account system | 2,500 | 🔲 |
+| **v1.4 Visual Identity** | Custom board skins, block themes, neon color palettes (premium unlock or free) | 3,500 | 🔲 |
+| **v1.5 Tournaments** | Weekly seeded tournament, seasonal rankings, end-of-season reward badge | 4,500 | 🔲 |
+| **v1.6 CRM & Re-engagement** | "You haven't played in 3 days" push, personalized challenge ("beat your Tuesday score"), lapsed user flow | 6,000 | 🔲 |
+| **v1.7 Virality Engine** | Referral system, "play my replay" ghost sharing, score card templates for social media | 8,000 | 🔲 |
+| **v2.0 Platform** | Creator tools, embeddable widget, API for communities, brand partnership hooks | 15,000+ | 🔲 |
 
 > Full roadmap, DAU milestones, and infrastructure upgrade triggers → see `README.md`.
 > Marketing strategy and growth plan → see `GROWTHPLAN.md` (local only).
@@ -79,6 +83,43 @@
 - [ ] Audit current audio dispatch path; pre-decode all SFX to `AudioBuffer`
 - [ ] SFX triggered via `AudioBufferSourceNode` + `AudioContext.currentTime` scheduling
 - [ ] Verify trigger-to-output latency < 5ms
+
+---
+
+## 🔮 Planned: v0.7 Social Ranking & Comparison
+
+> **Vision:** Drive re-engagement through relative competition. People care more about beating a rival than their absolute score. No WebSocket needed — all async via Redis.
+>
+> **Core insight:** "You're top 8% today" + "rival overtook you" loop is the strongest retention mechanic available without real-time infrastructure.
+
+### [SOCIAL-001] Percentile display (highest priority — ship first)
+- [ ] On game over, compute player's percentile for today's daily board: `ZCOUNT key (score +inf) / ZCARD key`
+- [ ] Show "Top X% today" badge on game over screen (e.g. 🏆 Top 3%)
+- [ ] Share-friendly: include percentile in the score share image/text
+- [ ] Same for weekly and all-time boards
+
+### [SOCIAL-002] Score gap display on leaderboard
+- [ ] Show score difference from #1: "1,240 behind 1st"
+- [ ] Show score difference from the player directly above: "+320 to pass player above"
+- [ ] Makes the gap feel closeable → drives one-more-game behavior
+
+### [SOCIAL-003] Async challenge link
+- [ ] "Challenge" button on game over → generates a seeded game link (seed = score + timestamp hash)
+- [ ] Recipient plays the exact same piece sequence
+- [ ] Result comparison card: side-by-side scores with winner highlighted
+- [ ] No account needed — link carries all context
+
+### [SOCIAL-004] Rival system
+- [ ] Auto-assign a "rival" — the player closest above the user in all-time leaderboard
+- [ ] Show on game over: "Rival: user123 — 280 pts ahead"
+- [ ] When user overtakes rival, celebrate + assign new rival
+- [ ] Stored in localStorage (no account needed at this stage)
+
+### [SOCIAL-005] Weekly tournament
+- [ ] Fixed seeded game, same for all players, resets every Monday
+- [ ] Separate leaderboard tab: TOURNAMENT
+- [ ] Each player gets one attempt (or best of 3) — stored via name dedup in Redis
+- [ ] Drives weekly return visits
 
 ---
 
