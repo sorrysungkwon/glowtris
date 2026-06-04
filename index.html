@@ -3957,7 +3957,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     } else {
       resumeBGM();
       $overlay.style.display = "none";
-      resumeGameTiming();
+      resumeWithCountdown();
     }
   }
   function _saveGameStats() {
@@ -5635,30 +5635,11 @@ ${window.location.origin}`;
     if (animFrame) cancelAnimationFrame(animFrame);
     resetLoop(performance.now());
     startBGM();
-    S._countdownGo = 0;
-    S._countdownVal = 3;
-    S._countdownTs = performance.now();
-    clearInterval(_countdownTimer);
-    if (!S.muteAudio) playBeep(440, "square", 0.13, 0.18, 0);
-    _countdownTimer = setInterval(() => {
-      S._countdownVal--;
-      S._countdownTs = performance.now();
-      if (S._countdownVal <= 0) {
-        clearInterval(_countdownTimer);
-        _countdownTimer = null;
-        S._countdownVal = 0;
-        S._countdownGo = 55;
-        S.gravityTimer = 0;
-        if (S.isSprintMode) S._sprintStartTime = performance.now();
-        if (!S.muteAudio) {
-          [523, 659, 784].forEach((f, i) => playBeep(f, "sawtooth", 0.16, 0.3, i * 0.04));
-        }
-      } else {
-        const pitch = { 2: 550, 1: 660 }[S._countdownVal] || 440;
-        if (!S.muteAudio) playBeep(pitch, "square", 0.13, 0.18, 0);
-      }
-    }, 1e3);
     animFrame = requestAnimationFrame(gameLoop);
+    startCountdown(() => {
+      S.gravityTimer = 0;
+      if (S.isSprintMode) S._sprintStartTime = performance.now();
+    });
   }
   function launchDailyChallenge() {
     const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
@@ -5676,6 +5657,39 @@ ${window.location.origin}`;
       _sprintPauseTs = 0;
     }
     resetLoop(performance.now());
+  }
+  function resumeWithCountdown() {
+    resetLoop(performance.now());
+    startCountdown(() => {
+      if (S.isSprintMode && _sprintPauseTs > 0) {
+        S._sprintStartTime += performance.now() - _sprintPauseTs;
+        _sprintPauseTs = 0;
+      }
+    });
+  }
+  function startCountdown(onComplete) {
+    S._countdownGo = 0;
+    S._countdownVal = 3;
+    S._countdownTs = performance.now();
+    clearInterval(_countdownTimer);
+    if (!S.muteAudio) playBeep(440, "square", 0.13, 0.18, 0);
+    _countdownTimer = setInterval(() => {
+      S._countdownVal--;
+      S._countdownTs = performance.now();
+      if (S._countdownVal <= 0) {
+        clearInterval(_countdownTimer);
+        _countdownTimer = null;
+        S._countdownVal = 0;
+        S._countdownGo = 55;
+        if (onComplete) onComplete();
+        if (!S.muteAudio) {
+          [523, 659, 784].forEach((f, i) => playBeep(f, "sawtooth", 0.16, 0.3, i * 0.04));
+        }
+      } else {
+        const pitch = { 2: 550, 1: 660 }[S._countdownVal] || 440;
+        if (!S.muteAudio) playBeep(pitch, "square", 0.13, 0.18, 0);
+      }
+    }, 1e3);
   }
   function stopGameAndReset() {
     clearInterval(_countdownTimer);
