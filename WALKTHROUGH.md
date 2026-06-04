@@ -622,3 +622,33 @@ Claude's role in v0.5:
 - RGB split / distortion shader polish
 
 **Do not start v0.5 visual work until Claude has set up the PixiJS foundation.** Claude will update this file when the skeleton is ready for handoff.
+
+---
+
+# Walkthrough: v0.4.2 — Unpause Countdown (2026-06-04, PR #28)
+
+## What changed (`src/game.js`, `src/screens.js`)
+
+- Extracted `startCountdown(onComplete)` from `startGame` — shared by both initial start and unpause
+- Added `resumeWithCountdown()` for the unpause flow:
+  1. Calls `resetLoop(performance.now())` immediately — prevents tick accumulation during the 3-second countdown
+  2. Runs 3-2-1 via `startCountdown`
+  3. Sprint timer compensation (`_sprintStartTime` adjustment) is deferred to countdown end so the 3 countdown seconds are NOT charged to sprint time
+- `togglePause` unpause branch now calls `resumeWithCountdown()` instead of `resumeGameTiming()`
+
+---
+
+# Antigravity Visual TODO: Sprint Complete Screen
+
+**Current state:** `_renderSprintScreen()` in `src/screens.js:261` — plain glass-panel overlay, no special effects.
+
+**What the user wants:** A celebratory visual moment when the player clears all 40 lines. Ideas to implement:
+
+- Screen flash / glow burst on sprint completion (use `triggerScreenFlash()` or `triggerAllClearFlash()` from `ui.js`)
+- Gold particle explosion — use `spawnGoldBurst()` from `ui.js`
+- Animated "SPRINT COMPLETE" header — neon pulse, scale-in animation
+- If new personal best: extra dramatic effect (rainbow flash, larger burst)
+
+**Entry point:** `endGame()` in `src/game.js` → calls `_renderSprintScreen(timeMs, isNewBest, prevBest)` in `src/screens.js`. Visual effects should fire just before or at the same time as the overlay appears.
+
+**Do NOT change the submit / share / leaderboard logic** — only add visual flair around the overlay display.
