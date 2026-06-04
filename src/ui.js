@@ -102,12 +102,13 @@ export function setLowPerfMode(on) {
 
 export function togglePerfMode() {
   setLowPerfMode(!S.lowPerfMode);
-  S._perfLocked = true; // Lock it manually
-  const btn = document.getElementById('ov-perf-btn');
-  if (btn) {
-    btn.className = `toggle-btn${S.lowPerfMode ? ' muted' : ''}`;
-    btn.textContent = S.lowPerfMode ? '🚀 PERF: LOW' : '✨ PERF: FULL';
-  }
+  S._perfLocked = true;
+  ['ov', 'st'].forEach(p => {
+    const btn = document.getElementById(`${p}-perf-btn`);
+    if (!btn) return;
+    btn.className = `toggle-btn${S.lowPerfMode ? ' lowspec-on' : ' muted'}`;
+    btn.textContent = S.lowPerfMode ? '⚡ LOW-SPEC MODE: ON' : '⚡ LOW-SPEC MODE: OFF';
+  });
 }
 
 export function resetPerfHold(locked, savedPerf) {
@@ -1030,33 +1031,35 @@ export function showScorePopup(pts, n, tspin=false, b2b=false) {
 }
 
 // ─── Settings UI ──────────────────────────────────────────────────────────────
+function _sEl(id) { return document.getElementById('ov-'+id) || document.getElementById('st-'+id); }
+
 export function updateDAS(v) {
   S.das = parseInt(v); localStorage.setItem(LS.DAS, v);
-  const el = document.getElementById('ov-das-val'); if (el) el.textContent = v + 'ms';
+  const el = _sEl('das-val'); if (el) el.textContent = v + 'ms';
 }
 export function updateSDF(v) {
   S.sdf = parseInt(v); localStorage.setItem(LS.SDF, v);
-  const el = document.getElementById('ov-sdf-val'); if (el) el.textContent = S.sdf === 0 ? '∞' : S.sdf + 'x';
+  const el = _sEl('sdf-val'); if (el) el.textContent = S.sdf === 0 ? '∞' : S.sdf + 'x';
 }
 export function updateARR(v) {
   S.arr = parseInt(v); localStorage.setItem(LS.ARR, v);
-  const el = document.getElementById('ov-arr-val'); if (el) el.textContent = v + 'ms';
+  const el = _sEl('arr-val'); if (el) el.textContent = v + 'ms';
 }
 export function updateLockDelay(v) {
   S.lockMs = parseInt(v); localStorage.setItem(LS.LOCK, v);
-  const el = document.getElementById('ov-lock-val'); if (el) el.textContent = v + 'ms';
+  const el = _sEl('lock-val'); if (el) el.textContent = v + 'ms';
 }
 export function updateGhost() {
   S.ghostVisible = !S.ghostVisible;
   localStorage.setItem(LS.GHOST, S.ghostVisible ? '1' : '0');
-  const btn = document.getElementById('ov-ghost-btn');
+  const btn = _sEl('ghost-btn');
   if (btn) btn.textContent = S.ghostVisible ? '👻 GHOST ON' : '👻 GHOST OFF';
   btn && btn.classList.toggle('muted', !S.ghostVisible);
 }
 export function updateColorblind() {
   S.colorblindMode = !S.colorblindMode;
   localStorage.setItem(LS.COLORBLIND, S.colorblindMode ? '1' : '0');
-  const btn = document.getElementById('ov-cb-btn');
+  const btn = _sEl('cb-btn');
   if (btn) btn.textContent = S.colorblindMode ? '🔳 CB MODE ON' : '🔳 CB MODE OFF';
   btn && btn.classList.toggle('cb-active', S.colorblindMode);
   btn && btn.classList.toggle('muted', !S.colorblindMode);
@@ -1068,7 +1071,7 @@ export function _animLabel() {
 export function cycleAnimIntensity() {
   S.animIntensity = S.animIntensity === 'full' ? 'reduced' : S.animIntensity === 'reduced' ? 'off' : 'full';
   localStorage.setItem(LS.ANIM, S.animIntensity);
-  const btn = document.getElementById('ov-anim-btn');
+  const btn = _sEl('anim-btn');
   if (btn) btn.textContent = _animLabel();
   btn && btn.classList.toggle('muted', S.animIntensity === 'off');
 }
