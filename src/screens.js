@@ -10,7 +10,7 @@ import {
 } from './leaderboard.js';
 import {
   startGame, startSprintMode, launchDailyChallenge,
-  pauseGameTiming, resumeGameTiming, stopGameAndReset
+  pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
 
 const $overlay = document.getElementById('overlay');
@@ -140,7 +140,7 @@ export function togglePause(){
   } else {
     resumeBGM();
     $overlay.style.display='none';
-    resumeGameTiming();
+    resumeWithCountdown();
   }
 }
 

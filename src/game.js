@@ -791,27 +791,11 @@ function _doStartGame(){
   if(animFrame)cancelAnimationFrame(animFrame);
   resetLoop(performance.now());
   startBGM();
-  // 3-2-1 countdown before pieces start falling
-  S._countdownGo=0;
-  S._countdownVal=3;
-  S._countdownTs=performance.now();
-  clearInterval(_countdownTimer);
-  if(!S.muteAudio)playBeep(440,'square',.13,.18,0);
-  _countdownTimer=setInterval(()=>{
-    S._countdownVal--;
-    S._countdownTs=performance.now();
-    if(S._countdownVal<=0){
-      clearInterval(_countdownTimer);_countdownTimer=null;S._countdownVal=0;
-      S._countdownGo=55;
-      S.gravityTimer=0;
-      if(S.isSprintMode)S._sprintStartTime=performance.now();
-      if(!S.muteAudio){[523,659,784].forEach((f,i)=>playBeep(f,'sawtooth',.16,.3,i*.04));}
-    }else{
-      const pitch={2:550,1:660}[S._countdownVal]||440;
-      if(!S.muteAudio)playBeep(pitch,'square',.13,.18,0);
-    }
-  },1000);
   animFrame=requestAnimationFrame(gameLoop);
+  startCountdown(()=>{
+    S.gravityTimer=0;
+    if(S.isSprintMode)S._sprintStartTime=performance.now();
+  });
 }
 
 export function launchDailyChallenge() {
@@ -833,6 +817,40 @@ export function resumeGameTiming() {
     _sprintPauseTs = 0;
   }
   resetLoop(performance.now());
+}
+
+// Unpause with countdown. Resets the loop immediately (prevents tick accumulation),
+// then runs 3-2-1. Sprint timer compensation is deferred to countdown end so the
+// 3 countdown seconds are also excluded from sprint time.
+export function resumeWithCountdown() {
+  resetLoop(performance.now());
+  startCountdown(() => {
+    if (S.isSprintMode && _sprintPauseTs > 0) {
+      S._sprintStartTime += performance.now() - _sprintPauseTs;
+      _sprintPauseTs = 0;
+    }
+  });
+}
+
+export function startCountdown(onComplete) {
+  S._countdownGo=0;
+  S._countdownVal=3;
+  S._countdownTs=performance.now();
+  clearInterval(_countdownTimer);
+  if(!S.muteAudio)playBeep(440,'square',.13,.18,0);
+  _countdownTimer=setInterval(()=>{
+    S._countdownVal--;
+    S._countdownTs=performance.now();
+    if(S._countdownVal<=0){
+      clearInterval(_countdownTimer);_countdownTimer=null;S._countdownVal=0;
+      S._countdownGo=55;
+      if(onComplete)onComplete();
+      if(!S.muteAudio){[523,659,784].forEach((f,i)=>playBeep(f,'sawtooth',.16,.3,i*.04));}
+    }else{
+      const pitch={2:550,1:660}[S._countdownVal]||440;
+      if(!S.muteAudio)playBeep(pitch,'square',.13,.18,0);
+    }
+  },1000);
 }
 
 export function stopGameAndReset() {
