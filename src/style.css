@@ -665,7 +665,16 @@
   }
 
   /* Settings in pause overlay */
-  .settings-box { width:100%; max-width:260px; display:flex; flex-direction:column; gap:12px; margin:8px 0 16px; }
+  .settings-box { width:100%; max-width:260px; display:flex; flex-direction:column; gap:8px; margin:8px 0 16px; }
+  .sg-label {
+    font-size: 8px; letter-spacing: 3px; color: rgba(0,200,255,0.4);
+    text-transform: uppercase; font-weight: 700; margin-top: 2px;
+  }
+  .sg-sep {
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,200,255,0.15), transparent);
+    margin: 2px 0;
+  }
   .settings-row { display:flex; align-items:center; gap:10px; }
   .settings-lbl { font-size:10px; letter-spacing:2px; color:rgba(0,200,255,0.65); width:40px; font-weight:700; text-transform:uppercase; }
   .settings-val { font-size:10px; color:var(--cyan); width:48px; text-align:right; letter-spacing:1px; font-weight:700; }
@@ -708,6 +717,19 @@
   }
   /* Colorblind active state — cyan glow to indicate it's ON */
   .toggle-btn.cb-active { border-color:rgba(0,200,255,0.7); background:rgba(0,200,255,0.14); color:#fff; box-shadow:0 0 8px rgba(0,200,255,0.3); }
+  /* Low-spec ON state — amber warning */
+  .toggle-btn.lowspec-on {
+    border-color: rgba(255,160,0,0.55);
+    background: rgba(255,150,0,0.1);
+    color: rgba(255,200,0,0.95);
+    text-shadow: 0 0 8px rgba(255,170,0,0.45);
+  }
+  @media (pointer:fine) {
+    .toggle-btn.lowspec-on:hover {
+      border-color: rgba(255,180,0,0.75);
+      box-shadow: 0 0 12px rgba(255,160,0,0.3);
+    }
+  }
 
   /* ── Hide touch controls on mouse/trackpad devices ── */
   @media (pointer:fine) {

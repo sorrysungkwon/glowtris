@@ -621,7 +621,7 @@
     gap: 6px; width: 100%; display: flex;
   }
   .btn-row.sub-actions .action-btn {
-    flex: 1; padding: 10px 12px; font-size: 10px;
+    flex: 1; padding: 14px 12px; font-size: 10px;
   }
 
   .action-btn.sm { font-size:10px; padding:9px 18px; letter-spacing:2px; border-radius:6px; }
@@ -703,7 +703,16 @@
   }
 
   /* Settings in pause overlay */
-  .settings-box { width:100%; max-width:260px; display:flex; flex-direction:column; gap:12px; margin:8px 0 16px; }
+  .settings-box { width:100%; max-width:260px; display:flex; flex-direction:column; gap:8px; margin:8px 0 16px; }
+  .sg-label {
+    font-size: 8px; letter-spacing: 3px; color: rgba(0,200,255,0.4);
+    text-transform: uppercase; font-weight: 700; margin-top: 2px;
+  }
+  .sg-sep {
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,200,255,0.15), transparent);
+    margin: 2px 0;
+  }
   .settings-row { display:flex; align-items:center; gap:10px; }
   .settings-lbl { font-size:10px; letter-spacing:2px; color:rgba(0,200,255,0.65); width:40px; font-weight:700; text-transform:uppercase; }
   .settings-val { font-size:10px; color:var(--cyan); width:48px; text-align:right; letter-spacing:1px; font-weight:700; }
@@ -746,6 +755,19 @@
   }
   /* Colorblind active state — cyan glow to indicate it's ON */
   .toggle-btn.cb-active { border-color:rgba(0,200,255,0.7); background:rgba(0,200,255,0.14); color:#fff; box-shadow:0 0 8px rgba(0,200,255,0.3); }
+  /* Low-spec ON state — amber warning */
+  .toggle-btn.lowspec-on {
+    border-color: rgba(255,160,0,0.55);
+    background: rgba(255,150,0,0.1);
+    color: rgba(255,200,0,0.95);
+    text-shadow: 0 0 8px rgba(255,170,0,0.45);
+  }
+  @media (pointer:fine) {
+    .toggle-btn.lowspec-on:hover {
+      border-color: rgba(255,180,0,0.75);
+      box-shadow: 0 0 12px rgba(255,160,0,0.3);
+    }
+  }
 
   /* ── Hide touch controls on mouse/trackpad devices ── */
   @media (pointer:fine) {
@@ -957,12 +979,44 @@
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(255,200,0,0.5);
-    text-shadow: 0 0 6px rgba(255,180,0,0.4);
-    pointer-events: none;
+    color: rgba(255,200,0,0.7);
+    text-shadow: 0 0 6px rgba(255,180,0,0.5);
+    pointer-events: auto;
+    cursor: pointer;
     opacity: 0;
     transition: opacity 0.4s ease;
   }
+  #perf-indicator:hover { color: rgba(255,220,0,1); text-shadow: 0 0 10px rgba(255,200,0,0.8); }
+
+  .low-spec-warning {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(255,160,0,0.1);
+    border: 1px solid rgba(255,160,0,0.35);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba(255,200,0,0.9);
+    text-shadow: 0 0 8px rgba(255,180,0,0.5);
+  }
+  .low-spec-off-btn {
+    background: rgba(255,160,0,0.15);
+    border: 1px solid rgba(255,160,0,0.5);
+    border-radius: 5px;
+    color: rgba(255,220,0,1);
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .low-spec-off-btn:hover { background: rgba(255,160,0,0.3); }
 
   /* ─── Low performance mode overrides ─── */
   /* Strip all GPU-expensive and cosmetic effects; keep only gameplay-critical UI. */
@@ -1336,7 +1390,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 
 <canvas id="bg-canvas"></canvas>
 <div id="screen-flash"></div>
-<div id="perf-indicator">⚡ PERF MODE</div>
+<div id="perf-indicator" onclick="openSettings()">⚡ LOW-SPEC MODE</div>
 <div id="overlay"></div>
 
 <div id="htp-overlay" style="display:none" onclick="closeHowToPlay()">
@@ -1761,11 +1815,13 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     const btn = document.getElementById("btn-mute");
     if (icon) icon.textContent = S.muteAudio ? "volume_off" : "volume_up";
     if (btn) btn.classList.toggle("muted", S.muteAudio);
-    const ovBtn = document.getElementById("ov-mute-btn");
-    if (ovBtn) {
-      ovBtn.textContent = S.muteAudio ? "\u{1F507} AUDIO OFF" : "\u{1F50A} AUDIO ON";
-      ovBtn.classList.toggle("muted", S.muteAudio);
-    }
+    ["ov", "st"].forEach((p) => {
+      const b = document.getElementById(p + "-mute-btn");
+      if (b) {
+        b.textContent = S.muteAudio ? "\u{1F507} AUDIO OFF" : "\u{1F50A} AUDIO ON";
+        b.classList.toggle("muted", S.muteAudio);
+      }
+    });
   }
   var _n = (s) => 440 * Math.pow(2, s / 12);
   var BGM_MELODY = [
@@ -2416,7 +2472,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       if (!S.lowPerfMode) {
         if (fps < 30) {
           _fpsLowCount++;
-          if (_fpsLowCount >= 5) {
+          if (_fpsLowCount >= 3) {
             setLowPerfMode(true);
             S._perfLocked = true;
             _perfHold = 1;
@@ -2438,11 +2494,12 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   function togglePerfMode() {
     setLowPerfMode(!S.lowPerfMode);
     S._perfLocked = true;
-    const btn = document.getElementById("ov-perf-btn");
-    if (btn) {
-      btn.className = `toggle-btn${S.lowPerfMode ? " muted" : ""}`;
-      btn.textContent = S.lowPerfMode ? "\u{1F680} PERF: LOW" : "\u2728 PERF: FULL";
-    }
+    ["ov", "st"].forEach((p) => {
+      const btn = document.getElementById(`${p}-perf-btn`);
+      if (!btn) return;
+      btn.className = `toggle-btn${S.lowPerfMode ? " lowspec-on" : " muted"}`;
+      btn.textContent = S.lowPerfMode ? "\u26A1 LOW-SPEC MODE: ON" : "\u26A1 LOW-SPEC MODE: OFF";
+    });
   }
   function resetPerfHold(locked, savedPerf) {
     _fpsCnt = 0;
@@ -3555,41 +3612,44 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       setTimeout(() => $combo.style.opacity = "0", 1400);
     }
   }
+  function _sEl(id) {
+    return document.getElementById("ov-" + id) || document.getElementById("st-" + id);
+  }
   function updateDAS(v) {
     S.das = parseInt(v);
     localStorage.setItem(LS.DAS, v);
-    const el = document.getElementById("ov-das-val");
+    const el = _sEl("das-val");
     if (el) el.textContent = v + "ms";
   }
   function updateSDF(v) {
     S.sdf = parseInt(v);
     localStorage.setItem(LS.SDF, v);
-    const el = document.getElementById("ov-sdf-val");
+    const el = _sEl("sdf-val");
     if (el) el.textContent = S.sdf === 0 ? "\u221E" : S.sdf + "x";
   }
   function updateARR(v) {
     S.arr = parseInt(v);
     localStorage.setItem(LS.ARR, v);
-    const el = document.getElementById("ov-arr-val");
+    const el = _sEl("arr-val");
     if (el) el.textContent = v + "ms";
   }
   function updateLockDelay(v) {
     S.lockMs = parseInt(v);
     localStorage.setItem(LS.LOCK, v);
-    const el = document.getElementById("ov-lock-val");
+    const el = _sEl("lock-val");
     if (el) el.textContent = v + "ms";
   }
   function updateGhost() {
     S.ghostVisible = !S.ghostVisible;
     localStorage.setItem(LS.GHOST, S.ghostVisible ? "1" : "0");
-    const btn = document.getElementById("ov-ghost-btn");
+    const btn = _sEl("ghost-btn");
     if (btn) btn.textContent = S.ghostVisible ? "\u{1F47B} GHOST ON" : "\u{1F47B} GHOST OFF";
     btn && btn.classList.toggle("muted", !S.ghostVisible);
   }
   function updateColorblind() {
     S.colorblindMode = !S.colorblindMode;
     localStorage.setItem(LS.COLORBLIND, S.colorblindMode ? "1" : "0");
-    const btn = document.getElementById("ov-cb-btn");
+    const btn = _sEl("cb-btn");
     if (btn) btn.textContent = S.colorblindMode ? "\u{1F533} CB MODE ON" : "\u{1F533} CB MODE OFF";
     btn && btn.classList.toggle("cb-active", S.colorblindMode);
     btn && btn.classList.toggle("muted", !S.colorblindMode);
@@ -3601,7 +3661,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   function cycleAnimIntensity() {
     S.animIntensity = S.animIntensity === "full" ? "reduced" : S.animIntensity === "reduced" ? "off" : "full";
     localStorage.setItem(LS.ANIM, S.animIntensity);
-    const btn = document.getElementById("ov-anim-btn");
+    const btn = _sEl("anim-btn");
     if (btn) btn.textContent = _animLabel();
     btn && btn.classList.toggle("muted", S.animIntensity === "off");
   }
@@ -3710,25 +3770,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     }
     [261, 329, 392, 523, 659, 784].forEach((f, i) => playBeep(f, "square", 0.16, 0.22, i * 0.05));
     S.levelUpScanline = 0.01;
-  }
-  function _detectLowEndGPU() {
-    var _a;
-    try {
-      const c = document.createElement("canvas");
-      const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
-      if (!gl) return false;
-      const ext = gl.getExtension("WEBGL_debug_renderer_info");
-      const r = ext ? (gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || "").toLowerCase() : "";
-      try {
-        (_a = gl.getExtension("WEBGL_lose_context")) == null ? void 0 : _a.loseContext();
-      } catch (e) {
-      }
-      if (r.includes("intel") && !r.includes(" xe ")) return true;
-      if (r.includes("vega") && !r.includes("rx vega")) return true;
-      return false;
-    } catch (e) {
-      return false;
-    }
   }
   function openHowToPlay() {
     _htpOpenTs = Date.now();
@@ -3915,6 +3956,53 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   `;
     $overlay.style.display = "flex";
   }
+  function _settingsHTML(p) {
+    return `
+    <div class="sg-label">AUDIO</div>
+    <button class="toggle-btn${S.muteAudio ? " muted" : ""}" id="${p}-mute-btn" onclick="toggleMute()">${S.muteAudio ? "\u{1F507} AUDIO OFF" : "\u{1F50A} AUDIO ON"}</button>
+
+    <div class="sg-sep"></div>
+    <div class="sg-label">VISUAL</div>
+    <button class="toggle-btn${S.ghostVisible ? "" : " muted"}" id="${p}-ghost-btn" onclick="updateGhost()">${S.ghostVisible ? "\u{1F47B} GHOST ON" : "\u{1F47B} GHOST OFF"}</button>
+    <button class="toggle-btn${S.animIntensity === "off" ? " muted" : ""}" id="${p}-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
+    <button class="toggle-btn${S.colorblindMode ? " cb-active" : " muted"}" id="${p}-cb-btn" onclick="updateColorblind()">${S.colorblindMode ? "\u{1F533} CB MODE ON" : "\u{1F533} CB MODE OFF"}</button>
+
+    <div class="sg-sep"></div>
+    <div class="sg-label">CONTROLS</div>
+    <div class="settings-row">
+      <span class="settings-lbl">DAS</span>
+      <input type="range" class="neon-range" min="50" max="300" value="${S.das}" oninput="updateDAS(this.value)">
+      <span class="settings-val" id="${p}-das-val">${S.das}ms</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">ARR</span>
+      <input type="range" class="neon-range" min="0" max="100" value="${S.arr}" oninput="updateARR(this.value)">
+      <span class="settings-val" id="${p}-arr-val">${S.arr}ms</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">SDF</span>
+      <input type="range" class="neon-range" min="0" max="40" value="${S.sdf}" oninput="updateSDF(this.value)">
+      <span class="settings-val" id="${p}-sdf-val">${S.sdf === 0 ? "\u221E" : S.sdf + "x"}</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">LOCK</span>
+      <input type="range" class="neon-range" min="100" max="1000" step="50" value="${S.lockMs}" oninput="updateLockDelay(this.value)">
+      <span class="settings-val" id="${p}-lock-val">${S.lockMs}ms</span>
+    </div>
+
+    <div class="sg-sep"></div>
+    <div class="sg-label">PERFORMANCE</div>
+    <button class="toggle-btn${S.lowPerfMode ? " lowspec-on" : " muted"}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode ? "\u26A1 LOW-SPEC MODE: ON" : "\u26A1 LOW-SPEC MODE: OFF"}</button>`;
+  }
+  function openSettings() {
+    $overlay.innerHTML = `
+    <div class="glass-panel">
+      <h1 class="pause-header">SETTINGS</h1>
+      <div class="settings-box">${_settingsHTML("st")}</div>
+      <button class="action-btn full-width" onclick="showStartScreen()">BACK</button>
+    </div>`;
+    $overlay.style.display = "flex";
+  }
   function togglePause() {
     if (!S.gameRunning) return;
     S.gamePaused = !S.gamePaused;
@@ -3924,33 +4012,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       $overlay.innerHTML = `
       <div class="glass-panel">
         <h1 class="pause-header">PAUSED</h1>
-        <div class="settings-box">
-          <button class="toggle-btn${S.muteAudio ? " muted" : ""}" id="ov-mute-btn" onclick="toggleMute()">${S.muteAudio ? "\u{1F507} AUDIO OFF" : "\u{1F50A} AUDIO ON"}</button>
-          <button class="toggle-btn${S.ghostVisible ? "" : " muted"}" id="ov-ghost-btn" onclick="updateGhost()">${S.ghostVisible ? "\u{1F47B} GHOST ON" : "\u{1F47B} GHOST OFF"}</button>
-          <button class="toggle-btn${S.colorblindMode ? " cb-active" : " muted"}" id="ov-cb-btn" onclick="updateColorblind()">${S.colorblindMode ? "\u{1F533} CB MODE ON" : "\u{1F533} CB MODE OFF"}</button>
-          <button class="toggle-btn${S.animIntensity === "off" ? " muted" : ""}" id="ov-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
-          <button class="toggle-btn${S.lowPerfMode ? " muted" : ""}" id="ov-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode ? "\u{1F680} PERF: LOW" : "\u2728 PERF: FULL"}</button>
-          <div class="settings-row">
-            <span class="settings-lbl">DAS</span>
-            <input type="range" class="neon-range" min="50" max="300" value="${S.das}" oninput="updateDAS(this.value)">
-            <span class="settings-val" id="ov-das-val">${S.das}ms</span>
-          </div>
-          <div class="settings-row">
-            <span class="settings-lbl">ARR</span>
-            <input type="range" class="neon-range" min="0" max="100" value="${S.arr}" oninput="updateARR(this.value)">
-            <span class="settings-val" id="ov-arr-val">${S.arr}ms</span>
-          </div>
-          <div class="settings-row">
-            <span class="settings-lbl">SDF</span>
-            <input type="range" class="neon-range" min="0" max="40" value="${S.sdf}" oninput="updateSDF(this.value)">
-            <span class="settings-val" id="ov-sdf-val">${S.sdf === 0 ? "\u221E" : S.sdf + "x"}</span>
-          </div>
-          <div class="settings-row">
-            <span class="settings-lbl">LOCK</span>
-            <input type="range" class="neon-range" min="100" max="1000" step="50" value="${S.lockMs}" oninput="updateLockDelay(this.value)">
-            <span class="settings-val" id="ov-lock-val">${S.lockMs}ms</span>
-          </div>
-        </div>
+        <div class="settings-box">${_settingsHTML("ov")}</div>
         <button class="action-btn full-width" onclick="togglePause()">RESUME</button>
         <button class="action-btn ghost full-width restart" onclick="showStartScreen()">RESTART</button>
       </div>`;
@@ -4145,6 +4207,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       <div class="btn-row sub-actions">
         <button class="action-btn ghost" onclick="openHowToPlay()">HOW TO PLAY</button>
         <button class="action-btn ghost" onclick="openStats()">STATS</button>
+      </div>
+      <div class="btn-row sub-actions">
+        <button class="action-btn ghost full-width" onclick="openSettings()">SETTINGS</button>
       </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
@@ -5793,10 +5858,6 @@ ${window.location.origin}`;
   initLayout();
   initStars();
   loadSettings();
-  if (!localStorage.getItem(LS.LOW_PERF) && _detectLowEndGPU()) {
-    setLowPerfMode(true);
-    S._perfLocked = true;
-  }
   S.hiScore = parseInt(localStorage.getItem(LS.HI) || "0");
   var $hiScore2 = document.getElementById("hi-score");
   var $hiScoreM2 = document.getElementById("hi-score-m");
@@ -5853,6 +5914,7 @@ ${window.location.origin}`;
     togglePause,
     showStartScreen,
     showModeSelector,
+    openSettings,
     submitScore,
     submitSprintScore,
     shareScore,
