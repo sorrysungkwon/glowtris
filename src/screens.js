@@ -127,12 +127,23 @@ function _settingsHTML(sliderIdPrefix) {
     ${S.lowPerfMode ? `<div class="low-spec-warning">⚠️ LOW-SPEC MODE IS ON<button class="low-spec-off-btn" onclick="togglePerfMode()">TURN OFF</button></div>` : ''}`;
 }
 
-export function openSettings() {
+export function openSettings(fromPause = false) {
   $overlay.innerHTML=`
     <div class="glass-panel">
       <h1 class="pause-header">SETTINGS</h1>
       <div class="settings-box">${_settingsHTML('st')}</div>
-      <button class="action-btn full-width" onclick="showStartScreen()">BACK</button>
+      <button class="action-btn full-width" onclick="${fromPause ? '_showPauseOverlay()' : 'showStartScreen()'}">BACK</button>
+    </div>`;
+  $overlay.style.display='flex';
+}
+
+export function _showPauseOverlay(){
+  $overlay.innerHTML=`
+    <div class="glass-panel">
+      <h1 class="pause-header">PAUSED</h1>
+      <button class="action-btn full-width" onclick="togglePause()">RESUME</button>
+      <button class="action-btn ghost full-width" onclick="openSettings(true)">SETTINGS</button>
+      <button class="action-btn ghost full-width restart" onclick="showStartScreen()">RESTART</button>
     </div>`;
   $overlay.style.display='flex';
 }
@@ -143,14 +154,7 @@ export function togglePause(){
   if(S.gamePaused){
     pauseGameTiming();
     pauseBGM();
-    $overlay.innerHTML=`
-      <div class="glass-panel">
-        <h1 class="pause-header">PAUSED</h1>
-        <div class="settings-box">${_settingsHTML('ov')}</div>
-        <button class="action-btn full-width" onclick="togglePause()">RESUME</button>
-        <button class="action-btn ghost full-width restart" onclick="showStartScreen()">RESTART</button>
-      </div>`;
-    $overlay.style.display='flex';
+    _showPauseOverlay();
   } else {
     resumeBGM();
     $overlay.style.display='none';
