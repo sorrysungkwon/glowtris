@@ -583,7 +583,7 @@
     gap: 6px; width: 100%; display: flex;
   }
   .btn-row.sub-actions .action-btn {
-    flex: 1; padding: 14px 12px; font-size: 10px;
+    flex: 1; padding: 12px 12px; font-size: 10px;
   }
 
   .action-btn.sm { font-size:10px; padding:9px 18px; letter-spacing:2px; border-radius:6px; }
