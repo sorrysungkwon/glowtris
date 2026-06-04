@@ -306,6 +306,7 @@ export function showStartScreen(){
   $overlay.innerHTML=`
     <div class="glass-panel">
       <h1>GLOWTRIS</h1>
+      <button onclick="window._debugSprint()" style="background:#ff0080;color:#fff;border:none;padding:5px 10px;border-radius:4px;margin-bottom:10px;font-weight:bold;cursor:pointer">TEST SPRINT EFFECT</button>
       <div id="start-lb">
         <div class="lb-mode-toggle">
           <button id="lb-mode-marathon" class="lb-tab ${S.lbMode==='marathon'?'active':''}" onclick="setLbMode('marathon')">MARATHON</button>
