@@ -77,9 +77,9 @@ export function measureFPS(ts) {
     if (dt > 1500) { _fpsLowCount = 0; return; }
 
     if (!S.lowPerfMode) {
-      if (fps < 30) { 
-        _fpsLowCount++; 
-        if (_fpsLowCount >= 5) { 
+      if (fps < 30) {
+        _fpsLowCount++;
+        if (_fpsLowCount >= 3) {
           setLowPerfMode(true); 
           S._perfLocked = true; 
           _perfHold = 1; 

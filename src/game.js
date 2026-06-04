@@ -11,7 +11,7 @@ document.addEventListener('pointerdown', (e) => {
 }, {passive: true});
 import {
   gc, gctx, pc, ncD, ncDx, hcD, hcDx, ncM, hcM, bgc,
-  measureFPS, setLowPerfMode, resetPerfHold, _detectLowEndGPU,
+  measureFPS, setLowPerfMode, resetPerfHold,
   initLayout, initStars, drawBackground,
   drawBoard, drawNext, drawHold, getCellSprite,
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
@@ -30,7 +30,7 @@ import {
 } from './leaderboard.js';
 import {
   showDailyGateOverlay, startDailyChallenge, togglePause, _saveGameStats, _renderGameOverScreen,
-  _renderSprintScreen, showStartScreen, showModeSelector
+  _renderSprintScreen, showStartScreen, showModeSelector, openSettings
 } from './screens.js';
 import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
 
@@ -956,11 +956,6 @@ initLayout();
 initStars();
 loadSettings();
 
-// Auto low-perf: if integrated GPU detected and user has not manually set preference
-if(!localStorage.getItem(LS.LOW_PERF)&&_detectLowEndGPU()){
-  setLowPerfMode(true);
-  S._perfLocked=true;
-}
 
 S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
 const $hiScore  = document.getElementById('hi-score');
@@ -1006,7 +1001,7 @@ window.onunhandledrejection = function(e) {
 // HTML template uses onclick="fn()" style which requires window.fn.
 Object.assign(window, {
   startGame, startSprintMode, startDailyChallenge, launchDailyChallenge,
-  togglePause, showStartScreen, showModeSelector,
+  togglePause, showStartScreen, showModeSelector, openSettings,
   submitScore, submitSprintScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
   toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,

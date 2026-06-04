@@ -2,7 +2,8 @@ import { S, LS, SPRINT_LINES, fmtTime, _getLifetime } from './shared.js';
 import { pauseBGM, resumeBGM, stopBGM, toggleMute } from './audio.js';
 import {
   updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind,
-  cycleAnimIntensity, _animLabel, openHowToPlay, openStats, unlockAchievement
+  cycleAnimIntensity, _animLabel, openHowToPlay, openStats, unlockAchievement,
+  togglePerfMode
 } from './ui.js';
 import {
   _donationHTML, submitScore, submitSprintScore,
@@ -97,6 +98,45 @@ export function startDailyChallenge() {
   $overlay.style.display = 'flex';
 }
 
+function _settingsHTML(sliderIdPrefix) {
+  return `
+    <button class="toggle-btn${S.muteAudio?' muted':''}" id="${sliderIdPrefix}-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON'}</button>
+    <button class="toggle-btn${S.ghostVisible?'':' muted'}" id="${sliderIdPrefix}-ghost-btn" onclick="updateGhost()">${S.ghostVisible?'👻 GHOST ON':'👻 GHOST OFF'}</button>
+    <button class="toggle-btn${S.colorblindMode?' cb-active':' muted'}" id="${sliderIdPrefix}-cb-btn" onclick="updateColorblind()">${S.colorblindMode?'🔳 CB MODE ON':'🔳 CB MODE OFF'}</button>
+    <button class="toggle-btn${S.animIntensity==='off'?' muted':''}" id="${sliderIdPrefix}-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
+    <div class="settings-row">
+      <span class="settings-lbl">DAS</span>
+      <input type="range" class="neon-range" min="50" max="300" value="${S.das}" oninput="updateDAS(this.value)">
+      <span class="settings-val" id="${sliderIdPrefix}-das-val">${S.das}ms</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">ARR</span>
+      <input type="range" class="neon-range" min="0" max="100" value="${S.arr}" oninput="updateARR(this.value)">
+      <span class="settings-val" id="${sliderIdPrefix}-arr-val">${S.arr}ms</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">SDF</span>
+      <input type="range" class="neon-range" min="0" max="40" value="${S.sdf}" oninput="updateSDF(this.value)">
+      <span class="settings-val" id="${sliderIdPrefix}-sdf-val">${S.sdf === 0 ? '∞' : S.sdf + 'x'}</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">LOCK</span>
+      <input type="range" class="neon-range" min="100" max="1000" step="50" value="${S.lockMs}" oninput="updateLockDelay(this.value)">
+      <span class="settings-val" id="${sliderIdPrefix}-lock-val">${S.lockMs}ms</span>
+    </div>
+    ${S.lowPerfMode ? `<div class="low-spec-warning">⚠️ LOW-SPEC MODE IS ON<button class="low-spec-off-btn" onclick="togglePerfMode()">TURN OFF</button></div>` : ''}`;
+}
+
+export function openSettings() {
+  $overlay.innerHTML=`
+    <div class="glass-panel">
+      <h1 class="pause-header">SETTINGS</h1>
+      <div class="settings-box">${_settingsHTML('st')}</div>
+      <button class="action-btn full-width" onclick="showStartScreen()">BACK</button>
+    </div>`;
+  $overlay.style.display='flex';
+}
+
 export function togglePause(){
   if(!S.gameRunning)return;
   S.gamePaused=!S.gamePaused;
@@ -106,33 +146,7 @@ export function togglePause(){
     $overlay.innerHTML=`
       <div class="glass-panel">
         <h1 class="pause-header">PAUSED</h1>
-        <div class="settings-box">
-          <button class="toggle-btn${S.muteAudio?' muted':''}" id="ov-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON'}</button>
-          <button class="toggle-btn${S.ghostVisible?'':' muted'}" id="ov-ghost-btn" onclick="updateGhost()">${S.ghostVisible?'👻 GHOST ON':'👻 GHOST OFF'}</button>
-          <button class="toggle-btn${S.colorblindMode?' cb-active':' muted'}" id="ov-cb-btn" onclick="updateColorblind()">${S.colorblindMode?'🔳 CB MODE ON':'🔳 CB MODE OFF'}</button>
-          <button class="toggle-btn${S.animIntensity==='off'?' muted':''}" id="ov-anim-btn" onclick="cycleAnimIntensity()">${_animLabel()}</button>
-          <button class="toggle-btn${S.lowPerfMode?' muted':''}" id="ov-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'🚀 PERF: LOW':'✨ PERF: FULL'}</button>
-          <div class="settings-row">
-            <span class="settings-lbl">DAS</span>
-            <input type="range" class="neon-range" min="50" max="300" value="${S.das}" oninput="updateDAS(this.value)">
-            <span class="settings-val" id="ov-das-val">${S.das}ms</span>
-          </div>
-          <div class="settings-row">
-            <span class="settings-lbl">ARR</span>
-            <input type="range" class="neon-range" min="0" max="100" value="${S.arr}" oninput="updateARR(this.value)">
-            <span class="settings-val" id="ov-arr-val">${S.arr}ms</span>
-          </div>
-          <div class="settings-row">
-            <span class="settings-lbl">SDF</span>
-            <input type="range" class="neon-range" min="0" max="40" value="${S.sdf}" oninput="updateSDF(this.value)">
-            <span class="settings-val" id="ov-sdf-val">${S.sdf === 0 ? '∞' : S.sdf + 'x'}</span>
-          </div>
-          <div class="settings-row">
-            <span class="settings-lbl">LOCK</span>
-            <input type="range" class="neon-range" min="100" max="1000" step="50" value="${S.lockMs}" oninput="updateLockDelay(this.value)">
-            <span class="settings-val" id="ov-lock-val">${S.lockMs}ms</span>
-          </div>
-        </div>
+        <div class="settings-box">${_settingsHTML('ov')}</div>
         <button class="action-btn full-width" onclick="togglePause()">RESUME</button>
         <button class="action-btn ghost full-width restart" onclick="showStartScreen()">RESTART</button>
       </div>`;
@@ -336,6 +350,7 @@ export function showStartScreen(){
       <div class="btn-row sub-actions">
         <button class="action-btn ghost" onclick="openHowToPlay()">HOW TO PLAY</button>
         <button class="action-btn ghost" onclick="openStats()">STATS</button>
+        <button class="action-btn ghost" onclick="openSettings()">SETTINGS</button>
       </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
