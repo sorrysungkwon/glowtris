@@ -55,25 +55,28 @@ A neon-styled block stacking game built with ES modules and canvas.
 
 | Milestone | Target Version | Focus |
 |---|---|---|
-| 🧱 Loop & Input Core | v0.2 | Decoupled fixed-timestep loop, ordered sub-frame input |
-| 🎮 Movement Standard | v0.3 (Done) | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
-| 🏆 Scoring Standard | v0.4 | Back-to-Back, 5-piece next queue, all-spin (SRS+) |
-| 🖼 Renderer & Audio | v0.5 | GPU-accelerated rendering, low-latency audio |
+| 🧱 Loop & Input Core | v0.2 ✅ | Decoupled fixed-timestep loop, ordered sub-frame input |
+| 🎮 Movement Standard | v0.3 ✅ | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
+| 🏆 Scoring Standard | v0.4 ✅ | B2B 1.5×, 3-piece queue, all-spin (SRS+), BUG-012/013 |
+| 🖼 Renderer & Audio | v0.5 | PixiJS WebGL2 renderer (staged), low-latency audio |
 | ⏱ Modes & Metrics | v0.6 | Ultra/Blitz mode, in-game APM/PPS |
+| 👥 Social Ranking + Account | v0.7 | Anonymous UUID → Google OAuth backup, percentile, rival system, async challenges, weekly tournament |
 
 ### Phase B — Public Launch & Growth (gated by Phase A)
+
+> **Strategy:** No multiplayer. Growth through social comparison, retention loops, CRM nudges, and virality — all async, no WebSocket.
 
 | Milestone | Target DAU | Target Version | Key Driver |
 |---|---:|---|---|
 | 🚀 **Real Release** | 700 | **v1.0** | Standards-compliant engine, official public launch |
-| 🎓 Skill Depth | 1,200 | v1.1 | Training mode, finesse tracking |
-| 🎨 Identity | 1,800 | v1.2 | Visual customization |
-| 🔥 Weekly Events | 2,500 | v1.3 | Weekly challenges + monthly leaderboard |
-| 👻 Self-Competition | 3,500 | v1.4 | Ghost race / personal replay |
-| 📊 Meta Game | 4,500 | v1.5 | Advanced stats dashboard |
-| 🏆 Ranked Play | 6,000 | v1.6 | Season & rank tier system |
-| 👥 Social Graph | 8,000 | v1.7 | Friend codes + async challenge |
-| ⚔️ Multiplayer | 15,000+ | v2.0 | Real-time 1v1 battle |
+| 🔔 Retention Core | 1,200 | v1.1 | Daily streak, PWA push notifications, "X away from top 10" nudge |
+| 🤝 Social Hooks | 1,800 | v1.2 | Percentile badge, challenge links, rival system, "friend beat you" trigger |
+| 📈 Progression + Account | 2,500 | v1.3 | Achievements depth, stats timeline, improvement graph (powered by v0.7 account) |
+| 🎨 Visual Identity | 3,500 | v1.4 | Custom board skins, block themes, neon palettes |
+| 🏆 Tournaments | 4,500 | v1.5 | Weekly seeded tournament, seasonal rankings, reward badges |
+| 📬 CRM & Re-engagement | 6,000 | v1.6 | "Haven't played in 3 days" push, personalized challenge nudges, lapsed user flow |
+| 🔥 Virality Engine | 8,000 | v1.7 | Referral system, ghost replay sharing, social media score card templates |
+| 🌐 Platform | 15,000+ | v2.0 | Creator tools, embeddable widget, API for communities |
 
 ### Infrastructure Upgrade Triggers
 | DAU | Upgrade |
@@ -81,7 +84,6 @@ A neon-styled block stacking game built with ES modules and canvas.
 | > 700 | Upstash Free → Pay-as-you-go (~+$1/mo) ¹ |
 | > 600 | Vercel Hobby → Pro (+$20/mo) |
 | > 50,000 | Upstash Pro plan review |
-| v2.0 | WebSocket service — Pusher or Ably (+$49/mo) |
 
 ¹ 60s edge cache is live — Upstash free ceiling extended from ~416 to ~700 DAU.
 

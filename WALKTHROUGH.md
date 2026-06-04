@@ -488,3 +488,167 @@ This session focused on layout refinements under `box-sizing: border-box`, PC pe
 - **Active preview branch:** `preview` — auto-deploys to [https://prevglow.vercel.app](https://prevglow.vercel.app).
 - **Latest Version:** `v1.0.9.4` (fully verified on preview staging, PR #4 is currently open to merge into `master` for production release).
 - **Vercel Daily Cap:** High deployment volumes during CI testing temporarily hit Vercel's daily free deployment limit. All fixes are verified locally and on staging. Next push will automatically trigger builds once the cap resets.
+
+---
+
+> **NOTE:** v1.0.9.x line is **abandoned**. Phase A engine rebuild begins at v0.2. See below.
+
+---
+
+# Phase A Engine Rebuild — Technical Handoff (Claude → Antigravity)
+
+> All entries below are Claude's architecture work. Antigravity's role: visual polish, colors, shaders, particles, neon aesthetics. Do NOT touch `game.js` unless explicitly discussed with Claude.
+
+---
+
+# Walkthrough: v0.2 — Loop & Input Core (2026-06-01, PR #17)
+
+## What changed
+
+Replaced the old `requestAnimationFrame`-only loop with a **1000Hz fixed-timestep game loop** decoupled from render.
+
+### Loop architecture (`src/game.js`)
+- `_lastTs` tracks the previous `performance.now()` timestamp
+- Each RAF tick accumulates `delta` ms and runs `_update()` in 1ms steps (capped at 50ms to prevent spiral-of-death on tab return)
+- `_render(alpha)` receives a sub-frame interpolation factor for smooth visual output between physics ticks
+
+### Sub-frame input ordering
+- Input events (`keydown`, `keyup`, touch) are queued into `S.inputQueue[]` with timestamps
+- `_update()` drains the queue in timestamp order, interleaved with physics ticks
+- Eliminates the "held key fires after gravity" artifact from the old single-RAF approach
+
+### Key constants
+- `TICK = 1` (ms per physics step)
+- `MAX_DELTA = 50` (ms cap per frame)
+
+---
+
+# Walkthrough: v0.3 — Movement Standard (2026-06-02, PR #19 + #20)
+
+## v0.3.0 — Core movement compliance
+- **SDF (Soft Drop Factor):** `S.sdf` multiplier, default 20×, applied to gravity during soft drop
+- **Lock delay cap:** 15 moves max regardless of resets (prevents infinite lock-delay abuse)
+- **IRS (Initial Rotation System):** rotation held before spawn applies immediately on piece entry
+- **IHS (Initial Hold System):** hold held before spawn swaps immediately on piece entry
+- **DCD (Delayed Cancel Direction):** on simultaneous left+right, later key wins
+- **Instant ARR=0:** when ARR is set to 0, das-charged movement teleports to wall instantly
+- **180° rotation:** `S.rot180` key, kicks use Tetr.io standard table (horizontal priority, max 1 cell up)
+
+## v0.3.1–v0.3.3 — Bug fixes
+- **BUG-008 (SRS y-signs):** I-piece kick table y-signs were inverted — board y increases downward, kick table uses math convention (up=positive). Fixed by negating y in `_tryRotate`.
+- **BUG-009 (iOS audio):** AudioContext enters `'interrupted'` state on iOS when call/notification interrupts. Added `'interrupted'` → resume handler; `'closed'` → full AudioContext recreation with speaker re-unlock.
+- **BUG-011 (180° kick table):** Implemented full Tetr.io-standard 180° kick table — 6 kicks per rotation state, horizontal offsets first, vertical max 1 cell up.
+- **Button composition (v0.3.3):** Touch button width = CCW+CW pair combined, gestalt grouping restored after panel layout refactor.
+
+## SRS coordinate convention (critical)
+Board y=0 is **top**, increases downward. SRS kick tables use math convention (y positive = up). All kick applications must negate the y component: `piece.y -= kick[1]`.
+
+---
+
+# Walkthrough: v0.4 — Scoring Standard (2026-06-03, PR #24)
+
+## FEAT-004 — Back-to-Back (B2B)
+- `S.b2b` boolean tracks consecutive difficult clears
+- "Difficult" = Tetris (4-line) OR T-spin (any) OR all-spin
+- On a difficult clear: if `S.b2b` already true → apply `×1.5` multiplier to line-clear score
+- Single/double/triple (non-spin) resets `S.b2b = false`
+
+## FEAT-005 — 3-piece next queue
+- `S.next = []` array (was single value)
+- `_refillBag()` pushes into array; spawn pops from front
+- `_drawQueue()` renders 3 mini-pieces in the next panel, top to bottom
+- Panel height increased to accommodate 3 previews
+
+## FEAT-010 — All-spin (SRS+)
+- `lastKickNonZero` flag set in `_tryRotate` when any non-zero kick is used
+- `checkAllSpin()` wraps `checkTSpin()`: if non-T piece + `lastKickNonZero` + line clear → spin bonus
+- T-pieces still use the dedicated corner-check T-spin logic (not all-spin)
+
+## BUG-013 — JLSTZ spawn column
+- Old formula: `Math.floor(COLS/2) - Math.floor(width/2)` → gives col 4 for 3-wide pieces on 10-col board
+- Correct formula: `Math.floor((COLS - width) / 2)` → gives col 3 (SRS standard)
+- The two formulas diverge for odd-width pieces on even-width boards
+
+## BUG-012 — iPad kb→touch panel sizing
+- `any-pointer: coarse` media query replaces `pointer: coarse` for iPad with Apple Pencil
+- `_applyTouchCELL` now uses `newCELL` variable for sizing `ncD`/`hcD` canvas dimensions
+- `gc.width === 0` bypass removed (was skipping layout on hidden canvas)
+
+---
+
+# Walkthrough: v0.4.1 — Security Patch (2026-06-03, PR #26)
+
+## CORS hardening (`api/leaderboard.js`)
+```js
+const ALLOWED_ORIGINS = ['https://glowtris.com', 'https://www.glowtris.com', 'https://prevglow.vercel.app'];
+const origin = req.headers.origin || '';
+const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+res.setHeader('Vary', 'Origin');  // required when origin is dynamic
+```
+
+## IP header preference
+- `x-real-ip` preferred over `x-forwarded-for` — Vercel edge sets x-real-ip, harder to spoof
+- Rate limiter now uses: `req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim()`
+
+## Name validation
+- Trim → slice to 12 chars → strip non-word/non-Korean chars → trim again
+- Blank name after sanitization → 400 reject
+- Reserved name blacklist: `admin, glowtris, moderator, mod, operator, system, bot, 운영자, 관리자`
+
+## Redis keepalive (`api/keepalive.js`)
+- Daily cron (`0 0 * * *` UTC) hits `/api/keepalive` → pings Upstash via REST API
+- Prevents Upstash free-plan 7-day inactivity deletion
+- Configured in `vercel.json` under `"crons"`
+
+---
+
+# Current State & What Antigravity Should Work On Next
+
+**v0.5 is the next milestone — Renderer & Audio.**
+
+Claude's role in v0.5:
+- PixiJS app setup, scene structure, board/piece/ghost rendering in `PIXI.Graphics`
+- Render interpolation (sub-frame alpha from the 1000Hz loop)
+- Particle system skeleton
+- Background nebula via `PIXI.Filter` skeleton
+- Glow/bloom shader skeleton
+
+**Antigravity's role in v0.5:**
+- Colors, glow intensities, bloom parameters
+- Particle tuning (size, lifetime, spread, color)
+- Nebula visual polish (hue, drift speed, opacity)
+- Neon aesthetics for board, pieces, ghost
+- RGB split / distortion shader polish
+
+**Do not start v0.5 visual work until Claude has set up the PixiJS foundation.** Claude will update this file when the skeleton is ready for handoff.
+
+---
+
+# Walkthrough: v0.4.2 — Unpause Countdown (2026-06-04, PR #28)
+
+## What changed (`src/game.js`, `src/screens.js`)
+
+- Extracted `startCountdown(onComplete)` from `startGame` — shared by both initial start and unpause
+- Added `resumeWithCountdown()` for the unpause flow:
+  1. Calls `resetLoop(performance.now())` immediately — prevents tick accumulation during the 3-second countdown
+  2. Runs 3-2-1 via `startCountdown`
+  3. Sprint timer compensation (`_sprintStartTime` adjustment) is deferred to countdown end so the 3 countdown seconds are NOT charged to sprint time
+- `togglePause` unpause branch now calls `resumeWithCountdown()` instead of `resumeGameTiming()`
+
+---
+
+# Antigravity Visual TODO: Sprint Complete Screen
+
+**Current state:** `_renderSprintScreen()` in `src/screens.js:261` — plain glass-panel overlay, no special effects.
+
+**What the user wants:** A celebratory visual moment when the player clears all 40 lines. Ideas to implement:
+
+- Screen flash / glow burst on sprint completion (use `triggerScreenFlash()` or `triggerAllClearFlash()` from `ui.js`)
+- Gold particle explosion — use `spawnGoldBurst()` from `ui.js`
+- Animated "SPRINT COMPLETE" header — neon pulse, scale-in animation
+- If new personal best: extra dramatic effect (rainbow flash, larger burst)
+
+**Entry point:** `endGame()` in `src/game.js` → calls `_renderSprintScreen(timeMs, isNewBest, prevBest)` in `src/screens.js`. Visual effects should fire just before or at the same time as the overlay appears.
+
+**Do NOT change the submit / share / leaderboard logic** — only add visual flair around the overlay display.
