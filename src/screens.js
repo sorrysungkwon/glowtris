@@ -266,7 +266,7 @@ export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
 
   $overlay.innerHTML=`
     <div class="glass-panel">
-      <h1 class="game-over-header" style="margin-bottom:8px !important">🏁 SPRINT COMPLETE!</h1>
+      <h1 class="game-over-header sprint-header-anim" style="margin-bottom:8px !important">🏁 SPRINT COMPLETE!</h1>
       ${isNewBest?'<div class="new-best-badge">★ NEW BEST ★</div>':prevBestLine}
       
       <div class="game-over-stats" style="padding:16px 12px">

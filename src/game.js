@@ -923,6 +923,16 @@ function endSprint(){
   unlockAchievement('sprint_finish');
 
   if(S.animIntensity!=='off'){
+    if(isNewBest){
+      triggerAllClearFlash();
+      spawnGoldBurst((COLS/2)*S.CELL, (ROWS/2)*S.CELL);
+      spawnGoldBurst((COLS/2)*S.CELL - 60, (ROWS/2)*S.CELL + 40);
+      spawnGoldBurst((COLS/2)*S.CELL + 60, (ROWS/2)*S.CELL - 20);
+    } else {
+      triggerScreenFlash();
+      spawnGoldBurst((COLS/2)*S.CELL, (ROWS/2)*S.CELL);
+    }
+
     for(let i=0;i<60;i++){
       const a=Math.random()*Math.PI*2,sp=Math.random()*10+3;
       S.particles.push({x:(Math.random()*COLS)*S.CELL,y:(Math.random()*ROWS*0.5)*S.CELL,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:Math.random()*.01+.005,color:['#00ff88','#00c8ff','#ffe600','#ffffff'][Math.floor(Math.random()*4)],size:Math.random()*6+2,type:'star'});
