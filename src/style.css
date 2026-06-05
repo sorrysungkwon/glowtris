@@ -1378,6 +1378,13 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   letter-spacing: 0.5px;
   margin-top: 2px;
 }
+.pwa-banner-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
 .pwa-banner-add {
   font-family: 'Orbitron', sans-serif;
   font-size: 10px;
@@ -1389,20 +1396,33 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   border-radius: 7px;
   padding: 8px 16px;
   cursor: pointer;
-  flex-shrink: 0;
   touch-action: manipulation;
+  white-space: nowrap;
 }
 .pwa-banner-add:active { opacity: 0.8; }
+.pwa-banner-snooze {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+  text-decoration: underline;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
 .pwa-banner-close {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.35);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px 8px;
+  padding: 6px 4px 6px 8px;
   flex-shrink: 0;
   touch-action: manipulation;
   line-height: 1;
+  align-self: flex-start;
 }
 
 /* ── PWA Modals ──────────────────────────────────────────────────────────── */

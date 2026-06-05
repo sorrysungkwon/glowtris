@@ -1416,6 +1416,13 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   letter-spacing: 0.5px;
   margin-top: 2px;
 }
+.pwa-banner-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
 .pwa-banner-add {
   font-family: 'Orbitron', sans-serif;
   font-size: 10px;
@@ -1427,20 +1434,33 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   border-radius: 7px;
   padding: 8px 16px;
   cursor: pointer;
-  flex-shrink: 0;
   touch-action: manipulation;
+  white-space: nowrap;
 }
 .pwa-banner-add:active { opacity: 0.8; }
+.pwa-banner-snooze {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+  text-decoration: underline;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
 .pwa-banner-close {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.35);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px 8px;
+  padding: 6px 4px 6px 8px;
   flex-shrink: 0;
   touch-action: manipulation;
   line-height: 1;
+  align-self: flex-start;
 }
 
 /* ── PWA Modals ──────────────────────────────────────────────────────────── */
@@ -4007,17 +4027,20 @@ if ('serviceWorker' in navigator) {
   }
 
   // src/pwa.js
-  var LS_DISMISSED = "pwa-dismissed";
   var LS_INSTALLED = "pwa-installed";
-  var LS_FIRST_GAME = "pwa-first-game";
+  var LS_SNOOZE_UNTIL = "pwa-snooze-until";
+  var SNOOZE_DAYS = 3;
   var _deferred = null;
   var _bannerShown = false;
-  var _startTimer = null;
   function _installed() {
     return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
   }
   function _iOS() {
     return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+  function _snoozed() {
+    const until = parseInt(localStorage.getItem(LS_SNOOZE_UNTIL) || "0", 10);
+    return Date.now() < until;
   }
   function initPWA() {
     if (_installed()) return;
@@ -4030,19 +4053,15 @@ if ('serviceWorker' in navigator) {
       _deferred = null;
       _hideBanner();
     });
-    if (!localStorage.getItem(LS_DISMISSED)) {
-      _startTimer = setTimeout(() => {
+    if (!_snoozed()) {
+      setTimeout(() => {
         if (!_bannerShown) _showBanner();
-      }, 3e4);
+      }, 2e3);
     }
   }
   function onPWAGameOver() {
-    if (_installed()) return;
-    if (_bannerShown || localStorage.getItem(LS_DISMISSED)) return;
-    if (!localStorage.getItem(LS_FIRST_GAME)) {
-      localStorage.setItem(LS_FIRST_GAME, "1");
-      setTimeout(_showBanner, 1200);
-    }
+    if (_installed() || _bannerShown || _snoozed()) return;
+    setTimeout(_showBanner, 1200);
   }
   function pwaInstallBtnHTML(p) {
     if (_installed()) return "";
@@ -4050,10 +4069,10 @@ if ('serviceWorker' in navigator) {
     return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">\u{1F4F2} ADD TO HOME SCREEN</button>`;
   }
   function _showBanner() {
-    if (_bannerShown || _installed()) return;
+    if (_bannerShown || _installed() || _snoozed()) return;
+    if (sessionStorage.getItem("pwa-closed")) return;
     if (!_deferred && !_iOS()) return;
     _bannerShown = true;
-    clearTimeout(_startTimer);
     const el = document.createElement("div");
     el.id = "pwa-banner";
     el.innerHTML = `
@@ -4061,9 +4080,12 @@ if ('serviceWorker' in navigator) {
       <span class="pwa-banner-icon">\u{1F4F2}</span>
       <div class="pwa-banner-text">
         <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
-        <div class="pwa-banner-sub">Play offline, no browser bar</div>
+        <div class="pwa-banner-sub">Play offline \xB7 no browser bar</div>
       </div>
-      <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+      <div class="pwa-banner-actions">
+        <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+        <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
+      </div>
       <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
     </div>`;
     document.body.appendChild(el);
@@ -4076,7 +4098,12 @@ if ('serviceWorker' in navigator) {
     setTimeout(() => el.remove(), 350);
   }
   window._pwaDismiss = function() {
-    localStorage.setItem(LS_DISMISSED, "1");
+    sessionStorage.setItem("pwa-closed", "1");
+    _hideBanner();
+  };
+  window._pwaSnooze = function() {
+    const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
+    localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
     _hideBanner();
   };
   window._pwaInstall = function() {
