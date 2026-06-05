@@ -33,7 +33,7 @@ import {
   _renderSprintScreen, showStartScreen, showModeSelector, openSettings
 } from './screens.js';
 import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
-import { initPWA } from './pwa.js';
+import { initPWA, offlineBarGameStart, offlineBarGameEnd } from './pwa.js';
 
 document.addEventListener('gesturestart',  e=>e.preventDefault(), {passive:false});
 document.addEventListener('gesturechange', e=>e.preventDefault(), {passive:false});
@@ -748,6 +748,7 @@ function loadSettings(){
 }
 
 export function startGame(){
+  offlineBarGameStart();
   $overlay.style.display='none';
   $combo.textContent='';
   // Reset display synchronously so overlay-hide and value-reset happen in the

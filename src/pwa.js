@@ -51,19 +51,31 @@ function _showOffline() {
   if (document.getElementById('offline-bar')) return;
   const el = document.createElement('div');
   el.id = 'offline-bar';
-  el.innerHTML = `
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="1" y1="1" x2="23" y2="23"/>
-      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
-      <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
-      <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
-      <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
-      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-      <line x1="12" y1="20" x2="12.01" y2="20"/>
-    </svg>
-    No internet connection`;
+  el.innerHTML = `<span class="material-icons-round" style="font-size:14px">wifi_off</span> No internet connection`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('visible'));
+
+  // swipe up to dismiss for this session
+  let startY = 0;
+  el.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  el.addEventListener('touchend', e => {
+    if (startY - e.changedTouches[0].clientY > 30) {
+      sessionStorage.setItem('offline-bar-swiped', '1');
+      el.classList.add('swiped');
+      setTimeout(() => el.remove(), 300);
+    }
+  }, { passive: true });
+}
+
+export function offlineBarGameStart() {
+  const el = document.getElementById('offline-bar');
+  if (el) el.classList.add('game-active');
+}
+
+export function offlineBarGameEnd() {
+  if (sessionStorage.getItem('offline-bar-swiped')) return;
+  const el = document.getElementById('offline-bar');
+  if (el) el.classList.remove('game-active');
 }
 
 function _hideOffline() {
