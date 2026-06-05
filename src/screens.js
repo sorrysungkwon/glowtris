@@ -224,6 +224,7 @@ export function _saveGameStats() {
 }
 
 export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, isBestLevel, isBestCombo, isBestLines }) {
+  offlineBarGameEnd();
   const savedName = localStorage.getItem(LS.NAME) || '';
 
   let pbBadges = [];
@@ -286,6 +287,7 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
 }
 
 export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
+  offlineBarGameEnd();
   const savedName=localStorage.getItem(LS.NAME)||'';
   const lpm=Math.round(SPRINT_LINES/(timeMs/60000));
   const prevBestLine=prevBest>0&&!isNewBest
