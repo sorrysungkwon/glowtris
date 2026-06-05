@@ -58,7 +58,12 @@
     text-shadow: 0 0 12px rgba(255,165,0,0.5);
     text-align: center;
     letter-spacing: 0.08em;
+    word-break: keep-all;
+    overflow-wrap: break-word;
     animation: bannerSlideDown 0.35s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @media (max-width: 480px) {
+    #maintenance-banner { padding: 9px 36px 9px 12px; text-align: left; font-size: 10px; }
   }
   #maintenance-banner::before {
     content: '';
