@@ -360,6 +360,51 @@ Without caching, the Upstash free tier exhausted at ~416 DAU (10K commands/day �
 
 ---
 
+## 🛠 Maintenance Banner — Operations Runbook
+
+The maintenance banner is driven by two Redis keys. When both are absent, no banner is shown. The API endpoint is `GET /api/maintenance` — the frontend polls this on load and displays the banner if a response is returned.
+
+### Redis keys
+
+| Key | Type | Description |
+|---|---|---|
+| `maintenance:msg` | String | Message text shown in the banner (required to activate) |
+| `maintenance:time` | String (Unix ms) | Optional scheduled time; frontend counts down to it in local timezone |
+
+### Activate banner (before maintenance)
+
+```bash
+REDIS_URL="<UPSTASH_REDIS_REST_URL>"
+REDIS_TOKEN="<token from .env.local>"
+
+# With scheduled time (Unix ms — e.g. get from: date -d "2026-06-10 03:00 KST" +%s%3N)
+curl -X POST "$REDIS_URL/mset/maintenance:msg/Scheduled%20maintenance/maintenance:time/1749484800000" \
+  -H "Authorization: Bearer $REDIS_TOKEN"
+
+# Message only (no countdown)
+curl -X POST "$REDIS_URL/mset/maintenance:msg/Scheduled%20maintenance" \
+  -H "Authorization: Bearer $REDIS_TOKEN"
+```
+
+### Clear banner (after maintenance)
+
+```bash
+curl -X POST "$REDIS_URL/del/maintenance:msg/maintenance:time" \
+  -H "Authorization: Bearer $REDIS_TOKEN"
+```
+
+### Verify current state
+
+```bash
+curl -s "$REDIS_URL/get/maintenance:msg" -H "Authorization: Bearer $REDIS_TOKEN"
+curl -s "$REDIS_URL/get/maintenance:time" -H "Authorization: Bearer $REDIS_TOKEN"
+# result: null = banner inactive
+```
+
+> The banner has `Cache-Control: no-store` so changes take effect on the next page load with no cache delay.
+
+---
+
 ## 🔁 Mandatory Release Workflow (no exceptions)
 
 ### Push rules
