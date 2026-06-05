@@ -1,27 +1,29 @@
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-const KEY_ALL   = 'glowtris-lb';
-const KEY_DAILY = () => `glowtris-daily-${new Date().toISOString().slice(0,10)}`;
+const REDIS_AVAILABLE = !!(REDIS_URL && REDIS_TOKEN);
+const P = process.env.LEADERBOARD_PREFIX || '';
+const KEY_ALL   = `${P}glowtris-lb`;
+const KEY_DAILY = () => `${P}glowtris-daily-${new Date().toISOString().slice(0,10)}`;
 const KEY_WEEKLY = () => {
   const d = new Date();
   const day = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() - day + 1);
-  return `glowtris-weekly-${d.toISOString().slice(0,10)}`;
+  return `${P}glowtris-weekly-${d.toISOString().slice(0,10)}`;
 };
 const KEY_CHALLENGE = () => {
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  return `daily:${today}`;
+  return `${P}daily:${today}`;
 };
-const KEY_CHALLENGE_ALLTIME = 'challenge:alltime';
+const KEY_CHALLENGE_ALLTIME = `${P}challenge:alltime`;
 
 // Sprint keys — ascending leaderboard (lowest time = best)
-const KEY_SPRINT     = 'glowtris-sprint';
-const KEY_SPRINT_DAILY  = () => `glowtris-sprint-daily-${new Date().toISOString().slice(0,10)}`;
+const KEY_SPRINT     = `${P}glowtris-sprint`;
+const KEY_SPRINT_DAILY  = () => `${P}glowtris-sprint-daily-${new Date().toISOString().slice(0,10)}`;
 const KEY_SPRINT_WEEKLY = () => {
   const d = new Date();
   const day = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() - day + 1);
-  return `glowtris-sprint-weekly-${d.toISOString().slice(0,10)}`;
+  return `${P}glowtris-sprint-weekly-${d.toISOString().slice(0,10)}`;
 };
 
 const TOP = 10;
@@ -150,6 +152,13 @@ export default async function handler(req, res) {
 
   const daily  = KEY_DAILY();
   const weekly = KEY_WEEKLY();
+
+  if (!REDIS_AVAILABLE) {
+    if (req.method === 'GET') {
+      return res.status(200).json({ board: [], dailyBoard: [], weeklyBoard: [], challengeBoard: [], challengeAlltimeBoard: [], sprintBoard: [], sprintDailyBoard: [], sprintWeeklyBoard: [] });
+    }
+    return res.status(503).json({ error: 'leaderboard unavailable' });
+  }
 
   if (req.method === 'GET') {
     // Cache GET responses at the Vercel edge for 60s.
