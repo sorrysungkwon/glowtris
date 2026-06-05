@@ -140,7 +140,7 @@ A neon-styled block stacking game built with ES modules and canvas.
 | v1.5 | **Advanced Stats** | Expanded STATS overlay: T-spin %, all-clear %, average combo. Session graph (score over last 10 games). Weekly personal report card. | 4,500 |
 | v1.6 | **Season & Rank** | Monthly season resets leaderboard. 7-tier rank system (Bronze → Radiant) based on season score. Season-exclusive title badges and board borders unlock at each tier. | 6,000 |
 | v1.7 | **Social Layer** | Friend code system (6-char code → follow mutual). Friend-only leaderboard tab. Async challenge — share a seeded run; recipient plays same sequence, results compared on a shared card. | 8,000 |
-| v2.0 | **Real-time Multiplayer** | 1v1 battle via WebSocket (Pusher/Ably). Garbage line mechanic. Live spectator mode. Elo-based matchmaking queue. Battle-exclusive leaderboard. | **15,000+** |
+| v2.0 | **Platform** | Embeddable widget, community API, rival system, percentile badge, brand/creator hooks. No real-time multiplayer — async social competition provides equivalent engagement at zero WebSocket cost. | **15,000+** |
 
 ## Infrastructure
 
