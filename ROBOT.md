@@ -204,7 +204,7 @@ When you implement a setting (slider, toggle, keybind) follow the full read/writ
 
 - **DCD had no LS key at all.** The setter wrote to `S.dcd` but the constant `LS.DCD` was never added to `shared.js`. Same checklist applies.
 
-When you fix a reported user bug, dig until you find the actual code path. The 180° rotation bug was logged in TODO.md with the note "IRS 중복 회전 방지 처리를 했으나 추가 검증 필요" — but the real cause was unrelated to IRS. The bug was that `lockPiece` schedules `spawnPiece` via `setTimeout(120)` on line clears; during that 120 ms window `S.current` is `null` and rotation taps are silently dropped by `rotatePiece`'s null-guard. IRS only catches keys *still held at spawn time*, so a tap during the pause was lost forever. The fix was to buffer rotation intent into `S.pendingRot` when `S.current` is null, then have `spawnPiece` consume it ahead of IRS.
+When you fix a reported user bug, dig until you find the actual code path. The 180° rotation bug was logged in TODO.md with the note "IRS duplicate-rotation prevention added, further verification needed" — but the real cause was unrelated to IRS. The bug was that `lockPiece` schedules `spawnPiece` via `setTimeout(120)` on line clears; during that 120 ms window `S.current` is `null` and rotation taps are silently dropped by `rotatePiece`'s null-guard. IRS only catches keys *still held at spawn time*, so a tap during the pause was lost forever. The fix was to buffer rotation intent into `S.pendingRot` when `S.current` is null, then have `spawnPiece` consume it ahead of IRS.
 
 When you add a state cap (15-reset lockdown, etc.) check every code path the state can change through. The 15-reset lock cap stopped `cancelLock` from clearing the timer (correct), but `gameTick` then kept counting down even if the piece slid into open air — locking the piece mid-air. Cap fixes need a follow-up airborne check in the tick loop.
 
@@ -360,13 +360,58 @@ Without caching, the Upstash free tier exhausted at ~416 DAU (10K commands/day �
 
 ---
 
+## 🛠 Maintenance Banner — Operations Runbook
+
+The maintenance banner is driven by two Redis keys. When both are absent, no banner is shown. The API endpoint is `GET /api/maintenance` — the frontend polls this on load and displays the banner if a response is returned.
+
+### Redis keys
+
+| Key | Type | Description |
+|---|---|---|
+| `maintenance:msg` | String | Message text shown in the banner (required to activate) |
+| `maintenance:time` | String (Unix ms) | Optional scheduled time; frontend counts down to it in local timezone |
+
+### Activate banner (before maintenance)
+
+```bash
+REDIS_URL="https://immortal-killdeer-134695.upstash.io"
+REDIS_TOKEN="<token from .env.local>"
+
+# With scheduled time (Unix ms — e.g. get from: date -d "2026-06-10 03:00 KST" +%s%3N)
+curl -X POST "$REDIS_URL/mset/maintenance:msg/Scheduled%20maintenance/maintenance:time/1749484800000" \
+  -H "Authorization: Bearer $REDIS_TOKEN"
+
+# Message only (no countdown)
+curl -X POST "$REDIS_URL/mset/maintenance:msg/Scheduled%20maintenance" \
+  -H "Authorization: Bearer $REDIS_TOKEN"
+```
+
+### Clear banner (after maintenance)
+
+```bash
+curl -X POST "$REDIS_URL/del/maintenance:msg/maintenance:time" \
+  -H "Authorization: Bearer $REDIS_TOKEN"
+```
+
+### Verify current state
+
+```bash
+curl -s "$REDIS_URL/get/maintenance:msg" -H "Authorization: Bearer $REDIS_TOKEN"
+curl -s "$REDIS_URL/get/maintenance:time" -H "Authorization: Bearer $REDIS_TOKEN"
+# result: null = banner inactive
+```
+
+> The banner has `Cache-Control: no-store` so changes take effect on the next page load with no cache delay.
+
+---
+
 ## 🔁 Mandatory Release Workflow (no exceptions)
 
 ### Push rules
 
 | Change type | Commit | Push |
 |---|---|---|
-| **Code / feature** | Agent commits | Agent pushes **only when user says "push해" or equivalent** |
+| **Code / feature** | Agent commits | Agent pushes **only when user says "push" or equivalent** |
 | **Docs-only** (README, TODO, CLAUDE, AGENTS, ROBOT…) | Agent commits | **Accumulate locally. Push together with the next code change — never push docs alone.** |
 
 ### Workflow
@@ -378,7 +423,7 @@ feature/xxx  →  preview (verify)  →  PR to master  →  production
 1. **Create feature branch**: `git checkout -b feature/xxx`
 2. **Develop & iterate**: all changes on `feature/*` only. Test locally (`npx serve .`).
 3. **Batch commit**: when 100% done, `git add . && git commit -m "feat: ..."` — report to user and **wait for push instruction**.
-4. **On "push해"**: `git push origin feature/xxx` then `git checkout preview && git merge feature/xxx && git push origin preview`
+4. **On "push"**: `git push origin feature/xxx` then `git checkout preview && git merge feature/xxx && git push origin preview`
 5. Vercel auto-deploys to **https://prevglow.vercel.app** — confirm with user.
 6. **Open PR**: `gh pr create --base master --head preview --title "feat: ..."` — only after user confirms preview is OK.
 7. **User merges PR** → Vercel auto-deploys to **https://glowtris.com** (production).
@@ -386,7 +431,7 @@ feature/xxx  →  preview (verify)  →  PR to master  →  production
 9. **Sync preview**: `git checkout preview && git merge master && git push origin preview` — run after user confirms PR is merged.
 
 ### Critical rules:
-- **Agent never pushes without user instruction** — wait for "push해" or equivalent
+- **Agent never pushes without user instruction** — wait for "push" or equivalent
 - **Docs commits accumulate** — never push docs alone; bundle with next code push
 - **ONE push to preview per feature** — no iterative preview pushes
 - **NEVER merge directly to master** — always via PR

@@ -3,7 +3,7 @@
 ## 🚨 Behavioral Guidelines (Must read first!)
 - **ES Modules Architecture**: Always maintain the ES modules split (`src/`). The build step generates the single `index.html`. No external frontend libraries allowed.
 - **English-Only Rule**: All code changes, comments, logs, documentation, and Git commit messages MUST be written entirely in English.
-- **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push해".** Docs-only commits accumulate locally and are bundled with the next code push.
+- **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push".** Docs-only commits accumulate locally and are bundled with the next code push.
 
 ## 📝 Latest Sync Notes & Future Suggestions (Handover to Claude)
 **Recently Completed (Antigravity Sync - 2026-06-05):**
@@ -663,6 +663,39 @@ Root cause: Vercel Analytics reported INP 568ms ("poor" — threshold is >500ms)
 
 ---
 
+## ✅ Completed: Post-v1.1.1 PWA & UX Polish — by Antigravity (2026-05-31 ~ 2026-06-05)
+
+- [x] **PWA A2HS banner**: singleton DOM element, 3-day snooze, correct hide/show across all screens (game active, mode selector, game over, start screen); max-width capped on iPad; translateY hide prevents layout shift
+- [x] **PWA v2 — PNG icons + shortcuts**: 192/512px PNG icons, app shortcuts, SW update toast (auto-reload prompt), offline score retry queue (submits queued scores when back online)
+- [x] **Push notifications**: permission prompt after PWA standalone launch (iOS 16.4+ requirement); `NOTIFICATIONS` toggle in settings; "NOT NOW" permanently suppresses auto-prompts; notification icon PNG fixed; hourly cron via GitHub Actions for per-timezone delivery
+- [x] **Offline indicator**: neon pill banner below safe area; hides during active gameplay, swipe-up to dismiss; auto-reloads leaderboard when connection restores; offline state maintained on tab switch
+- [x] **Service worker offline cache**: app shell cached on install; network-first for `index.html`; Google Fonts cached; SW cache version auto-bumped with 6-digit hex hash during `npm run build`
+- [x] **Body background neon navy** (`#070514`): blends iOS PWA bottom safe area with canvas glow; `theme-color` updated to match
+- [x] **Safe area guidelines**: top banners use `calc(env(safe-area-inset-top, 0px) + 12px)`; documented in `ROBOT.md`
+- [x] **Leaderboard state polish**: "NO RECORDS YET", "SUBMITTING...", "NETWORK ERROR", "SAVED OFFLINE" all use animated `lb-offline` styles; offline score queue auto-flushed on app startup if online
+- [x] **Bug fix**: `perf-indicator` `onclick` removed — ghost touches were quitting the game
+- [x] **Bug fix**: local date used in daily challenge check (was using UTC, caused wrong gate on timezones behind UTC)
+- [x] **Hide notification/install buttons from pause screen**
+
+---
+
+## ✅ Completed: Maintenance & Ops Tooling — by Antigravity (2026-06-05)
+
+- [x] **Maintenance banner**: neon amber overlay with optional message + local timezone timestamp; word-break and mobile padding polished; overlay-only (no layout shift)
+- [x] **Changelog page** (`changelog.html`): release history with neon Glowtris design; footer links added to all pages (index, privacy, terms, changelog)
+- [x] **CI: prevglow alias auto-assign**: GitHub Actions workflow auto-sets `prevglow.vercel.app` alias after each preview deployment
+
+---
+
+## ✅ Completed: Preview Leaderboard Isolation + Fixes — by Claude (2026-06-05)
+
+- [x] **`LEADERBOARD_PREFIX` env var**: all Redis keys prefixed when set (e.g. `preview:`) — isolates preview data from production within the same Redis instance; no cost, no breaking change
+- [x] **`REDIS_AVAILABLE` guard**: graceful fallback when Redis credentials absent — GET returns empty boards, POST returns 503; prevents crashes in environments without Redis
+- [x] **"NO RECORDS YET" centering**: flex centering applied to `.lb-inner` when entries array is empty; removed stale `margin-top:20px`
+- [x] **English-only cleanup**: removed all Korean strings from tracked files (TODO.md, ROBOT.md, WALKTHROUGH.md, api/leaderboard.js); updated "push해" references to "push" in workflow docs
+
+---
+
 ## 🔮 Planned: v1.2 — Ultra Mode + Streak
 > DAU goal: **700** | Key driver: time-pressure mode + daily return habit
 
@@ -748,16 +781,17 @@ Root cause: Vercel Analytics reported INP 568ms ("poor" — threshold is >500ms)
 
 ---
 
-## 🔮 Planned: v2.0 — Real-time Multiplayer
-> DAU goal: **15,000+** | Key driver: the platform shift
+## 🔮 Planned: v2.0 — Platform
+> DAU goal: **15,000+** | Key driver: platform shift via async social competition (no real-time multiplayer)
+>
+> **Strategy:** Deepen async social competition loops — percentile comparison, rival system, replay sharing, community embeds. Real-time multiplayer is explicitly out of scope; async challenge links and ghost racing provide equivalent engagement without WebSocket infrastructure cost.
 
-- [ ] Task 1: **WebSocket infrastructure** — integrate Pusher or Ably for real-time bidirectional communication; add API route for session management.
-- [ ] Task 2: **1v1 Battle Mode** — matchmaking queue; garbage line mechanic (cleared lines send junk to opponent); first to top out loses.
-- [ ] Task 3: **Battle HUD** — opponent board preview (mini, right panel); incoming garbage meter; attack/defence counter.
-- [ ] Task 4: **Elo rating system** — per-player Elo stored in Redis; updated after each ranked battle; displayed on profile.
-- [ ] Task 5: **Live spectator mode** — watch any ongoing public match; spectator count shown on match screen.
-- [ ] Task 6: **Battle leaderboard** — ranked by Elo; TODAY (most battles) / ALL TIME (highest Elo) tabs.
-- [ ] Task 7: Update docs, push version tag `v2.0`, upgrade infrastructure (Vercel Pro + Pusher).
+- [ ] Task 1: **Embeddable widget** — `<iframe>` + postMessage API for embedding Glowtris on community sites and content creator pages.
+- [ ] Task 2: **Community API** — public read-only leaderboard API endpoint for third-party integrations and community bots.
+- [ ] Task 3: **Rival system** — auto-assign the player directly above in all-time leaderboard as rival; "rival overtook you" push notification; celebrate when user surpasses rival.
+- [ ] Task 4: **Percentile badge** — show "Top X% today / all-time" on game over screen and share card.
+- [ ] Task 5: **Brand / creator hooks** — custom board skin sponsorship slots, creator referral codes, affiliate leaderboard.
+- [ ] Task 6: Update docs, push version tag `v2.0`.
 
 ## 🐛 Pending Bugs
-- [x] **180도 회전 버그 (해결됨)**: 유저 제보 - 하드드랍 뿐만 아니라 소프트드랍이나 가만히 두어 블록이 바닥에 닿아 고정될 때도 180도 회전(A키)이 가끔 씹히는 현상이 있었으나 IRS 중복 회전 방지 및 판정 수정을 통해 해결 완료.
+- [x] **180° rotation bug (fixed)**: User report — 180° rotation (A key) occasionally dropped not only on hard drop but also on soft drop or natural gravity lock. Root cause was unrelated to IRS; fixed by buffering rotation intent into `S.pendingRot` when `S.current` is null and consuming it in `spawnPiece`.
