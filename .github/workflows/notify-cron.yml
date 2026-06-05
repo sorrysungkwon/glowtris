@@ -1,0 +1,14 @@
+name: Hourly Push Notification
+
+on:
+  schedule:
+    - cron: '30 * * * *'  # fires at HH:30 UTC — matches local 11:30 for each timezone
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Trigger notify endpoint
+        run: |
+          curl -sf "https://glowtris.com/api/notify" || echo "notify returned non-2xx (non-blocking)"

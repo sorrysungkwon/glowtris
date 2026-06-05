@@ -6,8 +6,9 @@
 <title>GLOWTRIS</title>
 <meta name="description" content="Neon-styled block stacking game with online leaderboard. Compete for the top rank!">
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#00c8ff">
+<meta name="theme-color" content="#070514">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Glowtris">
@@ -50,7 +51,7 @@
 
   html, body {
     width:100%; height:100%;
-    background:#000;
+    background:#070514;
     overflow:hidden;
     overscroll-behavior:none;
     user-select:none; -webkit-user-select:none;
@@ -984,12 +985,10 @@
     text-transform: uppercase;
     color: rgba(255,200,0,0.7);
     text-shadow: 0 0 6px rgba(255,180,0,0.5);
-    pointer-events: auto;
-    cursor: pointer;
+    pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s ease;
   }
-  #perf-indicator:hover { color: rgba(255,220,0,1); text-shadow: 0 0 10px rgba(255,200,0,0.8); }
 
   .low-spec-warning {
     display: flex;
@@ -1380,8 +1379,306 @@
   }
 @keyframes text-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 8px rgba(0,200,255,0.8); } }
 html.low-perf .action-btn.play-btn { animation: none !important; }
+
+/* ── z-index hierarchy ───────────────────────────────────────────────────────
+   9000  #pwa-banner        install prompt (lowest)
+   9001  #pwa-toast         brief score/info toasts
+   9001  #pwa-update-bar    SW update bar
+   9002  #offline-bar       offline indicator (highest persistent)
+   10000 #overlay           game UI
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Brief toast (score submitted etc.) ─────────────────────────────────── */
+#pwa-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(0, 20, 10, 0.96);
+  border: 1px solid rgba(0, 255, 136, 0.35);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(0, 255, 136, 0.9);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+}
+#pwa-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── SW update bar ───────────────────────────────────────────────────────── */
+#pwa-update-bar {
+  position: fixed;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 0, 30, 0.97);
+  border: 1px solid rgba(120, 60, 255, 0.45);
+  border-radius: 20px;
+  padding: 7px 8px 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(180, 120, 255, 0.9);
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  transition: top 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+#pwa-update-bar.visible { top: max(12px, calc(env(safe-area-inset-top, 0px) + 12px)); }
+#offline-bar ~ #pwa-update-bar.visible,
+#pwa-update-bar.below-offline.visible { top: max(54px, calc(env(safe-area-inset-top, 0px) + 54px)); }
+.pwa-update-refresh {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #000;
+  background: rgba(160, 100, 255, 0.9);
+  border: none;
+  border-radius: 12px;
+  padding: 5px 10px;
+  cursor: pointer;
+  touch-action: manipulation;
+  margin-left: 4px;
+}
+
+/* ── Leaderboard offline state ───────────────────────────────────────────── */
+.lb-offline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.lb-offline-icon {
+  font-size: 32px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.lb-offline-txt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Offline Indicator ───────────────────────────────────────────────────── */
+#offline-bar {
+  position: fixed;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(20, 10, 0, 0.95);
+  border: 1px solid rgba(255, 140, 0, 0.45);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255, 160, 40, 0.9);
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  transition: top 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+#offline-bar.visible { top: max(12px, calc(env(safe-area-inset-top, 0px) + 12px)); }
+#offline-bar.game-active { top: -80px; }
+#offline-bar.swiped { top: -80px; transition: top 0.2s ease-in; }
+
+/* ── PWA Install Banner ──────────────────────────────────────────────────── */
+#pwa-banner {
+  position: fixed;
+  bottom: -220px;
+  left: 0;
+  right: 0;
+  max-width: 440px;
+  margin: 0 auto;
+  z-index: 9000;
+  padding: 0 16px 20px;
+  transition: bottom 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+#pwa-banner.visible { bottom: 0 !important; }
+#pwa-banner.game-active { bottom: -220px; }
+.pwa-banner-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0, 10, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 200, 255, 0.2);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.pwa-banner-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pwa-banner-icon { font-size: 28px; flex-shrink: 0; }
+.pwa-banner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pwa-banner-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #fff;
+  line-height: 1.1;
+}
+.pwa-banner-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.3;
+}
+.pwa-banner-close {
+  align-self: flex-start;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  margin: -4px -4px 0 0;
+  transition: color 0.2s;
+}
+.pwa-banner-close:hover { color: rgba(255, 255, 255, 0.8); }
+
+.pwa-banner-btns {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.pwa-banner-add {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #000;
+  background: linear-gradient(135deg, #00e5ff 0%, #0088ff 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 0;
+  cursor: pointer;
+  flex: 1;
+  box-shadow: 0 4px 16px rgba(0, 200, 255, 0.25);
+  transition: transform 0.1s, opacity 0.2s;
+}
+.pwa-banner-add:active { transform: scale(0.97); }
+.pwa-banner-snooze {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 11px 16px;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+}
+.pwa-banner-snooze:active { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+/* ── PWA Modals ──────────────────────────────────────────────────────────── */
+#pwa-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 8, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+#pwa-modal.visible { opacity: 1; }
+.pwa-modal-box {
+  background: rgba(0, 10, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 200, 255, 0.2);
+  border-radius: 24px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#pwa-modal.visible .pwa-modal-box { transform: scale(1); }
+.pwa-modal-icon { font-size: 44px; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(0,200,255,0.3)); }
+.pwa-modal-title {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.pwa-modal-body {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  padding: 0 10px;
+}
+.pwa-modal-steps {
+  text-align: left;
+  margin: 0 0 24px 0;
+  padding: 16px 16px 16px 36px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.pwa-modal-steps li { margin-bottom: 8px; }
+.pwa-modal-steps li::marker { color: #00e5ff; font-weight: bold; }
+.pwa-modal-steps li:last-child { margin-bottom: 0; }
+.pwa-modal-steps strong { color: #00e5ff; font-weight: 600; }
+
+/* Settings install button */
+.toggle-btn.pwa-install-btn {
+  border-color: rgba(0, 200, 255, 0.38);
+  color: rgba(0, 200, 255, 0.8);
+}
 \n@keyframes sprintCompletePulse {\n  0% { transform: scale(0.8); opacity: 0; text-shadow: 0 0 10px rgba(0,255,136,0); }\n  50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 30px rgba(0,255,136,1), 0 0 60px rgba(0,200,255,0.8); }\n  100% { transform: scale(1); opacity: 1; text-shadow: 0 0 15px rgba(0,255,136,0.6); }\n}\n.sprint-header-anim {\n  animation: sprintCompletePulse 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;\n}\n
 </style>
+<!-- Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const sw = reg.installing;
+        sw.addEventListener('statechange', () => {
+          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+            window._pwaShowUpdateToast && window._pwaShowUpdateToast();
+          }
+        });
+      });
+    }).catch(() => {});
+  });
+}
+</script>
 <!-- Vercel Speed Insights -->
 <script defer src="/_vercel/speed-insights/script.js"></script>
 <!-- Vercel Web Analytics -->
@@ -1394,7 +1691,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 
 <canvas id="bg-canvas"></canvas>
 <div id="screen-flash"></div>
-<div id="perf-indicator" onclick="openSettings()">⚡ LOW-SPEC MODE</div>
+<div id="perf-indicator">⚡ LOW-SPEC MODE</div>
 <div id="overlay"></div>
 
 <div id="htp-overlay" style="display:none" onclick="closeHowToPlay()">
@@ -3882,6 +4179,290 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     }, 150);
   }
 
+  // src/pwa.js
+  var LS_INSTALLED = "pwa-installed";
+  var LS_SNOOZE_UNTIL = "pwa-snooze-until";
+  var SNOOZE_DAYS = 3;
+  var VAPID_PUBLIC_KEY = "BI_rkhrMPW6oSlsvTpIBySBEECvvvkiPtxzmF5DOmtTim3fIDSxXU7P_Bn3TWMi3Vh_hapjlOZ1KyiexF8T0V4s";
+  function _urlBase64ToUint8Array(b64) {
+    const pad = "=".repeat((4 - b64.length % 4) % 4);
+    const base64 = (b64 + pad).replace(/-/g, "+").replace(/_/g, "/");
+    return Uint8Array.from([...atob(base64)].map((c) => c.charCodeAt(0)));
+  }
+  async function _registerPushSub() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+      await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscription: sub.toJSON(), tzOffset: (/* @__PURE__ */ new Date()).getTimezoneOffset() }) });
+    } catch (e) {
+      console.warn("[pwa] push sub failed", e);
+    }
+  }
+  function showToast(msg, { icon = "", duration = 3e3 } = {}) {
+    let el = document.getElementById("pwa-toast");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "pwa-toast";
+      document.body.appendChild(el);
+    }
+    el.innerHTML = icon ? `<span class="material-icons-round" style="font-size:14px">${icon}</span>${msg}` : msg;
+    el.classList.add("visible");
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => el.classList.remove("visible"), duration);
+  }
+  window._pwaShowUpdateToast = function() {
+    let el = document.getElementById("pwa-update-bar");
+    if (el) return;
+    el = document.createElement("div");
+    el.id = "pwa-update-bar";
+    el.innerHTML = `<span class="material-icons-round" style="font-size:14px">system_update</span>New version available<button class="pwa-update-refresh" onclick="window.location.reload()">REFRESH</button>`;
+    if (document.getElementById("offline-bar")) el.classList.add("below-offline");
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  };
+  var _deferred = null;
+  var _gameActive = false;
+  var _bannerTimer = null;
+  function _installed() {
+    return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
+  }
+  function _iOS() {
+    return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  }
+  function _isDesktop() {
+    return !_iOS() && !!_deferred && !("ontouchstart" in window) && window.innerWidth >= 600;
+  }
+  function _installLabel() {
+    return _isDesktop() ? "\u{1F4BB} INSTALL APP" : "\u{1F4F2} ADD TO HOME SCREEN";
+  }
+  function _bannerSubtext() {
+    return _isDesktop() ? "Launch from desktop \xB7 no browser bar" : "Play offline \xB7 no browser bar";
+  }
+  function _snoozed() {
+    const until = parseInt(localStorage.getItem(LS_SNOOZE_UNTIL) || "0", 10);
+    return Date.now() < until;
+  }
+  function initPWA() {
+    _initOfflineIndicator();
+    if (_installed()) {
+      setTimeout(_askNotif, 1500);
+      return;
+    }
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      _deferred = e;
+    });
+    window.addEventListener("appinstalled", () => {
+      localStorage.setItem(LS_INSTALLED, "1");
+      _deferred = null;
+      hidePWABanner();
+    });
+    if (!_snoozed()) {
+      clearTimeout(_bannerTimer);
+      _bannerTimer = setTimeout(_showBanner, 500);
+    }
+  }
+  function _initOfflineIndicator() {
+    window.addEventListener("offline", _showOffline);
+    window.addEventListener("online", _hideOffline);
+    if (!navigator.onLine) _showOffline();
+  }
+  function _showOffline() {
+    var _a;
+    if (document.getElementById("offline-bar")) return;
+    const el = document.createElement("div");
+    el.id = "offline-bar";
+    el.innerHTML = `<span class="material-icons-round" style="font-size:14px">wifi_off</span> No internet connection`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.add("below-offline");
+    let startY = 0;
+    el.addEventListener("touchstart", (e) => {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    el.addEventListener("touchend", (e) => {
+      if (startY - e.changedTouches[0].clientY > 30) {
+        sessionStorage.setItem("offline-bar-swiped", "1");
+        el.classList.add("swiped");
+        setTimeout(() => el.remove(), 300);
+      }
+    }, { passive: true });
+  }
+  function offlineBarGameStart() {
+    var _a, _b, _c;
+    _gameActive = true;
+    clearTimeout(_bannerTimer);
+    (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
+    (_b = document.getElementById("pwa-banner")) == null ? void 0 : _b.classList.add("game-active");
+    (_c = document.getElementById("pwa-banner")) == null ? void 0 : _c.classList.remove("visible");
+  }
+  function offlineBarGameEnd() {
+    var _a;
+    _gameActive = false;
+    if (!sessionStorage.getItem("offline-bar-swiped")) {
+      (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.remove("game-active");
+    }
+  }
+  function _hideOffline() {
+    var _a;
+    const el = document.getElementById("offline-bar");
+    if (!el) return;
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 300);
+    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.remove("below-offline");
+  }
+  function onPWAGameOver() {
+    if (_installed() || _snoozed()) return;
+    _gameActive = false;
+    clearTimeout(_bannerTimer);
+    _bannerTimer = setTimeout(_showBanner, 500);
+  }
+  function pwaInstallBtnHTML(p) {
+    if (_installed()) return "";
+    if (!_deferred && !_iOS()) return "";
+    return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
+  }
+  function _showBanner() {
+    if (_installed() || _snoozed()) return;
+    if (sessionStorage.getItem("pwa-closed")) return;
+    if (!_deferred && !_iOS()) return;
+    if (_gameActive) return;
+    let el = document.getElementById("pwa-banner");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "pwa-banner";
+      el.innerHTML = `
+      <div class="pwa-banner-inner">
+        <div class="pwa-banner-top">
+          <span class="pwa-banner-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
+          <div class="pwa-banner-text">
+            <div class="pwa-banner-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
+            <div class="pwa-banner-sub">${_bannerSubtext()}</div>
+          </div>
+          <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
+        </div>
+        <div class="pwa-banner-btns">
+          <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+          <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
+        </div>
+      </div>`;
+      document.body.appendChild(el);
+    }
+    el.offsetHeight;
+    if (!_gameActive) el.classList.add("visible");
+  }
+  function hidePWABanner() {
+    clearTimeout(_bannerTimer);
+    const el = document.getElementById("pwa-banner");
+    if (el) el.classList.remove("visible");
+  }
+  window._pwaDismiss = function() {
+    sessionStorage.setItem("pwa-closed", "1");
+    hidePWABanner();
+  };
+  window._pwaSnooze = function() {
+    const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
+    localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
+    hidePWABanner();
+  };
+  window._pwaInstall = function() {
+    hidePWABanner();
+    if (_deferred) {
+      _deferred.prompt();
+      _deferred.userChoice.then((r) => {
+        _deferred = null;
+        if (r.outcome === "accepted") {
+          localStorage.setItem(LS_INSTALLED, "1");
+          setTimeout(_askNotif, 800);
+        }
+      });
+    } else if (_iOS()) {
+      _showIOSModal();
+    }
+  };
+  function _showIOSModal() {
+    _removeModal();
+    const el = document.createElement("div");
+    el.id = "pwa-modal";
+    el.innerHTML = `
+    <div class="pwa-modal-box">
+      <div class="pwa-modal-title">ADD TO HOME SCREEN</div>
+      <ol class="pwa-modal-steps">
+        <li>Tap the <strong>Share</strong> button
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:3px;color:rgba(0,200,255,0.8)"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          at the bottom of Safari
+        </li>
+        <li>Scroll and tap <strong>"Add to Home Screen"</strong></li>
+        <li>Tap <strong>Add</strong> to confirm</li>
+      </ol>
+      <button class="action-btn full-width" onclick="window._pwaIOSDone()">GOT IT</button>
+    </div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  window._pwaIOSDone = function() {
+    _removeModal();
+    setTimeout(_askNotif, 400);
+  };
+  function _askNotif() {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "default") return;
+    if (localStorage.getItem("pwa-notif-snooze")) return;
+    _removeModal();
+    const el = document.createElement("div");
+    el.id = "pwa-modal";
+    el.innerHTML = `
+    <div class="pwa-modal-box">
+      <div class="pwa-modal-icon">\u{1F514}</div>
+      <div class="pwa-modal-title">ENABLE NOTIFICATIONS?</div>
+      <div class="pwa-modal-body">Get notified about daily challenges.<br><span style="opacity:0.7;font-size:10px">You can change this later in Settings.</span></div>
+      <button class="action-btn full-width" onclick="window._pwaNotifAllow()">ALLOW</button>
+      <button class="action-btn ghost full-width" style="margin-top:8px" onclick="window._pwaNotifDeny()">NOT NOW</button>
+    </div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  function _removeModal() {
+    const el = document.getElementById("pwa-modal");
+    if (!el) return;
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 350);
+  }
+  window._pwaNotifAllow = function() {
+    _removeModal();
+    Notification.requestPermission().then((p) => {
+      localStorage.setItem("pwa-notif", p);
+      if (p === "granted") _registerPushSub();
+    });
+  };
+  window._pwaNotifDeny = function() {
+    _removeModal();
+    localStorage.setItem("pwa-notif-snooze", "forever");
+  };
+  window._pwaNotifToggle = function() {
+    if (!("Notification" in window)) {
+      showToast("Notifications not supported on this browser.", { icon: "notifications_off" });
+      return;
+    }
+    if (Notification.permission === "granted") {
+      showToast("To turn off notifications, go to your browser/device settings.", { icon: "notifications", duration: 4e3 });
+      return;
+    }
+    if (Notification.permission === "denied") {
+      showToast("Notifications are blocked. Enable them in device settings.", { icon: "notifications_off", duration: 4e3 });
+      return;
+    }
+    Notification.requestPermission().then((p) => {
+      localStorage.setItem("pwa-notif", p);
+      if (p === "granted") {
+        _registerPushSub();
+        showToast("Notifications enabled!", { icon: "notifications_active" });
+      }
+    });
+  };
+
   // src/screens.js
   var $overlay = document.getElementById("overlay");
   function rollNumber(el, val, dur) {
@@ -3900,7 +4481,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     clearInterval(_gateTimer);
     const updateCountdown = () => {
       const now = /* @__PURE__ */ new Date();
-      const nextMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
       const diffMs = nextMidnight - now;
       if (diffMs <= 0) {
         clearInterval(_gateTimer);
@@ -3930,7 +4511,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     _gateTimer = setInterval(updateCountdown, 1e3);
   }
   function startDailyChallenge() {
-    const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
+    const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("sv").replace(/-/g, "");
     if (localStorage.getItem(LS.DAILY_DATE) === todayStr) {
       showDailyGateOverlay(todayStr);
       return;
@@ -3960,7 +4541,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   `;
     $overlay.style.display = "flex";
   }
-  function _settingsHTML(p) {
+  function _settingsHTML(p, showPWA = true) {
     return `
     <div class="sg-label">AUDIO</div>
     <button class="toggle-btn${S.muteAudio ? " muted" : ""}" id="${p}-mute-btn" onclick="toggleMute()">${S.muteAudio ? "\u{1F507} AUDIO OFF" : "\u{1F50A} AUDIO ON"}</button>
@@ -3995,8 +4576,22 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     </div>
 
     <div class="sg-sep"></div>
-    <div class="sg-label">PERFORMANCE</div>
-    <button class="toggle-btn${S.lowPerfMode ? " lowspec-on" : " muted"}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode ? "\u26A1 LOW-SPEC MODE: ON" : "\u26A1 LOW-SPEC MODE: OFF"}</button>`;
+    <div class="sg-label">PERFORMANCE & SYSTEM</div>
+    <button class="toggle-btn${S.lowPerfMode ? " lowspec-on" : " muted"}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode ? "\u26A1 LOW-SPEC MODE: ON" : "\u26A1 LOW-SPEC MODE: OFF"}</button>
+    ${showPWA ? `<button class="toggle-btn${_notifBtnClass()}" id="${p}-notif-btn" onclick="window._pwaNotifToggle()">${_notifBtnLabel()}</button>
+    ${pwaInstallBtnHTML(p)}` : ""}
+  `;
+  }
+  function _notifBtnClass() {
+    if (!("Notification" in window)) return " muted";
+    if (Notification.permission === "granted") return "";
+    return " muted";
+  }
+  function _notifBtnLabel() {
+    if (!("Notification" in window)) return "\u{1F514} NOTIFICATIONS: N/A";
+    if (Notification.permission === "granted") return "\u{1F514} NOTIFICATIONS: ON";
+    if (Notification.permission === "denied") return "\u{1F514} NOTIFICATIONS: OFF";
+    return "\u{1F514} NOTIFICATIONS: OFF";
   }
   function openSettings() {
     $overlay.innerHTML = `
@@ -4016,7 +4611,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       $overlay.innerHTML = `
       <div class="glass-panel">
         <h1 class="pause-header">PAUSED</h1>
-        <div class="settings-box">${_settingsHTML("ov")}</div>
+        <div class="settings-box">${_settingsHTML("ov", false)}</div>
         <button class="action-btn full-width" onclick="togglePause()">RESUME</button>
         <button class="action-btn ghost full-width restart" onclick="showStartScreen()">RESTART</button>
       </div>`;
@@ -4028,7 +4623,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     }
   }
   function _saveGameStats() {
-    const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
+    const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("sv").replace(/-/g, "");
     if (S.isDailyMode) localStorage.setItem(LS.DAILY_DATE, todayStr);
     const isNewBest = S.score > S.hiScore;
     if (isNewBest) {
@@ -4073,6 +4668,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     return { isNewBest, newStreak, displayMaxCombo, isBestLevel, isBestCombo, isBestLines };
   }
   function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, isBestLevel, isBestCombo, isBestLines }) {
+    offlineBarGameEnd();
     const savedName = localStorage.getItem(LS.NAME) || "";
     let pbBadges = [];
     if (S.isDailyMode) {
@@ -4126,13 +4722,17 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     rollNumber(document.getElementById("gov-score-val"), S.score, 1400);
     rollNumber(document.getElementById("gov-hi-val"), S.hiScore, 1400);
     const inp = document.getElementById("lb-name");
-    inp.focus();
-    inp.select();
+    if (!("ontouchstart" in window)) {
+      inp.focus();
+      inp.select();
+    }
     inp.addEventListener("keydown", (e) => {
       if (e.key === "Enter") submitScore();
     });
+    onPWAGameOver();
   }
   function _renderSprintScreen(timeMs, isNewBest, prevBest) {
+    offlineBarGameEnd();
     const savedName = localStorage.getItem(LS.NAME) || "";
     const lpm = Math.round(SPRINT_LINES / (timeMs / 6e4));
     const prevBestLine = prevBest > 0 && !isNewBest ? `<div style="font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,0.3);margin-bottom:10px">BEST: ${fmtTime(prevBest)}</div>` : "";
@@ -4159,13 +4759,17 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     </div>`;
     $overlay.style.display = "flex";
     const inp = document.getElementById("lb-name");
-    inp.focus();
-    inp.select();
+    if (!("ontouchstart" in window)) {
+      inp.focus();
+      inp.select();
+    }
     inp.addEventListener("keydown", (e) => {
       if (e.key === "Enter") submitSprintScore(timeMs);
     });
+    onPWAGameOver();
   }
   function showStartScreen() {
+    offlineBarGameEnd();
     S.isDailyMode = false;
     S.isSprintMode = false;
     if (_gateTimer) {
@@ -4224,12 +4828,14 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     </div>`;
     $overlay.style.display = "flex";
     loadStartLeaderboard();
+    onPWAGameOver();
   }
   function showModeSelector() {
+    hidePWABanner();
     const sprintBest = S._sprintHiTime > 0 ? `<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
     const hiS = parseInt(localStorage.getItem(LS.HI) || "0");
     const marathonBest = hiS > 0 ? `<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
-    const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
+    const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("sv").replace(/-/g, "");
     const dailyDone = localStorage.getItem(LS.DAILY_DATE) === todayStr;
     const dailySub = dailyDone ? '<span style="color:rgba(255,230,0,0.75)">\u2713 Completed today</span>' : '<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
     $overlay.innerHTML = `
@@ -4279,6 +4885,31 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   }
 
   // src/leaderboard.js
+  var LS_SCORE_QUEUE = "glowtris-score-queue";
+  function _enqueueScore(payload) {
+    const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || "[]");
+    q.push(payload);
+    localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(q));
+  }
+  async function _flushScoreQueue() {
+    const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || "[]");
+    if (!q.length) return;
+    const remaining = [];
+    for (const payload of q) {
+      try {
+        const r = await fetch("/api/leaderboard", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        if (!r.ok) remaining.push(payload);
+        else showToast("Score submitted!", { icon: "check_circle" });
+      } catch (e) {
+        remaining.push(payload);
+      }
+    }
+    localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(remaining));
+  }
+  window.addEventListener("online", _flushScoreQueue);
+  if (navigator.onLine) {
+    setTimeout(_flushScoreQueue, 1e3);
+  }
   function _openDonation() {
     if (!SUPPORT_URL) return;
     if (document.getElementById("donation-modal")) return;
@@ -4325,7 +4956,11 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     localStorage.setItem(LS.NAME, name);
     btn.disabled = true;
     inp.disabled = true;
-    res.innerHTML = '<div class="sub">SUBMITTING...</div>';
+    res.innerHTML = `
+    <div class="lb-offline" style="margin-top:10px; gap:6px;">
+      <div class="lb-offline-icon" style="font-size:24px; animation: text-pulse 1.5s infinite;">\u{1F680}</div>
+      <div class="lb-offline-txt" style="color:var(--cyan); animation: text-pulse 1.5s infinite;">SUBMITTING...</div>
+    </div>`;
     try {
       const r = await fetch("/api/leaderboard", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, score: timeMs, mode: "sprint" }) });
       const data = await r.json();
@@ -4347,12 +4982,42 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
       } else {
         btn.disabled = false;
         inp.disabled = false;
-        res.innerHTML = '<div class="sub">Save failed \u2014 please try again</div>';
+        res.innerHTML = `
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">\u26A0\uFE0F</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">SAVE FAILED</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
       }
     } catch (e) {
       btn.disabled = false;
       inp.disabled = false;
-      res.innerHTML = '<div class="sub">Network error \u2014 please try again</div>';
+      if (!navigator.onLine) {
+        const name2 = inp.value.trim();
+        _enqueueScore({ name: name2, score: timeMs, mode: "sprint" });
+        res.innerHTML = `
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:rgba(255,200,80,0.9)">\u{1F4BE}</div>
+          <div class="lb-offline-txt" style="color:rgba(255,200,80,0.9);">SAVED OFFLINE</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px; letter-spacing:0.5px">Will submit when back online</div>
+        </div>`;
+        const onResume = () => {
+          window.removeEventListener("online", onResume);
+          const r = document.getElementById("lb-result");
+          if (r && r.innerHTML.includes("SAVED OFFLINE")) {
+            const b = document.getElementById("lb-submit-btn");
+            if (b && !b.disabled) b.click();
+          }
+        };
+        window.addEventListener("online", onResume);
+      } else {
+        res.innerHTML = `
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">\u{1F4E1}</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">NETWORK ERROR</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
+      }
     }
   }
   async function shareSprintScore(timeMs, rank) {
@@ -4461,7 +5126,12 @@ Can you beat it? ${window.location.origin}`;
     return new Promise((res) => c.toBlob(res, "image/png"));
   }
   function lbHTML(entries, myName, myRank, myScore, timeMode = false) {
-    if (!entries.length) return '<div class="sub" style="margin-top:4px">No records yet</div>';
+    if (!entries.length) return `
+    <div class="lb-offline" style="margin-top:20px; gap:6px;">
+      <div class="lb-offline-icon" style="font-size:26px; opacity:0.8;">\u{1F4ED}</div>
+      <div class="lb-offline-txt" style="color:rgba(255,255,255,0.6);">NO RECORDS YET</div>
+      <div style="font-size:8px; color:rgba(255,255,255,0.3); margin-top:-2px; letter-spacing:1px">Be the first to claim the top spot!</div>
+    </div>`;
     const medals = ["\u{1F947}", "\u{1F948}", "\u{1F949}"];
     const fmt = timeMode ? ((v) => fmtTime(v)) : ((v) => v.toLocaleString());
     let html = `<table class="lb-table">${entries.map((e, i) => {
@@ -4489,7 +5159,11 @@ Can you beat it? ${window.location.origin}`;
     localStorage.setItem(LS.NAME, name);
     btn.disabled = true;
     inp.disabled = true;
-    res.innerHTML = '<div class="sub">SUBMITTING...</div>';
+    res.innerHTML = `
+    <div class="lb-offline" style="margin-top:10px; gap:6px;">
+      <div class="lb-offline-icon" style="font-size:24px; animation: text-pulse 1.5s infinite;">\u{1F680}</div>
+      <div class="lb-offline-txt" style="color:var(--cyan); animation: text-pulse 1.5s infinite;">SUBMITTING...</div>
+    </div>`;
     try {
       const payload = { name, score: S.score };
       if (S.isDailyMode) payload.mode = "daily";
@@ -4544,12 +5218,44 @@ Can you beat it? ${window.location.origin}`;
       } else {
         btn.disabled = false;
         inp.disabled = false;
-        res.innerHTML = '<div class="sub">Save failed \u2014 please try again</div>';
+        res.innerHTML = `
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">\u26A0\uFE0F</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">SAVE FAILED</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
       }
     } catch (e) {
       btn.disabled = false;
       inp.disabled = false;
-      res.innerHTML = '<div class="sub">Network error \u2014 please try again</div>';
+      if (!navigator.onLine) {
+        const name2 = inp.value.trim();
+        const payload = { name: name2, score: S.score };
+        if (S.isDailyMode) payload.mode = "daily";
+        _enqueueScore(payload);
+        res.innerHTML = `
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:rgba(255,200,80,0.9)">\u{1F4BE}</div>
+          <div class="lb-offline-txt" style="color:rgba(255,200,80,0.9);">SAVED OFFLINE</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px; letter-spacing:0.5px">Will submit when back online</div>
+        </div>`;
+        const onResume = () => {
+          window.removeEventListener("online", onResume);
+          const r = document.getElementById("lb-result");
+          if (r && r.innerHTML.includes("SAVED OFFLINE")) {
+            const b = document.getElementById("lb-submit-btn");
+            if (b && !b.disabled) b.click();
+          }
+        };
+        window.addEventListener("online", onResume);
+      } else {
+        res.innerHTML = `
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">\u{1F4E1}</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">NETWORK ERROR</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
+      }
     }
   }
   async function captureGameImage(sc, rank, isDaily = false) {
@@ -4700,10 +5406,20 @@ ${window.location.origin}`;
       const r = await fetch(url);
       const data = await r.json();
       S._lbCache = { ...S._lbCache, ...data };
+      S._lbOffline = false;
       const activeTab = document.querySelector(".lb-tab[data-tab].active");
       const defaultTab = S.lbMode === "daily" ? "challenge" : S.lbMode === "sprint" ? "sprint-daily" : "daily";
       renderLbTab(activeTab ? activeTab.dataset.tab : defaultTab);
     } catch (e) {
+      S._lbOffline = true;
+      const inner = document.querySelector(".lb-inner");
+      if (inner) {
+        inner.style.cssText = "display:flex;align-items:center;justify-content:center;";
+        inner.innerHTML = `<div class="lb-offline">
+        <span class="material-icons-round lb-offline-icon">wifi_off</span>
+        <span class="lb-offline-txt">NO INTERNET CONNECTION</span>
+      </div>`;
+      }
     }
   }
   function renderLbTab(tab) {
@@ -4737,6 +5453,14 @@ ${window.location.origin}`;
       myRank = S._lbCache.rank;
     }
     document.querySelectorAll(".lb-tab[data-tab]").forEach((t) => t.classList.toggle("active", t.dataset.tab === tab));
+    if (S._lbOffline || !navigator.onLine && (!entries || entries.length === 0)) {
+      inner.style.cssText = "display:flex;align-items:center;justify-content:center;";
+      inner.innerHTML = `<div class="lb-offline">
+      <span class="material-icons-round lb-offline-icon">wifi_off</span>
+      <span class="lb-offline-txt">NO INTERNET CONNECTION</span>
+    </div>`;
+      return;
+    }
     const myVal = isSprintTab ? S._lbCache.mySprintTime : S._lbCache.myScore;
     inner.removeAttribute("style");
     inner.innerHTML = lbHTML(entries, S._lbCache.myName, myRank, myVal, isSprintTab);
@@ -4771,6 +5495,9 @@ ${window.location.origin}`;
     }
     loadStartLeaderboard();
   }
+  window.addEventListener("online", () => {
+    if (document.querySelector(".lb-offline")) loadStartLeaderboard();
+  });
 
   // src/loop.js
   var TICK_RATE = 1;
@@ -5626,6 +6353,7 @@ ${window.location.origin}`;
     applyMuteToGain();
   }
   function startGame() {
+    offlineBarGameStart();
     $overlay2.style.display = "none";
     $combo2.textContent = "";
     S.score = 0;
@@ -5868,11 +6596,16 @@ ${window.location.origin}`;
   if ($hiScore2) $hiScore2.textContent = S.hiScore.toLocaleString();
   if ($hiScoreM2) $hiScoreM2.textContent = S.hiScore.toLocaleString();
   document.fonts.ready.then(() => {
+    initPWA();
     animFrame = requestAnimationFrame(function bgOnly(ts) {
       drawBackground();
       if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly);
     });
     showStartScreen();
+    const mode = new URLSearchParams(window.location.search).get("mode");
+    if (mode === "marathon") setTimeout(startGame, 100);
+    else if (mode === "sprint") setTimeout(startSprintMode, 100);
+    else if (mode === "daily") setTimeout(startDailyChallenge, 100);
   });
   (window.requestIdleCallback || function(cb) {
     setTimeout(cb, 200);

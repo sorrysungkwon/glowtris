@@ -1,6 +1,34 @@
 import { S, LS, SUPPORT_URL, SPRINT_LINES, fmtTime } from './shared.js';
 import { unlockAchievement } from './ui.js';
 import { showStartScreen } from './screens.js';
+import { showToast } from './pwa.js';
+
+const LS_SCORE_QUEUE = 'glowtris-score-queue';
+
+function _enqueueScore(payload) {
+  const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || '[]');
+  q.push(payload);
+  localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(q));
+}
+
+async function _flushScoreQueue() {
+  const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || '[]');
+  if (!q.length) return;
+  const remaining = [];
+  for (const payload of q) {
+    try {
+      const r = await fetch('/api/leaderboard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!r.ok) remaining.push(payload);
+      else showToast('Score submitted!', { icon: 'check_circle' });
+    } catch { remaining.push(payload); }
+  }
+  localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(remaining));
+}
+
+window.addEventListener('online', _flushScoreQueue);
+if (navigator.onLine) {
+  setTimeout(_flushScoreQueue, 1000); // Give app 1s to boot before flushing
+}
 
 export function _openDonation(){
   if(!SUPPORT_URL)return;
@@ -41,7 +69,11 @@ export async function submitSprintScore(timeMs){
   if(!name){inp.focus();return;}
   localStorage.setItem(LS.NAME,name);
   btn.disabled=true;inp.disabled=true;
-  res.innerHTML='<div class="sub">SUBMITTING...</div>';
+  res.innerHTML=`
+    <div class="lb-offline" style="margin-top:10px; gap:6px;">
+      <div class="lb-offline-icon" style="font-size:24px; animation: text-pulse 1.5s infinite;">🚀</div>
+      <div class="lb-offline-txt" style="color:var(--cyan); animation: text-pulse 1.5s infinite;">SUBMITTING...</div>
+    </div>`;
   try{
     const r=await fetch('/api/leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,score:timeMs,mode:'sprint'})});
     const data=await r.json();
@@ -61,11 +93,34 @@ export async function submitSprintScore(timeMs){
       res.innerHTML=rankMsg+tabs+`<div class="btn-row"><button class="action-btn sm ghost" onclick="shareSprintScore(${timeMs},${data.sprintRank||0})">SHARE</button><button class="action-btn sm" onclick="showStartScreen()">PLAY AGAIN</button></div>`;
     }else{
       btn.disabled=false;inp.disabled=false;
-      res.innerHTML='<div class="sub">Save failed — please try again</div>';
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">⚠️</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">SAVE FAILED</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
     }
   }catch(e){
     btn.disabled=false;inp.disabled=false;
-    res.innerHTML='<div class="sub">Network error — please try again</div>';
+    if(!navigator.onLine){
+      const name=inp.value.trim();
+      _enqueueScore({name,score:timeMs,mode:'sprint'});
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:rgba(255,200,80,0.9)">💾</div>
+          <div class="lb-offline-txt" style="color:rgba(255,200,80,0.9);">SAVED OFFLINE</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px; letter-spacing:0.5px">Will submit when back online</div>
+        </div>`;
+      const onResume=()=>{window.removeEventListener('online',onResume);const r=document.getElementById('lb-result');if(r&&r.innerHTML.includes('SAVED OFFLINE')){const b=document.getElementById('lb-submit-btn');if(b&&!b.disabled)b.click();}};
+      window.addEventListener('online',onResume);
+    } else {
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">📡</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">NETWORK ERROR</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
+    }
   }
 }
 
@@ -133,7 +188,12 @@ export async function captureSprintImage(timeMs,rank,lpm){
 }
 
 export function lbHTML(entries, myName, myRank, myScore, timeMode=false) {
-  if(!entries.length) return '<div class="sub" style="margin-top:4px">No records yet</div>';
+  if(!entries.length) return `
+    <div class="lb-offline" style="margin-top:20px; gap:6px;">
+      <div class="lb-offline-icon" style="font-size:26px; opacity:0.8;">📭</div>
+      <div class="lb-offline-txt" style="color:rgba(255,255,255,0.6);">NO RECORDS YET</div>
+      <div style="font-size:8px; color:rgba(255,255,255,0.3); margin-top:-2px; letter-spacing:1px">Be the first to claim the top spot!</div>
+    </div>`;
   const medals=['🥇','🥈','🥉'];
   const fmt=timeMode?(v=>fmtTime(v)):(v=>v.toLocaleString());
   let html = `<table class="lb-table">${entries.map((e,i)=>{
@@ -161,7 +221,11 @@ export async function submitScore(){
   localStorage.setItem(LS.NAME,name);
 
   btn.disabled=true; inp.disabled=true;
-  res.innerHTML='<div class="sub">SUBMITTING...</div>';
+  res.innerHTML=`
+    <div class="lb-offline" style="margin-top:10px; gap:6px;">
+      <div class="lb-offline-icon" style="font-size:24px; animation: text-pulse 1.5s infinite;">🚀</div>
+      <div class="lb-offline-txt" style="color:var(--cyan); animation: text-pulse 1.5s infinite;">SUBMITTING...</div>
+    </div>`;
 
   try{
     const payload = { name, score:S.score };
@@ -216,11 +280,36 @@ export async function submitScore(){
       res.innerHTML=rankMsg+tabs+`<div class="btn-row"><button class="action-btn sm ghost" onclick="shareScore(${S.score},${data.rank||0})">SHARE</button><button class="action-btn sm" onclick="showStartScreen()">PLAY AGAIN</button></div>`;
     }else{
       btn.disabled=false;inp.disabled=false;
-      res.innerHTML='<div class="sub">Save failed — please try again</div>';
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">⚠️</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">SAVE FAILED</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
     }
   }catch(e){
     btn.disabled=false;inp.disabled=false;
-    res.innerHTML='<div class="sub">Network error — please try again</div>';
+    if(!navigator.onLine){
+      const name=inp.value.trim();
+      const payload={name,score:S.score};
+      if(S.isDailyMode)payload.mode='daily';
+      _enqueueScore(payload);
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:rgba(255,200,80,0.9)">💾</div>
+          <div class="lb-offline-txt" style="color:rgba(255,200,80,0.9);">SAVED OFFLINE</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px; letter-spacing:0.5px">Will submit when back online</div>
+        </div>`;
+      const onResume=()=>{window.removeEventListener('online',onResume);const r=document.getElementById('lb-result');if(r&&r.innerHTML.includes('SAVED OFFLINE')){const b=document.getElementById('lb-submit-btn');if(b&&!b.disabled)b.click();}};
+      window.addEventListener('online',onResume);
+    } else {
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">📡</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">NETWORK ERROR</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
+    }
   }
 }
 
@@ -384,10 +473,21 @@ export async function loadStartLeaderboard(){
     const r=await fetch(url);
     const data=await r.json();
     S._lbCache={...S._lbCache,...data};
+    S._lbOffline = false;
     const activeTab=document.querySelector('.lb-tab[data-tab].active');
     const defaultTab=S.lbMode==='daily'?'challenge':S.lbMode==='sprint'?'sprint-daily':'daily';
     renderLbTab(activeTab?activeTab.dataset.tab:defaultTab);
-  }catch(e){}
+  }catch(e){
+    S._lbOffline = true;
+    const inner=document.querySelector('.lb-inner');
+    if(inner){
+      inner.style.cssText='display:flex;align-items:center;justify-content:center;';
+      inner.innerHTML=`<div class="lb-offline">
+        <span class="material-icons-round lb-offline-icon">wifi_off</span>
+        <span class="lb-offline-txt">NO INTERNET CONNECTION</span>
+      </div>`;
+    }
+  }
 }
 
 export function renderLbTab(tab){
@@ -405,6 +505,16 @@ export function renderLbTab(tab){
   else                         { entries=S._lbCache.board||[];                myRank=S._lbCache.rank; }
 
   document.querySelectorAll('.lb-tab[data-tab]').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  
+  if (S._lbOffline || (!navigator.onLine && (!entries || entries.length === 0))) {
+    inner.style.cssText='display:flex;align-items:center;justify-content:center;';
+    inner.innerHTML=`<div class="lb-offline">
+      <span class="material-icons-round lb-offline-icon">wifi_off</span>
+      <span class="lb-offline-txt">NO INTERNET CONNECTION</span>
+    </div>`;
+    return;
+  }
+
   const myVal=isSprintTab?S._lbCache.mySprintTime:S._lbCache.myScore;
   // Clear inline flex/centering styles left over from the LOADING placeholder.
   // Without this, the table is rendered as a flex item with align-items:center,
@@ -444,3 +554,7 @@ export function setLbMode(mode) {
   }
   loadStartLeaderboard();
 }
+
+window.addEventListener('online', () => {
+  if (document.querySelector('.lb-offline')) loadStartLeaderboard();
+});

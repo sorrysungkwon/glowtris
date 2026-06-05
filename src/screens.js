@@ -13,6 +13,7 @@ import {
   startGame, startSprintMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
+import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd, hidePWABanner } from './pwa.js';
 
 const $overlay = document.getElementById('overlay');
 
@@ -34,7 +35,7 @@ export function showDailyGateOverlay(todayStr) {
   clearInterval(_gateTimer);
   const updateCountdown = () => {
     const now = new Date();
-    const nextMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const diffMs = nextMidnight - now;
     if (diffMs <= 0) {
       clearInterval(_gateTimer);
@@ -66,7 +67,7 @@ export function showDailyGateOverlay(todayStr) {
 }
 
 export function startDailyChallenge() {
-  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const todayStr = new Date().toLocaleDateString('sv').replace(/-/g, '');
   if (localStorage.getItem(LS.DAILY_DATE) === todayStr) {
     showDailyGateOverlay(todayStr);
     return;
@@ -98,7 +99,7 @@ export function startDailyChallenge() {
   $overlay.style.display = 'flex';
 }
 
-function _settingsHTML(p) {
+function _settingsHTML(p, showPWA=true) {
   return `
     <div class="sg-label">AUDIO</div>
     <button class="toggle-btn${S.muteAudio?' muted':''}" id="${p}-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON'}</button>
@@ -133,8 +134,24 @@ function _settingsHTML(p) {
     </div>
 
     <div class="sg-sep"></div>
-    <div class="sg-label">PERFORMANCE</div>
-    <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>`;
+    <div class="sg-label">PERFORMANCE & SYSTEM</div>
+    <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>
+    ${showPWA?`<button class="toggle-btn${_notifBtnClass()}" id="${p}-notif-btn" onclick="window._pwaNotifToggle()">${_notifBtnLabel()}</button>
+    ${pwaInstallBtnHTML(p)}`:''}
+  `;
+}
+
+function _notifBtnClass() {
+  if (!('Notification' in window)) return ' muted';
+  if (Notification.permission === 'granted') return '';
+  return ' muted';
+}
+
+function _notifBtnLabel() {
+  if (!('Notification' in window)) return '🔔 NOTIFICATIONS: N/A';
+  if (Notification.permission === 'granted') return '🔔 NOTIFICATIONS: ON';
+  if (Notification.permission === 'denied') return '🔔 NOTIFICATIONS: OFF';
+  return '🔔 NOTIFICATIONS: OFF';
 }
 
 export function openSettings() {
@@ -156,7 +173,7 @@ export function togglePause(){
     $overlay.innerHTML=`
       <div class="glass-panel">
         <h1 class="pause-header">PAUSED</h1>
-        <div class="settings-box">${_settingsHTML('ov')}</div>
+        <div class="settings-box">${_settingsHTML('ov',false)}</div>
         <button class="action-btn full-width" onclick="togglePause()">RESUME</button>
         <button class="action-btn ghost full-width restart" onclick="showStartScreen()">RESTART</button>
       </div>`;
@@ -169,7 +186,7 @@ export function togglePause(){
 }
 
 export function _saveGameStats() {
-  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const todayStr = new Date().toLocaleDateString('sv').replace(/-/g, '');
   if (S.isDailyMode) localStorage.setItem(LS.DAILY_DATE, todayStr);
 
   const isNewBest = S.score > S.hiScore;
@@ -222,6 +239,7 @@ export function _saveGameStats() {
 }
 
 export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, isBestLevel, isBestCombo, isBestLines }) {
+  offlineBarGameEnd();
   const savedName = localStorage.getItem(LS.NAME) || '';
 
   let pbBadges = [];
@@ -278,11 +296,15 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
   rollNumber(document.getElementById('gov-score-val'), S.score, 1400);
   rollNumber(document.getElementById('gov-hi-val'), S.hiScore, 1400);
   const inp = document.getElementById('lb-name');
-  inp.focus(); inp.select();
+  if (!('ontouchstart' in window)) {
+    inp.focus(); inp.select();
+  }
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitScore(); });
+  onPWAGameOver();
 }
 
 export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
+  offlineBarGameEnd();
   const savedName=localStorage.getItem(LS.NAME)||'';
   const lpm=Math.round(SPRINT_LINES/(timeMs/60000));
   const prevBestLine=prevBest>0&&!isNewBest
@@ -311,11 +333,15 @@ export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
     </div>`;
   $overlay.style.display='flex';
   const inp=document.getElementById('lb-name');
-  inp.focus();inp.select();
+  if (!('ontouchstart' in window)) {
+    inp.focus(); inp.select();
+  }
   inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitSprintScore(timeMs);});
+  onPWAGameOver();
 }
 
 export function showStartScreen(){
+  offlineBarGameEnd();
   S.isDailyMode=false;
   S.isSprintMode=false;
   if(_gateTimer) { clearInterval(_gateTimer); _gateTimer=null; }
@@ -373,13 +399,15 @@ export function showStartScreen(){
     </div>`;
   $overlay.style.display='flex';
   loadStartLeaderboard();
+  onPWAGameOver();
 }
 
 export function showModeSelector(){
+  hidePWABanner();
   const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
   const hiS=parseInt(localStorage.getItem(LS.HI)||'0');
   const marathonBest=hiS>0?`<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
-  const todayStr=new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const todayStr=new Date().toLocaleDateString('sv').replace(/-/g,'');
   const dailyDone=localStorage.getItem(LS.DAILY_DATE)===todayStr;
   const dailySub=dailyDone?'<span style="color:rgba(255,230,0,0.75)">✓ Completed today</span>':'<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
 

@@ -33,6 +33,7 @@ import {
   _renderSprintScreen, showStartScreen, showModeSelector, openSettings
 } from './screens.js';
 import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
+import { initPWA, offlineBarGameStart, offlineBarGameEnd } from './pwa.js';
 
 document.addEventListener('gesturestart',  e=>e.preventDefault(), {passive:false});
 document.addEventListener('gesturechange', e=>e.preventDefault(), {passive:false});
@@ -747,6 +748,7 @@ function loadSettings(){
 }
 
 export function startGame(){
+  offlineBarGameStart();
   $overlay.style.display='none';
   $combo.textContent='';
   // Reset display synchronously so overlay-hide and value-reset happen in the
@@ -963,8 +965,13 @@ const $hiScoreM = document.getElementById('hi-score-m');
 if($hiScore)$hiScore.textContent=S.hiScore.toLocaleString();
 if($hiScoreM)$hiScoreM.textContent=S.hiScore.toLocaleString();
 document.fonts.ready.then(() => {
+  initPWA();
   animFrame=requestAnimationFrame(function bgOnly(ts){drawBackground();if(!S.gameRunning)animFrame=requestAnimationFrame(bgOnly);});
   showStartScreen();
+  const mode = new URLSearchParams(window.location.search).get('mode');
+  if (mode === 'marathon') setTimeout(startGame, 100);
+  else if (mode === 'sprint') setTimeout(startSprintMode, 100);
+  else if (mode === 'daily') setTimeout(startDailyChallenge, 100);
 });
 // Pre-warm cell sprites during idle so startGame() click doesn't block (INP fix)
 (window.requestIdleCallback||function(cb){setTimeout(cb,200);})(function(){
