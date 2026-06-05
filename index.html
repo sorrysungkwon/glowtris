@@ -4206,6 +4206,7 @@ if ('serviceWorker' in navigator) {
   var _deferred = null;
   var _bannerShown = false;
   var _gameActive = false;
+  var _bannerTimer = null;
   function _installed() {
     return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
   }
@@ -4238,7 +4239,7 @@ if ('serviceWorker' in navigator) {
       _hideBanner();
     });
     if (!_snoozed()) {
-      setTimeout(() => {
+      _bannerTimer = setTimeout(() => {
         if (!_bannerShown) _showBanner();
       }, 2e3);
     }
@@ -4272,6 +4273,8 @@ if ('serviceWorker' in navigator) {
   function offlineBarGameStart() {
     var _a;
     _gameActive = true;
+    clearTimeout(_bannerTimer);
+    _bannerTimer = null;
     (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
     hidePWABanner();
   }
@@ -4333,11 +4336,13 @@ if ('serviceWorker' in navigator) {
     setTimeout(() => el.remove(), 350);
   }
   function hidePWABanner() {
+    clearTimeout(_bannerTimer);
+    _bannerTimer = null;
     _bannerShown = false;
     const el = document.getElementById("pwa-banner");
     if (!el) return;
-    el.classList.remove("visible");
-    setTimeout(() => el.remove(), 400);
+    el.style.transform = "translateY(120%)";
+    setTimeout(() => el.remove(), 420);
   }
   window._pwaDismiss = function() {
     sessionStorage.setItem("pwa-closed", "1");
