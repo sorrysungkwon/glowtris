@@ -4204,6 +4204,7 @@ if ('serviceWorker' in navigator) {
   };
   var _deferred = null;
   var _bannerShown = false;
+  var _gameActive = false;
   function _installed() {
     return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
   }
@@ -4269,12 +4270,14 @@ if ('serviceWorker' in navigator) {
   }
   function offlineBarGameStart() {
     var _a;
+    _gameActive = true;
     (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
     const banner = document.getElementById("pwa-banner");
     if (banner) banner.classList.remove("visible");
   }
   function offlineBarGameEnd() {
     var _a;
+    _gameActive = false;
     if (!sessionStorage.getItem("offline-bar-swiped")) {
       (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.remove("game-active");
     }
@@ -4300,6 +4303,7 @@ if ('serviceWorker' in navigator) {
     if (_bannerShown || _installed() || _snoozed()) return;
     if (sessionStorage.getItem("pwa-closed")) return;
     if (!_deferred && !_iOS()) return;
+    if (_gameActive) return;
     _bannerShown = true;
     const el = document.createElement("div");
     el.id = "pwa-banner";
