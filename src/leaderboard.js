@@ -417,10 +417,12 @@ export async function loadStartLeaderboard(){
     const r=await fetch(url);
     const data=await r.json();
     S._lbCache={...S._lbCache,...data};
+    S._lbOffline = false;
     const activeTab=document.querySelector('.lb-tab[data-tab].active');
     const defaultTab=S.lbMode==='daily'?'challenge':S.lbMode==='sprint'?'sprint-daily':'daily';
     renderLbTab(activeTab?activeTab.dataset.tab:defaultTab);
   }catch(e){
+    S._lbOffline = true;
     const inner=document.querySelector('.lb-inner');
     if(inner){
       inner.style.cssText='display:flex;align-items:center;justify-content:center;';
@@ -448,7 +450,7 @@ export function renderLbTab(tab){
 
   document.querySelectorAll('.lb-tab[data-tab]').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   
-  if (!navigator.onLine && (!entries || entries.length === 0)) {
+  if (S._lbOffline || (!navigator.onLine && (!entries || entries.length === 0))) {
     inner.style.cssText='display:flex;align-items:center;justify-content:center;';
     inner.innerHTML=`<div class="lb-offline">
       <span class="material-icons-round lb-offline-icon">wifi_off</span>
