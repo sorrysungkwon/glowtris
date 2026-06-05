@@ -1509,84 +1509,91 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   left: 0;
   right: 0;
   z-index: 9000;
-  padding: 0 12px 16px;
-  transition: bottom 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
+  padding: 0 16px 20px;
+  transition: bottom 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 #pwa-banner.visible { bottom: 0; }
 #pwa-banner.game-active { bottom: -220px; }
 .pwa-banner-inner {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background: rgba(0, 15, 30, 0.97);
-  border: 1px solid rgba(0, 200, 255, 0.28);
-  border-radius: 14px;
-  padding: 14px 14px 12px;
-  box-shadow: 0 -4px 24px rgba(0, 200, 255, 0.12);
+  gap: 12px;
+  background: rgba(0, 10, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 200, 255, 0.2);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 .pwa-banner-top {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
-.pwa-banner-icon { font-size: 20px; flex-shrink: 0; }
-.pwa-banner-text { flex: 1; min-width: 0; }
+.pwa-banner-icon { font-size: 28px; flex-shrink: 0; }
+.pwa-banner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .pwa-banner-title {
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: rgba(0, 200, 255, 0.95);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #fff;
+  line-height: 1.1;
 }
 .pwa-banner-sub {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.38);
-  letter-spacing: 0.3px;
-  margin-top: 2px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.3;
 }
 .pwa-banner-close {
-  font-size: 16px;
+  align-self: flex-start;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.3);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 2px 4px;
-  flex-shrink: 0;
-  touch-action: manipulation;
-  line-height: 1;
+  padding: 4px;
+  margin: -4px -4px 0 0;
+  transition: color 0.2s;
 }
+.pwa-banner-close:hover { color: rgba(255, 255, 255, 0.8); }
+
 .pwa-banner-btns {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-top: 4px;
 }
 .pwa-banner-add {
   font-family: 'Orbitron', sans-serif;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
   color: #000;
-  background: rgba(0, 200, 255, 0.92);
+  background: linear-gradient(135deg, #00e5ff 0%, #0088ff 100%);
   border: none;
-  border-radius: 8px;
-  padding: 9px 0;
+  border-radius: 12px;
+  padding: 12px 0;
   cursor: pointer;
-  touch-action: manipulation;
   flex: 1;
+  box-shadow: 0 4px 16px rgba(0, 200, 255, 0.25);
+  transition: transform 0.1s, opacity 0.2s;
 }
-.pwa-banner-add:active { opacity: 0.8; }
+.pwa-banner-add:active { transform: scale(0.97); }
 .pwa-banner-snooze {
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.28);
-  background: none;
-  border: none;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 11px 16px;
+  text-decoration: none;
   cursor: pointer;
-  padding: 0;
-  touch-action: manipulation;
-  text-decoration: underline;
-  letter-spacing: 0.3px;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
 }
+.pwa-banner-snooze:active { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
 /* ── PWA Modals ──────────────────────────────────────────────────────────── */
 #pwa-modal {
@@ -1603,38 +1610,50 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 }
 #pwa-modal.visible { opacity: 1; }
 .pwa-modal-box {
-  background: rgba(0, 12, 26, 0.99);
-  border: 1px solid rgba(0, 200, 255, 0.28);
-  border-radius: 16px;
-  padding: 28px 22px 22px;
+  background: rgba(0, 10, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 200, 255, 0.2);
+  border-radius: 24px;
+  padding: 32px 24px;
   width: 100%;
-  max-width: 320px;
+  max-width: 340px;
   text-align: center;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.pwa-modal-icon { font-size: 38px; margin-bottom: 12px; }
+#pwa-modal.visible .pwa-modal-box { transform: scale(1); }
+.pwa-modal-icon { font-size: 44px; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(0,200,255,0.3)); }
 .pwa-modal-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 900;
-  letter-spacing: 3px;
-  color: rgba(0, 200, 255, 0.95);
-  margin-bottom: 16px;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 12px;
 }
 .pwa-modal-body {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.65;
-  margin-bottom: 22px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  padding: 0 10px;
 }
 .pwa-modal-steps {
   text-align: left;
-  margin: 0 0 22px 0;
-  padding-left: 18px;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 12px;
-  line-height: 1.9;
+  margin: 0 0 24px 0;
+  padding: 16px 16px 16px 36px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  line-height: 1.8;
 }
-.pwa-modal-steps li { margin-bottom: 2px; }
-.pwa-modal-steps strong { color: rgba(0, 200, 255, 0.9); }
+.pwa-modal-steps li { margin-bottom: 8px; }
+.pwa-modal-steps li::marker { color: #00e5ff; font-weight: bold; }
+.pwa-modal-steps li:last-child { margin-bottom: 0; }
+.pwa-modal-steps strong { color: #00e5ff; font-weight: 600; }
 
 /* Settings install button */
 .toggle-btn.pwa-install-btn {
