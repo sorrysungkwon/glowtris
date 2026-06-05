@@ -153,7 +153,8 @@ function _hideOffline() {
 }
 
 export function onPWAGameOver() {
-  if (_installed() || _bannerShown || _snoozed()) return;
+  if (_installed() || _snoozed()) return;
+  _bannerShown = false;
   setTimeout(_showBanner, 1200);
 }
 
@@ -199,8 +200,11 @@ function _hideBanner() {
 }
 
 export function hidePWABanner() {
+  _bannerShown = false;
   const el = document.getElementById('pwa-banner');
-  if (el) el.classList.remove('visible');
+  if (!el) return;
+  el.classList.remove('visible');
+  setTimeout(() => el.remove(), 400);
 }
 
 window._pwaDismiss = function() {
