@@ -13,7 +13,7 @@ import {
   startGame, startSprintMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
-import { pwaInstallBtnHTML, onPWAGameOver } from './pwa.js';
+import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd } from './pwa.js';
 
 const $overlay = document.getElementById('overlay');
 
@@ -319,6 +319,7 @@ export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
 }
 
 export function showStartScreen(){
+  offlineBarGameEnd();
   S.isDailyMode=false;
   S.isSprintMode=false;
   if(_gateTimer) { clearInterval(_gateTimer); _gateTimer=null; }
