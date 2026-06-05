@@ -189,7 +189,7 @@ export async function captureSprintImage(timeMs,rank,lpm){
 
 export function lbHTML(entries, myName, myRank, myScore, timeMode=false) {
   if(!entries.length) return `
-    <div class="lb-offline" style="margin-top:20px; gap:6px;">
+    <div class="lb-offline" style="gap:6px;">
       <div class="lb-offline-icon" style="font-size:26px; opacity:0.8;">📭</div>
       <div class="lb-offline-txt" style="color:rgba(255,255,255,0.6);">NO RECORDS YET</div>
       <div style="font-size:8px; color:rgba(255,255,255,0.3); margin-top:-2px; letter-spacing:1px">Be the first to claim the top spot!</div>
@@ -521,6 +521,7 @@ export function renderLbTab(tab){
   // clipping the top rows so the visible list starts mid-rank.
   inner.removeAttribute('style');
   inner.innerHTML=lbHTML(entries,S._lbCache.myName,myRank,myVal,isSprintTab);
+  if (!entries.length) inner.style.cssText='display:flex;align-items:center;justify-content:center;';
   inner.scrollTop=0;
 }
 
