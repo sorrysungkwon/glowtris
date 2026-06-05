@@ -4204,7 +4204,6 @@ if ('serviceWorker' in navigator) {
     requestAnimationFrame(() => el.classList.add("visible"));
   };
   var _deferred = null;
-  var _bannerShown = false;
   var _gameActive = false;
   var _bannerTimer = null;
   function _installed() {
@@ -4236,7 +4235,7 @@ if ('serviceWorker' in navigator) {
     window.addEventListener("appinstalled", () => {
       localStorage.setItem(LS_INSTALLED, "1");
       _deferred = null;
-      _hideBanner();
+      hidePWABanner();
     });
     if (!_snoozed()) {
       clearTimeout(_bannerTimer);
@@ -4294,7 +4293,6 @@ if ('serviceWorker' in navigator) {
   }
   function onPWAGameOver() {
     if (_installed() || _snoozed()) return;
-    _bannerShown = false;
     _gameActive = false;
     clearTimeout(_bannerTimer);
     _bannerTimer = setTimeout(_showBanner, 500);
@@ -4305,58 +4303,50 @@ if ('serviceWorker' in navigator) {
     return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
   }
   function _showBanner() {
-    if (_bannerShown || _installed() || _snoozed()) return;
+    if (_installed() || _snoozed()) return;
     if (sessionStorage.getItem("pwa-closed")) return;
     if (!_deferred && !_iOS()) return;
     if (_gameActive) return;
-    _bannerShown = true;
-    const el = document.createElement("div");
-    el.id = "pwa-banner";
-    el.innerHTML = `
-    <div class="pwa-banner-inner">
-      <div class="pwa-banner-top">
-        <span class="pwa-banner-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
-        <div class="pwa-banner-text">
-          <div class="pwa-banner-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
-          <div class="pwa-banner-sub">${_bannerSubtext()}</div>
+    let el = document.getElementById("pwa-banner");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "pwa-banner";
+      el.innerHTML = `
+      <div class="pwa-banner-inner">
+        <div class="pwa-banner-top">
+          <span class="pwa-banner-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
+          <div class="pwa-banner-text">
+            <div class="pwa-banner-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
+            <div class="pwa-banner-sub">${_bannerSubtext()}</div>
+          </div>
+          <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
         </div>
-        <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
-      </div>
-      <div class="pwa-banner-btns">
-        <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
-        <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
-      </div>
-    </div>`;
-    document.body.appendChild(el);
+        <div class="pwa-banner-btns">
+          <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+          <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
+        </div>
+      </div>`;
+      document.body.appendChild(el);
+    }
     el.offsetHeight;
     if (!_gameActive) el.classList.add("visible");
   }
-  function _hideBanner() {
-    clearTimeout(_bannerTimer);
-    const el = document.getElementById("pwa-banner");
-    if (!el) return;
-    el.classList.remove("visible");
-    setTimeout(() => el.remove(), 400);
-  }
   function hidePWABanner() {
     clearTimeout(_bannerTimer);
-    _bannerShown = false;
     const el = document.getElementById("pwa-banner");
-    if (!el) return;
-    el.classList.remove("visible");
-    setTimeout(() => el.remove(), 400);
+    if (el) el.classList.remove("visible");
   }
   window._pwaDismiss = function() {
     sessionStorage.setItem("pwa-closed", "1");
-    _hideBanner();
+    hidePWABanner();
   };
   window._pwaSnooze = function() {
     const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
     localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
-    _hideBanner();
+    hidePWABanner();
   };
   window._pwaInstall = function() {
-    _hideBanner();
+    hidePWABanner();
     if (_deferred) {
       _deferred.prompt();
       _deferred.userChoice.then((r) => {
