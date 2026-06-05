@@ -1,6 +1,34 @@
-const LS_INSTALLED   = 'pwa-installed';
+const LS_INSTALLED    = 'pwa-installed';
 const LS_SNOOZE_UNTIL = 'pwa-snooze-until';
-const SNOOZE_DAYS    = 3;
+const SNOOZE_DAYS     = 3;
+
+// ── Centralized toast ─────────────────────────────────────────────────────────
+export function showToast(msg, { icon = '', duration = 3000 } = {}) {
+  let el = document.getElementById('pwa-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'pwa-toast';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = icon
+    ? `<span class="material-icons-round" style="font-size:14px">${icon}</span>${msg}`
+    : msg;
+  el.classList.add('visible');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('visible'), duration);
+}
+
+// ── SW update toast ───────────────────────────────────────────────────────────
+window._pwaShowUpdateToast = function() {
+  let el = document.getElementById('pwa-update-bar');
+  if (el) return;
+  el = document.createElement('div');
+  el.id = 'pwa-update-bar';
+  el.innerHTML = `<span class="material-icons-round" style="font-size:14px">system_update</span>New version available<button class="pwa-update-refresh" onclick="window.location.reload()">REFRESH</button>`;
+  if (document.getElementById('offline-bar')) el.classList.add('below-offline');
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('visible'));
+};
 
 let _deferred    = null;
 let _bannerShown = false;

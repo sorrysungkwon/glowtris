@@ -1,6 +1,31 @@
 import { S, LS, SUPPORT_URL, SPRINT_LINES, fmtTime } from './shared.js';
 import { unlockAchievement } from './ui.js';
 import { showStartScreen } from './screens.js';
+import { showToast } from './pwa.js';
+
+const LS_SCORE_QUEUE = 'glowtris-score-queue';
+
+function _enqueueScore(payload) {
+  const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || '[]');
+  q.push(payload);
+  localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(q));
+}
+
+async function _flushScoreQueue() {
+  const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || '[]');
+  if (!q.length) return;
+  const remaining = [];
+  for (const payload of q) {
+    try {
+      const r = await fetch('/api/leaderboard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!r.ok) remaining.push(payload);
+      else showToast('Score submitted!', { icon: 'check_circle' });
+    } catch { remaining.push(payload); }
+  }
+  localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(remaining));
+}
+
+window.addEventListener('online', _flushScoreQueue);
 
 export function _openDonation(){
   if(!SUPPORT_URL)return;
@@ -220,7 +245,15 @@ export async function submitScore(){
     }
   }catch(e){
     btn.disabled=false;inp.disabled=false;
-    res.innerHTML='<div class="sub">Network error — please try again</div>';
+    if(!navigator.onLine){
+      const name=inp.value.trim();
+      const payload={name,score:S.score};
+      if(S.isDailyMode)payload.mode='daily';
+      _enqueueScore(payload);
+      res.innerHTML='<div class="sub" style="color:rgba(255,200,80,0.8)">Offline — score saved, will submit when back online</div>';
+    } else {
+      res.innerHTML='<div class="sub">Network error — please try again</div>';
+    }
   }
 }
 

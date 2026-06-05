@@ -6,6 +6,7 @@
 <title>GLOWTRIS</title>
 <meta name="description" content="Neon-styled block stacking game with online leaderboard. Compete for the top rank!">
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#00c8ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -40,7 +41,16 @@
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const sw = reg.installing;
+        sw.addEventListener('statechange', () => {
+          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+            window._pwaShowUpdateToast && window._pwaShowUpdateToast();
+          }
+        });
+      });
+    }).catch(() => {});
   });
 }
 </script>
