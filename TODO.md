@@ -3,7 +3,7 @@
 ## 🚨 Behavioral Guidelines (Must read first!)
 - **ES Modules Architecture**: Always maintain the ES modules split (`src/`). The build step generates the single `index.html`. No external frontend libraries allowed.
 - **English-Only Rule**: All code changes, comments, logs, documentation, and Git commit messages MUST be written entirely in English.
-- **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push해".** Docs-only commits accumulate locally and are bundled with the next code push.
+- **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push".** Docs-only commits accumulate locally and are bundled with the next code push.
 
 ## 📝 Latest Sync Notes & Future Suggestions (Handover to Claude)
 **Recently Completed (Antigravity Sync - 2026-06-05):**
@@ -760,4 +760,4 @@ Root cause: Vercel Analytics reported INP 568ms ("poor" — threshold is >500ms)
 - [ ] Task 7: Update docs, push version tag `v2.0`, upgrade infrastructure (Vercel Pro + Pusher).
 
 ## 🐛 Pending Bugs
-- [x] **180도 회전 버그 (해결됨)**: 유저 제보 - 하드드랍 뿐만 아니라 소프트드랍이나 가만히 두어 블록이 바닥에 닿아 고정될 때도 180도 회전(A키)이 가끔 씹히는 현상이 있었으나 IRS 중복 회전 방지 및 판정 수정을 통해 해결 완료.
+- [x] **180° rotation bug (fixed)**: User report — 180° rotation (A key) occasionally dropped not only on hard drop but also on soft drop or natural gravity lock. Root cause was unrelated to IRS; fixed by buffering rotation intent into `S.pendingRot` when `S.current` is null and consuming it in `spawnPiece`.
