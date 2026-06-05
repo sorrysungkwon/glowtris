@@ -966,7 +966,7 @@ if($hiScore)$hiScore.textContent=S.hiScore.toLocaleString();
 if($hiScoreM)$hiScoreM.textContent=S.hiScore.toLocaleString();
 fetch('/api/maintenance').then(r=>r.json()).then(data=>{
   if(!data||!data.time)return;
-  const t=new Date(data.time).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const t=new Date(data.time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   const el=document.getElementById('maintenance-banner');
   if(!el)return;
   document.getElementById('maintenance-text').textContent=`⚠ ${data.msg} — ${t}`;

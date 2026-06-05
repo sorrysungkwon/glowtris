@@ -6635,7 +6635,7 @@ ${window.location.origin}`;
   if ($hiScoreM2) $hiScoreM2.textContent = S.hiScore.toLocaleString();
   fetch("/api/maintenance").then((r) => r.json()).then((data) => {
     if (!data || !data.time) return;
-    const t = new Date(data.time).toLocaleString(void 0, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    const t = new Date(data.time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
     const el = document.getElementById("maintenance-banner");
     if (!el) return;
     document.getElementById("maintenance-text").textContent = `\u26A0 ${data.msg} \u2014 ${t}`;
