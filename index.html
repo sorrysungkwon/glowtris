@@ -1394,15 +1394,20 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 #pwa-banner.visible { bottom: 0; }
 .pwa-banner-inner {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
   background: rgba(0, 15, 30, 0.97);
   border: 1px solid rgba(0, 200, 255, 0.28);
   border-radius: 14px;
-  padding: 12px 12px 12px 16px;
+  padding: 14px 14px 12px;
   box-shadow: 0 -4px 24px rgba(0, 200, 255, 0.12);
 }
-.pwa-banner-icon { font-size: 22px; flex-shrink: 0; }
+.pwa-banner-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pwa-banner-icon { font-size: 20px; flex-shrink: 0; }
 .pwa-banner-text { flex: 1; min-width: 0; }
 .pwa-banner-title {
   font-size: 11px;
@@ -1412,35 +1417,44 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 }
 .pwa-banner-sub {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.3px;
   margin-top: 2px;
 }
-.pwa-banner-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+.pwa-banner-close {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
   flex-shrink: 0;
+  touch-action: manipulation;
+  line-height: 1;
+}
+.pwa-banner-btns {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .pwa-banner-add {
   font-family: 'Orbitron', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 2px;
   color: #000;
   background: rgba(0, 200, 255, 0.92);
   border: none;
-  border-radius: 7px;
-  padding: 8px 16px;
+  border-radius: 8px;
+  padding: 9px 0;
   cursor: pointer;
   touch-action: manipulation;
-  white-space: nowrap;
+  flex: 1;
 }
 .pwa-banner-add:active { opacity: 0.8; }
 .pwa-banner-snooze {
   font-size: 9px;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.28);
   background: none;
   border: none;
   cursor: pointer;
@@ -1449,18 +1463,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   text-decoration: underline;
   letter-spacing: 0.3px;
   white-space: nowrap;
-}
-.pwa-banner-close {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.35);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px 4px 6px 8px;
   flex-shrink: 0;
-  touch-action: manipulation;
-  line-height: 1;
-  align-self: flex-start;
 }
 
 /* ── PWA Modals ──────────────────────────────────────────────────────────── */
@@ -4077,16 +4080,18 @@ if ('serviceWorker' in navigator) {
     el.id = "pwa-banner";
     el.innerHTML = `
     <div class="pwa-banner-inner">
-      <span class="pwa-banner-icon">\u{1F4F2}</span>
-      <div class="pwa-banner-text">
-        <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
-        <div class="pwa-banner-sub">Play offline \xB7 no browser bar</div>
+      <div class="pwa-banner-top">
+        <span class="pwa-banner-icon">\u{1F4F2}</span>
+        <div class="pwa-banner-text">
+          <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
+          <div class="pwa-banner-sub">Play offline \xB7 no browser bar</div>
+        </div>
+        <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
       </div>
-      <div class="pwa-banner-actions">
+      <div class="pwa-banner-btns">
         <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
         <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
       </div>
-      <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
     </div>`;
     document.body.appendChild(el);
     requestAnimationFrame(() => el.classList.add("visible"));
