@@ -29,6 +29,14 @@
 
 ---
 
+## 📱 UI & SafeArea Guidelines
+
+- **Top Safe Area Reservation**: DO NOT place any UI elements (banners, buttons, indicators) rigidly at `top: 0` or directly inside the OS safe area (`env(safe-area-inset-top)`). 
+- **Notches & Dynamic Islands**: When positioning system popups at the top, ALWAYS use `top: calc(env(safe-area-inset-top, 0px) + 12px)` to gracefully clear iPhone notches, normal-state Dynamic Islands, and Android camera rings (punch holes) so the UI looks perfectly balanced in the normal state. Temporary expansions (like iOS Live Activities) may overlap, but the normal idle state must look pretty. Treat the top `env(safe-area-inset-top)` as a strict "no-fly zone".
+- **Bottom Overlaps**: PWA install banners pop up from the bottom (`bottom: 0`). Do not place other system toasts or offline indicators at the bottom if they will overlap with the install banner.
+
+---
+
 ## Branch & Deployment Strategy
 
 - `master` — protected, requires PR. Auto-deploys to **https://glowtris.com** (production).
