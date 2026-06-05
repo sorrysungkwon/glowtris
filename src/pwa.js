@@ -1,10 +1,9 @@
-const LS_DISMISSED = 'pwa-dismissed';
-const LS_INSTALLED  = 'pwa-installed';
-const LS_FIRST_GAME = 'pwa-first-game';
+const LS_INSTALLED   = 'pwa-installed';
+const LS_SNOOZE_UNTIL = 'pwa-snooze-until';
+const SNOOZE_DAYS    = 3;
 
 let _deferred    = null;
 let _bannerShown = false;
-let _startTimer  = null;
 
 function _installed() {
   return window.matchMedia('(display-mode: standalone)').matches ||
@@ -14,6 +13,11 @@ function _installed() {
 
 function _iOS() {
   return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function _snoozed() {
+  const until = parseInt(localStorage.getItem(LS_SNOOZE_UNTIL) || '0', 10);
+  return Date.now() < until;
 }
 
 export function initPWA() {
@@ -30,18 +34,14 @@ export function initPWA() {
     _hideBanner();
   });
 
-  if (!localStorage.getItem(LS_DISMISSED)) {
-    _startTimer = setTimeout(() => { if (!_bannerShown) _showBanner(); }, 30000);
+  if (!_snoozed()) {
+    setTimeout(() => { if (!_bannerShown) _showBanner(); }, 2000);
   }
 }
 
 export function onPWAGameOver() {
-  if (_installed()) return;
-  if (_bannerShown || localStorage.getItem(LS_DISMISSED)) return;
-  if (!localStorage.getItem(LS_FIRST_GAME)) {
-    localStorage.setItem(LS_FIRST_GAME, '1');
-    setTimeout(_showBanner, 1200);
-  }
+  if (_installed() || _bannerShown || _snoozed()) return;
+  setTimeout(_showBanner, 1200);
 }
 
 export function pwaInstallBtnHTML(p) {
@@ -51,10 +51,10 @@ export function pwaInstallBtnHTML(p) {
 }
 
 function _showBanner() {
-  if (_bannerShown || _installed()) return;
+  if (_bannerShown || _installed() || _snoozed()) return;
+  if (sessionStorage.getItem('pwa-closed')) return;
   if (!_deferred && !_iOS()) return;
   _bannerShown = true;
-  clearTimeout(_startTimer);
 
   const el = document.createElement('div');
   el.id = 'pwa-banner';
@@ -63,9 +63,12 @@ function _showBanner() {
       <span class="pwa-banner-icon">📲</span>
       <div class="pwa-banner-text">
         <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
-        <div class="pwa-banner-sub">Play offline, no browser bar</div>
+        <div class="pwa-banner-sub">Play offline · no browser bar</div>
       </div>
-      <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+      <div class="pwa-banner-actions">
+        <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+        <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
+      </div>
       <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">✕</button>
     </div>`;
   document.body.appendChild(el);
@@ -80,7 +83,13 @@ function _hideBanner() {
 }
 
 window._pwaDismiss = function() {
-  localStorage.setItem(LS_DISMISSED, '1');
+  sessionStorage.setItem('pwa-closed', '1');
+  _hideBanner();
+};
+
+window._pwaSnooze = function() {
+  const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1000;
+  localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
   _hideBanner();
 };
 
