@@ -4868,6 +4868,9 @@ if ('serviceWorker' in navigator) {
     localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(remaining));
   }
   window.addEventListener("online", _flushScoreQueue);
+  if (navigator.onLine) {
+    setTimeout(_flushScoreQueue, 1e3);
+  }
   function _openDonation() {
     if (!SUPPORT_URL) return;
     if (document.getElementById("donation-modal")) return;

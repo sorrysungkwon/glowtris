@@ -26,6 +26,9 @@ async function _flushScoreQueue() {
 }
 
 window.addEventListener('online', _flushScoreQueue);
+if (navigator.onLine) {
+  setTimeout(_flushScoreQueue, 1000); // Give app 1s to boot before flushing
+}
 
 export function _openDonation(){
   if(!SUPPORT_URL)return;
