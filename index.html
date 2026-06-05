@@ -1505,15 +1505,15 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 /* ── PWA Install Banner ──────────────────────────────────────────────────── */
 #pwa-banner {
   position: fixed;
-  bottom: 0;
+  bottom: -220px;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: 9000;
   padding: 0 12px 16px;
-  transform: translateY(110%);
-  transition: transform 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition: bottom 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
-#pwa-banner.visible { transform: translateY(0); }
+#pwa-banner.visible { bottom: 0; }
+#pwa-banner.game-active { bottom: -220px; }
 .pwa-banner-inner {
   display: flex;
   flex-direction: column;
@@ -4206,7 +4206,6 @@ if ('serviceWorker' in navigator) {
   var _deferred = null;
   var _bannerShown = false;
   var _gameActive = false;
-  var _bannerTimer = null;
   function _installed() {
     return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
   }
@@ -4238,11 +4237,7 @@ if ('serviceWorker' in navigator) {
       _deferred = null;
       _hideBanner();
     });
-    if (!_snoozed()) {
-      _bannerTimer = setTimeout(() => {
-        if (!_bannerShown) _showBanner();
-      }, 2e3);
-    }
+    if (!_snoozed()) _showBanner();
   }
   function _initOfflineIndicator() {
     window.addEventListener("offline", _showOffline);
@@ -4271,12 +4266,11 @@ if ('serviceWorker' in navigator) {
     }, { passive: true });
   }
   function offlineBarGameStart() {
-    var _a;
+    var _a, _b, _c;
     _gameActive = true;
-    clearTimeout(_bannerTimer);
-    _bannerTimer = null;
     (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
-    hidePWABanner();
+    (_b = document.getElementById("pwa-banner")) == null ? void 0 : _b.classList.add("game-active");
+    (_c = document.getElementById("pwa-banner")) == null ? void 0 : _c.classList.remove("visible");
   }
   function offlineBarGameEnd() {
     var _a;
@@ -4296,6 +4290,7 @@ if ('serviceWorker' in navigator) {
   function onPWAGameOver() {
     if (_installed() || _snoozed()) return;
     _bannerShown = false;
+    _gameActive = false;
     setTimeout(_showBanner, 1200);
   }
   function pwaInstallBtnHTML(p) {
@@ -4333,16 +4328,14 @@ if ('serviceWorker' in navigator) {
     const el = document.getElementById("pwa-banner");
     if (!el) return;
     el.classList.remove("visible");
-    setTimeout(() => el.remove(), 350);
+    setTimeout(() => el.remove(), 400);
   }
   function hidePWABanner() {
-    clearTimeout(_bannerTimer);
-    _bannerTimer = null;
     _bannerShown = false;
     const el = document.getElementById("pwa-banner");
     if (!el) return;
-    el.style.transform = "translateY(120%)";
-    setTimeout(() => el.remove(), 420);
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 400);
   }
   window._pwaDismiss = function() {
     sessionStorage.setItem("pwa-closed", "1");
