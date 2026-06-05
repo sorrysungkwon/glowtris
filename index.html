@@ -5167,6 +5167,9 @@ ${window.location.origin}`;
     }
     loadStartLeaderboard();
   }
+  window.addEventListener("online", () => {
+    if (document.querySelector(".lb-offline")) loadStartLeaderboard();
+  });
 
   // src/loop.js
   var TICK_RATE = 1;
