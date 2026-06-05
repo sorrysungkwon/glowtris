@@ -453,3 +453,7 @@ export function setLbMode(mode) {
   }
   loadStartLeaderboard();
 }
+
+window.addEventListener('online', () => {
+  if (document.querySelector('.lb-offline')) loadStartLeaderboard();
+});
