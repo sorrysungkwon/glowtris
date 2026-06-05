@@ -447,6 +447,16 @@ export function renderLbTab(tab){
   else                         { entries=S._lbCache.board||[];                myRank=S._lbCache.rank; }
 
   document.querySelectorAll('.lb-tab[data-tab]').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  
+  if (!navigator.onLine && (!entries || entries.length === 0)) {
+    inner.style.cssText='display:flex;align-items:center;justify-content:center;';
+    inner.innerHTML=`<div class="lb-offline">
+      <span class="material-icons-round lb-offline-icon">wifi_off</span>
+      <span class="lb-offline-txt">NO INTERNET CONNECTION</span>
+    </div>`;
+    return;
+  }
+
   const myVal=isSprintTab?S._lbCache.mySprintTime:S._lbCache.myScore;
   // Clear inline flex/centering styles left over from the LOADING placeholder.
   // Without this, the table is rendered as a flex item with align-items:center,
