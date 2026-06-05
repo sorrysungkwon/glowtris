@@ -1,10 +1,21 @@
-const CACHE      = 'glowtris-v3';
+const CACHE      = 'glowtris-v4';
 const FONT_CACHE = 'glowtris-fonts-v1';
 const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg'];
+const FONT_URLS  = [
+  'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap',
+  'https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap',
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(APP_SHELL))
+    Promise.all([
+      caches.open(CACHE).then(c => c.addAll(APP_SHELL)),
+      caches.open(FONT_CACHE).then(c =>
+        Promise.all(FONT_URLS.map(url =>
+          fetch(url).then(res => { if (res.ok) c.put(url, res); }).catch(() => {})
+        ))
+      ),
+    ])
   );
   self.skipWaiting();
 });
@@ -31,12 +42,12 @@ self.addEventListener('fetch', e => {
       caches.match(request).then(cached => {
         if (cached) return cached;
         return fetch(request).then(res => {
-          if (res.ok) {
+          if (res.ok || res.type === 'opaque') {
             const clone = res.clone();
             caches.open(FONT_CACHE).then(c => c.put(request, clone));
           }
           return res;
-        });
+        }).catch(() => new Response('', { status: 408, statusText: 'Offline' }));
       })
     );
     return;
