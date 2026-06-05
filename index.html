@@ -1869,318 +1869,6 @@ if ('serviceWorker' in navigator) {
 
 <script>
 (() => {
-  var __defProp = Object.defineProperty;
-  var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __esm = (fn, res) => function __init() {
-    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-  };
-  var __export = (target, all) => {
-    for (var name in all)
-      __defProp(target, name, { get: all[name], enumerable: true });
-  };
-
-  // src/pwa.js
-  var pwa_exports = {};
-  __export(pwa_exports, {
-    hidePWABanner: () => hidePWABanner,
-    initPWA: () => initPWA,
-    offlineBarGameEnd: () => offlineBarGameEnd,
-    offlineBarGameStart: () => offlineBarGameStart,
-    onPWAGameOver: () => onPWAGameOver,
-    pwaInstallBtnHTML: () => pwaInstallBtnHTML,
-    showToast: () => showToast
-  });
-  function _urlBase64ToUint8Array(b64) {
-    const pad = "=".repeat((4 - b64.length % 4) % 4);
-    const base64 = (b64 + pad).replace(/-/g, "+").replace(/_/g, "/");
-    return Uint8Array.from([...atob(base64)].map((c) => c.charCodeAt(0)));
-  }
-  async function _registerPushSub() {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
-      await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscription: sub.toJSON(), tzOffset: (/* @__PURE__ */ new Date()).getTimezoneOffset() }) });
-    } catch (e) {
-      console.warn("[pwa] push sub failed", e);
-    }
-  }
-  function showToast(msg, { icon = "", duration = 3e3 } = {}) {
-    let el = document.getElementById("pwa-toast");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "pwa-toast";
-      document.body.appendChild(el);
-    }
-    el.innerHTML = icon ? `<span class="material-icons-round" style="font-size:14px">${icon}</span>${msg}` : msg;
-    el.classList.add("visible");
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => el.classList.remove("visible"), duration);
-  }
-  function _installed() {
-    return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
-  }
-  function _iOS() {
-    return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
-  }
-  function _isDesktop() {
-    return !_iOS() && !!_deferred && !("ontouchstart" in window) && window.innerWidth >= 600;
-  }
-  function _installLabel() {
-    return _isDesktop() ? "\u{1F4BB} INSTALL APP" : "\u{1F4F2} ADD TO HOME SCREEN";
-  }
-  function _bannerSubtext() {
-    return _isDesktop() ? "Launch from desktop \xB7 no browser bar" : "Play offline \xB7 no browser bar";
-  }
-  function _snoozed() {
-    const until = parseInt(localStorage.getItem(LS_SNOOZE_UNTIL) || "0", 10);
-    return Date.now() < until;
-  }
-  function initPWA() {
-    _initOfflineIndicator();
-    if (_installed()) {
-      setTimeout(_askNotif, 1500);
-      return;
-    }
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      _deferred = e;
-    });
-    window.addEventListener("appinstalled", () => {
-      localStorage.setItem(LS_INSTALLED, "1");
-      _deferred = null;
-      hidePWABanner();
-    });
-    if (!_snoozed()) {
-      clearTimeout(_bannerTimer);
-      _bannerTimer = setTimeout(_showBanner, 500);
-    }
-  }
-  function _initOfflineIndicator() {
-    window.addEventListener("offline", _showOffline);
-    window.addEventListener("online", _hideOffline);
-    if (!navigator.onLine) _showOffline();
-  }
-  function _showOffline() {
-    var _a;
-    if (document.getElementById("offline-bar")) return;
-    const el = document.createElement("div");
-    el.id = "offline-bar";
-    el.innerHTML = `<span class="material-icons-round" style="font-size:14px">wifi_off</span> No internet connection`;
-    document.body.appendChild(el);
-    requestAnimationFrame(() => el.classList.add("visible"));
-    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.add("below-offline");
-    let startY = 0;
-    el.addEventListener("touchstart", (e) => {
-      startY = e.touches[0].clientY;
-    }, { passive: true });
-    el.addEventListener("touchend", (e) => {
-      if (startY - e.changedTouches[0].clientY > 30) {
-        sessionStorage.setItem("offline-bar-swiped", "1");
-        el.classList.add("swiped");
-        setTimeout(() => el.remove(), 300);
-      }
-    }, { passive: true });
-  }
-  function offlineBarGameStart() {
-    var _a, _b, _c;
-    _gameActive = true;
-    clearTimeout(_bannerTimer);
-    (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
-    (_b = document.getElementById("pwa-banner")) == null ? void 0 : _b.classList.add("game-active");
-    (_c = document.getElementById("pwa-banner")) == null ? void 0 : _c.classList.remove("visible");
-  }
-  function offlineBarGameEnd() {
-    var _a;
-    _gameActive = false;
-    if (!sessionStorage.getItem("offline-bar-swiped")) {
-      (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.remove("game-active");
-    }
-  }
-  function _hideOffline() {
-    var _a;
-    const el = document.getElementById("offline-bar");
-    if (!el) return;
-    el.classList.remove("visible");
-    setTimeout(() => el.remove(), 300);
-    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.remove("below-offline");
-  }
-  function onPWAGameOver() {
-    if (_installed() || _snoozed()) return;
-    _gameActive = false;
-    clearTimeout(_bannerTimer);
-    _bannerTimer = setTimeout(_showBanner, 500);
-  }
-  function pwaInstallBtnHTML(p) {
-    if (_installed()) return "";
-    if (!_deferred && !_iOS()) return "";
-    return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
-  }
-  function _showBanner() {
-    if (_installed() || _snoozed()) return;
-    if (sessionStorage.getItem("pwa-closed")) return;
-    if (!_deferred && !_iOS()) return;
-    if (_gameActive) return;
-    let el = document.getElementById("pwa-banner");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "pwa-banner";
-      el.innerHTML = `
-      <div class="pwa-banner-inner">
-        <div class="pwa-banner-top">
-          <span class="pwa-banner-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
-          <div class="pwa-banner-text">
-            <div class="pwa-banner-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
-            <div class="pwa-banner-sub">${_bannerSubtext()}</div>
-          </div>
-          <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
-        </div>
-        <div class="pwa-banner-btns">
-          <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
-          <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
-        </div>
-      </div>`;
-      document.body.appendChild(el);
-    }
-    el.offsetHeight;
-    if (!_gameActive) el.classList.add("visible");
-  }
-  function hidePWABanner() {
-    clearTimeout(_bannerTimer);
-    const el = document.getElementById("pwa-banner");
-    if (el) el.classList.remove("visible");
-  }
-  function _showIOSModal() {
-    _removeModal();
-    const el = document.createElement("div");
-    el.id = "pwa-modal";
-    el.innerHTML = `
-    <div class="pwa-modal-box">
-      <div class="pwa-modal-title">ADD TO HOME SCREEN</div>
-      <ol class="pwa-modal-steps">
-        <li>Tap the <strong>Share</strong> button
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:3px;color:rgba(0,200,255,0.8)"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-          at the bottom of Safari
-        </li>
-        <li>Scroll and tap <strong>"Add to Home Screen"</strong></li>
-        <li>Tap <strong>Add</strong> to confirm</li>
-      </ol>
-      <button class="action-btn full-width" onclick="window._pwaIOSDone()">GOT IT</button>
-    </div>`;
-    document.body.appendChild(el);
-    requestAnimationFrame(() => el.classList.add("visible"));
-  }
-  function _askNotif() {
-    if (!("Notification" in window)) return;
-    if (Notification.permission !== "default") return;
-    if (localStorage.getItem("pwa-notif-snooze")) return;
-    _removeModal();
-    const el = document.createElement("div");
-    el.id = "pwa-modal";
-    el.innerHTML = `
-    <div class="pwa-modal-box">
-      <div class="pwa-modal-icon">\u{1F514}</div>
-      <div class="pwa-modal-title">ENABLE NOTIFICATIONS?</div>
-      <div class="pwa-modal-body">Get notified about daily challenges.<br><span style="opacity:0.7;font-size:10px">You can change this later in Settings.</span></div>
-      <button class="action-btn full-width" onclick="window._pwaNotifAllow()">ALLOW</button>
-      <button class="action-btn ghost full-width" style="margin-top:8px" onclick="window._pwaNotifDeny()">NOT NOW</button>
-    </div>`;
-    document.body.appendChild(el);
-    requestAnimationFrame(() => el.classList.add("visible"));
-  }
-  function _removeModal() {
-    const el = document.getElementById("pwa-modal");
-    if (!el) return;
-    el.classList.remove("visible");
-    setTimeout(() => el.remove(), 350);
-  }
-  var LS_INSTALLED, LS_SNOOZE_UNTIL, SNOOZE_DAYS, VAPID_PUBLIC_KEY, _deferred, _gameActive, _bannerTimer;
-  var init_pwa = __esm({
-    "src/pwa.js"() {
-      LS_INSTALLED = "pwa-installed";
-      LS_SNOOZE_UNTIL = "pwa-snooze-until";
-      SNOOZE_DAYS = 3;
-      VAPID_PUBLIC_KEY = "BI_rkhrMPW6oSlsvTpIBySBEECvvvkiPtxzmF5DOmtTim3fIDSxXU7P_Bn3TWMi3Vh_hapjlOZ1KyiexF8T0V4s";
-      window._pwaShowUpdateToast = function() {
-        let el = document.getElementById("pwa-update-bar");
-        if (el) return;
-        el = document.createElement("div");
-        el.id = "pwa-update-bar";
-        el.innerHTML = `<span class="material-icons-round" style="font-size:14px">system_update</span>New version available<button class="pwa-update-refresh" onclick="window.location.reload()">REFRESH</button>`;
-        if (document.getElementById("offline-bar")) el.classList.add("below-offline");
-        document.body.appendChild(el);
-        requestAnimationFrame(() => el.classList.add("visible"));
-      };
-      _deferred = null;
-      _gameActive = false;
-      _bannerTimer = null;
-      window._pwaDismiss = function() {
-        sessionStorage.setItem("pwa-closed", "1");
-        hidePWABanner();
-      };
-      window._pwaSnooze = function() {
-        const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
-        localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
-        hidePWABanner();
-      };
-      window._pwaInstall = function() {
-        hidePWABanner();
-        if (_deferred) {
-          _deferred.prompt();
-          _deferred.userChoice.then((r) => {
-            _deferred = null;
-            if (r.outcome === "accepted") {
-              localStorage.setItem(LS_INSTALLED, "1");
-              setTimeout(_askNotif, 800);
-            }
-          });
-        } else if (_iOS()) {
-          _showIOSModal();
-        }
-      };
-      window._pwaIOSDone = function() {
-        _removeModal();
-        setTimeout(_askNotif, 400);
-      };
-      window._pwaNotifAllow = function() {
-        _removeModal();
-        Notification.requestPermission().then((p) => {
-          localStorage.setItem("pwa-notif", p);
-          if (p === "granted") _registerPushSub();
-        });
-      };
-      window._pwaNotifDeny = function() {
-        _removeModal();
-        localStorage.setItem("pwa-notif-snooze", "forever");
-      };
-      window._pwaNotifToggle = function(btn) {
-        if (!("Notification" in window)) {
-          alert("Push notifications are not supported on this device/browser.");
-          return;
-        }
-        if (Notification.permission === "granted") {
-          alert("Notifications are currently ON. To turn them off, please go to your device or browser settings for this app.");
-          return;
-        }
-        if (Notification.permission === "denied") {
-          alert("Notifications are currently BLOCKED. Please enable them in your device settings for this app.");
-          return;
-        }
-        Notification.requestPermission().then((p) => {
-          localStorage.setItem("pwa-notif", p);
-          if (p === "granted") {
-            Promise.resolve().then(() => (init_pwa(), pwa_exports)).then((m) => {
-              window.location.reload();
-            });
-          } else {
-            alert("Notification permission was not granted.");
-          }
-        });
-      };
-    }
-  });
-
   // src/shared.js
   var COLS = 10;
   var ROWS = 20;
@@ -4491,8 +4179,291 @@ if ('serviceWorker' in navigator) {
     }, 150);
   }
 
+  // src/pwa.js
+  var LS_INSTALLED = "pwa-installed";
+  var LS_SNOOZE_UNTIL = "pwa-snooze-until";
+  var SNOOZE_DAYS = 3;
+  var VAPID_PUBLIC_KEY = "BI_rkhrMPW6oSlsvTpIBySBEECvvvkiPtxzmF5DOmtTim3fIDSxXU7P_Bn3TWMi3Vh_hapjlOZ1KyiexF8T0V4s";
+  function _urlBase64ToUint8Array(b64) {
+    const pad = "=".repeat((4 - b64.length % 4) % 4);
+    const base64 = (b64 + pad).replace(/-/g, "+").replace(/_/g, "/");
+    return Uint8Array.from([...atob(base64)].map((c) => c.charCodeAt(0)));
+  }
+  async function _registerPushSub() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+      await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscription: sub.toJSON(), tzOffset: (/* @__PURE__ */ new Date()).getTimezoneOffset() }) });
+    } catch (e) {
+      console.warn("[pwa] push sub failed", e);
+    }
+  }
+  function showToast(msg, { icon = "", duration = 3e3 } = {}) {
+    let el = document.getElementById("pwa-toast");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "pwa-toast";
+      document.body.appendChild(el);
+    }
+    el.innerHTML = icon ? `<span class="material-icons-round" style="font-size:14px">${icon}</span>${msg}` : msg;
+    el.classList.add("visible");
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => el.classList.remove("visible"), duration);
+  }
+  window._pwaShowUpdateToast = function() {
+    let el = document.getElementById("pwa-update-bar");
+    if (el) return;
+    el = document.createElement("div");
+    el.id = "pwa-update-bar";
+    el.innerHTML = `<span class="material-icons-round" style="font-size:14px">system_update</span>New version available<button class="pwa-update-refresh" onclick="window.location.reload()">REFRESH</button>`;
+    if (document.getElementById("offline-bar")) el.classList.add("below-offline");
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  };
+  var _deferred = null;
+  var _gameActive = false;
+  var _bannerTimer = null;
+  function _installed() {
+    return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
+  }
+  function _iOS() {
+    return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  }
+  function _isDesktop() {
+    return !_iOS() && !!_deferred && !("ontouchstart" in window) && window.innerWidth >= 600;
+  }
+  function _installLabel() {
+    return _isDesktop() ? "\u{1F4BB} INSTALL APP" : "\u{1F4F2} ADD TO HOME SCREEN";
+  }
+  function _bannerSubtext() {
+    return _isDesktop() ? "Launch from desktop \xB7 no browser bar" : "Play offline \xB7 no browser bar";
+  }
+  function _snoozed() {
+    const until = parseInt(localStorage.getItem(LS_SNOOZE_UNTIL) || "0", 10);
+    return Date.now() < until;
+  }
+  function initPWA() {
+    _initOfflineIndicator();
+    if (_installed()) {
+      setTimeout(_askNotif, 1500);
+      return;
+    }
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      _deferred = e;
+    });
+    window.addEventListener("appinstalled", () => {
+      localStorage.setItem(LS_INSTALLED, "1");
+      _deferred = null;
+      hidePWABanner();
+    });
+    if (!_snoozed()) {
+      clearTimeout(_bannerTimer);
+      _bannerTimer = setTimeout(_showBanner, 500);
+    }
+  }
+  function _initOfflineIndicator() {
+    window.addEventListener("offline", _showOffline);
+    window.addEventListener("online", _hideOffline);
+    if (!navigator.onLine) _showOffline();
+  }
+  function _showOffline() {
+    var _a;
+    if (document.getElementById("offline-bar")) return;
+    const el = document.createElement("div");
+    el.id = "offline-bar";
+    el.innerHTML = `<span class="material-icons-round" style="font-size:14px">wifi_off</span> No internet connection`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.add("below-offline");
+    let startY = 0;
+    el.addEventListener("touchstart", (e) => {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    el.addEventListener("touchend", (e) => {
+      if (startY - e.changedTouches[0].clientY > 30) {
+        sessionStorage.setItem("offline-bar-swiped", "1");
+        el.classList.add("swiped");
+        setTimeout(() => el.remove(), 300);
+      }
+    }, { passive: true });
+  }
+  function offlineBarGameStart() {
+    var _a, _b, _c;
+    _gameActive = true;
+    clearTimeout(_bannerTimer);
+    (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
+    (_b = document.getElementById("pwa-banner")) == null ? void 0 : _b.classList.add("game-active");
+    (_c = document.getElementById("pwa-banner")) == null ? void 0 : _c.classList.remove("visible");
+  }
+  function offlineBarGameEnd() {
+    var _a;
+    _gameActive = false;
+    if (!sessionStorage.getItem("offline-bar-swiped")) {
+      (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.remove("game-active");
+    }
+  }
+  function _hideOffline() {
+    var _a;
+    const el = document.getElementById("offline-bar");
+    if (!el) return;
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 300);
+    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.remove("below-offline");
+  }
+  function onPWAGameOver() {
+    if (_installed() || _snoozed()) return;
+    _gameActive = false;
+    clearTimeout(_bannerTimer);
+    _bannerTimer = setTimeout(_showBanner, 500);
+  }
+  function pwaInstallBtnHTML(p) {
+    if (_installed()) return "";
+    if (!_deferred && !_iOS()) return "";
+    return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
+  }
+  function _showBanner() {
+    if (_installed() || _snoozed()) return;
+    if (sessionStorage.getItem("pwa-closed")) return;
+    if (!_deferred && !_iOS()) return;
+    if (_gameActive) return;
+    let el = document.getElementById("pwa-banner");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "pwa-banner";
+      el.innerHTML = `
+      <div class="pwa-banner-inner">
+        <div class="pwa-banner-top">
+          <span class="pwa-banner-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
+          <div class="pwa-banner-text">
+            <div class="pwa-banner-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
+            <div class="pwa-banner-sub">${_bannerSubtext()}</div>
+          </div>
+          <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
+        </div>
+        <div class="pwa-banner-btns">
+          <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+          <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
+        </div>
+      </div>`;
+      document.body.appendChild(el);
+    }
+    el.offsetHeight;
+    if (!_gameActive) el.classList.add("visible");
+  }
+  function hidePWABanner() {
+    clearTimeout(_bannerTimer);
+    const el = document.getElementById("pwa-banner");
+    if (el) el.classList.remove("visible");
+  }
+  window._pwaDismiss = function() {
+    sessionStorage.setItem("pwa-closed", "1");
+    hidePWABanner();
+  };
+  window._pwaSnooze = function() {
+    const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
+    localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
+    hidePWABanner();
+  };
+  window._pwaInstall = function() {
+    hidePWABanner();
+    if (_deferred) {
+      _deferred.prompt();
+      _deferred.userChoice.then((r) => {
+        _deferred = null;
+        if (r.outcome === "accepted") {
+          localStorage.setItem(LS_INSTALLED, "1");
+          setTimeout(_askNotif, 800);
+        }
+      });
+    } else if (_iOS()) {
+      _showIOSModal();
+    }
+  };
+  function _showIOSModal() {
+    _removeModal();
+    const el = document.createElement("div");
+    el.id = "pwa-modal";
+    el.innerHTML = `
+    <div class="pwa-modal-box">
+      <div class="pwa-modal-title">ADD TO HOME SCREEN</div>
+      <ol class="pwa-modal-steps">
+        <li>Tap the <strong>Share</strong> button
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:3px;color:rgba(0,200,255,0.8)"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          at the bottom of Safari
+        </li>
+        <li>Scroll and tap <strong>"Add to Home Screen"</strong></li>
+        <li>Tap <strong>Add</strong> to confirm</li>
+      </ol>
+      <button class="action-btn full-width" onclick="window._pwaIOSDone()">GOT IT</button>
+    </div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  window._pwaIOSDone = function() {
+    _removeModal();
+    setTimeout(_askNotif, 400);
+  };
+  function _askNotif() {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "default") return;
+    if (localStorage.getItem("pwa-notif-snooze")) return;
+    _removeModal();
+    const el = document.createElement("div");
+    el.id = "pwa-modal";
+    el.innerHTML = `
+    <div class="pwa-modal-box">
+      <div class="pwa-modal-icon">\u{1F514}</div>
+      <div class="pwa-modal-title">ENABLE NOTIFICATIONS?</div>
+      <div class="pwa-modal-body">Get notified about daily challenges.<br><span style="opacity:0.7;font-size:10px">You can change this later in Settings.</span></div>
+      <button class="action-btn full-width" onclick="window._pwaNotifAllow()">ALLOW</button>
+      <button class="action-btn ghost full-width" style="margin-top:8px" onclick="window._pwaNotifDeny()">NOT NOW</button>
+    </div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  function _removeModal() {
+    const el = document.getElementById("pwa-modal");
+    if (!el) return;
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 350);
+  }
+  window._pwaNotifAllow = function() {
+    _removeModal();
+    Notification.requestPermission().then((p) => {
+      localStorage.setItem("pwa-notif", p);
+      if (p === "granted") _registerPushSub();
+    });
+  };
+  window._pwaNotifDeny = function() {
+    _removeModal();
+    localStorage.setItem("pwa-notif-snooze", "forever");
+  };
+  window._pwaNotifToggle = function() {
+    if (!("Notification" in window)) {
+      showToast("Notifications not supported on this browser.", { icon: "notifications_off" });
+      return;
+    }
+    if (Notification.permission === "granted") {
+      showToast("To turn off notifications, go to your browser/device settings.", { icon: "notifications", duration: 4e3 });
+      return;
+    }
+    if (Notification.permission === "denied") {
+      showToast("Notifications are blocked. Enable them in device settings.", { icon: "notifications_off", duration: 4e3 });
+      return;
+    }
+    Notification.requestPermission().then((p) => {
+      localStorage.setItem("pwa-notif", p);
+      if (p === "granted") {
+        _registerPushSub();
+        showToast("Notifications enabled!", { icon: "notifications_active" });
+      }
+    });
+  };
+
   // src/screens.js
-  init_pwa();
   var $overlay = document.getElementById("overlay");
   function rollNumber(el, val, dur) {
     if (!el) return;
@@ -4913,7 +4884,6 @@ if ('serviceWorker' in navigator) {
   }
 
   // src/leaderboard.js
-  init_pwa();
   var LS_SCORE_QUEUE = "glowtris-score-queue";
   function _enqueueScore(payload) {
     const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || "[]");
@@ -5559,7 +5529,6 @@ ${window.location.origin}`;
   }
 
   // src/game.js
-  init_pwa();
   document.addEventListener("mouseover", (e) => {
     const btn = e.target.closest(".action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap");
     if (btn && (!e.relatedTarget || !btn.contains(e.relatedTarget))) sfxUIHover();
