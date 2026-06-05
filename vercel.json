@@ -4,7 +4,8 @@
   "outputDirectory": ".",
   "alias": ["prevglow.vercel.app"],
   "crons": [
-    { "path": "/api/keepalive", "schedule": "0 0 * * *" }
+    { "path": "/api/keepalive", "schedule": "0 0 * * *" },
+    { "path": "/api/notify", "schedule": "0 * * * *" }
   ],
   "rewrites": [
     { "source": "/((?!api/|sw\\.js).*)", "destination": "/index.html" }

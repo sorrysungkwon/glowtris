@@ -1440,9 +1440,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   box-shadow: 0 4px 16px rgba(0,0,0,0.5);
   transition: top 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
-#pwa-update-bar.visible { top: 54px; }
+#pwa-update-bar.visible { top: 12px; }
 #offline-bar ~ #pwa-update-bar.visible,
-#pwa-update-bar.below-offline { top: 54px; }
+#pwa-update-bar.below-offline.visible { top: 54px; }
 .pwa-update-refresh {
   font-family: 'Orbitron', sans-serif;
   font-size: 9px;
@@ -4163,6 +4163,23 @@ if ('serviceWorker' in navigator) {
   var LS_INSTALLED = "pwa-installed";
   var LS_SNOOZE_UNTIL = "pwa-snooze-until";
   var SNOOZE_DAYS = 3;
+  var VAPID_PUBLIC_KEY = "BI_rkhrMPW6oSlsvTpIBySBEECvvvkiPtxzmF5DOmtTim3fIDSxXU7P_Bn3TWMi3Vh_hapjlOZ1KyiexF8T0V4s";
+  function _urlBase64ToUint8Array(b64) {
+    const pad = "=".repeat((4 - b64.length % 4) % 4);
+    const base64 = (b64 + pad).replace(/-/g, "+").replace(/_/g, "/");
+    return Uint8Array.from([...atob(base64)].map((c) => c.charCodeAt(0)));
+  }
+  async function _registerPushSub() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+      await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscription: sub.toJSON(), tzOffset: (/* @__PURE__ */ new Date()).getTimezoneOffset() }) });
+    } catch (e) {
+      console.warn("[pwa] push sub failed", e);
+    }
+  }
   function showToast(msg, { icon = "", duration = 3e3 } = {}) {
     let el = document.getElementById("pwa-toast");
     if (!el) {
@@ -4191,7 +4208,16 @@ if ('serviceWorker' in navigator) {
     return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
   }
   function _iOS() {
-    return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+    return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  }
+  function _isDesktop() {
+    return !_iOS() && !!_deferred && !("ontouchstart" in window) && window.innerWidth >= 600;
+  }
+  function _installLabel() {
+    return _isDesktop() ? "\u{1F4BB} INSTALL APP" : "\u{1F4F2} ADD TO HOME SCREEN";
+  }
+  function _bannerSubtext() {
+    return _isDesktop() ? "Launch from desktop \xB7 no browser bar" : "Play offline \xB7 no browser bar";
   }
   function _snoozed() {
     const until = parseInt(localStorage.getItem(LS_SNOOZE_UNTIL) || "0", 10);
@@ -4221,12 +4247,14 @@ if ('serviceWorker' in navigator) {
     if (!navigator.onLine) _showOffline();
   }
   function _showOffline() {
+    var _a;
     if (document.getElementById("offline-bar")) return;
     const el = document.createElement("div");
     el.id = "offline-bar";
     el.innerHTML = `<span class="material-icons-round" style="font-size:14px">wifi_off</span> No internet connection`;
     document.body.appendChild(el);
     requestAnimationFrame(() => el.classList.add("visible"));
+    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.add("below-offline");
     let startY = 0;
     el.addEventListener("touchstart", (e) => {
       startY = e.touches[0].clientY;
@@ -4240,19 +4268,24 @@ if ('serviceWorker' in navigator) {
     }, { passive: true });
   }
   function offlineBarGameStart() {
-    const el = document.getElementById("offline-bar");
-    if (el) el.classList.add("game-active");
+    var _a;
+    (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
+    const banner = document.getElementById("pwa-banner");
+    if (banner) banner.classList.remove("visible");
   }
   function offlineBarGameEnd() {
-    if (sessionStorage.getItem("offline-bar-swiped")) return;
-    const el = document.getElementById("offline-bar");
-    if (el) el.classList.remove("game-active");
+    var _a;
+    if (!sessionStorage.getItem("offline-bar-swiped")) {
+      (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.remove("game-active");
+    }
   }
   function _hideOffline() {
+    var _a;
     const el = document.getElementById("offline-bar");
     if (!el) return;
     el.classList.remove("visible");
     setTimeout(() => el.remove(), 300);
+    (_a = document.getElementById("pwa-update-bar")) == null ? void 0 : _a.classList.remove("below-offline");
   }
   function onPWAGameOver() {
     if (_installed() || _bannerShown || _snoozed()) return;
@@ -4261,7 +4294,7 @@ if ('serviceWorker' in navigator) {
   function pwaInstallBtnHTML(p) {
     if (_installed()) return "";
     if (!_deferred && !_iOS()) return "";
-    return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">\u{1F4F2} ADD TO HOME SCREEN</button>`;
+    return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
   }
   function _showBanner() {
     if (_bannerShown || _installed() || _snoozed()) return;
@@ -4273,10 +4306,10 @@ if ('serviceWorker' in navigator) {
     el.innerHTML = `
     <div class="pwa-banner-inner">
       <div class="pwa-banner-top">
-        <span class="pwa-banner-icon">\u{1F4F2}</span>
+        <span class="pwa-banner-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
         <div class="pwa-banner-text">
-          <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
-          <div class="pwa-banner-sub">Play offline \xB7 no browser bar</div>
+          <div class="pwa-banner-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
+          <div class="pwa-banner-sub">${_bannerSubtext()}</div>
         </div>
         <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
       </div>
@@ -4369,6 +4402,7 @@ if ('serviceWorker' in navigator) {
     _removeModal();
     Notification.requestPermission().then((p) => {
       localStorage.setItem("pwa-notif", p);
+      if (p === "granted") _registerPushSub();
     });
   };
   window._pwaNotifDeny = function() {
@@ -4393,7 +4427,7 @@ if ('serviceWorker' in navigator) {
     clearInterval(_gateTimer);
     const updateCountdown = () => {
       const now = /* @__PURE__ */ new Date();
-      const nextMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
       const diffMs = nextMidnight - now;
       if (diffMs <= 0) {
         clearInterval(_gateTimer);
@@ -4423,7 +4457,7 @@ if ('serviceWorker' in navigator) {
     _gateTimer = setInterval(updateCountdown, 1e3);
   }
   function startDailyChallenge() {
-    const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
+    const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("sv").replace(/-/g, "");
     if (localStorage.getItem(LS.DAILY_DATE) === todayStr) {
       showDailyGateOverlay(todayStr);
       return;
@@ -4522,7 +4556,7 @@ if ('serviceWorker' in navigator) {
     }
   }
   function _saveGameStats() {
-    const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
+    const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("sv").replace(/-/g, "");
     if (S.isDailyMode) localStorage.setItem(LS.DAILY_DATE, todayStr);
     const isNewBest = S.score > S.hiScore;
     if (isNewBest) {
