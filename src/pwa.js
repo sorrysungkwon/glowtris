@@ -97,7 +97,10 @@ export function initPWA() {
     _hideBanner();
   });
 
-  if (!_snoozed()) _showBanner();
+  if (!_snoozed()) {
+    clearTimeout(_bannerTimer);
+    _bannerTimer = setTimeout(_showBanner, 100);
+  }
 }
 
 function _initOfflineIndicator() {
@@ -131,6 +134,7 @@ function _showOffline() {
 
 export function offlineBarGameStart() {
   _gameActive = true;
+  clearTimeout(_bannerTimer);
   document.getElementById('offline-bar')?.classList.add('game-active');
   document.getElementById('pwa-banner')?.classList.add('game-active');
   document.getElementById('pwa-banner')?.classList.remove('visible');
@@ -156,7 +160,8 @@ export function onPWAGameOver() {
   if (_installed() || _snoozed()) return;
   _bannerShown = false;
   _gameActive = false;
-  setTimeout(_showBanner, 1200);
+  clearTimeout(_bannerTimer);
+  _bannerTimer = setTimeout(_showBanner, 1200);
 }
 
 export function pwaInstallBtnHTML(p) {
@@ -190,10 +195,12 @@ function _showBanner() {
       </div>
     </div>`;
   document.body.appendChild(el);
-  requestAnimationFrame(() => el.classList.add('visible'));
+  el.offsetHeight; // force reflow for transition
+  if (!_gameActive) el.classList.add('visible');
 }
 
 function _hideBanner() {
+  clearTimeout(_bannerTimer);
   const el = document.getElementById('pwa-banner');
   if (!el) return;
   el.classList.remove('visible');
@@ -201,6 +208,7 @@ function _hideBanner() {
 }
 
 export function hidePWABanner() {
+  clearTimeout(_bannerTimer);
   _bannerShown = false;
   const el = document.getElementById('pwa-banner');
   if (!el) return;
