@@ -83,7 +83,10 @@ function _snoozed() {
 export function initPWA() {
   _initOfflineIndicator();
 
-  if (_installed()) return;
+  if (_installed()) {
+    setTimeout(_askNotif, 1500); // Ask for push notifs when launched from home screen
+    return;
+  }
 
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
@@ -262,6 +265,9 @@ window._pwaIOSDone = function() {
 function _askNotif() {
   if (!('Notification' in window)) return;
   if (Notification.permission !== 'default') return;
+  if (sessionStorage.getItem('pwa-notif-dismissed') === '1') return; // Don't ask again this session
+  if (localStorage.getItem('pwa-notif-snooze') && Date.now() < parseInt(localStorage.getItem('pwa-notif-snooze'))) return; // Snoozed
+
   _removeModal();
 
   const el = document.createElement('div');
@@ -295,4 +301,6 @@ window._pwaNotifAllow = function() {
 
 window._pwaNotifDeny = function() {
   _removeModal();
+  sessionStorage.setItem('pwa-notif-dismissed', '1');
+  localStorage.setItem('pwa-notif-snooze', Date.now() + 7 * 24 * 60 * 60 * 1000); // Snooze for 7 days
 };
