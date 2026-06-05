@@ -1381,6 +1381,30 @@
 @keyframes text-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 8px rgba(0,200,255,0.8); } }
 html.low-perf .action-btn.play-btn { animation: none !important; }
 
+/* ── Offline Indicator ───────────────────────────────────────────────────── */
+#offline-bar {
+  position: fixed;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(20, 10, 0, 0.95);
+  border: 1px solid rgba(255, 140, 0, 0.45);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255, 160, 40, 0.9);
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  transition: top 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+#offline-bar.visible { top: 12px; }
+
 /* ── PWA Install Banner ──────────────────────────────────────────────────── */
 #pwa-banner {
   position: fixed;
@@ -4046,6 +4070,7 @@ if ('serviceWorker' in navigator) {
     return Date.now() < until;
   }
   function initPWA() {
+    _initOfflineIndicator();
     if (_installed()) return;
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
@@ -4061,6 +4086,35 @@ if ('serviceWorker' in navigator) {
         if (!_bannerShown) _showBanner();
       }, 2e3);
     }
+  }
+  function _initOfflineIndicator() {
+    window.addEventListener("offline", _showOffline);
+    window.addEventListener("online", _hideOffline);
+    if (!navigator.onLine) _showOffline();
+  }
+  function _showOffline() {
+    if (document.getElementById("offline-bar")) return;
+    const el = document.createElement("div");
+    el.id = "offline-bar";
+    el.innerHTML = `
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="1" y1="1" x2="23" y2="23"/>
+      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+      <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+      <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+      <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+      <line x1="12" y1="20" x2="12.01" y2="20"/>
+    </svg>
+    No internet connection`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  function _hideOffline() {
+    const el = document.getElementById("offline-bar");
+    if (!el) return;
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 300);
   }
   function onPWAGameOver() {
     if (_installed() || _bannerShown || _snoozed()) return;
