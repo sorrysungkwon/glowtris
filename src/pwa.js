@@ -302,31 +302,24 @@ window._pwaNotifDeny = function() {
   localStorage.setItem('pwa-notif-snooze', 'forever'); // Don't ask again automatically
 };
 
-window._pwaNotifToggle = function(btn) {
+window._pwaNotifToggle = function() {
   if (!('Notification' in window)) {
-    alert('Push notifications are not supported on this device/browser.');
+    showToast('Notifications not supported on this browser.', { icon: 'notifications_off' });
     return;
   }
   if (Notification.permission === 'granted') {
-    alert('Notifications are currently ON. To turn them off, please go to your device or browser settings for this app.');
+    showToast('To turn off notifications, go to your browser/device settings.', { icon: 'notifications', duration: 4000 });
     return;
   }
   if (Notification.permission === 'denied') {
-    alert('Notifications are currently BLOCKED. Please enable them in your device settings for this app.');
+    showToast('Notifications are blocked. Enable them in device settings.', { icon: 'notifications_off', duration: 4000 });
     return;
   }
-  
-  // It's 'default', so ask for permission
   Notification.requestPermission().then(p => {
     localStorage.setItem('pwa-notif', p);
     if (p === 'granted') {
-      import('./pwa.js').then(m => {
-         // Because _registerPushSub is internal, we can just call it if we export it or it's available.
-         // Actually, _registerPushSub is not exported, let's just reload or show toast
-         window.location.reload(); 
-      });
-    } else {
-      alert('Notification permission was not granted.');
+      _registerPushSub();
+      showToast('Notifications enabled!', { icon: 'notifications_active' });
     }
   });
 };

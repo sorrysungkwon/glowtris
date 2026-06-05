@@ -1,4 +1,4 @@
-const CACHE      = 'glowtris-541f71';
+const CACHE      = 'glowtris-c6a210';
 const FONT_CACHE = 'glowtris-fonts-v1';
 const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 const FONT_URLS  = [
@@ -87,8 +87,8 @@ self.addEventListener('push', e => {
   e.waitUntil(
     self.registration.showNotification(data.title || 'Glowtris', {
       body: data.body || "Today's daily challenge is live!",
-      icon: '/icon-192.svg',
-      badge: '/icon-192.svg',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
       data: { url: data.url || '/' },
     })
   );
