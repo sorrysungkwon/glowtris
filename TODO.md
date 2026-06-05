@@ -663,6 +663,39 @@ Root cause: Vercel Analytics reported INP 568ms ("poor" — threshold is >500ms)
 
 ---
 
+## ✅ Completed: Post-v1.1.1 PWA & UX Polish — by Antigravity (2026-05-31 ~ 2026-06-05)
+
+- [x] **PWA A2HS banner**: singleton DOM element, 3-day snooze, correct hide/show across all screens (game active, mode selector, game over, start screen); max-width capped on iPad; translateY hide prevents layout shift
+- [x] **PWA v2 — PNG icons + shortcuts**: 192/512px PNG icons, app shortcuts, SW update toast (auto-reload prompt), offline score retry queue (submits queued scores when back online)
+- [x] **Push notifications**: permission prompt after PWA standalone launch (iOS 16.4+ requirement); `NOTIFICATIONS` toggle in settings; "NOT NOW" permanently suppresses auto-prompts; notification icon PNG fixed; hourly cron via GitHub Actions for per-timezone delivery
+- [x] **Offline indicator**: neon pill banner below safe area; hides during active gameplay, swipe-up to dismiss; auto-reloads leaderboard when connection restores; offline state maintained on tab switch
+- [x] **Service worker offline cache**: app shell cached on install; network-first for `index.html`; Google Fonts cached; SW cache version auto-bumped with 6-digit hex hash during `npm run build`
+- [x] **Body background neon navy** (`#070514`): blends iOS PWA bottom safe area with canvas glow; `theme-color` updated to match
+- [x] **Safe area guidelines**: top banners use `calc(env(safe-area-inset-top, 0px) + 12px)`; documented in `ROBOT.md`
+- [x] **Leaderboard state polish**: "NO RECORDS YET", "SUBMITTING...", "NETWORK ERROR", "SAVED OFFLINE" all use animated `lb-offline` styles; offline score queue auto-flushed on app startup if online
+- [x] **Bug fix**: `perf-indicator` `onclick` removed — ghost touches were quitting the game
+- [x] **Bug fix**: local date used in daily challenge check (was using UTC, caused wrong gate on timezones behind UTC)
+- [x] **Hide notification/install buttons from pause screen**
+
+---
+
+## ✅ Completed: Maintenance & Ops Tooling — by Antigravity (2026-06-05)
+
+- [x] **Maintenance banner**: neon amber overlay with optional message + local timezone timestamp; word-break and mobile padding polished; overlay-only (no layout shift)
+- [x] **Changelog page** (`changelog.html`): release history with neon Glowtris design; footer links added to all pages (index, privacy, terms, changelog)
+- [x] **CI: prevglow alias auto-assign**: GitHub Actions workflow auto-sets `prevglow.vercel.app` alias after each preview deployment
+
+---
+
+## ✅ Completed: Preview Leaderboard Isolation + Fixes — by Claude (2026-06-05)
+
+- [x] **`LEADERBOARD_PREFIX` env var**: all Redis keys prefixed when set (e.g. `preview:`) — isolates preview data from production within the same Redis instance; no cost, no breaking change
+- [x] **`REDIS_AVAILABLE` guard**: graceful fallback when Redis credentials absent — GET returns empty boards, POST returns 503; prevents crashes in environments without Redis
+- [x] **"NO RECORDS YET" centering**: flex centering applied to `.lb-inner` when entries array is empty; removed stale `margin-top:20px`
+- [x] **English-only cleanup**: removed all Korean strings from tracked files (TODO.md, ROBOT.md, WALKTHROUGH.md, api/leaderboard.js); updated "push해" references to "push" in workflow docs
+
+---
+
 ## 🔮 Planned: v1.2 — Ultra Mode + Streak
 > DAU goal: **700** | Key driver: time-pressure mode + daily return habit
 
