@@ -49,6 +49,7 @@ window._pwaShowUpdateToast = function() {
 
 let _deferred    = null;
 let _bannerShown = false;
+let _gameActive  = false;
 
 function _installed() {
   return window.matchMedia('(display-mode: standalone)').matches ||
@@ -130,13 +131,14 @@ function _showOffline() {
 }
 
 export function offlineBarGameStart() {
+  _gameActive = true;
   document.getElementById('offline-bar')?.classList.add('game-active');
-  // hide install banner during game
   const banner = document.getElementById('pwa-banner');
   if (banner) banner.classList.remove('visible');
 }
 
 export function offlineBarGameEnd() {
+  _gameActive = false;
   if (!sessionStorage.getItem('offline-bar-swiped')) {
     document.getElementById('offline-bar')?.classList.remove('game-active');
   }
@@ -166,6 +168,7 @@ function _showBanner() {
   if (_bannerShown || _installed() || _snoozed()) return;
   if (sessionStorage.getItem('pwa-closed')) return;
   if (!_deferred && !_iOS()) return;
+  if (_gameActive) return;
   _bannerShown = true;
 
   const el = document.createElement('div');
