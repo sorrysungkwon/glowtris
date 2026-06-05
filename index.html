@@ -4206,6 +4206,7 @@ if ('serviceWorker' in navigator) {
   var _deferred = null;
   var _bannerShown = false;
   var _gameActive = false;
+  var _bannerTimer = null;
   function _installed() {
     return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
   }
@@ -4237,7 +4238,10 @@ if ('serviceWorker' in navigator) {
       _deferred = null;
       _hideBanner();
     });
-    if (!_snoozed()) _showBanner();
+    if (!_snoozed()) {
+      clearTimeout(_bannerTimer);
+      _bannerTimer = setTimeout(_showBanner, 100);
+    }
   }
   function _initOfflineIndicator() {
     window.addEventListener("offline", _showOffline);
@@ -4268,6 +4272,7 @@ if ('serviceWorker' in navigator) {
   function offlineBarGameStart() {
     var _a, _b, _c;
     _gameActive = true;
+    clearTimeout(_bannerTimer);
     (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
     (_b = document.getElementById("pwa-banner")) == null ? void 0 : _b.classList.add("game-active");
     (_c = document.getElementById("pwa-banner")) == null ? void 0 : _c.classList.remove("visible");
@@ -4291,7 +4296,8 @@ if ('serviceWorker' in navigator) {
     if (_installed() || _snoozed()) return;
     _bannerShown = false;
     _gameActive = false;
-    setTimeout(_showBanner, 1200);
+    clearTimeout(_bannerTimer);
+    _bannerTimer = setTimeout(_showBanner, 1200);
   }
   function pwaInstallBtnHTML(p) {
     if (_installed()) return "";
@@ -4322,15 +4328,18 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>`;
     document.body.appendChild(el);
-    requestAnimationFrame(() => el.classList.add("visible"));
+    el.offsetHeight;
+    if (!_gameActive) el.classList.add("visible");
   }
   function _hideBanner() {
+    clearTimeout(_bannerTimer);
     const el = document.getElementById("pwa-banner");
     if (!el) return;
     el.classList.remove("visible");
     setTimeout(() => el.remove(), 400);
   }
   function hidePWABanner() {
+    clearTimeout(_bannerTimer);
     _bannerShown = false;
     const el = document.getElementById("pwa-banner");
     if (!el) return;
