@@ -653,9 +653,9 @@ Claude's role in v0.5:
 
 ---
 
-## 🚨 Open Bug: PWA Install Banner Does Not Hide During Gameplay (2026-06-05)
+## ✅ Fixed Bug: PWA Install Banner Does Not Hide During Gameplay (2026-06-05)
 
-**Status:** Unresolved — handed off to Antigravity.
+**Status:** Fixed by Antigravity. (Root cause was an uncancelled `_bannerTimer` causing a delayed duplicate banner creation, plus a `requestAnimationFrame` race condition that added `.visible` *after* JS had removed it.)
 
 **Symptom:** The "Add to Home Screen" install banner (bottom of screen) does not disappear when the user opens the mode selector or starts a game. It stays visible throughout gameplay.
 
