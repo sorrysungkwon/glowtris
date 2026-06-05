@@ -406,7 +406,7 @@ export function showModeSelector(){
   const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
   const hiS=parseInt(localStorage.getItem(LS.HI)||'0');
   const marathonBest=hiS>0?`<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
-  const todayStr=new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const todayStr=new Date().toLocaleDateString('sv').replace(/-/g,'');
   const dailyDone=localStorage.getItem(LS.DAILY_DATE)===todayStr;
   const dailySub=dailyDone?'<span style="color:rgba(255,230,0,0.75)">✓ Completed today</span>':'<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
 
