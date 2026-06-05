@@ -5088,9 +5088,10 @@ if ('serviceWorker' in navigator) {
     }
     try {
       const lpm = Math.round(SPRINT_LINES / (timeMs / 6e4));
-      const rankStr = rank ? ` \u2014 Rank #${rank}` : "";
-      const text = `\u26A1 Glowtris Sprint \u2014 ${fmtTime(timeMs)} (${lpm} LPM)${rankStr}
-Can you beat it? ${window.location.origin}`;
+      const rankLine = rank ? `\u26A1 Sprint 40L in ${fmtTime(timeMs)} \xB7 Rank #${rank} All Time` : `\u26A1 Sprint 40L in ${fmtTime(timeMs)} (${lpm} LPM)`;
+      const cta = rank ? `Can you go faster? \u2192 ${window.location.origin}` : `Can you clear 40 lines faster? \u2192 ${window.location.origin}`;
+      const text = `${rankLine}
+${cta}`;
       const blob = await captureSprintImage(timeMs, rank, lpm);
       const file = new File([blob], "glowtris-sprint.png", { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -5428,10 +5429,18 @@ Can you beat it? ${window.location.origin}`;
     }
     try {
       const isChallenge = S.isDailyMode;
-      const rankStr = rank ? ` \u2014 Rank #${rank}` : "";
-      const challengeHeader = isChallenge ? `\u{1F3C6} Glowtris Daily Challenge \u2014 ` : `\u{1F3AE} Glowtris \u2014 `;
-      const text = `${challengeHeader}${sc.toLocaleString()} pts${rankStr}
-${window.location.origin}`;
+      let text;
+      if (isChallenge) {
+        const rankLine = rank ? `\u{1F3C6} Daily Challenge \xB7 Rank #${rank} Today \xB7 ${sc.toLocaleString()} pts` : `\u{1F3C6} Glowtris Daily Challenge \u2014 ${sc.toLocaleString()} pts`;
+        const cta = rank ? `Same board for everyone \u2014 can you beat me? \u2192 ${window.location.origin}` : `Same board for everyone today \u2014 try it! \u2192 ${window.location.origin}`;
+        text = `${rankLine}
+${cta}`;
+      } else {
+        const rankLine = rank ? `\u{1F3AE} Rank #${rank} All Time \xB7 ${sc.toLocaleString()} pts on Glowtris` : `\u{1F3AE} Glowtris \u2014 ${sc.toLocaleString()} pts`;
+        const cta = rank ? `Think you can beat me? \u2192 ${window.location.origin}` : `Can you top this? \u2192 ${window.location.origin}`;
+        text = `${rankLine}
+${cta}`;
+      }
       const blob = await captureGameImage(sc, rank, isChallenge);
       const file = new File([blob], "glowtris-score.png", { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
