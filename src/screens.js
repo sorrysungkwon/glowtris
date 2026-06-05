@@ -99,7 +99,7 @@ export function startDailyChallenge() {
   $overlay.style.display = 'flex';
 }
 
-function _settingsHTML(p) {
+function _settingsHTML(p, showPWA=true) {
   return `
     <div class="sg-label">AUDIO</div>
     <button class="toggle-btn${S.muteAudio?' muted':''}" id="${p}-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON'}</button>
@@ -136,8 +136,9 @@ function _settingsHTML(p) {
     <div class="sg-sep"></div>
     <div class="sg-label">PERFORMANCE & SYSTEM</div>
     <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>
-    <button class="toggle-btn${_notifBtnClass()}" id="${p}-notif-btn" onclick="window._pwaNotifToggle()">${_notifBtnLabel()}</button>
-    ${pwaInstallBtnHTML(p)}`;
+    ${showPWA?`<button class="toggle-btn${_notifBtnClass()}" id="${p}-notif-btn" onclick="window._pwaNotifToggle()">${_notifBtnLabel()}</button>
+    ${pwaInstallBtnHTML(p)}`:''}
+  `;
 }
 
 function _notifBtnClass() {
@@ -172,7 +173,7 @@ export function togglePause(){
     $overlay.innerHTML=`
       <div class="glass-panel">
         <h1 class="pause-header">PAUSED</h1>
-        <div class="settings-box">${_settingsHTML('ov')}</div>
+        <div class="settings-box">${_settingsHTML('ov',false)}</div>
         <button class="action-btn full-width" onclick="togglePause()">RESUME</button>
         <button class="action-btn ghost full-width restart" onclick="showStartScreen()">RESTART</button>
       </div>`;
