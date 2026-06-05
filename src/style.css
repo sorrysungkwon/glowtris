@@ -946,12 +946,10 @@
     text-transform: uppercase;
     color: rgba(255,200,0,0.7);
     text-shadow: 0 0 6px rgba(255,180,0,0.5);
-    pointer-events: auto;
-    cursor: pointer;
+    pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s ease;
   }
-  #perf-indicator:hover { color: rgba(255,220,0,1); text-shadow: 0 0 10px rgba(255,200,0,0.8); }
 
   .low-spec-warning {
     display: flex;
