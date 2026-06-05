@@ -433,7 +433,7 @@ feature/xxx  →  preview (verify)  →  PR to master  →  production
 ### Critical rules:
 - **Agent never pushes without user instruction** — wait for "push" or equivalent
 - **Docs commits accumulate** — never push docs alone; bundle with next code push
-- **ONE push to preview per feature** — no iterative preview pushes
+- **Batch small changes** — minor fixes and tweaks accumulate on `preview`; ship together in the next meaningful PR rather than opening a PR per small commit
 - **ALL changes go through PR** — no direct merge to master regardless of size
 - **NEVER run `vercel` CLI** for deploys
 
