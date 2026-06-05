@@ -265,9 +265,7 @@ window._pwaIOSDone = function() {
 function _askNotif() {
   if (!('Notification' in window)) return;
   if (Notification.permission !== 'default') return;
-  if (sessionStorage.getItem('pwa-notif-dismissed') === '1') return; // Don't ask again this session
-  if (localStorage.getItem('pwa-notif-snooze') && Date.now() < parseInt(localStorage.getItem('pwa-notif-snooze'))) return; // Snoozed
-
+  if (localStorage.getItem('pwa-notif-snooze')) return; // Snoozed or disabled
   _removeModal();
 
   const el = document.createElement('div');
@@ -276,7 +274,7 @@ function _askNotif() {
     <div class="pwa-modal-box">
       <div class="pwa-modal-icon">🔔</div>
       <div class="pwa-modal-title">ENABLE NOTIFICATIONS?</div>
-      <div class="pwa-modal-body">Get notified about daily challenges and updates.</div>
+      <div class="pwa-modal-body">Get notified about daily challenges.<br><span style="opacity:0.7;font-size:10px">You can change this later in Settings.</span></div>
       <button class="action-btn full-width" onclick="window._pwaNotifAllow()">ALLOW</button>
       <button class="action-btn ghost full-width" style="margin-top:8px" onclick="window._pwaNotifDeny()">NOT NOW</button>
     </div>`;
@@ -301,6 +299,34 @@ window._pwaNotifAllow = function() {
 
 window._pwaNotifDeny = function() {
   _removeModal();
-  sessionStorage.setItem('pwa-notif-dismissed', '1');
-  localStorage.setItem('pwa-notif-snooze', Date.now() + 7 * 24 * 60 * 60 * 1000); // Snooze for 7 days
+  localStorage.setItem('pwa-notif-snooze', 'forever'); // Don't ask again automatically
+};
+
+window._pwaNotifToggle = function(btn) {
+  if (!('Notification' in window)) {
+    alert('Push notifications are not supported on this device/browser.');
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    alert('Notifications are currently ON. To turn them off, please go to your device or browser settings for this app.');
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    alert('Notifications are currently BLOCKED. Please enable them in your device settings for this app.');
+    return;
+  }
+  
+  // It's 'default', so ask for permission
+  Notification.requestPermission().then(p => {
+    localStorage.setItem('pwa-notif', p);
+    if (p === 'granted') {
+      import('./pwa.js').then(m => {
+         // Because _registerPushSub is internal, we can just call it if we export it or it's available.
+         // Actually, _registerPushSub is not exported, let's just reload or show toast
+         window.location.reload(); 
+      });
+    } else {
+      alert('Notification permission was not granted.');
+    }
+  });
 };
