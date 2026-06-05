@@ -405,7 +405,16 @@ curl -s "$REDIS_URL/get/maintenance:time" -H "Authorization: Bearer $REDIS_TOKEN
 
 ---
 
-## 🔁 Mandatory Release Workflow (no exceptions)
+## 🔁 Release Workflow
+
+### PR required vs. direct merge
+
+| Change type | Workflow |
+|---|---|
+| New feature, API change, structural refactor, new page | `feature → preview → PR → master` |
+| Text/copy, CSS tweak, single-line bug fix, docs | `preview → direct merge to master` (no PR) |
+
+When in doubt: if the change touches game logic, API routes, or affects multiple files in a non-obvious way → use PR. Otherwise → direct merge is fine.
 
 ### Push rules
 
@@ -414,7 +423,7 @@ curl -s "$REDIS_URL/get/maintenance:time" -H "Authorization: Bearer $REDIS_TOKEN
 | **Code / feature** | Agent commits | Agent pushes **only when user says "push" or equivalent** |
 | **Docs-only** (README, TODO, CLAUDE, AGENTS, ROBOT…) | Agent commits | **Accumulate locally. Push together with the next code change — never push docs alone.** |
 
-### Workflow
+### Workflow A — feature (PR required)
 
 ```
 feature/xxx  →  preview (verify)  →  PR to master  →  production
@@ -430,11 +439,21 @@ feature/xxx  →  preview (verify)  →  PR to master  →  production
 8. **Tag if versioned**: prepare `git tag -a vX.Y.Z -m "Description" && git push origin vX.Y.Z` — present to user, do not run autonomously.
 9. **Sync preview**: `git checkout preview && git merge master && git push origin preview` — run after user confirms PR is merged.
 
+### Workflow B — small fix (direct merge)
+
+```
+preview (verify)  →  direct merge to master  →  production
+```
+
+1. Commit and push to `preview`.
+2. Verify at **https://prevglow.vercel.app**.
+3. On user confirmation: `gh pr merge` or `git checkout master && git merge preview && git push origin master`.
+4. Sync preview: `git checkout preview && git merge master && git push origin preview`.
+
 ### Critical rules:
 - **Agent never pushes without user instruction** — wait for "push" or equivalent
 - **Docs commits accumulate** — never push docs alone; bundle with next code push
 - **ONE push to preview per feature** — no iterative preview pushes
-- **NEVER merge directly to master** — always via PR
 - **NEVER run `vercel` CLI** for deploys
 
 ---
