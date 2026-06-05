@@ -13,7 +13,7 @@ import {
   startGame, startSprintMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
-import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd } from './pwa.js';
+import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd, hidePWABanner } from './pwa.js';
 
 const $overlay = document.getElementById('overlay');
 
@@ -382,6 +382,7 @@ export function showStartScreen(){
 }
 
 export function showModeSelector(){
+  hidePWABanner();
   const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
   const hiS=parseInt(localStorage.getItem(LS.HI)||'0');
   const marathonBest=hiS>0?`<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';

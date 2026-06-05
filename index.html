@@ -4273,8 +4273,7 @@ if ('serviceWorker' in navigator) {
     var _a;
     _gameActive = true;
     (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
-    const banner = document.getElementById("pwa-banner");
-    if (banner) banner.classList.remove("visible");
+    hidePWABanner();
   }
   function offlineBarGameEnd() {
     var _a;
@@ -4331,6 +4330,10 @@ if ('serviceWorker' in navigator) {
     if (!el) return;
     el.classList.remove("visible");
     setTimeout(() => el.remove(), 350);
+  }
+  function hidePWABanner() {
+    const el = document.getElementById("pwa-banner");
+    if (el) el.classList.remove("visible");
   }
   window._pwaDismiss = function() {
     sessionStorage.setItem("pwa-closed", "1");
@@ -4763,6 +4766,7 @@ if ('serviceWorker' in navigator) {
     loadStartLeaderboard();
   }
   function showModeSelector() {
+    hidePWABanner();
     const sprintBest = S._sprintHiTime > 0 ? `<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
     const hiS = parseInt(localStorage.getItem(LS.HI) || "0");
     const marathonBest = hiS > 0 ? `<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
