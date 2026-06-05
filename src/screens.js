@@ -35,7 +35,7 @@ export function showDailyGateOverlay(todayStr) {
   clearInterval(_gateTimer);
   const updateCountdown = () => {
     const now = new Date();
-    const nextMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const diffMs = nextMidnight - now;
     if (diffMs <= 0) {
       clearInterval(_gateTimer);
@@ -67,7 +67,7 @@ export function showDailyGateOverlay(todayStr) {
 }
 
 export function startDailyChallenge() {
-  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const todayStr = new Date().toLocaleDateString('sv').replace(/-/g, '');
   if (localStorage.getItem(LS.DAILY_DATE) === todayStr) {
     showDailyGateOverlay(todayStr);
     return;
@@ -171,7 +171,7 @@ export function togglePause(){
 }
 
 export function _saveGameStats() {
-  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const todayStr = new Date().toLocaleDateString('sv').replace(/-/g, '');
   if (S.isDailyMode) localStorage.setItem(LS.DAILY_DATE, todayStr);
 
   const isNewBest = S.score > S.hiScore;

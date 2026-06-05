@@ -1,6 +1,23 @@
 const LS_INSTALLED    = 'pwa-installed';
 const LS_SNOOZE_UNTIL = 'pwa-snooze-until';
 const SNOOZE_DAYS     = 3;
+const VAPID_PUBLIC_KEY = 'BI_rkhrMPW6oSlsvTpIBySBEECvvvkiPtxzmF5DOmtTim3fIDSxXU7P_Bn3TWMi3Vh_hapjlOZ1KyiexF8T0V4s';
+
+function _urlBase64ToUint8Array(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4);
+  const base64 = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
+}
+
+async function _registerPushSub() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+    await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subscription: sub.toJSON(), tzOffset: new Date().getTimezoneOffset() }) });
+  } catch (e) { console.warn('[pwa] push sub failed', e); }
+}
 
 // ── Centralized toast ─────────────────────────────────────────────────────────
 export function showToast(msg, { icon = '', duration = 3000 } = {}) {
@@ -40,7 +57,21 @@ function _installed() {
 }
 
 function _iOS() {
-  return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+  // iPadOS 13+ reports as "Macintosh" — use maxTouchPoints to distinguish
+  return (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function _isDesktop() {
+  return !_iOS() && !!_deferred && !('ontouchstart' in window) && window.innerWidth >= 600;
+}
+
+function _installLabel() {
+  return _isDesktop() ? '💻 INSTALL APP' : '📲 ADD TO HOME SCREEN';
+}
+
+function _bannerSubtext() {
+  return _isDesktop() ? 'Launch from desktop · no browser bar' : 'Play offline · no browser bar';
 }
 
 function _snoozed() {
@@ -83,6 +114,9 @@ function _showOffline() {
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('visible'));
 
+  // push update-bar below if it's showing
+  document.getElementById('pwa-update-bar')?.classList.add('below-offline');
+
   // swipe up to dismiss for this session
   let startY = 0;
   el.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
@@ -96,14 +130,16 @@ function _showOffline() {
 }
 
 export function offlineBarGameStart() {
-  const el = document.getElementById('offline-bar');
-  if (el) el.classList.add('game-active');
+  document.getElementById('offline-bar')?.classList.add('game-active');
+  // hide install banner during game
+  const banner = document.getElementById('pwa-banner');
+  if (banner) banner.classList.remove('visible');
 }
 
 export function offlineBarGameEnd() {
-  if (sessionStorage.getItem('offline-bar-swiped')) return;
-  const el = document.getElementById('offline-bar');
-  if (el) el.classList.remove('game-active');
+  if (!sessionStorage.getItem('offline-bar-swiped')) {
+    document.getElementById('offline-bar')?.classList.remove('game-active');
+  }
 }
 
 function _hideOffline() {
@@ -111,6 +147,8 @@ function _hideOffline() {
   if (!el) return;
   el.classList.remove('visible');
   setTimeout(() => el.remove(), 300);
+  // restore update-bar position
+  document.getElementById('pwa-update-bar')?.classList.remove('below-offline');
 }
 
 export function onPWAGameOver() {
@@ -121,7 +159,7 @@ export function onPWAGameOver() {
 export function pwaInstallBtnHTML(p) {
   if (_installed()) return '';
   if (!_deferred && !_iOS()) return '';
-  return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">📲 ADD TO HOME SCREEN</button>`;
+  return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
 }
 
 function _showBanner() {
@@ -135,10 +173,10 @@ function _showBanner() {
   el.innerHTML = `
     <div class="pwa-banner-inner">
       <div class="pwa-banner-top">
-        <span class="pwa-banner-icon">📲</span>
+        <span class="pwa-banner-icon">${_isDesktop() ? '💻' : '📲'}</span>
         <div class="pwa-banner-text">
-          <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
-          <div class="pwa-banner-sub">Play offline · no browser bar</div>
+          <div class="pwa-banner-title">${_isDesktop() ? 'INSTALL APP' : 'ADD TO HOME SCREEN'}</div>
+          <div class="pwa-banner-sub">${_bannerSubtext()}</div>
         </div>
         <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">✕</button>
       </div>
@@ -241,6 +279,7 @@ window._pwaNotifAllow = function() {
   _removeModal();
   Notification.requestPermission().then(p => {
     localStorage.setItem('pwa-notif', p);
+    if (p === 'granted') _registerPushSub();
   });
 };
 
