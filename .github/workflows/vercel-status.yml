@@ -44,7 +44,7 @@ jobs:
               target_url:  'https://vercel.com/sgkwon-team/glowtris',
             });
 
-      # ── 2. Poll Vercel until the deployment for this SHA is done ──────────
+      # ── 2. Poll Vercel until the deployment for this commit is done ─────────
       - name: Poll Vercel deployment
         id: poll
         env:
@@ -53,25 +53,50 @@ jobs:
           # Use stable IDs — these never change even if the team/project is renamed
           VERCEL_TEAM_ID:    team_pb1objuXoHlJIv67jumHZrg8
           VERCEL_PROJECT_ID: prj_V1lhSONnxAM9K2hpk5VLtemldWnm
+          # Workflow start time (ms) — deployments created before this are from a previous push
+          STARTED_AT: ${{ github.run_id }}
         run: |
           set -euo pipefail
           DEPLOY_URL=""
           FINAL_STATE="error"
+          START_MS=$(date +%s%3N)
 
           echo "Waiting for Vercel to pick up ${COMMIT_SHA:0:12}…"
 
-          # Look for the deployment (up to ~3 min)
-          # Filter by both teamId AND projectId to avoid picking up other projects' deploys
+          # Look for the most recent deployment created after this workflow started.
+          # Vercel's GitHub integration does not always populate meta.githubCommitSha,
+          # so we match by timing: the deployment created closest after our push.
           DEPLOY_ID=""
           for i in $(seq 1 18); do
             sleep 10
             RESP=$(curl -sf \
-              "https://api.vercel.com/v6/deployments?limit=10&teamId=${VERCEL_TEAM_ID}&projectId=${VERCEL_PROJECT_ID}" \
+              "https://api.vercel.com/v6/deployments?limit=5&teamId=${VERCEL_TEAM_ID}&projectId=${VERCEL_PROJECT_ID}" \
               -H "Authorization: Bearer $VERCEL_TOKEN" 2>/dev/null || echo '{"deployments":[]}')
 
-            DEPLOY_ID=$(echo "$RESP" | jq -r --arg sha "${COMMIT_SHA:0:12}" \
-              '.deployments[]? | select(.meta.githubCommitSha // "" | startswith($sha)) | .uid' \
-              2>/dev/null | head -1)
+            # Try SHA match first (works when Vercel GitHub App populates meta)
+            DEPLOY_ID=$(echo "$RESP" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+sha = '${COMMIT_SHA}'[:12]
+for d in data.get('deployments', []):
+    m = d.get('meta', {})
+    commit = m.get('githubCommitSha', '') or m.get('gitSha', '')
+    if commit.startswith(sha):
+        print(d['uid']); sys.exit(0)
+" 2>/dev/null)
+
+            # Fallback: pick the newest deployment created after workflow start
+            if [ -z "$DEPLOY_ID" ]; then
+              DEPLOY_ID=$(echo "$RESP" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+start = $START_MS
+for d in data.get('deployments', []):
+    created = d.get('createdAt', 0)
+    if created >= start - 60000:
+        print(d['uid']); sys.exit(0)
+" 2>/dev/null)
+            fi
 
             [ -n "$DEPLOY_ID" ] && { echo "Found: $DEPLOY_ID (attempt $i)"; break; }
             echo "  Not found yet (attempt $i)…"
