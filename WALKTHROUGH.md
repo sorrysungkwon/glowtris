@@ -651,4 +651,65 @@ Claude's role in v0.5:
 
 **Entry point:** `endGame()` in `src/game.js` → calls `_renderSprintScreen(timeMs, isNewBest, prevBest)` in `src/screens.js`. Visual effects should fire just before or at the same time as the overlay appears.
 
+---
+
+## 🚨 Open Bug: PWA Install Banner Does Not Hide During Gameplay (2026-06-05)
+
+**Status:** Unresolved — handed off to Antigravity.
+
+**Symptom:** The "Add to Home Screen" install banner (bottom of screen) does not disappear when the user opens the mode selector or starts a game. It stays visible throughout gameplay.
+
+**Expected behavior:**
+- Banner visible: start screen, game over screen
+- Banner hidden: mode selector, countdown, active gameplay
+
+**What was tried (all failed):**
+1. `classList.remove('visible')` in `offlineBarGameStart()` — didn't work
+2. CSS changed from `bottom: -90px` to `transform: translateY(110%)` — didn't work
+3. Added `_gameActive` flag + check in `_showBanner()` — didn't fix visible banner
+4. `hidePWABanner()` called from `showModeSelector()` — didn't work
+5. Inline `el.style.transform = 'translateY(120%)'` override — didn't work
+6. Mirrored offline-bar approach: `bottom: -220px` + `.game-active` CSS class — didn't work
+7. Removed 2s startup delay — didn't help
+
+**Root cause — suspected but unconfirmed:**
+The banner element is appended to `document.body`. All CSS hide attempts visually fail even though the JS calls are confirmed to be executing (verified via source). Possible causes:
+- `position: fixed` is being offset by a parent element that has `transform` or `filter` applied (e.g., `#bg-canvas` or `#app`) — in CSS, a `transform` on any ancestor breaks `position: fixed` and makes it behave like `position: absolute` relative to that ancestor instead of the viewport
+- The CSS transition is being overridden by something else
+
+**Recommended debugging approach for Antigravity:**
+1. Open `prevglow.vercel.app` in Chrome DevTools
+2. Trigger the banner, then click PLAY
+3. Inspect `#pwa-banner` in the Elements panel — check:
+   - Is `game-active` class being added?
+   - What is the computed `bottom` value after class is added?
+   - Does any ancestor element have a `transform`, `filter`, or `perspective` CSS property?
+4. If an ancestor has `transform`, move `#pwa-banner` append target from `document.body` to a wrapper element outside the transformed ancestor, or switch to `position: absolute` with explicit coordinates
+
+**Relevant files:**
+- `src/pwa.js` — `offlineBarGameStart()`, `hidePWABanner()`, `_showBanner()`, `_hideBanner()`
+- `src/screens.js` — `showModeSelector()` calls `hidePWABanner()`
+- `src/style.css` — `#pwa-banner`, `#pwa-banner.visible`, `#pwa-banner.game-active`
+- `src/game.js` — `startGame()` calls `offlineBarGameStart()`
+
+**Current CSS (as of commit e34f6ce):**
+```css
+#pwa-banner {
+  position: fixed;
+  bottom: -220px;
+  left: 0; right: 0;
+  z-index: 9000;
+  transition: bottom 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+#pwa-banner.visible    { bottom: 0; }
+#pwa-banner.game-active { bottom: -220px; }
+```
+
+**Current JS hide call (as of commit e34f6ce):**
+```js
+// offlineBarGameStart() in src/pwa.js
+document.getElementById('pwa-banner')?.classList.add('game-active');
+document.getElementById('pwa-banner')?.classList.remove('visible');
+```
+
 **Do NOT change the submit / share / leaderboard logic** — only add visual flair around the overlay display.
