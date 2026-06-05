@@ -968,6 +968,10 @@ document.fonts.ready.then(() => {
   initPWA();
   animFrame=requestAnimationFrame(function bgOnly(ts){drawBackground();if(!S.gameRunning)animFrame=requestAnimationFrame(bgOnly);});
   showStartScreen();
+  const mode = new URLSearchParams(window.location.search).get('mode');
+  if (mode === 'marathon') setTimeout(startGame, 100);
+  else if (mode === 'sprint') setTimeout(startSprintMode, 100);
+  else if (mode === 'daily') setTimeout(startDailyChallenge, 100);
 });
 // Pre-warm cell sprites during idle so startGame() click doesn't block (INP fix)
 (window.requestIdleCallback||function(cb){setTimeout(cb,200);})(function(){

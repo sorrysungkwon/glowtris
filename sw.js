@@ -1,6 +1,6 @@
-const CACHE      = 'glowtris-v4';
+const CACHE      = 'glowtris-v5';
 const FONT_CACHE = 'glowtris-fonts-v1';
-const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg'];
+const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 const FONT_URLS  = [
   'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap',
   'https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap',

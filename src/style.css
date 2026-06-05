@@ -1343,6 +1343,82 @@
 @keyframes text-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 8px rgba(0,200,255,0.8); } }
 html.low-perf .action-btn.play-btn { animation: none !important; }
 
+/* ── z-index hierarchy ───────────────────────────────────────────────────────
+   9000  #pwa-banner        install prompt (lowest)
+   9001  #pwa-toast         brief score/info toasts
+   9001  #pwa-update-bar    SW update bar
+   9002  #offline-bar       offline indicator (highest persistent)
+   10000 #overlay           game UI
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Brief toast (score submitted etc.) ─────────────────────────────────── */
+#pwa-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(0, 20, 10, 0.96);
+  border: 1px solid rgba(0, 255, 136, 0.35);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(0, 255, 136, 0.9);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+}
+#pwa-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── SW update bar ───────────────────────────────────────────────────────── */
+#pwa-update-bar {
+  position: fixed;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 0, 30, 0.97);
+  border: 1px solid rgba(120, 60, 255, 0.45);
+  border-radius: 20px;
+  padding: 7px 8px 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(180, 120, 255, 0.9);
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  transition: top 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+#pwa-update-bar.visible { top: 54px; }
+#offline-bar ~ #pwa-update-bar.visible,
+#pwa-update-bar.below-offline { top: 54px; }
+.pwa-update-refresh {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #000;
+  background: rgba(160, 100, 255, 0.9);
+  border: none;
+  border-radius: 12px;
+  padding: 5px 10px;
+  cursor: pointer;
+  touch-action: manipulation;
+  margin-left: 4px;
+}
+
 /* ── Leaderboard offline state ───────────────────────────────────────────── */
 .lb-offline {
   display: flex;
