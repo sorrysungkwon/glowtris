@@ -395,6 +395,8 @@ export function showStartScreen(){
         <a href="/privacy.html" class="footer-link">PRIVACY</a>
         <span style="color:rgba(255,255,255,0.12)">·</span>
         <a href="/terms.html" class="footer-link">TERMS</a>
+        <span style="color:rgba(255,255,255,0.12)">·</span>
+        <a href="/changelog.html" class="footer-link">CHANGELOG</a>
       </div>
     </div>`;
   $overlay.style.display='flex';

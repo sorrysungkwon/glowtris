@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Changelog — GLOWTRIS</title>
+<meta name="description" content="Glowtris update history — new features, fixes, and improvements.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#00c8ff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --cyan: #00c8ff;
+    --purple: #a000ff;
+    --pink: #ff0080;
+    --green: #00ffaa;
+    --panel-bg: rgba(4,4,30,0.72);
+    --border: rgba(0,200,255,0.28);
+  }
+
+  html, body {
+    min-height: 100%;
+    background: #000;
+    font-family: 'Orbitron', monospace;
+    color: #fff;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 30%, rgba(0,200,255,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 80% 70%, rgba(160,0,255,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 20%, rgba(0,200,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 55%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 85%, rgba(160,0,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 5%  90%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 10%, rgba(255,0,128,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 95%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 33% 60%, rgba(0,200,255,0.3) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(0,200,255,0.6);
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+  .back-link:hover { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .page-header .logo {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink), var(--cyan));
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 14px rgba(0,200,255,0.4));
+    animation: gradient-flow 6s linear infinite;
+  }
+  @keyframes gradient-flow {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+  .page-header h2 {
+    margin-top: 10px;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: rgba(0,200,255,0.55);
+    text-transform: uppercase;
+  }
+
+  /* ── Version card ── */
+  .version-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+      0 0 30px rgba(0,200,255,0.06),
+      inset 0 0 20px rgba(0,0,40,0.4),
+      0 4px 40px rgba(0,0,0,0.5);
+    margin-bottom: 16px;
+  }
+  .version-card.latest {
+    border-color: rgba(0,255,170,0.35);
+    box-shadow:
+      0 0 30px rgba(0,255,170,0.08),
+      inset 0 0 20px rgba(0,0,40,0.4),
+      0 4px 40px rgba(0,0,0,0.5);
+  }
+
+  .version-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,200,255,0.12);
+  }
+  .version-tag {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    text-shadow: 0 0 12px rgba(0,200,255,0.5);
+  }
+  .version-card.latest .version-tag { color: var(--green); text-shadow: 0 0 12px rgba(0,255,170,0.5); }
+  .version-date {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+  }
+  .version-badge {
+    margin-left: auto;
+    font-size: 8px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    background: rgba(0,255,170,0.12);
+    color: var(--green);
+    border: 1px solid rgba(0,255,170,0.3);
+  }
+
+  .change-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .change-list li {
+    font-size: 11px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.62);
+    letter-spacing: 0.4px;
+    padding-left: 20px;
+    position: relative;
+  }
+  .change-list li::before {
+    position: absolute;
+    left: 0;
+    font-size: 10px;
+  }
+  .change-list li.feat::before  { content: '✦'; color: var(--cyan); }
+  .change-list li.fix::before   { content: '◈'; color: rgba(255,200,0,0.8); }
+  .change-list li.perf::before  { content: '⚡'; }
+  .change-list li.infra::before { content: '⚙'; color: rgba(160,0,255,0.8); }
+
+  .change-label {
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 12px 0;
+  }
+
+  .page-footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.18);
+    text-transform: uppercase;
+  }
+  .page-footer a {
+    color: rgba(0,200,255,0.35);
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.2s;
+  }
+  .page-footer a:hover { color: var(--cyan); }
+  .footer-links { margin-bottom: 6px; }
+  .footer-copy { opacity: 0.7; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <a href="/" class="back-link">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Glowtris
+  </a>
+
+  <header class="page-header">
+    <div class="logo">GLOWTRIS</div>
+    <h2>Changelog</h2>
+  </header>
+
+  <!-- Latest -->
+  <div class="version-card latest">
+    <div class="version-header">
+      <span class="version-tag">PWA UPDATE</span>
+      <span class="version-date">Jun 2026</span>
+      <span class="version-badge">Latest</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Push notifications</span> — get notified when the daily challenge goes live (opt-in)</li>
+      <li class="feat"><span class="change-label">Install prompt</span> — add to home screen banner for iOS, Android, and desktop</li>
+      <li class="feat"><span class="change-label">Offline support</span> — play without internet; scores sync when reconnected</li>
+      <li class="fix"><span class="change-label">Daily challenge date fix</span> — "completed today" now correctly reflects your local date</li>
+      <li class="infra"><span class="change-label">Per-timezone notifications</span> — each user receives their notification at local noon</li>
+    </ul>
+  </div>
+
+  <!-- v1.1.1 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v1.1.1</span>
+      <span class="version-date">May 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Full keyboard navigation</span> — WASD + arrows + Tab + Enter across all menus</li>
+      <li class="feat"><span class="change-label">Auto-focus management</span> — modals capture focus; Escape/Backspace closes them</li>
+      <li class="fix"><span class="change-label">Duplicate modal fix</span> — donation modal no longer stacks on repeated clicks</li>
+      <li class="fix"><span class="change-label">Touch sound fix</span> — no more double-fire on touch screens</li>
+      <li class="fix"><span class="change-label">iPad keyboard mode</span> — side panels appear correctly on keyboard-connected iPads</li>
+    </ul>
+  </div>
+
+  <!-- v1.1 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v1.1</span>
+      <span class="version-date">May 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Sprint Mode</span> — clear 40 lines as fast as possible; personal best tracked</li>
+      <li class="feat"><span class="change-label">Mode selector</span> — Marathon / Sprint / Daily Challenge card UI with records</li>
+      <li class="feat"><span class="change-label">3-2-1 countdown</span> — animated countdown with sound before each game</li>
+      <li class="feat"><span class="change-label">Sprint leaderboard</span> — separate ascending leaderboard (fastest time wins)</li>
+      <li class="feat"><span class="change-label">iPad keyboard support</span> — first keypress shows desktop UI on tablet</li>
+      <li class="feat"><span class="change-label">WASD support</span> — full WASD control alongside arrow keys</li>
+    </ul>
+  </div>
+
+  <!-- v1.0.9 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v1.0.9</span>
+      <span class="version-date">May 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Daily Challenge</span> — same piece sequence for all players each day; dedicated leaderboard</li>
+      <li class="feat"><span class="change-label">Achievements</span> — 20 milestones with neon toast popups and badge gallery</li>
+      <li class="feat"><span class="change-label">Challenge background</span> — crimson nebula, amber meteors, exclusive BGM</li>
+      <li class="feat"><span class="change-label">T-Spin Mini</span> — distinct scoring and label for mini T-spins</li>
+      <li class="feat"><span class="change-label">OG image</span> — rich preview card for Twitter, KakaoTalk, Discord, and more</li>
+      <li class="perf"><span class="change-label">Memory leak fixes</span> — audio nodes, BGM scheduler, WebGL context all properly released</li>
+    </ul>
+  </div>
+
+  <!-- v1.0.8 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v1.0.8</span>
+      <span class="version-date">May 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Colorblind mode</span> — unique stripe/dot patterns on each piece type</li>
+      <li class="feat"><span class="change-label">Animation intensity</span> — Full / Low / Off setting for effects and particles</li>
+      <li class="perf"><span class="change-label">Cell sprite cache</span> — pre-rendered piece colors; eliminates 400+ gradient creates per frame</li>
+      <li class="perf"><span class="change-label">Auto performance mode</span> — detects low FPS and disables heavy effects automatically</li>
+    </ul>
+  </div>
+
+  <!-- v1.0.6 / v1.0.7 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v1.0.6 – v1.0.7</span>
+      <span class="version-date">May 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Ghost piece toggle</span> — hide ghost piece and alignment lasers</li>
+      <li class="feat"><span class="change-label">Lock-delay tuning</span> — slider from 100ms to 1000ms</li>
+      <li class="feat"><span class="change-label">Privacy &amp; Terms pages</span> — legal docs in Glowtris neon style</li>
+      <li class="feat"><span class="change-label">Keyboard parallax</span> — board springs sideways on left/right moves</li>
+      <li class="fix"><span class="change-label">iPad layout fix</span> — board stays fully visible without clipping</li>
+    </ul>
+  </div>
+
+  <!-- v1.0 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v1.0</span>
+      <span class="version-date">May 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Initial launch</span> — Marathon mode, global leaderboard (Today / Weekly / All Time)</li>
+      <li class="feat"><span class="change-label">Scoring</span> — B2B bonus, all-spin detection, 3-piece next queue</li>
+      <li class="feat"><span class="change-label">Controls</span> — DAS/ARR tuning, IRS, IHS, SDF, instant soft drop</li>
+      <li class="feat"><span class="change-label">BGM</span> — 4-track chiptune with dynamic BPM scaling</li>
+      <li class="feat"><span class="change-label">Canvas share</span> — save and share your final board as an image</li>
+    </ul>
+  </div>
+
+  <footer class="page-footer">
+    <div class="footer-links">
+      <a href="/">Play Glowtris</a>
+      <span style="margin:0 6px">·</span>
+      <a href="/privacy.html">Privacy</a>
+      <span style="margin:0 6px">·</span>
+      <a href="/terms.html">Terms</a>
+    </div>
+    <div class="footer-copy">© 2026 Glowtris. All rights reserved.</div>
+  </footer>
+
+</div>
+<script>
+  document.addEventListener('keydown', function(e) {
+    if (e.code === 'Escape' || e.code === 'Backspace') {
+      e.preventDefault();
+      if (document.referrer.includes(window.location.host)) {
+        history.back();
+      } else {
+        window.location.href = '/';
+      }
+    }
+  });
+</script>
+</body>
+</html>
