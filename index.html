@@ -4240,7 +4240,7 @@ if ('serviceWorker' in navigator) {
     });
     if (!_snoozed()) {
       clearTimeout(_bannerTimer);
-      _bannerTimer = setTimeout(_showBanner, 100);
+      _bannerTimer = setTimeout(_showBanner, 500);
     }
   }
   function _initOfflineIndicator() {
@@ -4297,7 +4297,7 @@ if ('serviceWorker' in navigator) {
     _bannerShown = false;
     _gameActive = false;
     clearTimeout(_bannerTimer);
-    _bannerTimer = setTimeout(_showBanner, 1200);
+    _bannerTimer = setTimeout(_showBanner, 500);
   }
   function pwaInstallBtnHTML(p) {
     if (_installed()) return "";
@@ -5327,6 +5327,14 @@ ${window.location.origin}`;
       myRank = S._lbCache.rank;
     }
     document.querySelectorAll(".lb-tab[data-tab]").forEach((t) => t.classList.toggle("active", t.dataset.tab === tab));
+    if (!navigator.onLine && (!entries || entries.length === 0)) {
+      inner.style.cssText = "display:flex;align-items:center;justify-content:center;";
+      inner.innerHTML = `<div class="lb-offline">
+      <span class="material-icons-round lb-offline-icon">wifi_off</span>
+      <span class="lb-offline-txt">NO INTERNET CONNECTION</span>
+    </div>`;
+      return;
+    }
     const myVal = isSprintTab ? S._lbCache.mySprintTime : S._lbCache.myScore;
     inner.removeAttribute("style");
     inner.innerHTML = lbHTML(entries, S._lbCache.myName, myRank, myVal, isSprintTab);
