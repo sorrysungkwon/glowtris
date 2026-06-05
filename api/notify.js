@@ -3,7 +3,7 @@ import webpush from 'web-push';
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
-const NOTIFY_HOUR = 12; // local noon
+const NOTIFY_HOUR = 11; // local 11:30 — accounts for up to 1h GitHub Actions delay
 
 webpush.setVapidDetails(
   'mailto:seonqwer@gmail.com',
