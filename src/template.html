@@ -64,6 +64,11 @@ if ('serviceWorker' in navigator) {
 </head>
 <body>
 
+<div id="maintenance-banner" style="display:none">
+  <span id="maintenance-text"></span>
+  <button id="maintenance-close" onclick="document.getElementById('maintenance-banner').style.display='none'" aria-label="Close">✕</button>
+</div>
+
 <canvas id="bg-canvas"></canvas>
 <div id="screen-flash"></div>
 <div id="perf-indicator">⚡ LOW-SPEC MODE</div>
