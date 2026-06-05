@@ -318,6 +318,7 @@ export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
   const inp=document.getElementById('lb-name');
   inp.focus();inp.select();
   inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitSprintScore(timeMs);});
+  onPWAGameOver();
 }
 
 export function showStartScreen(){
@@ -379,6 +380,7 @@ export function showStartScreen(){
     </div>`;
   $overlay.style.display='flex';
   loadStartLeaderboard();
+  onPWAGameOver();
 }
 
 export function showModeSelector(){

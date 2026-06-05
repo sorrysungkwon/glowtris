@@ -4723,6 +4723,7 @@ if ('serviceWorker' in navigator) {
     inp.addEventListener("keydown", (e) => {
       if (e.key === "Enter") submitSprintScore(timeMs);
     });
+    onPWAGameOver();
   }
   function showStartScreen() {
     offlineBarGameEnd();
@@ -4784,6 +4785,7 @@ if ('serviceWorker' in navigator) {
     </div>`;
     $overlay.style.display = "flex";
     loadStartLeaderboard();
+    onPWAGameOver();
   }
   function showModeSelector() {
     hidePWABanner();
