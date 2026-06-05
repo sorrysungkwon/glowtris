@@ -1466,14 +1466,15 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 /* ── PWA Install Banner ──────────────────────────────────────────────────── */
 #pwa-banner {
   position: fixed;
-  bottom: -90px;
+  bottom: 0;
   left: 0;
   right: 0;
   z-index: 9999;
   padding: 0 12px 16px;
-  transition: bottom 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transform: translateY(110%);
+  transition: transform 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
-#pwa-banner.visible { bottom: 0; }
+#pwa-banner.visible { transform: translateY(0); }
 .pwa-banner-inner {
   display: flex;
   flex-direction: column;
