@@ -1349,13 +1349,17 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 28px 0;
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 10px;
-  letter-spacing: 2px;
-  font-weight: 700;
 }
-.lb-offline svg { opacity: 0.3; }
+.lb-offline-icon {
+  font-size: 32px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.lb-offline-txt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.45);
+}
 
 /* ── Offline Indicator ───────────────────────────────────────────────────── */
 #offline-bar {
