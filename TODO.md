@@ -5,6 +5,21 @@
 - **English-Only Rule**: All code changes, comments, logs, documentation, and Git commit messages MUST be written entirely in English.
 - **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push해".** Docs-only commits accumulate locally and are bundled with the next code push.
 
+## 📝 Latest Sync Notes & Future Suggestions (Handover to Claude)
+**Recently Completed (Antigravity Sync - 2026-06-05):**
+- **iOS SafeArea**: Top UI margins strictly use `calc(env(safe-area-inset-top) + 12px)` to prevent Dynamic Island overlaps.
+- **PWA Home Indicator**: The overall `body` and `theme-color` is set to `#070514` (Dark Navy) so the bottom touch bar blends smoothly without harsh black bars.
+- **Leaderboard States**: Visual polish applied to "NO RECORDS YET", "SUBMITTING...", "NETWORK ERROR", and "SAVED OFFLINE" using animated `lb-offline` styles.
+- **Offline Sync**: Automatically flushes `LS_SCORE_QUEUE` on app launch (`navigator.onLine`). If network connects while on the "SAVED OFFLINE" screen, the app visually resumes submission automatically.
+- **Push Notifications**: Fixed iOS 16.4+ standalone requirement. Notification permission now prompts only after the app is launched from the home screen (`standalone` mode). Added a `NOTIFICATIONS` toggle in the Settings menu; "NOT NOW" permanently suppresses auto-prompts.
+
+**🔥 Recommended "Game Feel" & Core Mechanics additions:**
+- **Haptic Feedback**: Use `navigator.vibrate([15])` for Hard Drops and `[30, 50, 30]` for line clears.
+- **Screen Shake**: Add a CSS `.shake` class to `#app` or canvas for Hard Drops/Tetris clears.
+- **Hold Feature & T-Spin Scoring**: Core tetris elements missing. Hold requires UI/logic, T-Spins require 3-corner checks and massive score/visual feedback.
+- **Anti-Cheat**: Current leaderboard fetch is unauthenticated. Need basic hash/token signing.
+- **Local Stats / Ghost Racing**: Save PB times locally to show progression graphs, or render a ghost piece replay of the #1 player during Sprint.
+
 ---
 
 ## 🎯 Version Pipeline (current → next)

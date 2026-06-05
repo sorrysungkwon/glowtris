@@ -6,8 +6,9 @@
 <title>GLOWTRIS</title>
 <meta name="description" content="Neon-styled block stacking game with online leaderboard. Compete for the top rank!">
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#00c8ff">
+<meta name="theme-color" content="#070514">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Glowtris">
@@ -36,6 +37,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap" rel="stylesheet">
 <!--BUILD_CSS-->
+<!-- Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const sw = reg.installing;
+        sw.addEventListener('statechange', () => {
+          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+            window._pwaShowUpdateToast && window._pwaShowUpdateToast();
+          }
+        });
+      });
+    }).catch(() => {});
+  });
+}
+</script>
 <!-- Vercel Speed Insights -->
 <script defer src="/_vercel/speed-insights/script.js"></script>
 <!-- Vercel Web Analytics -->
@@ -48,7 +66,7 @@
 
 <canvas id="bg-canvas"></canvas>
 <div id="screen-flash"></div>
-<div id="perf-indicator" onclick="openSettings()">⚡ LOW-SPEC MODE</div>
+<div id="perf-indicator">⚡ LOW-SPEC MODE</div>
 <div id="overlay"></div>
 
 <div id="htp-overlay" style="display:none" onclick="closeHowToPlay()">
