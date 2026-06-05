@@ -19,9 +19,9 @@ export default async function handler(req, res) {
       redisGet('maintenance:msg'),
     ]);
 
-    if (!time) return res.status(200).json(null);
+    if (!time && !msg) return res.status(200).json(null);
 
-    res.status(200).json({ time: Number(time), msg: msg || 'Scheduled maintenance' });
+    res.status(200).json({ time: time ? Number(time) : null, msg: msg || 'Scheduled maintenance' });
   } catch {
     res.status(200).json(null);
   }

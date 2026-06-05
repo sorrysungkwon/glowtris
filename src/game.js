@@ -966,10 +966,10 @@ if($hiScore)$hiScore.textContent=S.hiScore.toLocaleString();
 if($hiScoreM)$hiScoreM.textContent=S.hiScore.toLocaleString();
 fetch('/api/maintenance').then(r=>r.json()).then(data=>{
   if(!data||!data.time)return;
-  const t=new Date(data.time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   const el=document.getElementById('maintenance-banner');
   if(!el)return;
-  document.getElementById('maintenance-text').textContent=`⚠ ${data.msg} — ${t}`;
+  const t=data.time?new Date(data.time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+  document.getElementById('maintenance-text').textContent=t?`⚠ ${data.msg} — ${t}`:`⚠ ${data.msg}`;
   el.style.display='block';
   document.documentElement.style.setProperty('--banner-h', el.offsetHeight+'px');
   document.getElementById('maintenance-close').addEventListener('click',()=>{
