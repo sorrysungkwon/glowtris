@@ -33,6 +33,7 @@ import {
   _renderSprintScreen, showStartScreen, showModeSelector, openSettings
 } from './screens.js';
 import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
+import { initPWA } from './pwa.js';
 
 document.addEventListener('gesturestart',  e=>e.preventDefault(), {passive:false});
 document.addEventListener('gesturechange', e=>e.preventDefault(), {passive:false});
@@ -963,6 +964,7 @@ const $hiScoreM = document.getElementById('hi-score-m');
 if($hiScore)$hiScore.textContent=S.hiScore.toLocaleString();
 if($hiScoreM)$hiScoreM.textContent=S.hiScore.toLocaleString();
 document.fonts.ready.then(() => {
+  initPWA();
   animFrame=requestAnimationFrame(function bgOnly(ts){drawBackground();if(!S.gameRunning)animFrame=requestAnimationFrame(bgOnly);});
   showStartScreen();
 });

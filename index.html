@@ -1380,8 +1380,132 @@
   }
 @keyframes text-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 8px rgba(0,200,255,0.8); } }
 html.low-perf .action-btn.play-btn { animation: none !important; }
+
+/* ── PWA Install Banner ──────────────────────────────────────────────────── */
+#pwa-banner {
+  position: fixed;
+  bottom: -90px;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  padding: 0 12px 16px;
+  transition: bottom 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+#pwa-banner.visible { bottom: 0; }
+.pwa-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 15, 30, 0.97);
+  border: 1px solid rgba(0, 200, 255, 0.28);
+  border-radius: 14px;
+  padding: 12px 12px 12px 16px;
+  box-shadow: 0 -4px 24px rgba(0, 200, 255, 0.12);
+}
+.pwa-banner-icon { font-size: 22px; flex-shrink: 0; }
+.pwa-banner-text { flex: 1; min-width: 0; }
+.pwa-banner-title {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(0, 200, 255, 0.95);
+}
+.pwa-banner-sub {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.pwa-banner-add {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #000;
+  background: rgba(0, 200, 255, 0.92);
+  border: none;
+  border-radius: 7px;
+  padding: 8px 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.pwa-banner-add:active { opacity: 0.8; }
+.pwa-banner-close {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.35);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  line-height: 1;
+}
+
+/* ── PWA Modals ──────────────────────────────────────────────────────────── */
+#pwa-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 8, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+#pwa-modal.visible { opacity: 1; }
+.pwa-modal-box {
+  background: rgba(0, 12, 26, 0.99);
+  border: 1px solid rgba(0, 200, 255, 0.28);
+  border-radius: 16px;
+  padding: 28px 22px 22px;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+.pwa-modal-icon { font-size: 38px; margin-bottom: 12px; }
+.pwa-modal-title {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: rgba(0, 200, 255, 0.95);
+  margin-bottom: 16px;
+}
+.pwa-modal-body {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.65;
+  margin-bottom: 22px;
+}
+.pwa-modal-steps {
+  text-align: left;
+  margin: 0 0 22px 0;
+  padding-left: 18px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  line-height: 1.9;
+}
+.pwa-modal-steps li { margin-bottom: 2px; }
+.pwa-modal-steps strong { color: rgba(0, 200, 255, 0.9); }
+
+/* Settings install button */
+.toggle-btn.pwa-install-btn {
+  border-color: rgba(0, 200, 255, 0.38);
+  color: rgba(0, 200, 255, 0.8);
+}
 \n@keyframes sprintCompletePulse {\n  0% { transform: scale(0.8); opacity: 0; text-shadow: 0 0 10px rgba(0,255,136,0); }\n  50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 30px rgba(0,255,136,1), 0 0 60px rgba(0,200,255,0.8); }\n  100% { transform: scale(1); opacity: 1; text-shadow: 0 0 15px rgba(0,255,136,0.6); }\n}\n.sprint-header-anim {\n  animation: sprintCompletePulse 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;\n}\n
 </style>
+<!-- Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
 <!-- Vercel Speed Insights -->
 <script defer src="/_vercel/speed-insights/script.js"></script>
 <!-- Vercel Web Analytics -->
@@ -3882,6 +4006,151 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     }, 150);
   }
 
+  // src/pwa.js
+  var LS_DISMISSED = "pwa-dismissed";
+  var LS_INSTALLED = "pwa-installed";
+  var LS_FIRST_GAME = "pwa-first-game";
+  var _deferred = null;
+  var _bannerShown = false;
+  var _startTimer = null;
+  function _installed() {
+    return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
+  }
+  function _iOS() {
+    return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+  function initPWA() {
+    if (_installed()) return;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      _deferred = e;
+    });
+    window.addEventListener("appinstalled", () => {
+      localStorage.setItem(LS_INSTALLED, "1");
+      _deferred = null;
+      _hideBanner();
+    });
+    if (!localStorage.getItem(LS_DISMISSED)) {
+      _startTimer = setTimeout(() => {
+        if (!_bannerShown) _showBanner();
+      }, 3e4);
+    }
+  }
+  function onPWAGameOver() {
+    if (_installed()) return;
+    if (_bannerShown || localStorage.getItem(LS_DISMISSED)) return;
+    if (!localStorage.getItem(LS_FIRST_GAME)) {
+      localStorage.setItem(LS_FIRST_GAME, "1");
+      setTimeout(_showBanner, 1200);
+    }
+  }
+  function pwaInstallBtnHTML(p) {
+    if (_installed()) return "";
+    if (!_deferred && !_iOS()) return "";
+    return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">\u{1F4F2} ADD TO HOME SCREEN</button>`;
+  }
+  function _showBanner() {
+    if (_bannerShown || _installed()) return;
+    if (!_deferred && !_iOS()) return;
+    _bannerShown = true;
+    clearTimeout(_startTimer);
+    const el = document.createElement("div");
+    el.id = "pwa-banner";
+    el.innerHTML = `
+    <div class="pwa-banner-inner">
+      <span class="pwa-banner-icon">\u{1F4F2}</span>
+      <div class="pwa-banner-text">
+        <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
+        <div class="pwa-banner-sub">Play offline, no browser bar</div>
+      </div>
+      <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
+      <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
+    </div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  function _hideBanner() {
+    const el = document.getElementById("pwa-banner");
+    if (!el) return;
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 350);
+  }
+  window._pwaDismiss = function() {
+    localStorage.setItem(LS_DISMISSED, "1");
+    _hideBanner();
+  };
+  window._pwaInstall = function() {
+    _hideBanner();
+    if (_deferred) {
+      _deferred.prompt();
+      _deferred.userChoice.then((r) => {
+        _deferred = null;
+        if (r.outcome === "accepted") {
+          localStorage.setItem(LS_INSTALLED, "1");
+          setTimeout(_askNotif, 800);
+        }
+      });
+    } else if (_iOS()) {
+      _showIOSModal();
+    }
+  };
+  function _showIOSModal() {
+    _removeModal();
+    const el = document.createElement("div");
+    el.id = "pwa-modal";
+    el.innerHTML = `
+    <div class="pwa-modal-box">
+      <div class="pwa-modal-title">ADD TO HOME SCREEN</div>
+      <ol class="pwa-modal-steps">
+        <li>Tap the <strong>Share</strong> button
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:3px;color:rgba(0,200,255,0.8)"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          at the bottom of Safari
+        </li>
+        <li>Scroll and tap <strong>"Add to Home Screen"</strong></li>
+        <li>Tap <strong>Add</strong> to confirm</li>
+      </ol>
+      <button class="action-btn full-width" onclick="window._pwaIOSDone()">GOT IT</button>
+    </div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  window._pwaIOSDone = function() {
+    _removeModal();
+    setTimeout(_askNotif, 400);
+  };
+  function _askNotif() {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "default") return;
+    _removeModal();
+    const el = document.createElement("div");
+    el.id = "pwa-modal";
+    el.innerHTML = `
+    <div class="pwa-modal-box">
+      <div class="pwa-modal-icon">\u{1F514}</div>
+      <div class="pwa-modal-title">ENABLE NOTIFICATIONS?</div>
+      <div class="pwa-modal-body">Get notified about daily challenges and updates.</div>
+      <button class="action-btn full-width" onclick="window._pwaNotifAllow()">ALLOW</button>
+      <button class="action-btn ghost full-width" style="margin-top:8px" onclick="window._pwaNotifDeny()">NOT NOW</button>
+    </div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
+  function _removeModal() {
+    const el = document.getElementById("pwa-modal");
+    if (!el) return;
+    el.classList.remove("visible");
+    setTimeout(() => el.remove(), 350);
+  }
+  window._pwaNotifAllow = function() {
+    _removeModal();
+    Notification.requestPermission().then((p) => {
+      localStorage.setItem("pwa-notif", p);
+    });
+  };
+  window._pwaNotifDeny = function() {
+    _removeModal();
+  };
+
   // src/screens.js
   var $overlay = document.getElementById("overlay");
   function rollNumber(el, val, dur) {
@@ -3996,7 +4265,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 
     <div class="sg-sep"></div>
     <div class="sg-label">PERFORMANCE</div>
-    <button class="toggle-btn${S.lowPerfMode ? " lowspec-on" : " muted"}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode ? "\u26A1 LOW-SPEC MODE: ON" : "\u26A1 LOW-SPEC MODE: OFF"}</button>`;
+    <button class="toggle-btn${S.lowPerfMode ? " lowspec-on" : " muted"}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode ? "\u26A1 LOW-SPEC MODE: ON" : "\u26A1 LOW-SPEC MODE: OFF"}</button>
+    ${pwaInstallBtnHTML(p)}`;
   }
   function openSettings() {
     $overlay.innerHTML = `
@@ -4131,6 +4401,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
     inp.addEventListener("keydown", (e) => {
       if (e.key === "Enter") submitScore();
     });
+    onPWAGameOver();
   }
   function _renderSprintScreen(timeMs, isNewBest, prevBest) {
     const savedName = localStorage.getItem(LS.NAME) || "";
@@ -5868,6 +6139,7 @@ ${window.location.origin}`;
   if ($hiScore2) $hiScore2.textContent = S.hiScore.toLocaleString();
   if ($hiScoreM2) $hiScoreM2.textContent = S.hiScore.toLocaleString();
   document.fonts.ready.then(() => {
+    initPWA();
     animFrame = requestAnimationFrame(function bgOnly(ts) {
       drawBackground();
       if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly);

@@ -13,6 +13,7 @@ import {
   startGame, startSprintMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
+import { pwaInstallBtnHTML, onPWAGameOver } from './pwa.js';
 
 const $overlay = document.getElementById('overlay');
 
@@ -134,7 +135,8 @@ function _settingsHTML(p) {
 
     <div class="sg-sep"></div>
     <div class="sg-label">PERFORMANCE</div>
-    <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>`;
+    <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>
+    ${pwaInstallBtnHTML(p)}`;
 }
 
 export function openSettings() {
@@ -280,6 +282,7 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
   const inp = document.getElementById('lb-name');
   inp.focus(); inp.select();
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitScore(); });
+  onPWAGameOver();
 }
 
 export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
