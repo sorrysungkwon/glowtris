@@ -138,7 +138,7 @@ async function deduplicateAndAddSprint(key, cleanName, newTime, newMember) {
 }
 
 const ALLOWED_ORIGINS = ['https://glowtris.com', 'https://www.glowtris.com', 'https://prevglow.vercel.app'];
-const RESERVED_NAMES = ['admin', 'glowtris', 'moderator', 'mod', 'operator', 'system', 'bot', '운영자', '관리자'];
+const RESERVED_NAMES = ['admin', 'glowtris', 'moderator', 'mod', 'operator', 'system', 'bot'];
 
 export default async function handler(req, res) {
   const origin = req.headers.origin || '';

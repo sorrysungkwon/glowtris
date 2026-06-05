@@ -18,30 +18,27 @@ A neon-styled block stacking game built with ES modules and canvas.
 
 ## Features
 
-- Neon glow effect on pieces and UI
-- Responsive layout — desktop 3-panel, mobile touch controls, tablet support
-- Starfield background animation
+- Neon glow effect on pieces and UI; PixiJS WebGL2 renderer (v0.5, in progress)
+- Responsive layout — desktop 3-panel, mobile touch controls, iPad keyboard mode
+- Starfield + nebula background animation; challenge mode gets distinct crimson background
 - Screen shake + danger red overlay when stack is high
-- Chiptune BGM via Web Audio API (A minor, 140 BPM, 4-phrase looping melody with bass)
-- BGM tempo auto-scaling with level (140 BPM at L1 → 200 BPM cap at L13+)
-- Sound effects: move, rotate, hold, line clear (1–3 lines), Glowtris fanfare, game over
-- Enhanced screen shake on hard drop (scales with drop distance)
-- Audio mute toggle (persists across sessions)
-- T-spin detection with bonus scoring (single / double / triple)
-- DAS/ARR key-repeat tuning (accessible from pause menu)
-- Combo flash overlay (cyan → purple → pink as combo grows)
-- Glowtris full-screen flash + rainbow border glow on 4-line clear
-- All-clear bonus: 2000×level pts + gold flash + fanfare + burst particles
-- NEW BEST effect: gold badge + ascending SFX + gold particles on personal record
-- Personal game history: last 5 scores shown on game over screen (localStorage)
-- Online leaderboard: TODAY and ALL TIME tabs, top 10, submit after game over
-- Daily leaderboard resets each day (Redis TTL)
-- Rank shown after score submission (today rank + all-time rank)
-- Restart button in pause menu (returns to start screen without full reload)
-- HOW TO PLAY popup — full-screen overlay listing keyboard and touch controls
-- Web Share API result sharing (clipboard fallback on desktop)
-- PWA: installable on iOS/Android home screen (manifest + icons)
-- OG image + social meta tags for rich SNS sharing preview
+- Multi-track chiptune BGM via Web Audio API; tempo auto-scales with level; challenge mode distinct BGM
+- Sound effects: move, rotate, hold, line clear, Glowtris fanfare, game over, UI interactions
+- T-spin Mini + Full detection with bonus scoring; Back-to-Back 1.5× bonus
+- All-spin detection (SRS+); 5-piece next queue; 180° rotation
+- DAS / ARR / SDF / lock-delay tuning (pause menu); instant ARR=0 support; IRS / IHS / DCD
+- Combo flash overlay + rainbow border on Glowtris; all-clear gold flash + fanfare
+- Ghost piece with alignment lasers; colorblind mode (7 symbol overlays); animation intensity (Full/Low/Off)
+- Automatic low-perf mode (FPS monitor); manual PERF toggle in settings
+- Game modes: Marathon, Sprint 40L, Daily Challenge (date-seeded, one attempt per day)
+- Online leaderboard — TODAY / WEEKLY / ALL TIME per mode; rank shown after submission
+- Score deduplication (personal best kept); IP-based rate limiting; score validation
+- 20 achievement milestones — unlock toast + particle burst; badge gallery in STATS overlay
+- Canvas share image (1200×630 PNG) via Web Share API; clipboard fallback
+- PWA: installable on iOS/Android/desktop; service worker offline cache; push notifications (iOS 16.4+ standalone)
+- Maintenance banner with local timezone display
+- Changelog page; Privacy Policy + Terms of Service pages
+- OG image (`/api/og` Edge Function, 1200×630 PNG) for Twitter/KakaoTalk/Discord/Line previews
 
 ## Version Revision (2026-06-01)
 
@@ -121,15 +118,15 @@ A neon-styled block stacking game built with ES modules and canvas.
 | ~~v1.1~~ ✅ | **Sprint Mode + iPad Keyboard**: Sprint 40L engine — clear 40 lines, stopwatch HUD, remaining-lines counter, mode selector card UI (Marathon / Sprint 40L / Daily Challenge), 3-2-1 animated countdown (per-number colours, scale animation, expanding rings, GO! flash). Sprint leaderboard ascending (lowest time = best), personal best tracking, shareable Sprint result card (time + LPM + rank). iPad external-keyboard mode — first keydown on coarse-pointer tablet shows desktop side panels (SCORE / LINES / LEVEL / NEXT / HOLD / KEYS), touch restores instantly; phones always keep touch UI. Keyboard nudge spring-back redesigned with `void offsetWidth` forced reflow + `cubic-bezier(0.15,2.8,0.5,0.82)` overshoot. API: `KEY_SPRINT` / `KEY_SPRINT_DAILY` / `KEY_SPRINT_WEEKLY` Redis keys, ascending `getSprintBoard()`, `deduplicateAndAddSprint()`. |
 | ~~v1.1.1~~ ✅ | **UX/UI Polish & Keyboard Nav**: Gestalt visual grouping of overlays. Full keyboard navigation for all dialogs (WASD, Arrows, Tab, Enter). Intelligent Escape/Backspace bindings. Auto-focus management for modals to prevent trapping. Fixed touch controls bypassing game countdown. Duplicate modal prevention. Upgraded hover sound logic and UI interaction effects. |
 
-### 🔮 Planned — Phase A (Engine Foundation, pre-1.0 beta)
+### Phase A Status (Engine Foundation, pre-1.0 beta)
 
-| Version | Theme | Features |
+| Version | Theme | Status |
 |---|---|---|
-| v0.2 | **Loop & Input Core** | Decoupled fixed-timestep logic loop (sub-4ms input-to-state latency). Ordered sub-frame input handling — inputs in the same render frame simulated in true chronological order. |
-| v0.3 (Done) | **Movement Standard** | 180° rotation. Customisable keybinds. SDF (soft-drop factor) slider with ∞ option. Lock-delay reset cap (15 moves). IRS (initial rotation) and IHS (initial hold). DCD (dash cancellation delay). Instant ARR=0 transition. |
-| v0.4 | **Scoring Standard** | Back-to-Back 1.5× bonus for consecutive T-spins/Tetrises. 5-piece next queue. All-spin detection (SRS+) for S/Z/J/L/I in addition to T. |
-| v0.5 | **Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged: board → particles → background → shader effects). Render interpolation between 1ms logic ticks for full monitor refresh rate (144Hz+). 1000+ particle systems. Signature neon/glow shader pipeline. Low-latency audio dispatch (SFX <5ms). |
-| v0.6 | **Modes & Metrics** | Ultra/Blitz 2-minute timed mode. In-game APM / PPS display. |
+| v0.2 | **Loop & Input Core** — Decoupled fixed-timestep logic loop, ordered sub-frame input handling | ✅ Done |
+| v0.3 | **Movement Standard** — 180° rotation, custom keybinds, SDF/∞, lock-cap (15 moves), IRS/IHS/DCD, instant ARR=0 | ✅ Done |
+| v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
+| v0.5 | **Renderer & Audio** — PixiJS WebGL2 renderer (staged), render interpolation, 1000+ particles, low-latency audio | 🔄 In Progress |
+| v0.6 | **Modes & Metrics** — Ultra/Blitz 2-minute mode, in-game APM/PPS display | 🔲 Planned |
 
 ### 🔮 Planned — Phase B (Public Launch & Growth, post-1.0)
 
@@ -143,7 +140,7 @@ A neon-styled block stacking game built with ES modules and canvas.
 | v1.5 | **Advanced Stats** | Expanded STATS overlay: T-spin %, all-clear %, average combo. Session graph (score over last 10 games). Weekly personal report card. | 4,500 |
 | v1.6 | **Season & Rank** | Monthly season resets leaderboard. 7-tier rank system (Bronze → Radiant) based on season score. Season-exclusive title badges and board borders unlock at each tier. | 6,000 |
 | v1.7 | **Social Layer** | Friend code system (6-char code → follow mutual). Friend-only leaderboard tab. Async challenge — share a seeded run; recipient plays same sequence, results compared on a shared card. | 8,000 |
-| v2.0 | **Real-time Multiplayer** | 1v1 battle via WebSocket (Pusher/Ably). Garbage line mechanic. Live spectator mode. Elo-based matchmaking queue. Battle-exclusive leaderboard. | **15,000+** |
+| v2.0 | **Platform** | Embeddable widget, community API, rival system, percentile badge, brand/creator hooks. No real-time multiplayer — async social competition provides equivalent engagement at zero WebSocket cost. | **15,000+** |
 
 ## Infrastructure
 
@@ -156,10 +153,11 @@ A neon-styled block stacking game built with ES modules and canvas.
 
 ### Environment Variables
 
-| Variable | Description |
-|---|---|
-| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST endpoint |
-| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis auth token |
+| Variable | Env | Description |
+|---|---|---|
+| `UPSTASH_REDIS_REST_URL` | Production, Preview | Upstash Redis REST endpoint |
+| `UPSTASH_REDIS_REST_TOKEN` | Production, Preview | Upstash Redis auth token |
+| `LEADERBOARD_PREFIX` | Preview only | Redis key namespace prefix (e.g. `preview:`) — isolates preview data from production |
 
 Set in Vercel Dashboard → Settings → Environment Variables.
 

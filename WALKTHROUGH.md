@@ -594,7 +594,7 @@ res.setHeader('Vary', 'Origin');  // required when origin is dynamic
 ## Name validation
 - Trim → slice to 12 chars → strip non-word/non-Korean chars → trim again
 - Blank name after sanitization → 400 reject
-- Reserved name blacklist: `admin, glowtris, moderator, mod, operator, system, bot, 운영자, 관리자`
+- Reserved name blacklist: `admin, glowtris, moderator, mod, operator, system, bot`
 
 ## Redis keepalive (`api/keepalive.js`)
 - Daily cron (`0 0 * * *` UTC) hits `/api/keepalive` → pings Upstash via REST API
