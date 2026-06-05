@@ -1,5 +1,6 @@
-const CACHE = 'glowtris-v2';
-const APP_SHELL = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg'];
+const CACHE      = 'glowtris-v3';
+const FONT_CACHE = 'glowtris-fonts-v1';
+const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -9,9 +10,10 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
+  const keep = [CACHE, FONT_CACHE];
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => !keep.includes(k)).map(k => caches.delete(k))))
       .then(() => clients.claim())
   );
 });
@@ -22,6 +24,23 @@ self.addEventListener('fetch', e => {
 
   // API calls always go to network
   if (url.pathname.startsWith('/api/')) return;
+
+  // Google Fonts CSS + font files: cache-first, long-lived
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+    e.respondWith(
+      caches.match(request).then(cached => {
+        if (cached) return cached;
+        return fetch(request).then(res => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(FONT_CACHE).then(c => c.put(request, clone));
+          }
+          return res;
+        });
+      })
+    );
+    return;
+  }
 
   // index.html: network-first so updates are picked up, cache as fallback
   if (url.pathname === '/' || url.pathname === '/index.html') {
