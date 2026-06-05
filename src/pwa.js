@@ -50,6 +50,7 @@ window._pwaShowUpdateToast = function() {
 let _deferred    = null;
 let _bannerShown = false;
 let _gameActive  = false;
+let _bannerTimer = null;
 
 function _installed() {
   return window.matchMedia('(display-mode: standalone)').matches ||
@@ -97,7 +98,7 @@ export function initPWA() {
   });
 
   if (!_snoozed()) {
-    setTimeout(() => { if (!_bannerShown) _showBanner(); }, 2000);
+    _bannerTimer = setTimeout(() => { if (!_bannerShown) _showBanner(); }, 2000);
   }
 }
 
@@ -132,6 +133,8 @@ function _showOffline() {
 
 export function offlineBarGameStart() {
   _gameActive = true;
+  clearTimeout(_bannerTimer);
+  _bannerTimer = null;
   document.getElementById('offline-bar')?.classList.add('game-active');
   hidePWABanner();
 }
@@ -200,11 +203,13 @@ function _hideBanner() {
 }
 
 export function hidePWABanner() {
+  clearTimeout(_bannerTimer);
+  _bannerTimer = null;
   _bannerShown = false;
   const el = document.getElementById('pwa-banner');
   if (!el) return;
-  el.classList.remove('visible');
-  setTimeout(() => el.remove(), 400);
+  el.style.transform = 'translateY(120%)';
+  setTimeout(() => el.remove(), 420);
 }
 
 window._pwaDismiss = function() {
