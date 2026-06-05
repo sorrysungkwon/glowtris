@@ -60,16 +60,18 @@ function _showBanner() {
   el.id = 'pwa-banner';
   el.innerHTML = `
     <div class="pwa-banner-inner">
-      <span class="pwa-banner-icon">📲</span>
-      <div class="pwa-banner-text">
-        <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
-        <div class="pwa-banner-sub">Play offline · no browser bar</div>
+      <div class="pwa-banner-top">
+        <span class="pwa-banner-icon">📲</span>
+        <div class="pwa-banner-text">
+          <div class="pwa-banner-title">ADD TO HOME SCREEN</div>
+          <div class="pwa-banner-sub">Play offline · no browser bar</div>
+        </div>
+        <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">✕</button>
       </div>
-      <div class="pwa-banner-actions">
+      <div class="pwa-banner-btns">
         <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
         <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
       </div>
-      <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">✕</button>
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('visible'));
