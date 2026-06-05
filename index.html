@@ -93,7 +93,6 @@
   }
 
   :root {
-    --banner-h: 0px;
     --cyan: #00c8ff;
     --purple: #a000ff;
     --pink: #ff0080;
@@ -132,8 +131,7 @@
     position:relative; z-index:1;
     display:flex; flex-direction:column;
     align-items:center;
-    height:calc(100dvh - var(--banner-h));
-    margin-top:var(--banner-h);
+    height:100%; height:100dvh;
     padding-top:max(8px, var(--safe-top));
     padding-bottom:max(8px, var(--safe-bottom));
     gap:8px;
@@ -6664,10 +6662,6 @@ ${window.location.origin}`;
     const t = data.time ? new Date(data.time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
     document.getElementById("maintenance-text").textContent = t ? `\u26A0 ${data.msg} \u2014 ${t}` : `\u26A0 ${data.msg}`;
     el.style.display = "block";
-    document.documentElement.style.setProperty("--banner-h", el.offsetHeight + "px");
-    document.getElementById("maintenance-close").addEventListener("click", () => {
-      document.documentElement.style.setProperty("--banner-h", "0px");
-    });
   }).catch(() => {
   });
   document.fonts.ready.then(() => {
