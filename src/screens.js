@@ -134,9 +134,23 @@ function _settingsHTML(p) {
     </div>
 
     <div class="sg-sep"></div>
-    <div class="sg-label">PERFORMANCE</div>
+    <div class="sg-label">PERFORMANCE & SYSTEM</div>
     <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>
+    <button class="toggle-btn${_notifBtnClass()}" id="${p}-notif-btn" onclick="window._pwaNotifToggle()">${_notifBtnLabel()}</button>
     ${pwaInstallBtnHTML(p)}`;
+}
+
+function _notifBtnClass() {
+  if (!('Notification' in window)) return ' muted';
+  if (Notification.permission === 'granted') return '';
+  return ' muted';
+}
+
+function _notifBtnLabel() {
+  if (!('Notification' in window)) return '🔔 NOTIFICATIONS: N/A';
+  if (Notification.permission === 'granted') return '🔔 NOTIFICATIONS: ON';
+  if (Notification.permission === 'denied') return '🔔 NOTIFICATIONS: OFF';
+  return '🔔 NOTIFICATIONS: OFF';
 }
 
 export function openSettings() {
