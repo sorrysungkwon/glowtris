@@ -97,9 +97,7 @@ export function initPWA() {
     _hideBanner();
   });
 
-  if (!_snoozed()) {
-    _bannerTimer = setTimeout(() => { if (!_bannerShown) _showBanner(); }, 2000);
-  }
+  if (!_snoozed()) _showBanner();
 }
 
 function _initOfflineIndicator() {
@@ -133,10 +131,9 @@ function _showOffline() {
 
 export function offlineBarGameStart() {
   _gameActive = true;
-  clearTimeout(_bannerTimer);
-  _bannerTimer = null;
   document.getElementById('offline-bar')?.classList.add('game-active');
-  hidePWABanner();
+  document.getElementById('pwa-banner')?.classList.add('game-active');
+  document.getElementById('pwa-banner')?.classList.remove('visible');
 }
 
 export function offlineBarGameEnd() {
@@ -158,6 +155,7 @@ function _hideOffline() {
 export function onPWAGameOver() {
   if (_installed() || _snoozed()) return;
   _bannerShown = false;
+  _gameActive = false;
   setTimeout(_showBanner, 1200);
 }
 
@@ -199,17 +197,15 @@ function _hideBanner() {
   const el = document.getElementById('pwa-banner');
   if (!el) return;
   el.classList.remove('visible');
-  setTimeout(() => el.remove(), 350);
+  setTimeout(() => el.remove(), 400);
 }
 
 export function hidePWABanner() {
-  clearTimeout(_bannerTimer);
-  _bannerTimer = null;
   _bannerShown = false;
   const el = document.getElementById('pwa-banner');
   if (!el) return;
-  el.style.transform = 'translateY(120%)';
-  setTimeout(() => el.remove(), 420);
+  el.classList.remove('visible');
+  setTimeout(() => el.remove(), 400);
 }
 
 window._pwaDismiss = function() {
