@@ -129,8 +129,9 @@ export async function shareSprintScore(timeMs,rank){
   if(btn){btn.disabled=true;btn.textContent='GENERATING...';}
   try{
     const lpm=Math.round(SPRINT_LINES/(timeMs/60000));
-    const rankStr=rank?` — Rank #${rank}`:'';
-    const text=`⚡ Glowtris Sprint — ${fmtTime(timeMs)} (${lpm} LPM)${rankStr}\nCan you beat it? ${window.location.origin}`;
+    const rankLine=rank?`⚡ Sprint 40L in ${fmtTime(timeMs)} · Rank #${rank} All Time`:`⚡ Sprint 40L in ${fmtTime(timeMs)} (${lpm} LPM)`;
+    const cta=rank?`Can you go faster? → ${window.location.origin}`:`Can you clear 40 lines faster? → ${window.location.origin}`;
+    const text=`${rankLine}\n${cta}`;
     const blob=await captureSprintImage(timeMs,rank,lpm);
     const file=new File([blob],'glowtris-sprint.png',{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
@@ -435,9 +436,16 @@ export async function shareScore(sc,rank){
   if(btn){btn.disabled=true; btn.textContent='GENERATING...';}
   try {
     const isChallenge = S.isDailyMode;
-    const rankStr=rank?` — Rank #${rank}`:'';
-    const challengeHeader = isChallenge ? `🏆 Glowtris Daily Challenge — ` : `🎮 Glowtris — `;
-    const text=`${challengeHeader}${sc.toLocaleString()} pts${rankStr}\n${window.location.origin}`;
+    let text;
+    if (isChallenge) {
+      const rankLine = rank ? `🏆 Daily Challenge · Rank #${rank} Today · ${sc.toLocaleString()} pts` : `🏆 Glowtris Daily Challenge — ${sc.toLocaleString()} pts`;
+      const cta = rank ? `Same board for everyone — can you beat me? → ${window.location.origin}` : `Same board for everyone today — try it! → ${window.location.origin}`;
+      text = `${rankLine}\n${cta}`;
+    } else {
+      const rankLine = rank ? `🎮 Rank #${rank} All Time · ${sc.toLocaleString()} pts on Glowtris` : `🎮 Glowtris — ${sc.toLocaleString()} pts`;
+      const cta = rank ? `Think you can beat me? → ${window.location.origin}` : `Can you top this? → ${window.location.origin}`;
+      text = `${rankLine}\n${cta}`;
+    }
     const blob = await captureGameImage(sc, rank, isChallenge);
     const file = new File([blob], 'glowtris-score.png', {type: 'image/png'});
 
