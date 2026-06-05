@@ -102,12 +102,25 @@ export async function submitSprintScore(timeMs){
     }
   }catch(e){
     btn.disabled=false;inp.disabled=false;
-    res.innerHTML=`
-      <div class="lb-offline" style="margin-top:10px; gap:6px;">
-        <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">📡</div>
-        <div class="lb-offline-txt" style="color:var(--pink);">NETWORK ERROR</div>
-        <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
-      </div>`;
+    if(!navigator.onLine){
+      const name=inp.value.trim();
+      _enqueueScore({name,score:timeMs,mode:'sprint'});
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:rgba(255,200,80,0.9)">💾</div>
+          <div class="lb-offline-txt" style="color:rgba(255,200,80,0.9);">SAVED OFFLINE</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px; letter-spacing:0.5px">Will submit when back online</div>
+        </div>`;
+      const onResume=()=>{window.removeEventListener('online',onResume);const r=document.getElementById('lb-result');if(r&&r.innerHTML.includes('SAVED OFFLINE')){const b=document.getElementById('lb-submit-btn');if(b&&!b.disabled)b.click();}};
+      window.addEventListener('online',onResume);
+    } else {
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">📡</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">NETWORK ERROR</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
+    }
   }
 }
 
@@ -287,6 +300,8 @@ export async function submitScore(){
           <div class="lb-offline-txt" style="color:rgba(255,200,80,0.9);">SAVED OFFLINE</div>
           <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px; letter-spacing:0.5px">Will submit when back online</div>
         </div>`;
+      const onResume=()=>{window.removeEventListener('online',onResume);const r=document.getElementById('lb-result');if(r&&r.innerHTML.includes('SAVED OFFLINE')){const b=document.getElementById('lb-submit-btn');if(b&&!b.disabled)b.click();}};
+      window.addEventListener('online',onResume);
     } else {
       res.innerHTML=`
         <div class="lb-offline" style="margin-top:10px; gap:6px;">
