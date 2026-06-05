@@ -781,16 +781,17 @@ Root cause: Vercel Analytics reported INP 568ms ("poor" — threshold is >500ms)
 
 ---
 
-## 🔮 Planned: v2.0 — Real-time Multiplayer
-> DAU goal: **15,000+** | Key driver: the platform shift
+## 🔮 Planned: v2.0 — Platform
+> DAU goal: **15,000+** | Key driver: platform shift via async social competition (no real-time multiplayer)
+>
+> **Strategy:** Deepen async social competition loops — percentile comparison, rival system, replay sharing, community embeds. Real-time multiplayer is explicitly out of scope; async challenge links and ghost racing provide equivalent engagement without WebSocket infrastructure cost.
 
-- [ ] Task 1: **WebSocket infrastructure** — integrate Pusher or Ably for real-time bidirectional communication; add API route for session management.
-- [ ] Task 2: **1v1 Battle Mode** — matchmaking queue; garbage line mechanic (cleared lines send junk to opponent); first to top out loses.
-- [ ] Task 3: **Battle HUD** — opponent board preview (mini, right panel); incoming garbage meter; attack/defence counter.
-- [ ] Task 4: **Elo rating system** — per-player Elo stored in Redis; updated after each ranked battle; displayed on profile.
-- [ ] Task 5: **Live spectator mode** — watch any ongoing public match; spectator count shown on match screen.
-- [ ] Task 6: **Battle leaderboard** — ranked by Elo; TODAY (most battles) / ALL TIME (highest Elo) tabs.
-- [ ] Task 7: Update docs, push version tag `v2.0`, upgrade infrastructure (Vercel Pro + Pusher).
+- [ ] Task 1: **Embeddable widget** — `<iframe>` + postMessage API for embedding Glowtris on community sites and content creator pages.
+- [ ] Task 2: **Community API** — public read-only leaderboard API endpoint for third-party integrations and community bots.
+- [ ] Task 3: **Rival system** — auto-assign the player directly above in all-time leaderboard as rival; "rival overtook you" push notification; celebrate when user surpasses rival.
+- [ ] Task 4: **Percentile badge** — show "Top X% today / all-time" on game over screen and share card.
+- [ ] Task 5: **Brand / creator hooks** — custom board skin sponsorship slots, creator referral codes, affiliate leaderboard.
+- [ ] Task 6: Update docs, push version tag `v2.0`.
 
 ## 🐛 Pending Bugs
 - [x] **180° rotation bug (fixed)**: User report — 180° rotation (A key) occasionally dropped not only on hard drop but also on soft drop or natural gravity lock. Root cause was unrelated to IRS; fixed by buffering rotation intent into `S.pendingRot` when `S.current` is null and consuming it in `spawnPiece`.
