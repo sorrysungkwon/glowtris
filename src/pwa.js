@@ -133,8 +133,7 @@ function _showOffline() {
 export function offlineBarGameStart() {
   _gameActive = true;
   document.getElementById('offline-bar')?.classList.add('game-active');
-  const banner = document.getElementById('pwa-banner');
-  if (banner) banner.classList.remove('visible');
+  hidePWABanner();
 }
 
 export function offlineBarGameEnd() {
@@ -197,6 +196,11 @@ function _hideBanner() {
   if (!el) return;
   el.classList.remove('visible');
   setTimeout(() => el.remove(), 350);
+}
+
+export function hidePWABanner() {
+  const el = document.getElementById('pwa-banner');
+  if (el) el.classList.remove('visible');
 }
 
 window._pwaDismiss = function() {
