@@ -971,10 +971,6 @@ fetch('/api/maintenance').then(r=>r.json()).then(data=>{
   const t=data.time?new Date(data.time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
   document.getElementById('maintenance-text').textContent=t?`⚠ ${data.msg} — ${t}`:`⚠ ${data.msg}`;
   el.style.display='block';
-  document.documentElement.style.setProperty('--banner-h', el.offsetHeight+'px');
-  document.getElementById('maintenance-close').addEventListener('click',()=>{
-    document.documentElement.style.setProperty('--banner-h','0px');
-  });
 }).catch(()=>{});
 
 document.fonts.ready.then(() => {
