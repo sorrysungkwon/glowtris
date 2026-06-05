@@ -39,6 +39,16 @@ async function build() {
 
   fs.writeFileSync(path.join(root, 'index.html'), html);
   console.log(`Built index.html  ${(html.length / 1024).toFixed(1)} KB`);
+
+  // Auto-bump Service Worker cache version
+  const swPath = path.join(root, 'sw.js');
+  if (fs.existsSync(swPath)) {
+    let swContent = fs.readFileSync(swPath, 'utf8');
+    const hash = require('crypto').randomBytes(3).toString('hex');
+    swContent = swContent.replace(/const CACHE\s*=\s*['"]glowtris-[^'"]+['"];/, `const CACHE      = 'glowtris-${hash}';`);
+    fs.writeFileSync(swPath, swContent);
+    console.log(`Updated sw.js cache version to glowtris-${hash}`);
+  }
 }
 
 build().catch(e => { console.error(e); process.exit(1); });
