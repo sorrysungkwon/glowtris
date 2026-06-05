@@ -964,6 +964,19 @@ const $hiScore  = document.getElementById('hi-score');
 const $hiScoreM = document.getElementById('hi-score-m');
 if($hiScore)$hiScore.textContent=S.hiScore.toLocaleString();
 if($hiScoreM)$hiScoreM.textContent=S.hiScore.toLocaleString();
+fetch('/api/maintenance').then(r=>r.json()).then(data=>{
+  if(!data||!data.time)return;
+  const t=new Date(data.time).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const el=document.getElementById('maintenance-banner');
+  if(!el)return;
+  document.getElementById('maintenance-text').textContent=`⚠ ${data.msg} — ${t}`;
+  el.style.display='block';
+  document.documentElement.style.setProperty('--banner-h', el.offsetHeight+'px');
+  document.getElementById('maintenance-close').addEventListener('click',()=>{
+    document.documentElement.style.setProperty('--banner-h','0px');
+  });
+}).catch(()=>{});
+
 document.fonts.ready.then(() => {
   initPWA();
   animFrame=requestAnimationFrame(function bgOnly(ts){drawBackground();if(!S.gameRunning)animFrame=requestAnimationFrame(bgOnly);});
