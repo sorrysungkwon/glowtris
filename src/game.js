@@ -1052,7 +1052,7 @@ if($hiScore)$hiScore.textContent=S.hiScore.toLocaleString();
 if($hiScoreM)$hiScoreM.textContent=S.hiScore.toLocaleString();
 fetch('/api/maintenance').then(r=>r.json()).then(data=>{
   if(!data||!data.time)return;
-  const el=document.getElementById('maintenance-banner');
+  const el=document.getElementById('maintenance-bar');
   if(!el)return;
   const t=data.time?new Date(data.time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
   document.getElementById('maintenance-text').textContent=t?`⚠ ${data.msg} — ${t}`:`⚠ ${data.msg}`;
