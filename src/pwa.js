@@ -28,8 +28,8 @@ export function showToast(msg, { icon = '', duration = 3000 } = {}) {
     document.body.appendChild(el);
   }
   el.innerHTML = icon
-    ? `<span class="material-icons-round" style="font-size:14px">${icon}</span>${msg}`
-    : msg;
+    ? `<span class="material-icons-round" style="font-size:14px;flex-shrink:0">${icon}</span><span class="toast-text">${msg}</span>`
+    : `<span class="toast-text">${msg}</span>`;
   el.classList.add('visible');
   clearTimeout(el._timer);
   el._timer = setTimeout(() => el.classList.remove('visible'), duration);

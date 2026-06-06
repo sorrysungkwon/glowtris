@@ -1485,14 +1485,20 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   font-weight: 700;
   letter-spacing: 1.5px;
   color: rgba(0, 255, 136, 0.9);
-  white-space: nowrap;
   max-width: calc(100vw - 32px);
-  overflow: hidden;
-  text-overflow: ellipsis;
   box-sizing: border-box;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
+}
+#pwa-toast .toast-text {
+  white-space: normal;
+  word-break: keep-all;
+  text-align: center;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 #pwa-toast.visible {
   opacity: 1;
