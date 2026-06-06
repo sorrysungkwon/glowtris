@@ -49,7 +49,7 @@ window._pwaShowUpdateToast = function() {
 
 let _deferred    = null;
 let _gameActive  = false;
-let _bannerTimer = null;
+let _sheetTimer = null;
 
 function _installed() {
   return window.matchMedia('(display-mode: standalone)').matches ||
@@ -71,7 +71,7 @@ function _installLabel() {
   return _isDesktop() ? '💻 INSTALL APP' : '📲 ADD TO HOME SCREEN';
 }
 
-function _bannerSubtext() {
+function _sheetSubtext() {
   return _isDesktop() ? 'Launch from desktop · no browser bar' : 'Play offline · no browser bar';
 }
 
@@ -100,12 +100,12 @@ export function initPWA() {
   window.addEventListener('appinstalled', () => {
     localStorage.setItem(LS_INSTALLED, '1');
     _deferred = null;
-    hidePWABanner();
+    hidePWASheet();
   });
 
   if (!_snoozed()) {
-    clearTimeout(_bannerTimer);
-    _bannerTimer = setTimeout(_showBanner, 500);
+    clearTimeout(_sheetTimer);
+    _sheetTimer = setTimeout(_showSheet, 500);
   }
 }
 
@@ -140,10 +140,10 @@ function _showOffline() {
 
 export function offlineBarGameStart() {
   _gameActive = true;
-  clearTimeout(_bannerTimer);
+  clearTimeout(_sheetTimer);
   document.getElementById('offline-bar')?.classList.add('game-active');
-  document.getElementById('pwa-banner')?.classList.add('game-active');
-  document.getElementById('pwa-banner')?.classList.remove('visible');
+  document.getElementById('pwa-sheet')?.classList.add('game-active');
+  document.getElementById('pwa-sheet')?.classList.remove('visible');
 }
 
 export function offlineBarGameEnd() {
@@ -165,8 +165,8 @@ function _hideOffline() {
 export function onPWAGameOver() {
   if (_installed() || _snoozed()) return;
   _gameActive = false;
-  clearTimeout(_bannerTimer);
-  _bannerTimer = setTimeout(_showBanner, 500);
+  clearTimeout(_sheetTimer);
+  _sheetTimer = setTimeout(_showSheet, 500);
 }
 
 export function pwaInstallBtnHTML(p) {
@@ -175,57 +175,57 @@ export function pwaInstallBtnHTML(p) {
   return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
 }
 
-function _showBanner() {
+function _showSheet() {
   if (_installed() || _snoozed()) return;
   if (sessionStorage.getItem('pwa-closed')) return;
   if (!_deferred && !_iOS()) return;
   if (_gameActive) return;
 
-  let el = document.getElementById('pwa-banner');
+  let el = document.getElementById('pwa-sheet');
   if (!el) {
     el = document.createElement('div');
-    el.id = 'pwa-banner';
+    el.id = 'pwa-sheet';
     el.innerHTML = `
-      <div class="pwa-banner-inner">
-        <div class="pwa-banner-top">
-          <span class="pwa-banner-icon">${_isDesktop() ? '💻' : '📲'}</span>
-          <div class="pwa-banner-text">
-            <div class="pwa-banner-title">${_isDesktop() ? 'INSTALL APP' : 'ADD TO HOME SCREEN'}</div>
-            <div class="pwa-banner-sub">${_bannerSubtext()}</div>
+      <div class="pwa-sheet-inner">
+        <div class="pwa-sheet-top">
+          <span class="pwa-sheet-icon">${_isDesktop() ? '💻' : '📲'}</span>
+          <div class="pwa-sheet-text">
+            <div class="pwa-sheet-title">${_isDesktop() ? 'INSTALL APP' : 'ADD TO HOME SCREEN'}</div>
+            <div class="pwa-sheet-sub">${_sheetSubtext()}</div>
           </div>
-          <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">✕</button>
+          <button class="pwa-sheet-close" onclick="window._pwaDismiss()" aria-label="Dismiss">✕</button>
         </div>
-        <div class="pwa-banner-btns">
-          <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
-          <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
+        <div class="pwa-sheet-btns">
+          <button class="pwa-sheet-add" onclick="window._pwaInstall()">ADD</button>
+          <button class="pwa-sheet-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
         </div>
       </div>`;
     document.body.appendChild(el);
   }
-  
+
   el.offsetHeight; // force reflow for transition
   if (!_gameActive) el.classList.add('visible');
 }
 
-export function hidePWABanner() {
-  clearTimeout(_bannerTimer);
-  const el = document.getElementById('pwa-banner');
+export function hidePWASheet() {
+  clearTimeout(_sheetTimer);
+  const el = document.getElementById('pwa-sheet');
   if (el) el.classList.remove('visible');
 }
 
 window._pwaDismiss = function() {
   sessionStorage.setItem('pwa-closed', '1');
-  hidePWABanner();
+  hidePWASheet();
 };
 
 window._pwaSnooze = function() {
   const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1000;
   localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
-  hidePWABanner();
+  hidePWASheet();
 };
 
 window._pwaInstall = function() {
-  hidePWABanner();
+  hidePWASheet();
   if (_deferred) {
     _deferred.prompt();
     _deferred.userChoice.then(r => {
