@@ -259,6 +259,8 @@
     </div>
     <ul class="change-list">
       <li class="perf"><span class="change-label">Canvas2D Optimization</span> — Rolled back experimental WebGL renderer due to Safari bugs; bundle size heavily reduced</li>
+      <li class="feat"><span class="change-label">High-Hz Support</span> — Delta-time physics interpolation added; all animations now run flawlessly on 144Hz/240Hz monitors</li>
+      <li class="perf"><span class="change-label">Zero-Latency Audio</span> — All synthetic sound effects are now pre-rendered into AudioBuffers via OfflineAudioContext, eliminating CPU spikes and latency during play</li>
       <li class="feat"><span class="change-label">Lock-delay UI</span> — Added a floating lock-delay timer bar above the active piece</li>
     </ul>
   </div>
