@@ -3,7 +3,7 @@ import webpush from 'web-push';
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
-const NOTIFY_HOUR = 23; // local 23:30 (11:30 PM) — accounts for up to 30m GitHub Actions delay
+const NOTIFY_HOUR = 11; // local 11:30 (Lunchtime) — accounts for up to 30m GitHub Actions delay
 
 webpush.setVapidDetails(
   'mailto:seonqwer@gmail.com',
@@ -45,18 +45,23 @@ export default async function handler(req, res) {
     try { subs.push({ field: raw[i], ...JSON.parse(raw[i + 1]) }); } catch {}
   }
 
+  const isTest = req.query && req.query.test === '1';
+
   let sent = 0;
   const toDelete = [];
 
   for (const sub of subs) {
     const tz = sub.tzOffset || 0;
-    if (localHour(utcMinutes, tz) !== NOTIFY_HOUR) continue;
+    
+    if (!isTest) {
+      if (localHour(utcMinutes, tz) !== NOTIFY_HOUR) continue;
 
-    // Dedup: only send once per local day
-    const localDate = localDateStr(now, tz);
-    const dedupKey  = encodeURIComponent(`glowtris-notif:${localDate}:${sub.field}`);
-    const nx = await redis(`set/${dedupKey}/1/ex/90000/nx`);
-    if (!nx.result) continue;
+      // Dedup: only send once per local day
+      const localDate = localDateStr(now, tz);
+      const dedupKey  = encodeURIComponent(`glowtris-notif:${localDate}:${sub.field}`);
+      const nx = await redis(`set/${dedupKey}/1/ex/90000/nx`);
+      if (!nx.result) continue;
+    }
 
     const displayDate = new Date(now.getTime() - tz * 60000)
       .toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
