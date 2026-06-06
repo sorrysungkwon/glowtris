@@ -14,12 +14,12 @@
 - **Root cause (multi-layer):**
   1. **Vercel Serverless timeout** — original `api/notify.js` was timing out on Vercel's 10s limit when iterating many subscriptions. Migrated to GitHub Actions (`scripts/notify.js` + `.github/workflows/notify-cron.yml`).
   2. **Redis `hset` syntax error** — `api/subscribe.js` used incorrect Upstash REST API syntax (`/hset/key/field/value` path format) instead of the correct JSON array body (`["hset", key, field, value]`). Subscriptions were not being saved.
-  3. **VAPID key rotation gone wrong** — a previous session changed `pwa.js` from key `BI_rkhr...` to `BBu-74...` but GitHub Actions secrets were not updated in sync, causing all existing subscriptions (registered with `BBu-74...`) to fail with `VapidPkHashMismatch`. Further confusion occurred when a new key pair (`BLSk...`) was generated mid-debug without updating all 30k existing subscriptions.
+  3. **VAPID key rotation gone wrong** — a previous session changed the VAPID public key in `pwa.js` but GitHub Actions secrets were not updated in sync, causing all existing subscriptions to fail with `VapidPkHashMismatch`. Further confusion occurred when a new key pair was generated mid-debug without updating all 30k existing subscriptions.
   4. **Invalid test data in Redis** — a `test3` entry with `p256dh: "test3"` persisted in the Redis hash, causing a `p256dh value should be 65 bytes long` error on every run.
   5. **Corrupted workflow YAML** — `notify-cron.yml` had duplicate `workflow_dispatch:` keys and a misplaced `runs-on:` line due to a bad merge, preventing manual dispatch.
 - **Fix:**
-  - Restored `pwa.js` `VAPID_PUBLIC_KEY` to the original value (`BBu-74...`) matching all existing user subscriptions.
-  - Updated GitHub Actions secrets `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` to the matching pair from Vercel env vars.
+  - Restored `pwa.js` `VAPID_PUBLIC_KEY` to the original value matching all existing user subscriptions.
+  - Updated GitHub Actions secrets `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` to the matching pair from Vercel env vars (stored in GitHub Secrets only).
   - Fixed `notify-cron.yml` YAML syntax (removed duplicate `workflow_dispatch:`, fixed indentation).
   - Confirmed `api/subscribe.js` Upstash REST syntax is correct.
 - **Result:** `Sent: 2, Total: 3, Deleted: 0` — 2 real subscriptions delivered successfully. Remaining failure: `test3` (invalid test data in Redis) and 1 device re-subscribed with a wrong key during debug (user's own phone — fixed by reinstalling PWA).

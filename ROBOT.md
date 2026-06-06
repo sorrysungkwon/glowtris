@@ -98,8 +98,9 @@ Push notifications run via **GitHub Actions** (NOT Vercel Serverless — Vercel 
 
 - **Public key location**: `src/pwa.js` → `const VAPID_PUBLIC_KEY`
 - **Private key location**: GitHub Actions secret `VAPID_PRIVATE_KEY`
-- **Both must always be the matching pair**: `<VAPID_PUBLIC_KEY>` (public)
+- **Both must always be a matching pair** — Stored in Vercel/GitHub secrets only
 - **Source of truth**: Vercel Dashboard → Settings → Environment Variables → `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`
+- **Do NOT store plaintext VAPID keys in documentation or code** — Use environment variables only
 
 ### Redis push subscription format
 
