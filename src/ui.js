@@ -1,6 +1,6 @@
 import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime } from './shared.js';
 import { sfxAchievementUnlock, playBeep, toggleMute, applyMuteToGain } from './audio.js';
-import { initPixiRenderer, drawBoardPixi, resizePixiRenderer, pixiEnabled } from './renderer.js';
+import { initPixiRenderer, drawBoardPixi, resizePixiRenderer, updateParticlesPixi, pixiEnabled } from './renderer.js';
 
 // ─── Canvas refs ──────────────────────────────────────────────────────────────
 // gc is `let` so the live binding updates when PixiJS swaps the canvas element.
@@ -898,11 +898,27 @@ export function spawnDropTrail(current) {
 }
 
 export function updateParticles() {
-  pctx.clearRect(0, 0, pc.width, pc.height);
+  // ── Physics tick (runs for all renderers) ────────────────────────────────────
   S.particles = S.particles.filter(p => p.life > 0);
   for (const p of S.particles) {
+    if (p.type === 'text') { p.x += p.vx; p.y += p.vy; p.life -= p.decay; continue; }
+    if (p.type === 'ring' || p.type === 'radial-ring') { p.life -= p.decay; continue; }
+    p.vx *= 0.94; p.vy += 0.15;
+    p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+  }
+
+  // ── PixiJS path ─────────────────────────────────────────────────────────────
+  if (pixiEnabled) {
+    pctx.clearRect(0, 0, pc.width, pc.height); // keep Canvas2D particle canvas blank
+    updateParticlesPixi(S.particles);
+    return;
+  }
+
+  // ── Canvas2D fallback ────────────────────────────────────────────────────────
+  pctx.clearRect(0, 0, pc.width, pc.height);
+  for (const p of S.particles) {
+    if (p.life <= 0) continue;
     if (p.type === 'text') {
-      p.x += p.vx; p.y += p.vy; p.life -= p.decay;
       pctx.save(); pctx.globalAlpha = Math.max(0, p.life);
       pctx.font = `900 ${p.size}px Orbitron, monospace`;
       pctx.textAlign = 'center';
@@ -911,8 +927,7 @@ export function updateParticles() {
       continue;
     }
     if (p.type === 'ring' || p.type === 'radial-ring') {
-      p.life -= p.decay;
-      if (S.lowPerfMode) { continue; }
+      if (S.lowPerfMode) continue;
       pctx.save(); pctx.globalAlpha = Math.max(0, p.life);
       pctx.strokeStyle = p.color; pctx.lineWidth = p.size*p.life;
       if (!S.lowPerfMode) { pctx.shadowColor = p.color; pctx.shadowBlur = 15; }
@@ -923,8 +938,6 @@ export function updateParticles() {
       pctx.stroke(); pctx.restore();
       continue;
     }
-    p.vx *= 0.94; p.vy += 0.15;
-    p.x += p.vx; p.y += p.vy; p.life -= p.decay;
     pctx.save(); pctx.globalAlpha = Math.max(0, p.life);
     const {r,g,b} = hexToRgb(p.color);
     if (p.type === 'star') {
