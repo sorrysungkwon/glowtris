@@ -80,6 +80,49 @@
 
 ---
 
+## 📲 Push Notification Architecture
+
+Push notifications run via **GitHub Actions** (NOT Vercel Serverless — Vercel times out after 10s for large subscriber lists).
+
+### Architecture overview
+
+| Component | Location | Purpose |
+|---|---|---|
+| `api/subscribe.js` | Vercel Serverless | Receives push subscription from browser, stores in Redis hash `glowtris-push-subs` |
+| `scripts/notify.js` | GitHub Actions runner | Reads subscriptions from Redis, sends push via `web-push` library |
+| `.github/workflows/notify-cron.yml` | GitHub Actions | Cron (`30 * * * *`) + manual dispatch trigger |
+
+### VAPID Keys — CRITICAL RULES
+
+> ⚠️ **NEVER rotate VAPID keys unless absolutely necessary.** When VAPID keys change, ALL existing push subscriptions become permanently invalid. Users must open the app and re-subscribe manually. For 30k+ users this is a catastrophic regression.
+
+- **Public key location**: `src/pwa.js` → `const VAPID_PUBLIC_KEY`
+- **Private key location**: GitHub Actions secret `VAPID_PRIVATE_KEY`
+- **Both must always be the matching pair**: `<VAPID_PUBLIC_KEY>` (public)
+- **Source of truth**: Vercel Dashboard → Settings → Environment Variables → `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`
+
+### Redis push subscription format
+
+Hash key: `glowtris-push-subs`
+Fields: `<random-16-char-hex>` → JSON string:
+```json
+{"endpoint":"https://web.push.apple.com/...", "keys":{"p256dh":"...","auth":"..."}, "tzOffset":-540}
+```
+
+### Manual test dispatch
+```bash
+gh workflow run notify-cron.yml --ref master
+```
+
+### Known invalid data in Redis
+- `fd61a03af4f77d87` → `{"endpoint":"test3","keys":{"p256dh":"test3","auth":"test3"}}` — leftover test entry. Causes `p256dh value should be 65 bytes long` error on every run. Safe to delete with:
+```bash
+curl -X POST "<UPSTASH_REDIS_REST_URL>/hdel/glowtris-push-subs/fd61a03af4f77d87" \
+  -H "Authorization: Bearer <UPSTASH_REDIS_REST_TOKEN>"
+```
+
+---
+
 ## 🚨 DEPLOYMENT DISCIPLINE — Minimize Deployments
 
 Vercel free plan allows **100 deployments per day**. Exceeding this blocks ALL deployments until midnight UTC. Every agent must treat each deployment as expensive.
