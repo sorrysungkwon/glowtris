@@ -5,11 +5,7 @@ const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
 const NOTIFY_HOUR = 11; // local 11:30 (Lunchtime) — accounts for up to 30m GitHub Actions delay
 
-webpush.setVapidDetails(
-  'mailto:seonqwer@gmail.com',
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
+
 
 async function redis(path, body) {
   const opts = { headers: { Authorization: `Bearer ${REDIS_TOKEN}` } };
@@ -28,15 +24,31 @@ function localDateStr(utcNow, tzOffset) {
 }
 
 export default async function handler(req, res) {
-  if (!REDIS_URL || !process.env.VAPID_PRIVATE_KEY) {
+  if (!REDIS_URL || !process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
     return res.status(500).json({ error: 'missing env vars' });
+  }
+
+  try {
+    webpush.setVapidDetails(
+      'mailto:seonqwer@gmail.com',
+      process.env.VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+  } catch (err) {
+    return res.status(500).json({ error: 'invalid vapid keys', details: err.message });
   }
 
   const now = new Date();
   const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
-  const hashData = await redis(`hgetall/${SUBS_KEY}`);
-  const raw = hashData.result;
+  let raw;
+  try {
+    const hashData = await redis(`hgetall/${SUBS_KEY}`);
+    raw = hashData.result;
+  } catch (err) {
+    return res.status(500).json({ error: 'redis fetch failed', details: err.message });
+  }
+
   if (!raw || raw.length === 0) return res.status(200).json({ sent: 0, total: 0 });
 
   // hgetall returns [field, value, field, value, ...]
