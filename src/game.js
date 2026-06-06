@@ -783,21 +783,29 @@ function _doStartGame(){
   bag=[];refillBag();S.next=[];for(let i=0;i<3;i++)S.next.push(makePiece(nextFromBag()));S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
 
-  // ── Sprint mode init ──────────────────────────────────────────────────────
+  // ── Sprint & Time Attack init ──────────────────────────────────────────────
   const psl=document.getElementById('panel-score-label');
   const lsl=document.getElementById('lines-sub-label');
+  const isTimeAttack = S.isBlitzMode || S.isUltraMode;
+  
   if(S.isSprintMode){
     S._sprintHiTime=parseInt(localStorage.getItem(LS.SPRINT_HI)||'0');
     S._sprintEndTime=0;S._sprintStartTime=0;
     if(psl)psl.textContent='TIME';
     if(lsl)lsl.textContent='LEFT';
-  }else{
+  } else if(isTimeAttack) {
+    if(S.isBlitzMode) S._blitzHiScore = parseInt(localStorage.getItem(LS.BLITZ_HI)||'0');
+    if(S.isUltraMode) S._ultraHiScore = parseInt(localStorage.getItem(LS.ULTRA_HI)||'0');
+    S._timeAttackStartTime = 0;
+    if(psl)psl.textContent='TIME';
+    if(lsl)lsl.textContent='SCORE';
+  } else {
     if(psl)psl.textContent='SCORE';
     if(lsl)lsl.textContent='CLEARED';
   }
 
   spawnPiece();drawNext();drawHold();updateUI();
-  if(S.isSprintMode)updateSprintTimer();
+  if(S.isSprintMode || isTimeAttack)updateSprintTimer();
   if(animFrame)cancelAnimationFrame(animFrame);
   resetLoop(performance.now());
   startBGM();
@@ -805,12 +813,16 @@ function _doStartGame(){
   startCountdown(()=>{
     S.gravityTimer=0;
     if(S.isSprintMode)S._sprintStartTime=performance.now();
+    if(S.isBlitzMode || S.isUltraMode)S._timeAttackStartTime=performance.now();
   });
 }
 
 export function launchDailyChallenge() {
-  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  document.getElementById('overlay').style.display = 'none';
+  S.isSprintMode=false;
+  S.isBlitzMode=false;
   S.isDailyMode=true;
+  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   _prng = mulberry32(parseInt(todayStr, 10));
   startGame();
 }
@@ -819,6 +831,7 @@ let _sprintPauseTs = 0;
 
 export function pauseGameTiming() {
   if (S.isSprintMode && S._sprintStartTime > 0) _sprintPauseTs = performance.now();
+  if (_countdownTimer) { clearInterval(_countdownTimer); _countdownTimer = null; }
 }
 
 export function resumeGameTiming() {
@@ -846,6 +859,7 @@ export function startCountdown(onComplete) {
   S._countdownGo=0;
   S._countdownVal=3;
   S._countdownTs=performance.now();
+  if (_countdownTimer) clearInterval(_countdownTimer);
   if(!S.muteAudio) sfxCountdownTick(3);
   _countdownTimer=setInterval(()=>{
     S._countdownVal--;
@@ -951,8 +965,73 @@ function endSprint(){
   setTimeout(()=>_renderSprintScreen(timeMs,isNewBest,prevBest),600);
 }
 
+// ─── Time Attack (Blitz & Ultra) ───────────────────────────────────────────────
+export function endTimeAttack(){
+  S.gameRunning=false;gameOver=true;
+  stopBGM();
+  sfxSprintGoal();
+
+  const isBlitz = S.isBlitzMode;
+  const prevBest = isBlitz ? S._blitzHiScore : S._ultraHiScore;
+  const isNewBest = S.score > prevBest;
+  
+  if(isNewBest){
+    if(isBlitz) { S._blitzHiScore = S.score; localStorage.setItem(LS.BLITZ_HI, S.score); }
+    else { S._ultraHiScore = S.score; localStorage.setItem(LS.ULTRA_HI, S.score); }
+  }
+
+  if(S.animIntensity!=='off'){
+    if(isNewBest){
+      triggerAllClearFlash();
+      spawnGoldBurst((COLS/2)*S.CELL, (ROWS/2)*S.CELL);
+      spawnGoldBurst((COLS/2)*S.CELL - 60, (ROWS/2)*S.CELL + 40);
+      spawnGoldBurst((COLS/2)*S.CELL + 60, (ROWS/2)*S.CELL - 20);
+    } else {
+      triggerScreenFlash();
+      spawnGoldBurst((COLS/2)*S.CELL, (ROWS/2)*S.CELL);
+    }
+    for(let i=0;i<60;i++){
+      const a=Math.random()*Math.PI*2,sp=Math.random()*10+3;
+      S.particles.push({x:(Math.random()*COLS)*S.CELL,y:(Math.random()*ROWS*0.5)*S.CELL,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:Math.random()*.01+.005,color:['#ff2040','#cc00ff','#ffe600','#ffffff'][Math.floor(Math.random()*4)],size:Math.random()*6+2,type:'star'});
+    }
+  }
+
+  // Reuse the game over screen logic for now, but mark it as Time Attack
+  setTimeout(() => {
+    const stats = _saveGameStats();
+    stats.isNewBest = isNewBest; // Force 'NEW BEST' UI flag if true
+    _renderGameOverScreen(stats);
+  }, 600);
+}
+
 export function startSprintMode(){
   S.isSprintMode=true;
+  S.isBlitzMode=false;
+  S.isUltraMode=false;
+  S.isDailyMode=false;
+  startGame();
+}
+
+export function startBlitzMode(){
+  S.isSprintMode=false;
+  S.isBlitzMode=true;
+  S.isUltraMode=false;
+  S.isDailyMode=false;
+  startGame();
+}
+
+export function startUltraMode(){
+  S.isSprintMode=false;
+  S.isBlitzMode=false;
+  S.isUltraMode=true;
+  S.isDailyMode=false;
+  startGame();
+}
+
+export function startMarathonMode(){
+  S.isSprintMode=false;
+  S.isBlitzMode=false;
+  S.isUltraMode=false;
   S.isDailyMode=false;
   startGame();
 }

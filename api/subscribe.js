@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+const crypto = require('crypto');
 
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -11,7 +11,7 @@ async function redis(path, body) {
   return res.json();
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
@@ -28,6 +28,6 @@ export default async function handler(req, res) {
     tzOffset: parseInt(tzOffset) || 0,
   });
 
-  await redis(`hset/${SUBS_KEY}`, [field, value]);
-  return res.status(200).json({ ok: true });
+  const r = await redis(`hset/${SUBS_KEY}`, [field, value]);
+  return res.status(200).json({ ok: true, r });
 }
