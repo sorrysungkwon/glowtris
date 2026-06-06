@@ -415,16 +415,16 @@ export function showModeSelector(){
 
   $overlay.innerHTML=`
     <div class="glass-panel">
-      <h1 style="font-size:16px;margin-bottom:18px;letter-spacing:3px">SELECT MODE</h1>
+      <h1 style="font-size:15px;margin-bottom:12px;letter-spacing:3px">SELECT MODE</h1>
 
-      <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+      <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
 
         <!-- MARATHON -->
         <div class="mode-card marathon" tabindex="0" onclick="startGame()">
           <div class="mode-icon">🎮</div>
           <div class="mode-info">
             <div class="mode-name">MARATHON</div>
-            <div class="mode-desc">Clear lines, rack up score. No time limit — how high can you go?</div>
+            <div class="mode-desc">No time limit — how high can you go?</div>
             <div class="mode-best">${marathonBest}</div>
           </div>
           <div class="mode-arrow">›</div>
@@ -435,7 +435,7 @@ export function showModeSelector(){
           <div class="mode-icon">⚡</div>
           <div class="mode-info">
             <div class="mode-name">SPRINT 40L</div>
-            <div class="mode-desc">Clear 40 lines as fast as possible. Fastest time wins the leaderboard.</div>
+            <div class="mode-desc">Clear 40 lines. Fastest time wins.</div>
             <div class="mode-best">${sprintBest}</div>
           </div>
           <div class="mode-arrow">›</div>
@@ -446,7 +446,7 @@ export function showModeSelector(){
           <div class="mode-icon">🏆</div>
           <div class="mode-info">
             <div class="mode-name">DAILY CHALLENGE</div>
-            <div class="mode-desc">Today's fixed piece sequence. Same for everyone — pure skill, no luck.</div>
+            <div class="mode-desc">Same piece sequence for everyone — pure skill.</div>
             <div class="mode-best">${dailySub}</div>
           </div>
           <div class="mode-arrow">›</div>
