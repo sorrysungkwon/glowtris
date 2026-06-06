@@ -1342,5 +1342,7 @@ export function hideAchTooltip() {
 // Runs before the user can start a game; updates gc live binding on success.
 initPixiRenderer(gc).then(newCanvas => {
   if (newCanvas) gc = newCanvas;
+}).catch(e => {
+  console.warn('[v0.5] PixiJS init promise rejected, using Canvas2D:', e);
 });
 
