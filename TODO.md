@@ -5,8 +5,28 @@
 - **English-Only Rule**: All code changes, comments, logs, documentation, and Git commit messages MUST be written entirely in English.
 - **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push".** Docs-only commits accumulate locally and are bundled with the next code push.
 
-## 📝 Latest Sync Notes & Future Suggestions (Handover to Claude)
-**Recently Completed (Antigravity Sync - 2026-06-05):**
+## 📝 Latest Sync Notes & Future Suggestions (Handover to Antigravity)
+**Recently Completed (Claude Sync - 2026-06-06):**
+
+### ⚠️ CRITICAL: v0.5 PixiJS — Safari/iPad Regression (UNRESOLVED — Decision Needed)
+- **Branch**: `feature/v0.5-pixi-foundation` (8 commits ahead of master, also merged into `preview`)
+- **Regression**: After PixiJS integration, the **start screen does not appear on Safari/iPad** (completely blank dark screen)
+- **Root cause (original)**: pixi.js bundled invalid regex character class `[a-z0-9-+.]` → `SyntaxError` on Safari/WebKit. Patched via `scripts/build.js` post-processing + `minifySyntax: false` in esbuild.
+- **Current status**: Regex patches applied (confirmed via grep — no invalid ranges remain), but user reports start screen STILL not showing. An in-page JS error banner was added (`template.html`) and deployed but user sees no red error banner either.
+- **Hypothesis**: Some Safari-specific crash inside the pixi.js IIFE initialization is silently blocking execution before `document.fonts.ready.then()` registers. The exact failure point is undiagnosed.
+- **User's direction**: Consider rolling back PixiJS entirely. Canvas2D fallback was stable. The 700KB pixi.js bundle may have further Safari incompatibilities that are impractical to debug without device access.
+
+### What PixiJS added (would be lost on rollback):
+- `src/renderer.js` (new file, 463 lines): PixiJS `Application`, `Graphics`-based board/piece rendering, gradient fills per cell, glow halos, particle system via Text pool, countdown animations, lock-delay floating bar
+- `src/ui.js`: ~108 lines changed to branch on `pixiEnabled` for canvas sizing/rendering
+- `src/template.html`: JS error banner + `initPixiRenderer` call at end of `ui.js`
+- `scripts/build.js`: esbuild config changes + pixi.js regex patch
+
+### Recommended decision (Antigravity):
+**Option A — Full rollback**: Revert `src/renderer.js` to not import pixi.js, remove `initPixiRenderer` call from `ui.js`, restore original build settings. Bundle drops from ~745KB → ~70KB. Canvas2D rendering restored, Safari fixed.
+**Option B — Fix PixiJS**: Add a more aggressive try-catch wrapper around the entire IIFE, force-disable PixiJS on Safari (`/Safari/.test(navigator.userAgent)`), or diagnose the specific crash point with a physical Safari device.
+
+**Previously Completed (Antigravity Sync - 2026-06-05):**
 - **iOS SafeArea**: Top UI margins strictly use `calc(env(safe-area-inset-top) + 12px)` to prevent Dynamic Island overlaps.
 - **PWA Home Indicator**: The overall `body` and `theme-color` is set to `#070514` (Dark Navy) so the bottom touch bar blends smoothly without harsh black bars.
 - **Leaderboard States**: Visual polish applied to "NO RECORDS YET", "SUBMITTING...", "NETWORK ERROR", and "SAVED OFFLINE" using animated `lb-offline` styles.
