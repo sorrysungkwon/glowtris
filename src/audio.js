@@ -273,50 +273,105 @@ export async function resumeBGM(){
   bgmScheduleLoop();
 }
 
-export function playBeep(freq,type,dur,vol,delay=0,freqEnd=null){
-  const ctx=getAudioCtx();
-  const t=ctx.currentTime+delay;
-  const osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.connect(gain);gain.connect(masterGain);
-  osc.type=type;osc.frequency.setValueAtTime(freq,t);
-  if(freqEnd)osc.frequency.exponentialRampToValueAtTime(freqEnd,t+dur);
-  gain.gain.setValueAtTime(vol,t);
-  gain.gain.exponentialRampToValueAtTime(0.001,t+dur);
-  osc.start(t);osc.stop(t+dur);
-  osc.onended=()=>{try{osc.disconnect();gain.disconnect();}catch(e){}};
+// ─── SFX Pre-rendering & playback (ARCH-005) ──────────────────────────────
+const _sfxCache = {};
+
+async function _renderBuffer(key, instructions, totalDur) {
+  if (_sfxCache[key]) return _sfxCache[key];
+  const sr = 44100;
+  const length = Math.max(1, Math.ceil(sr * totalDur));
+  const octx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, length, sr);
+  
+  for (const {f, t, d, v, delay=0, fe=null} of instructions) {
+    const osc = octx.createOscillator(), gain = octx.createGain();
+    osc.connect(gain); gain.connect(octx.destination);
+    osc.type = t; 
+    osc.frequency.setValueAtTime(f, delay);
+    if (fe) osc.frequency.exponentialRampToValueAtTime(fe, delay + d);
+    gain.gain.setValueAtTime(v, delay);
+    gain.gain.exponentialRampToValueAtTime(0.001, delay + d);
+    osc.start(delay); osc.stop(delay + d);
+  }
+  
+  _sfxCache[key] = await octx.startRendering();
+  return _sfxCache[key];
 }
 
-export function sfxMove(){playBeep(220,'square',.04,.1);}
-export function sfxRotate(){playBeep(330,'square',.05,.12);playBeep(440,'square',.04,.08,.03);}
-export function sfxHardDrop(){playBeep(80,'sawtooth',.15,.45);playBeep(180,'sawtooth',.06,.35,.02,60);playBeep(800,'square',.03,.18,.01);}
-export function sfxHold(){playBeep(392,'square',.06,.15);playBeep(523,'square',.05,.12,.05);}
-export function sfxLineClear(n){
-  if(n>=4){[523,659,784,1047].forEach((f,i)=>playBeep(f,'sawtooth',.2,.3,i*.08));}
-  else{[440,523,659].slice(0,n).forEach((f,i)=>playBeep(f,'square',.12,.25,i*.05));}
+export async function preDecodeSFX() {
+  const reqs = [
+    { k:'move', d:0.05, i:[{f:220, t:'square', d:0.04, v:0.1}] },
+    { k:'rotate', d:0.08, i:[{f:330, t:'square', d:0.05, v:0.12}, {f:440, t:'square', d:0.04, v:0.08, delay:0.03}] },
+    { k:'hardDrop', d:0.2, i:[{f:80, t:'sawtooth', d:0.15, v:0.45}, {f:180, t:'sawtooth', d:0.06, v:0.35, delay:0.02, fe:60}, {f:800, t:'square', d:0.03, v:0.18, delay:0.01}] },
+    { k:'hold', d:0.12, i:[{f:392, t:'square', d:0.06, v:0.15}, {f:523, t:'square', d:0.05, v:0.12, delay:0.05}] },
+    { k:'tspin', d:0.25, i:[{f:880, t:'square', d:0.07, v:0.22}, {f:1046, t:'square', d:0.06, v:0.18, delay:0.06}, {f:1318, t:'sawtooth', d:0.14, v:0.28, delay:0.1}] },
+    { k:'uiHover', d:0.05, i:[{f:800, t:'sine', d:0.04, v:0.02}] },
+    { k:'uiClick', d:0.08, i:[{f:1200, t:'square', d:0.05, v:0.04}, {f:1600, t:'sine', d:0.05, v:0.03, delay:0.02}] },
+    { k:'countdownTap', d:0.05, i:[{f:440, t:'square', d:0.13, v:0.18}] },
+    { k:'countdown3', d:0.05, i:[{f:440, t:'square', d:0.13, v:0.18}] },
+    { k:'countdown2', d:0.05, i:[{f:550, t:'square', d:0.13, v:0.18}] },
+    { k:'countdown1', d:0.05, i:[{f:660, t:'square', d:0.13, v:0.18}] },
+    { k:'countdownGo', d:0.2, i:[523,659,784].map((f,i) => ({f, t:'sawtooth', d:0.16, v:0.3, delay:i*0.04})) },
+    { k:'sprintGoal', d:0.5, i:[523,659,784,1047].map((f,i) => ({f, t:'sawtooth', d:0.18, v:0.28, delay:i*0.06+0.3})) },
+    { k:'dailyComplete', d:0.5, i:[523,659,784,1047,1319].map((f,i) => ({f, t:'sawtooth', d:0.18, v:0.28, delay:i*0.07+0.1})) },
+    { k:'allClear', d:0.5, i:[523,659,784,880,1047,1319].map((f,i) => ({f, t:'sawtooth', d:0.22, v:0.35, delay:i*0.07})) },
+    { k:'levelUp', d:0.4, i:[261,329,392,523,659,784].map((f,i) => ({f, t:'square', d:0.16, v:0.22, delay:i*0.05})) },
+  ];
+  
+  // Line clears
+  for (let n=1; n<=4; n++) {
+    if (n >= 4) reqs.push({ k:`clear4`, d:0.5, i:[523,659,784,1047].map((f,i) => ({f, t:'sawtooth', d:0.2, v:0.3, delay:i*0.08})) });
+    else reqs.push({ k:`clear${n}`, d:0.3, i:[440,523,659].slice(0,n).map((f,i) => ({f, t:'square', d:0.12, v:0.25, delay:i*0.05})) });
+  }
+
+  // Game over
+  const goInsts = [392,349,329,261].map((f,i) => ({f, t:'sawtooth', d:0.28, v:0.38, delay:i*0.18}));
+  goInsts.push({f:130, t:'sawtooth', d:0.6, v:0.3, delay:0.75});
+  reqs.push({ k:'gameOver', d:1.4, i:goInsts });
+
+  // Achievement
+  const achInsts = [];
+  [523,659,784,1047].forEach((f, i) => {
+    achInsts.push({f, t:'sine', d:0.25, v:0.22, delay:i*0.05});
+    achInsts.push({f:f*2, t:'square', d:0.1, v:0.06, delay:i*0.05+0.02});
+  });
+  reqs.push({ k:'achievement', d:0.45, i:achInsts });
+
+  await Promise.all(reqs.map(r => _renderBuffer(r.k, r.i, r.d)));
 }
-export function sfxGameOver(){
-  [392,349,329,261].forEach((f,i)=>playBeep(f,'sawtooth',.28,.38,i*.18));
-  playBeep(130,'sawtooth',.6,.3,.75);
+
+function playSFX(key) {
+  if (S.muteAudio) return;
+  const ctx = getAudioCtx();
+  if (ctx.state !== 'running' || !_sfxCache[key]) return;
+  const src = ctx.createBufferSource();
+  src.buffer = _sfxCache[key];
+  src.connect(masterGain);
+  src.start(ctx.currentTime);
 }
-export function sfxTSpin(){
-  playBeep(880,'square',.07,.22);
-  playBeep(1046,'square',.06,.18,.06);
-  playBeep(1318,'sawtooth',.14,.28,.1);
-}
-export function sfxUIHover(){ if(!S.muteAudio) playBeep(800, 'sine', 0.04, 0.02); }
+
+export function sfxMove(){ playSFX('move'); }
+export function sfxRotate(){ playSFX('rotate'); }
+export function sfxHardDrop(){ playSFX('hardDrop'); }
+export function sfxHold(){ playSFX('hold'); }
+export function sfxLineClear(n){ playSFX(`clear${Math.min(4, n)}`); }
+export function sfxGameOver(){ playSFX('gameOver'); }
+export function sfxTSpin(){ playSFX('tspin'); }
+export function sfxUIHover(){ playSFX('uiHover'); }
+export function sfxAchievementUnlock(){ playSFX('achievement'); }
+export function sfxCountdownTap(){ playSFX('countdownTap'); }
+export function sfxCountdownTick(val){ playSFX(`countdown${val}`) || playSFX('countdown3'); }
+export function sfxCountdownGo(){ playSFX('countdownGo'); }
+export function sfxSprintGoal(){ playSFX('sprintGoal'); }
+export function sfxDailyComplete(){ playSFX('dailyComplete'); }
+export function sfxAllClear(){ playSFX('allClear'); }
+export function sfxLevelUp(){ playSFX('levelUp'); }
+
 let _lastUIClick = 0;
 export function sfxUIClick(){
   const now = performance.now();
   if (now - _lastUIClick < 50) return;
   _lastUIClick = now;
-  if(!S.muteAudio) { playBeep(1200, 'square', 0.05, 0.04); playBeep(1600, 'sine', 0.05, 0.03, 0.02); }
-}
-export function sfxAchievementUnlock(){
-  if(S.muteAudio)return;
-  [523, 659, 784, 1047].forEach((f, i) => {
-    playBeep(f, 'sine', 0.25, 0.22, i * 0.05);
-    playBeep(f * 2, 'square', 0.1, 0.06, i * 0.05 + 0.02);
-  });
+  playSFX('uiClick');
 }
 
 // ─── Lifecycle helpers ────────────────────────────────────────────────────────
@@ -343,4 +398,9 @@ export function onPageShow(){
 export function closeAudio(){
   stopBGM();
   if(audioCtx){audioCtx.close();audioCtx=null;masterGain=null;}
+}
+
+// Kick off pre-rendering immediately
+if (window.OfflineAudioContext || window.webkitOfflineAudioContext) {
+  preDecodeSFX().catch(e => console.warn('SFX pre-render failed:', e));
 }
