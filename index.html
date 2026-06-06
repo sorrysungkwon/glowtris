@@ -6568,6 +6568,10 @@ ${cta}`;
   var _sprintPauseTs = 0;
   function pauseGameTiming() {
     if (S.isSprintMode && S._sprintStartTime > 0) _sprintPauseTs = performance.now();
+    if (_countdownTimer) {
+      clearInterval(_countdownTimer);
+      _countdownTimer = null;
+    }
   }
   function resumeGameTiming() {
     if (S.isSprintMode && _sprintPauseTs > 0) {
