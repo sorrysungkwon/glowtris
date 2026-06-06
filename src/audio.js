@@ -110,16 +110,27 @@ const CHALLENGE_DRUM_PAT=[1,0,4,0, 2,0,4,0, 1,0,4,0, 2,0,4,0];
 
 // ── SPRINT BGM: Peaceful Major Key (C Major, Happy/Bouncy) ──────────────
 const SPRINT_MELODY=[
+  // Bar 1-4 (A Section)
   _n(15), null, _n(12), null, _n(10), null, _n(7), null, _n(10), null, _n(12), null, _n(15), null, null, null,
   _n(17), null, _n(15), null, _n(12), null, _n(10), null, _n(12), null, _n(15), null, _n(17), null, null, null,
   _n(19), null, _n(15), null, _n(12), null, _n(10), null, _n(7), null, _n(5), null, _n(3), null, null, null,
   _n(5), null, _n(7), null, _n(10), null, _n(12), null, _n(15), null, _n(17), null, _n(15), null, null, null,
+  // Bar 5-8 (B Section - Higher & Energetic)
+  _n(19), null, _n(24), null, _n(19), null, _n(17), null, _n(15), null, _n(17), null, _n(19), null, null, null,
+  _n(17), null, _n(15), null, _n(12), null, _n(10), null, _n(12), null, _n(15), null, _n(17), null, null, null,
+  _n(24), null, _n(19), null, _n(15), null, _n(12), null, _n(15), null, _n(19), null, _n(24), null, null, null,
+  _n(19), null, _n(15), null, _n(12), null, _n(10), null, _n(7), null, _n(5), null, _n(3), null, null, null,
 ];
 const SPRINT_HARMONY=[
   _n(3), null, null, null, _n(7), null, null, null, _n(3), null, null, null, _n(7), null, null, null,
   _n(5), null, null, null, _n(8), null, null, null, _n(5), null, null, null, _n(8), null, null, null,
   _n(7), null, null, null, _n(10), null, null, null, _n(3), null, null, null, _n(7), null, null, null,
   _n(5), null, null, null, _n(10), null, null, null, _n(7), null, null, null, _n(3), null, null, null,
+  
+  _n(10), null, null, null, _n(15), null, null, null, _n(10), null, null, null, _n(15), null, null, null,
+  _n(8), null, null, null, _n(12), null, null, null, _n(8), null, null, null, _n(12), null, null, null,
+  _n(7), null, null, null, _n(10), null, null, null, _n(3), null, null, null, _n(7), null, null, null,
+  _n(5), null, null, null, _n(8), null, null, null, _n(3), null, null, null, _n(3), null, null, null,
 ];
 const SPRINT_BASS_WALK=[
   _n(-9)/4, _n(-9)/4, _n(-9)/4, _n(-9)/4,  _n(-5)/4, _n(-5)/4, _n(-5)/4, _n(-5)/4,
