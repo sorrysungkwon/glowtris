@@ -846,6 +846,7 @@ export function startCountdown(onComplete) {
   S._countdownGo=0;
   S._countdownVal=3;
   S._countdownTs=performance.now();
+  if (_countdownTimer) clearInterval(_countdownTimer);
   if(!S.muteAudio) sfxCountdownTick(3);
   _countdownTimer=setInterval(()=>{
     S._countdownVal--;
