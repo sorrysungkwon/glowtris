@@ -317,21 +317,19 @@ export function drawBackground(dtFactor = 1) {
 
   if (th.type === 'matrix') {
     if (!_matrixDrops) {
-      _matrixDrops = Array.from({length: 120}, () => ({
+      _matrixDrops = Array.from({length: 80}, () => ({
         x: Math.random() * bgc.width, 
         y: Math.random() * bgc.height, 
-        speed: Math.random() * 2.5 + 1.0,
-        size: Math.floor(Math.random() * 6 + 4),
-        op: Math.random() * 0.15 + 0.05
+        speed: Math.random() * 1.5 + 0.5,
+        size: Math.floor(Math.random() * 2 + 2),
+        op: Math.random() * 0.06 + 0.02
       }));
     }
     for (const d of _matrixDrops) {
       d.y += d.speed * dtFactor;
       if (d.y > bgc.height) { d.y = -d.size*3; d.x = Math.random() * bgc.width; }
       bgx.fillStyle = `rgba(0,150,255,${d.op})`;
-      bgx.fillRect(d.x, d.y, d.size-1, d.size-1);
-      bgx.fillStyle = `rgba(0,220,255,${d.op*1.2})`;
-      bgx.fillRect(d.x, d.y + d.size, d.size-1, d.size-1);
+      bgx.fillRect(d.x, d.y, d.size, d.size*2);
     }
   } else {
     for (const neb of nebulae) {
