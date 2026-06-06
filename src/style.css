@@ -1422,7 +1422,11 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   font-weight: 700;
   letter-spacing: 1.5px;
   color: rgba(0, 255, 136, 0.9);
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
+  text-align: center;
+  max-width: min(360px, calc(100vw - 40px));
+  box-sizing: border-box;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
