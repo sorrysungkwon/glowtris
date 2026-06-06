@@ -291,11 +291,13 @@ export function initStars() {
 }
 
 function getBgTheme() {
-  if (S.isDailyMode) return { m: 'daily', bg: 'rgba(10,0,3,0.22)', hueBase: 10,  core: 'rgba(220,80,0,0.04)', core2: 'rgba(160,20,0,0.025)', edge: 'rgba(160,0,10,1)', glow: true, speed: 1.7 };
-  if (S.isBlitzMode) return { m: 'blitz', bg: 'rgba(8,0,8,0.18)',  hueBase: 280, core: 'rgba(220,0,220,0.04)', core2: 'rgba(160,0,160,0.025)', edge: 'rgba(160,0,160,1)', glow: true, speed: 1.5 };
-  if (S.isSprintMode)return { m: 'sprint', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
-  return { m: 'marathon', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
+  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,10,0,0.22)', hueBase: 45,  core: 'rgba(255,180,0,0.04)', core2: 'rgba(200,140,0,0.025)', edge: 'rgba(200,150,0,1)', glow: true, speed: 1.7 };
+  if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(8,0,8,0.18)',  hueBase: 280, core: 'rgba(220,0,220,0.04)', core2: 'rgba(160,0,160,0.025)', edge: 'rgba(160,0,160,1)', glow: true, speed: 1.5 };
+  if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
+  return { m: 'marathon', type: 'nebula', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
 }
+
+let _matrixDrops = null;
 
 export function drawBackground(dtFactor = 1) {
   if (S.lowPerfMode) {
@@ -313,42 +315,62 @@ export function drawBackground(dtFactor = 1) {
   _cBgPulse = (_cBgPulse + 0.022 * dtFactor * th.speed) % (Math.PI*2);
   bgx.fillStyle = th.bg; bgx.fillRect(0, 0, bgc.width, bgc.height);
 
-  for (const neb of nebulae) {
-    neb.x += neb.vx * th.speed * dtFactor; neb.y += neb.vy * th.speed * dtFactor;
-    if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
-    if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
-    
-    if (!neb.c) neb.c = {};
-    if (!neb.c[th.m]) {
-      const size = neb.r * 2;
-      const cn = document.createElement('canvas'); cn.width = size; cn.height = size;
-      const ctxN = cn.getContext('2d');
-      const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
-      const h = th.hueBase + neb.hue % 50;
-      grN.addColorStop(0,   `hsla(${h},95%,35%,0.12)`);
-      grN.addColorStop(0.5, `hsla(${(h+40)%360},90%,20%,0.06)`);
-      grN.addColorStop(1,   'transparent');
-      ctxN.fillStyle = grN; ctxN.fillRect(0, 0, size, size);
-      neb.c[th.m] = cn;
+  if (th.type === 'matrix') {
+    if (!_matrixDrops) {
+      _matrixDrops = Array.from({length: 60}, () => ({
+        x: Math.random() * bgc.width, 
+        y: Math.random() * bgc.height, 
+        speed: Math.random() * 8 + 6,
+        size: Math.floor(Math.random() * 15 + 15),
+        op: Math.random() * 0.4 + 0.1
+      }));
     }
-    bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
-  }
+    for (const d of _matrixDrops) {
+      d.y += d.speed * dtFactor;
+      if (d.y > bgc.height) { d.y = -d.size*3; d.x = Math.random() * bgc.width; }
+      bgx.fillStyle = `rgba(0,180,255,${d.op})`;
+      bgx.fillRect(d.x, d.y, d.size-2, d.size-2);
+      bgx.fillStyle = `rgba(200,240,255,${d.op*1.5})`;
+      bgx.fillRect(d.x, d.y + d.size, d.size-2, d.size-2);
+    }
+  } else {
+    for (const neb of nebulae) {
+      neb.x += neb.vx * th.speed * dtFactor; neb.y += neb.vy * th.speed * dtFactor;
+      if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
+      if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
+      
+      if (!neb.c) neb.c = {};
+      if (!neb.c[th.m]) {
+        const size = neb.r * 2;
+        const cn = document.createElement('canvas'); cn.width = size; cn.height = size;
+        const ctxN = cn.getContext('2d');
+        const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
+        const h = th.hueBase + neb.hue % 50;
+        grN.addColorStop(0,   `hsla(${h},95%,35%,0.12)`);
+        grN.addColorStop(0.5, `hsla(${(h+40)%360},90%,20%,0.06)`);
+        grN.addColorStop(1,   'transparent');
+        ctxN.fillStyle = grN; ctxN.fillRect(0, 0, size, size);
+        neb.c[th.m] = cn;
+      }
+      bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
+    }
 
-  bgx.fillStyle = 'rgba(180,220,255,0.5)';
-  for (const s of stars) {
-    s.y += s.speed * (th.glow?2.8:1.0) * dtFactor; 
-    s.x += s.vx * (th.glow?2.8:1.0) * dtFactor;
-    if (s.y > bgc.height || s.x > bgc.width) { s.y = Math.random()*bgc.height*0.4; s.x = Math.random()*bgc.width*0.6; }
-    
-    if (th.glow) {
-      const tLen = s.speed * 22;
-      const tg = bgx.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
-      tg.addColorStop(0, 'transparent');
-      tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
-      bgx.strokeStyle = tg; bgx.lineWidth = s.r*0.9;
-      bgx.beginPath(); bgx.moveTo(s.x-s.vx*22, s.y-tLen); bgx.lineTo(s.x, s.y); bgx.stroke();
-    } else {
-      bgx.beginPath(); bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2); bgx.fill();
+    bgx.fillStyle = 'rgba(180,220,255,0.5)';
+    for (const s of stars) {
+      s.y += s.speed * (th.glow?2.8:1.0) * dtFactor; 
+      s.x += s.vx * (th.glow?2.8:1.0) * dtFactor;
+      if (s.y > bgc.height || s.x > bgc.width) { s.y = Math.random()*bgc.height*0.4; s.x = Math.random()*bgc.width*0.6; }
+      
+      if (th.glow) {
+        const tLen = s.speed * 22;
+        const tg = bgx.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
+        tg.addColorStop(0, 'transparent');
+        tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
+        bgx.strokeStyle = tg; bgx.lineWidth = s.r*0.9;
+        bgx.beginPath(); bgx.moveTo(s.x-s.vx*22, s.y-tLen); bgx.lineTo(s.x, s.y); bgx.stroke();
+      } else {
+        bgx.beginPath(); bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2); bgx.fill();
+      }
     }
   }
 
