@@ -1,6 +1,21 @@
 node_modules
 .vercel
-.env*
+
+# Sensitive credentials - NEVER commit
+.env
+.env.local
+.env.*.local
+.env.production.local
+
+# Secrets and credentials
+**/secrets.*
+**/credentials.*
+**/token.*
+**/key.*
+
+# Local documentation (not versioned)
 MONETIZATION.md
 GROWTHPLAN.md
+
+# Build output
 /index.html
