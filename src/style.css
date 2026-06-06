@@ -1494,8 +1494,12 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 }
 #pwa-toast .toast-text {
   white-space: normal;
-  word-break: keep-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
   text-align: center;
+  line-height: 1.5;
+  max-height: 3em;
+  overflow: hidden;
 }
 #pwa-toast.visible {
   opacity: 1;
