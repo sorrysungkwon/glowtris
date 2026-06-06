@@ -108,24 +108,24 @@ const CHALLENGE_BASS_WALK=[
 ];
 const CHALLENGE_DRUM_PAT=[1,0,4,0, 2,0,4,0, 1,0,4,0, 2,0,4,0];
 
-// ── SPRINT BGM: Fast Heroic/Trance Lead (Melody-driven, 150+ BPM) ──────────────
+// ── SPRINT BGM: Peaceful Major Key (C Major, Happy/Bouncy) ──────────────
 const SPRINT_MELODY=[
-  _n(12), null, _n(12), _n(15), _n(14), null, _n(10), null, _n(7), null, _n(10), null, _n(12), null, null, null,
-  _n(12), null, _n(12), _n(15), _n(14), null, _n(19), null, _n(15), null, _n(14), null, _n(15), null, null, null,
-  _n(17), null, _n(17), _n(19), _n(20), null, _n(19), null, _n(15), null, _n(12), null, _n(15), null, null, null,
-  _n(19), null, _n(19), _n(15), _n(14), null, _n(10), null, _n(7), null, _n(10), null, _n(12), null, null, null,
+  _n(15), null, _n(12), null, _n(10), null, _n(7), null, _n(10), null, _n(12), null, _n(15), null, null, null,
+  _n(17), null, _n(15), null, _n(12), null, _n(10), null, _n(12), null, _n(15), null, _n(17), null, null, null,
+  _n(19), null, _n(15), null, _n(12), null, _n(10), null, _n(7), null, _n(5), null, _n(3), null, null, null,
+  _n(5), null, _n(7), null, _n(10), null, _n(12), null, _n(15), null, _n(17), null, _n(15), null, null, null,
 ];
 const SPRINT_HARMONY=[
-  null,null,_n(0),null, null,null,_n(0),null, null,null,_n(2),null, null,null,_n(2),null,
-  null,null,_n(1),null, null,null,_n(1),null, null,null,_n(0),null, null,null,_n(0),null,
-  null,null,_n(5),null, null,null,_n(5),null, null,null,_n(0),null, null,null,_n(0),null,
-  null,null,_n(7),null, null,null,_n(7),null, null,null,_n(0),null, null,null,_n(0),null,
+  _n(3), null, null, null, _n(7), null, null, null, _n(3), null, null, null, _n(7), null, null, null,
+  _n(5), null, null, null, _n(8), null, null, null, _n(5), null, null, null, _n(8), null, null, null,
+  _n(7), null, null, null, _n(10), null, null, null, _n(3), null, null, null, _n(7), null, null, null,
+  _n(5), null, null, null, _n(10), null, null, null, _n(7), null, null, null, _n(3), null, null, null,
 ];
 const SPRINT_BASS_WALK=[
-  _n(0)/4, _n(0)/4, _n(0)/4, _n(0)/4,  _n(2)/4, _n(2)/4, _n(2)/4, _n(2)/4,
-  _n(1)/4, _n(1)/4, _n(1)/4, _n(1)/4,  _n(0)/4, _n(0)/4, _n(-2)/4, _n(-2)/4,
+  _n(-9)/4, _n(-9)/4, _n(-9)/4, _n(-9)/4,  _n(-5)/4, _n(-5)/4, _n(-5)/4, _n(-5)/4,
+  _n(-7)/4, _n(-7)/4, _n(-7)/4, _n(-7)/4,  _n(-5)/4, _n(-5)/4, _n(-5)/4, _n(-5)/4,
 ];
-const SPRINT_DRUM_PAT=[5,4,5,4, 5,4,5,4, 5,4,5,4, 5,4,5,4];
+const SPRINT_DRUM_PAT=[1,0,3,0, 2,0,3,0, 1,0,3,0, 2,0,3,0];
 
 // ── BLITZ/ULTRA BGM: Syncopated Techno (130 BPM) ──────────────
 const BLITZ_MELODY=[
@@ -201,7 +201,7 @@ function bgmScheduleHihat(t){
 
 function getBGMBeat(){
   let baseBpm = 100;
-  if (S.isSprintMode) baseBpm = 150;
+  if (S.isSprintMode) baseBpm = 125;
   else if (S.isBlitzMode) baseBpm = 130;
   else if (S.isDailyMode) baseBpm = 165;
   const bpm = Math.min(210, baseBpm + (S.level || 1) * 5);

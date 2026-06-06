@@ -291,7 +291,7 @@ export function initStars() {
 }
 
 function getBgTheme() {
-  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,5,0,0.18)', hueBase: 25,  core: 'rgba(255,100,0,0.015)', core2: 'rgba(200,80,0,0.01)', edge: 'rgba(200,80,0,0.4)', glow: true, speed: 1.7 };
+  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,5,0,0.18)', hueBase: 15, hueVar: 15, core: 'rgba(255,100,0,0.015)', core2: 'rgba(200,80,0,0.01)', edge: 'rgba(200,80,0,0.4)', glow: true, speed: 1.7 };
   if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(8,0,8,0.18)',  hueBase: 280, core: 'rgba(220,0,220,0.04)', core2: 'rgba(160,0,160,0.025)', edge: 'rgba(160,0,160,1)', glow: true, speed: 1.5 };
   if (S.isSprintMode)return { m: 'sprint', type: 'nebula', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
   return { m: 'marathon', type: 'nebula', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
@@ -325,9 +325,10 @@ export function drawBackground(dtFactor = 1) {
         const cn = document.createElement('canvas'); cn.width = size; cn.height = size;
         const ctxN = cn.getContext('2d');
         const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
-        const h = th.hueBase + neb.hue % 50;
+        const variance = th.hueVar || 50;
+        const h = th.hueBase + neb.hue % variance;
         grN.addColorStop(0,   `hsla(${h},95%,35%,0.12)`);
-        grN.addColorStop(0.5, `hsla(${(h+40)%360},90%,20%,0.06)`);
+        grN.addColorStop(0.5, `hsla(${(h+variance)%360},90%,20%,0.06)`);
         grN.addColorStop(1,   'transparent');
         ctxN.fillStyle = grN; ctxN.fillRect(0, 0, size, size);
         neb.c[th.m] = cn;
