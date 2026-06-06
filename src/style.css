@@ -1496,10 +1496,6 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   white-space: normal;
   word-break: keep-all;
   text-align: center;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 }
 #pwa-toast.visible {
   opacity: 1;
