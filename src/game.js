@@ -809,8 +809,12 @@ function _doStartGame(){
 }
 
 export function launchDailyChallenge() {
-  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  document.getElementById('overlay').style.display = 'none';
+  S.isSprintMode=false;
+  S.isBlitzMode=false;
   S.isDailyMode=true;
+  document.body.classList.add('daily-theme');
+  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   _prng = mulberry32(parseInt(todayStr, 10));
   startGame();
 }
@@ -955,7 +959,17 @@ function endSprint(){
 
 export function startSprintMode(){
   S.isSprintMode=true;
+  S.isBlitzMode=false;
   S.isDailyMode=false;
+  document.body.classList.remove('daily-theme');
+  startGame();
+}
+
+export function startMarathonMode(){
+  S.isSprintMode=false;
+  S.isBlitzMode=false;
+  S.isDailyMode=false;
+  document.body.classList.remove('daily-theme');
   startGame();
 }
 

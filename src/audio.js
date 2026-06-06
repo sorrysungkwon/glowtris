@@ -66,74 +66,60 @@ export function toggleMute(){
 
 const _n=s=>440*Math.pow(2,s/12);
 
-// ── NORMAL BGM: A minor, 4 bars × 16 steps = 64 16th-notes ───────────────
-// Melody (square, lead voice)
+// ── NORMAL BGM (MARATHON): Minecraft-like Ambient (Sparse, Slow, C Major/Am) ───────────────
 const BGM_MELODY=[
-  // Bar 1 – Am arpeggio + descent
+  _n(3), null, null, null,  null, null, _n(7), null,  _n(12), null, null, null,  null, null, null, null,
+  _n(10), null, null, null, null, null, _n(3), null,  _n(5), null, null, null,   null, null, null, null,
+  _n(0), null, null, null,  null, null, _n(3), null,  _n(7), null, null, null,   null, null, null, null,
+  _n(5), null, null, null,  null, null, _n(2), null,  _n(-2), null, null, null,  null, null, null, null,
+];
+const BGM_HARMONY=[
+  _n(-5), null, null, null, null, null, null, null,   _n(0), null, null, null, null, null, null, null,
+  _n(-2), null, null, null, null, null, null, null,   _n(3), null, null, null, null, null, null, null,
+  _n(-9), null, null, null, null, null, null, null,   _n(-5), null, null, null, null, null, null, null,
+  _n(-7), null, null, null, null, null, null, null,   _n(-2), null, null, null, null, null, null, null,
+];
+const BGM_BASS_WALK=[
+  _n(-17)/4, _n(-17)/4, _n(-17)/4, _n(-17)/4,
+  _n(-14)/4, _n(-14)/4, _n(-14)/4, _n(-14)/4,
+  _n(-21)/4, _n(-21)/4, _n(-21)/4, _n(-21)/4,
+  _n(-19)/4, _n(-19)/4, _n(-19)/4, _n(-19)/4,
+];
+const BGM_DRUM_PAT=[0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+
+// ── CHALLENGE BGM: (Previously Marathon BGM) Fast A minor synthwave ──────────────
+const CHALLENGE_MELODY=[
   _n(12),null,_n(7),null,  _n(3),_n(7),null,_n(10),  null,_n(7),null,_n(3),  _n(2),null,_n(0),null,
-  // Bar 2 – F→C ascent
   _n(8),null,null,_n(10),  _n(12),null,_n(10),null,  _n(8),_n(7),null,null,  _n(5),null,_n(7),null,
-  // Bar 3 – syncopated climb
   _n(0),_n(3),null,_n(5),  _n(7),null,_n(10),null,  _n(12),null,_n(10),_n(8),  null,_n(7),null,_n(5),
-  // Bar 4 – climax + resolve
   _n(7),null,_n(10),null,  _n(12),_n(10),_n(8),null,  _n(7),null,_n(5),null,  _n(0),null,null,null,
 ];
-// Harmony (triangle, 3rds below melody — softer colour)
-const BGM_HARMONY=[
+const CHALLENGE_HARMONY=[
   _n(8),null,_n(3),null,  _n(0),_n(3),null,_n(7),  null,_n(3),null,_n(0),  _n(-2),null,_n(-5),null,
   _n(5),null,null,_n(7),  _n(8),null,_n(7),null,  _n(5),_n(3),null,null,  _n(2),null,_n(3),null,
   _n(-5),_n(0),null,_n(2),  _n(3),null,_n(7),null,  _n(8),null,_n(7),_n(5),  null,_n(3),null,_n(2),
   _n(3),null,_n(7),null,  _n(8),_n(7),_n(5),null,  _n(3),null,_n(2),null,  _n(-5),null,null,null,
 ];
-// Walking bass (triangle): one note per quarter-note = every 4 steps, 16 notes total
-const BGM_BASS_WALK=[
-  _n(0)/4,_n(7)/4,  _n(0)/4,_n(3)/4,   // Bar 1: A E A C
-  _n(8)/4,_n(8)/4,  _n(3)/4,_n(7)/4,   // Bar 2: F F C E
-  _n(0)/4,_n(0)/4,  _n(-2)/4,_n(-2)/4, // Bar 3: A A G G
-  _n(3)/4,_n(5)/4,  _n(0)/4,_n(0)/4,   // Bar 4: C D A A
-];
-// Drum bit-flags (16 steps, loops): bit0=kick bit1=snare bit2=hihat (combinable)
-// e.g. 5=kick+hihat(1+4), 6=snare+hihat(2+4)
-const BGM_DRUM_PAT=[1,0,4,0, 2,0,4,0, 1,0,4,0, 2,0,4,0];
-
-// ── CHALLENGE BGM: A harmonic minor, chaotic + exhilarating ──────────────
-// Uses G#(_n(11)) leading tone + wide leaps + chromatic tension
-const CHALLENGE_MELODY=[
-  // Bar 1 – explosive harmonic-minor burst (G# leading tone)
-  _n(0),_n(7),_n(12),_n(11), _n(12),_n(15),_n(12),_n(11), _n(12),null,_n(7),null, _n(11),_n(12),_n(15),null,
-  // Bar 2 – wild chromatic descent from high D
-  _n(17),_n(15),null,_n(12), _n(11),null,_n(10),null, _n(8),null,_n(7),null, _n(11),_n(12),null,null,
-  // Bar 3 – octave leaps + syncopation
-  _n(0),null,_n(12),null, _n(7),_n(11),_n(12),null, _n(19),_n(17),_n(15),null, _n(12),_n(11),_n(12),null,
-  // Bar 4 – full ascending run → crash
-  _n(0),_n(3),_n(7),_n(11), _n(12),_n(14),_n(15),_n(17), _n(19),null,_n(15),null, _n(12),_n(7),_n(0),null,
-];
-// Harmony: mix of tritones (6 semi) and dissonant 2nds for chaos
-const CHALLENGE_HARMONY=[
-  _n(-5),_n(3),_n(6),_n(7), _n(6),_n(9),_n(8),_n(7), _n(6),null,_n(3),null, _n(7),_n(6),_n(9),null,
-  _n(11),_n(9),null,_n(8), _n(7),null,_n(6),null, _n(5),null,_n(3),null, _n(7),_n(8),null,null,
-  _n(-5),null,_n(8),null, _n(3),_n(7),_n(8),null, _n(15),_n(13),_n(11),null, _n(8),_n(7),_n(8),null,
-  _n(-5),_n(0),_n(3),_n(7), _n(8),_n(10),_n(11),_n(13), _n(15),null,_n(11),null, _n(8),_n(3),_n(-5),null,
-];
-// Bass: G# leading tone creates harmonic-minor tension on every bar
 const CHALLENGE_BASS_WALK=[
-  _n(0)/4,  _n(7)/4,  _n(0)/4,  _n(11)/4,  // Bar 1: A E A G#
-  _n(8)/4,  _n(5)/4,  _n(1)/4,  _n(11)/4,  // Bar 2: F D Bb G#
-  _n(0)/4,  _n(5)/4,  _n(7)/4,  _n(11)/4,  // Bar 3: A D E G#
-  _n(0)/4,  _n(11)/4, _n(7)/4,  _n(0)/4,   // Bar 4: A G# E A
+  _n(0)/4,_n(7)/4,  _n(0)/4,_n(3)/4,
+  _n(8)/4,_n(8)/4,  _n(3)/4,_n(7)/4,
+  _n(0)/4,_n(0)/4,  _n(-2)/4,_n(-2)/4,
+  _n(3)/4,_n(5)/4,  _n(0)/4,_n(0)/4,
 ];
-// Challenge drums: 16th-note hihat wall + double kicks on every beat = maximum intensity
-// 5=kick+hihat, 6=snare+hihat, 4=hihat only
-const CHALLENGE_DRUM_PAT=[5,4,5,4, 6,4,5,4, 5,5,4,4, 6,4,5,6];
+const CHALLENGE_DRUM_PAT=[1,0,4,0, 2,0,4,0, 1,0,4,0, 2,0,4,0];
 
-// ── SPRINT BGM: Driving Bassline (150+ BPM) ──────────────
+// ── SPRINT BGM: Fast Heroic/Trance Lead (Melody-driven, 150+ BPM) ──────────────
 const SPRINT_MELODY=[
-  _n(12),_n(7),_n(3),_n(7), _n(12),_n(7),_n(3),_n(7), _n(15),_n(10),_n(7),_n(10), _n(15),_n(10),_n(7),_n(10),
-  _n(14),_n(9),_n(5),_n(9), _n(14),_n(9),_n(5),_n(9), _n(12),_n(7),_n(3),_n(7), _n(12),_n(7),_n(3),_n(7),
+  _n(12), null, _n(12), _n(15), _n(14), null, _n(10), null, _n(7), null, _n(10), null, _n(12), null, null, null,
+  _n(12), null, _n(12), _n(15), _n(14), null, _n(19), null, _n(15), null, _n(14), null, _n(15), null, null, null,
+  _n(17), null, _n(17), _n(19), _n(20), null, _n(19), null, _n(15), null, _n(12), null, _n(15), null, null, null,
+  _n(19), null, _n(19), _n(15), _n(14), null, _n(10), null, _n(7), null, _n(10), null, _n(12), null, null, null,
 ];
 const SPRINT_HARMONY=[
   null,null,_n(0),null, null,null,_n(0),null, null,null,_n(2),null, null,null,_n(2),null,
   null,null,_n(1),null, null,null,_n(1),null, null,null,_n(0),null, null,null,_n(0),null,
+  null,null,_n(5),null, null,null,_n(5),null, null,null,_n(0),null, null,null,_n(0),null,
+  null,null,_n(7),null, null,null,_n(7),null, null,null,_n(0),null, null,null,_n(0),null,
 ];
 const SPRINT_BASS_WALK=[
   _n(0)/4, _n(0)/4, _n(0)/4, _n(0)/4,  _n(2)/4, _n(2)/4, _n(2)/4, _n(2)/4,
