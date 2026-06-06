@@ -56,7 +56,12 @@ export const LS = {
   LOW_PERF:     'glowTrisLowPerf',
   ACHIEVEMENTS: 'glowTrisAchievements',
   SPRINT_HI:    'glowTrisSprintHi',
+  BLITZ_HI:     'glowTrisBlitzHi',
+  ULTRA_HI:     'glowTrisUltraHi',
 };
+
+export const BLITZ_TIME = 120000; // 2 minutes
+export const ULTRA_TIME = 180000; // 3 minutes
 
 // ─── Achievement definitions ─────────────────────────────────────────────────
 export const ACHIEVEMENTS = [
@@ -141,6 +146,8 @@ export const S = {
   gamePaused:  false,
   isDailyMode: false,
   isSprintMode: false,
+  isBlitzMode: false,
+  isUltraMode: false,
 
   // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
   _countdownVal: 0,
@@ -190,6 +197,11 @@ export const S = {
   _sprintStartTime: 0,
   _sprintEndTime:   0,   // only game.js uses, kept here for symmetry
   _sprintHiTime:    0,
+
+  // Time Attack timing (Blitz/Ultra)
+  _timeAttackStartTime: 0,
+  _blitzHiScore: 0,
+  _ultraHiScore: 0,
 
   // Perf lock (ui.js measureFPS writes, game.js _doStartGame reads)
   _perfLocked: false,

@@ -248,7 +248,7 @@ export async function submitScore(){
       };
 
       const rankMsg = `
-        <div class="sub" style="color:#ffe600;margin-bottom:2px">TODAY: #${data.challengeRank}</div>
+        <div class="sub" style="color:#ff7700;margin-bottom:2px">TODAY: #${data.challengeRank}</div>
         <div class="sub" style="color:#00c8ff;margin-bottom:6px">ALL TIME: #${data.challengeAlltimeRank}</div>`;
       inp.style.display='none';
       btn.closest('.btn-row').style.display='none';
@@ -357,7 +357,7 @@ export async function captureGameImage(sc, rank, isDaily=false) {
   ctx.textAlign = 'center';
 
   if (isDaily) {
-    ctx.fillStyle = '#ffe600';
+    ctx.fillStyle = '#ff7700';
     ctx.font = '900 52px Orbitron, monospace';
     ctx.shadowColor = 'rgba(255,230,0,0.6)';
     ctx.shadowBlur = 20;
@@ -388,8 +388,8 @@ export async function captureGameImage(sc, rank, isDaily=false) {
   ctx.fillText('FINAL SCORE', px + pw/2, py + 210);
 
   ctx.font = '900 70px Orbitron, monospace';
-  ctx.fillStyle = '#ffe600';
-  ctx.shadowColor = '#ffe600';
+  ctx.fillStyle = isDaily ? '#ff7700' : '#ffe600';
+  ctx.shadowColor = isDaily ? '#ff7700' : '#ffe600';
   ctx.shadowBlur = 25;
   ctx.letterSpacing = '2px';
   ctx.fillText(sc.toLocaleString(), px + pw/2, py + 290);

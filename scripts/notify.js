@@ -1,15 +1,9 @@
-import webpush from 'web-push';
+const webpush = require('web-push');
 
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
-const NOTIFY_HOUR = 11; // local 11:30 — accounts for up to 1h GitHub Actions delay
-
-webpush.setVapidDetails(
-  'mailto:seonqwer@gmail.com',
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
+const NOTIFY_HOUR = 11; // local 11:30 (Lunchtime) — accounts for up to 30m GitHub Actions delay
 
 async function redis(path, body) {
   const opts = { headers: { Authorization: `Bearer ${REDIS_TOKEN}` } };
@@ -19,7 +13,6 @@ async function redis(path, body) {
 }
 
 function localHour(utcMinutes, tzOffset) {
-  // tzOffset = getTimezoneOffset() — positive means behind UTC (EST=300), negative means ahead (KST=-540)
   return Math.floor(((utcMinutes - tzOffset) % 1440 + 1440) % 1440 / 60);
 }
 
@@ -27,36 +20,53 @@ function localDateStr(utcNow, tzOffset) {
   return new Date(utcNow.getTime() - tzOffset * 60000).toISOString().slice(0, 10);
 }
 
-export default async function handler(req, res) {
-  if (!REDIS_URL || !process.env.VAPID_PRIVATE_KEY) {
-    return res.status(500).json({ error: 'missing env vars' });
+async function run() {
+  if (!REDIS_URL || !process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+    console.error('Missing env vars');
+    process.exit(1);
   }
+
+  webpush.setVapidDetails(
+    'mailto:seonqwer@gmail.com',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
 
   const now = new Date();
   const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
   const hashData = await redis(`hgetall/${SUBS_KEY}`);
+  console.log('Redis response:', hashData);
+  
   const raw = hashData.result;
-  if (!raw || raw.length === 0) return res.status(200).json({ sent: 0, total: 0 });
 
-  // hgetall returns [field, value, field, value, ...]
+  if (!raw || raw.length === 0) {
+    console.log('No subscriptions found.');
+    return;
+  }
+
   const subs = [];
   for (let i = 0; i < raw.length; i += 2) {
     try { subs.push({ field: raw[i], ...JSON.parse(raw[i + 1]) }); } catch {}
   }
+
+  // If run with --test, we bypass the time/dedup checks
+  const isTest = process.argv.includes('--test');
 
   let sent = 0;
   const toDelete = [];
 
   for (const sub of subs) {
     const tz = sub.tzOffset || 0;
-    if (localHour(utcMinutes, tz) !== NOTIFY_HOUR) continue;
+    
+    if (!isTest) {
+      if (localHour(utcMinutes, tz) !== NOTIFY_HOUR) continue;
 
-    // Dedup: only send once per local day
-    const localDate = localDateStr(now, tz);
-    const dedupKey  = encodeURIComponent(`glowtris-notif:${localDate}:${sub.field}`);
-    const nx = await redis(`set/${dedupKey}/1/ex/90000/nx`);
-    if (!nx.result) continue;
+      const localDate = localDateStr(now, tz);
+      const dedupKey  = encodeURIComponent(`glowtris-notif:${localDate}:${sub.field}`);
+      const nx = await redis(`set/${dedupKey}/1/ex/90000/nx`);
+      if (!nx.result) continue;
+    }
 
     const displayDate = new Date(now.getTime() - tz * 60000)
       .toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
@@ -73,13 +83,18 @@ export default async function handler(req, res) {
       sent++;
     } catch (e) {
       if (e.statusCode === 410 || e.statusCode === 404) toDelete.push(sub.field);
+      else console.error('Push error for', sub.endpoint, e);
     }
   }
 
-  // Remove expired subscriptions
   if (toDelete.length) {
     await redis(`hdel/${SUBS_KEY}`, toDelete);
   }
 
-  return res.status(200).json({ sent, total: subs.length, deleted: toDelete.length });
+  console.log(`Sent: ${sent}, Total subs: ${subs.length}, Deleted: ${toDelete.length}`);
 }
+
+run().catch(err => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});
