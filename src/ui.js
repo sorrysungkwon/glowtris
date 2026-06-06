@@ -404,20 +404,12 @@ function _drawChallengeBg(dtFactor = 1) {
     cg2.addColorStop(1,   'transparent');
     gc2.fillStyle = cg2; gc2.fillRect(0, 0, W, H);
 
-    const vA = 0.07 + Math.sin(_cBgPulse)*0.02;
-    const vc = `rgba(160,0,10,${vA})`;
-    const vTop = gc2.createLinearGradient(0,0,0,H*0.14);
-    vTop.addColorStop(0, vc); vTop.addColorStop(1, 'transparent');
-    gc2.fillStyle = vTop; gc2.fillRect(0, 0, W, H*0.14);
-    const vBot = gc2.createLinearGradient(0,H,0,H*0.86);
-    vBot.addColorStop(0, vc); vBot.addColorStop(1, 'transparent');
-    gc2.fillStyle = vBot; gc2.fillRect(0, H*0.86, W, H*0.14);
-    const vLft = gc2.createLinearGradient(0,0,W*0.10,0);
-    vLft.addColorStop(0, vc); vLft.addColorStop(1, 'transparent');
-    gc2.fillStyle = vLft; gc2.fillRect(0, 0, W*0.10, H);
-    const vRgt = gc2.createLinearGradient(W,0,W*0.90,0);
-    vRgt.addColorStop(0, vc); vRgt.addColorStop(1, 'transparent');
-    gc2.fillStyle = vRgt; gc2.fillRect(W*0.90, 0, W*0.10, H);
+    if (!S.lowPerfMode) {
+      const vA = 0.03 + Math.sin(_cBgPulse)*0.015;
+      gc2.strokeStyle = `rgba(160,0,10,${vA})`;
+      gc2.lineWidth = 15;
+      gc2.strokeRect(0, 0, W, H);
+    }
   }
   if (_chGradCache) bgx.drawImage(_chGradCache, 0, 0);
 }
