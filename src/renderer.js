@@ -73,12 +73,12 @@ function _drawCell(g, cx, cy, hex, alpha = 1, glowScale = 1) {
 
   // Glow halo (WebGL-only perk)
   if (glowScale > 0.4 && !S.lowPerfMode) {
-    const pad = Math.round(cs * 0.5);
+    const pad = Math.round(cs * 0.28);
     g.rect(px - pad, py - pad, cs + pad * 2, cs + pad * 2)
      .fill({ color: cn, alpha: 0.13 * glowScale * alpha });
     if (glowScale > 1.2) {
       // Extra tight glow for active piece
-      const pad2 = Math.round(cs * 0.22);
+      const pad2 = Math.round(cs * 0.13);
       g.rect(px - pad2, py - pad2, cs + pad2 * 2, cs + pad2 * 2)
        .fill({ color: cn, alpha: 0.22 * alpha });
     }
@@ -248,26 +248,33 @@ export function drawBoardPixi(visX, visY, getGhostY) {
       g.stroke({ color: pc, width: 1, alpha: 0.09 });
     }
 
-    // Lock delay indicator
-    if (S.lockActive && S.lockTimer > 0) {
-      const pct = S.lockTimer / S.lockMs;
-      for (let row = 0; row < S.current.shape.length; row++) {
-        for (let col = 0; col < S.current.shape[row].length; col++) {
-          if (!S.current.shape[row][col]) continue;
-          g.rect((visX + col) * cs + 1, (visY + row) * cs + 1, cs - 2, cs - 2)
-            .fill({ color: pc, alpha: 0.18 * pct });
-        }
-      }
-      const bY = (visY + S.current.shape.length) * cs - 3;
-      g.rect(visX * cs, bY, S.current.shape[0].length * cs * pct, 3)
-        .fill({ color: pc, alpha: 0.75 });
-    }
-
     // Current piece — stronger glow (glowScale 1.5)
     for (let row = 0; row < S.current.shape.length; row++) {
       for (let col = 0; col < S.current.shape[row].length; col++) {
         if (!S.current.shape[row][col]) continue;
         _drawCell(g, visX + col, visY + row, S.current.color, 1, 1.5);
+      }
+    }
+
+    // Lock delay indicator — fixed-width bar floating 1 cell above piece top, centered
+    if (S.lockActive && S.lockTimer > 0) {
+      const pct   = S.lockTimer / S.lockMs;
+      const barW  = cs * 2;
+      const barH  = 4;
+      const barX  = (visX + S.current.shape[0].length / 2) * cs - barW / 2;
+      const barY  = visY * cs - cs - barH / 2;
+      // Track
+      g.rect(barX, barY, barW, barH)
+       .fill({ color: 0x112233, alpha: 0.55 });
+      // Fill — drains left to right
+      if (pct > 0) {
+        g.rect(barX, barY, barW * pct, barH)
+         .fill({ color: pc, alpha: 0.92 });
+        // Subtle glow behind fill
+        if (!S.lowPerfMode) {
+          g.rect(barX - 1, barY - 2, barW * pct + 2, barH + 4)
+           .fill({ color: pc, alpha: 0.18 });
+        }
       }
     }
   }
