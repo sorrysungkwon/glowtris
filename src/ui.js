@@ -580,16 +580,26 @@ export function drawBoard() {
     if (S.lockActive && S.lockTimer > 0) {
       const pct = S.lockTimer / S.lockMs;
       const {r,g,b} = hexToRgb(S.current.color);
-      for (let row = 0; row < S.current.shape.length; row++) for (let col = 0; col < S.current.shape[row].length; col++) {
-        if (!S.current.shape[row][col]) continue;
-        gctx.save(); gctx.fillStyle = `rgba(${r},${g},${b},${0.18*pct})`;
-        gctx.fillRect((visX+col)*S.CELL+1, (visY+row)*S.CELL+1, S.CELL-2, S.CELL-2); gctx.restore();
-      }
-      const bY = (visY + S.current.shape.length)*S.CELL - 3;
+      
+      const barW = S.CELL * 2;
+      const barH = 4;
+      const barX = (visX + S.current.shape[0].length / 2) * S.CELL - barW / 2;
+      const barY = visY * S.CELL - S.CELL - barH / 2;
+      
       gctx.save();
-      gctx.fillStyle = `rgba(${r},${g},${b},0.75)`;
-      if (!S.lowPerfMode) { gctx.shadowColor = S.current.color; gctx.shadowBlur = 5; }
-      gctx.fillRect(visX*S.CELL, bY, S.current.shape[0].length*S.CELL*pct, 3);
+      // Track
+      gctx.fillStyle = 'rgba(17, 34, 51, 0.55)';
+      gctx.fillRect(barX, barY, barW, barH);
+      
+      // Fill
+      if (pct > 0) {
+        gctx.fillStyle = `rgba(${r},${g},${b},0.92)`;
+        if (!S.lowPerfMode) {
+          gctx.shadowColor = S.current.color;
+          gctx.shadowBlur = 8;
+        }
+        gctx.fillRect(barX, barY, barW * pct, barH);
+      }
       gctx.restore();
     }
 
