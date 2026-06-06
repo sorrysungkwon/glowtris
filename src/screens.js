@@ -80,7 +80,7 @@ export function startDailyChallenge() {
       <div class="daily-subtitle">SAME BLOCKS FOR EVERYONE!</div>
 
       <div class="briefing-card">
-        <p style="color:#ffe600;font-weight:900;letter-spacing:1px">[WELCOME TO THE DAILY MISSION!]</p>
+        <p style="color:#ff7700;font-weight:900;letter-spacing:1px">[WELCOME TO THE DAILY MISSION!]</p>
         <p>Today, every player in the whole world will get the <strong>exact same blocks</strong> in the same order!</p>
         <p style="color:var(--cyan)">Luck doesn't matter today! Only your real skills will make you number one on the leaderboard.</p>
       </div>
