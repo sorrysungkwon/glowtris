@@ -107,24 +107,45 @@ const BGM_BASS_WALK=[
 ];
 const BGM_DRUM_PAT=[0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
 
-// ── CHALLENGE BGM: (Previously Marathon BGM) Fast A minor synthwave ──────────────
+// ── CHALLENGE BGM: Fast Heroic Major Key (165 BPM) ──────────────
 const CHALLENGE_MELODY=[
-  _n(12),null,_n(7),null,  _n(3),_n(7),null,_n(10),  null,_n(7),null,_n(3),  _n(2),null,_n(0),null,
-  _n(8),null,null,_n(10),  _n(12),null,_n(10),null,  _n(8),_n(7),null,null,  _n(5),null,_n(7),null,
-  _n(0),_n(3),null,_n(5),  _n(7),null,_n(10),null,  _n(12),null,_n(10),_n(8),  null,_n(7),null,_n(5),
-  _n(7),null,_n(10),null,  _n(12),_n(10),_n(8),null,  _n(7),null,_n(5),null,  _n(0),null,null,null,
+  // Bar 1
+  _n(10), null, _n(15), null, _n(12), null, _n(10), null, _n(7), null, _n(5), null, _n(7), null, _n(10), null,
+  // Bar 2
+  _n(12), null, _n(15), null, _n(17), null, _n(15), null, _n(12), null, _n(15), null, _n(12), null, _n(10), null,
+  // Bar 3
+  _n(10), null, _n(15), null, _n(12), null, _n(10), null, _n(7), null, _n(5), null, _n(7), null, _n(10), null,
+  // Bar 4
+  _n(5), null, _n(3), null, _n(5), null, _n(7), null, _n(10), null, _n(7), null, _n(5), null, _n(3), null,
+  // Bar 5 (Climax)
+  _n(15), null, _n(19), null, _n(17), null, _n(15), null, _n(12), null, _n(10), null, _n(12), null, _n(15), null,
+  // Bar 6
+  _n(17), null, _n(19), null, _n(22), null, _n(19), null, _n(17), null, _n(15), null, _n(17), null, _n(15), null,
+  // Bar 7
+  _n(15), null, _n(19), null, _n(17), null, _n(15), null, _n(12), null, _n(10), null, _n(12), null, _n(15), null,
+  // Bar 8
+  _n(12), null, _n(10), null, _n(7), null, _n(5), null, _n(3), null, _n(5), null, _n(7), null, _n(10), null,
 ];
 const CHALLENGE_HARMONY=[
-  _n(8),null,_n(3),null,  _n(0),_n(3),null,_n(7),  null,_n(3),null,_n(0),  _n(-2),null,_n(-5),null,
-  _n(5),null,null,_n(7),  _n(8),null,_n(7),null,  _n(5),_n(3),null,null,  _n(2),null,_n(3),null,
-  _n(-5),_n(0),null,_n(2),  _n(3),null,_n(7),null,  _n(8),null,_n(7),_n(5),  null,_n(3),null,_n(2),
-  _n(3),null,_n(7),null,  _n(8),_n(7),_n(5),null,  _n(3),null,_n(2),null,  _n(-5),null,null,null,
+  // Fast pulsing chords: C, F, C, G
+  _n(3), null, _n(7), null, _n(3), null, _n(7), null, _n(3), null, _n(7), null, _n(3), null, _n(7), null,
+  _n(8), null, _n(12), null, _n(8), null, _n(12), null, _n(8), null, _n(12), null, _n(8), null, _n(12), null,
+  _n(3), null, _n(7), null, _n(3), null, _n(7), null, _n(3), null, _n(7), null, _n(3), null, _n(7), null,
+  _n(2), null, _n(5), null, _n(2), null, _n(5), null, _n(2), null, _n(5), null, _n(2), null, _n(5), null,
+  _n(7), null, _n(10), null, _n(7), null, _n(10), null, _n(7), null, _n(10), null, _n(7), null, _n(10), null,
+  _n(8), null, _n(12), null, _n(8), null, _n(12), null, _n(8), null, _n(12), null, _n(8), null, _n(12), null,
+  _n(7), null, _n(10), null, _n(7), null, _n(10), null, _n(7), null, _n(10), null, _n(7), null, _n(10), null,
+  _n(5), null, _n(10), null, _n(5), null, _n(10), null, _n(5), null, _n(10), null, _n(5), null, _n(10), null,
 ];
 const CHALLENGE_BASS_WALK=[
-  _n(0)/4,_n(7)/4,  _n(0)/4,_n(3)/4,
-  _n(8)/4,_n(8)/4,  _n(3)/4,_n(7)/4,
-  _n(0)/4,_n(0)/4,  _n(-2)/4,_n(-2)/4,
-  _n(3)/4,_n(5)/4,  _n(0)/4,_n(0)/4,
+  _n(-9)/4, _n(-9)/4, _n(-9)/4, _n(-9)/4,
+  _n(-4)/4, _n(-4)/4, _n(-4)/4, _n(-4)/4,
+  _n(-9)/4, _n(-9)/4, _n(-9)/4, _n(-9)/4,
+  _n(-7)/4, _n(-7)/4, _n(-7)/4, _n(-7)/4,
+  _n(-9)/4, _n(-9)/4, _n(-9)/4, _n(-9)/4,
+  _n(-4)/4, _n(-4)/4, _n(-4)/4, _n(-4)/4,
+  _n(-9)/4, _n(-9)/4, _n(-9)/4, _n(-9)/4,
+  _n(-7)/4, _n(-7)/4, _n(-7)/4, _n(-7)/4,
 ];
 const CHALLENGE_DRUM_PAT=[1,0,4,0, 2,0,4,0, 1,0,4,0, 2,0,4,0];
 
