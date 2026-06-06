@@ -1139,8 +1139,8 @@
 
   /* --- Mode Selector Cards --- */
   .mode-card {
-    cursor: pointer; display: flex; align-items: center; gap: 14px;
-    padding: 14px 16px; border-radius: 12px;
+    cursor: pointer; display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.02);
     touch-action: manipulation;
@@ -1148,7 +1148,7 @@
     width: 100%; box-sizing: border-box;
   }
   .mode-card .mode-icon {
-    font-size: 32px; line-height: 1; flex-shrink: 0;
+    font-size: 26px; line-height: 1; flex-shrink: 0;
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .mode-card .mode-info {
@@ -1159,11 +1159,11 @@
     margin-bottom: 4px;
   }
   .mode-card .mode-desc {
-    font-size: 9.5px; color: rgba(255, 255, 255, 0.6);
-    letter-spacing: 0.5px; line-height: 1.45;
+    font-size: 9px; color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.5px; line-height: 1.35;
   }
   .mode-card .mode-best {
-    font-size: 8px; margin-top: 5px; font-family: 'Orbitron', monospace;
+    font-size: 8px; margin-top: 3px; font-family: 'Orbitron', monospace;
   }
   .mode-card .mode-arrow {
     font-size: 20px; color: rgba(255, 255, 255, 0.25);
@@ -1263,10 +1263,10 @@
   .mode-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     border: 1px solid rgba(255,255,255,0.07);
     border-radius: 16px;
-    padding: 10px;
+    padding: 8px;
     background: rgba(255,255,255,0.02);
   }
   .mode-group .mode-card {
