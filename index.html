@@ -702,6 +702,27 @@
     box-shadow: 0 0 40px rgba(0,200,255,0.8), inset 0 0 20px rgba(255,255,255,0.6) !important;
     background: linear-gradient(135deg, rgba(0,200,255,0.7), rgba(160,0,255,0.7));
   }
+  /* --- Daily Theme Action Buttons --- */
+  body.daily-theme .action-btn {
+    border-color: rgba(255, 230, 0, 0.45);
+    color: #ffe600;
+  }
+  body.daily-theme .action-btn:hover {
+    box-shadow: 0 0 25px rgba(255, 230, 0, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    background: rgba(255, 230, 0, 0.2);
+    border-color: #fff;
+    color: #fff;
+  }
+  body.daily-theme .action-btn.play-btn {
+    background: linear-gradient(135deg, rgba(255,200,0,0.45), rgba(255,100,0,0.45));
+    text-shadow: 0 0 10px rgba(255,255,255,0.7);
+    color: #fff;
+  }
+  body.daily-theme .action-btn.play-btn:hover {
+    box-shadow: 0 0 40px rgba(255,200,0,0.8), inset 0 0 20px rgba(255,255,255,0.6) !important;
+    background: linear-gradient(135deg, rgba(255,200,0,0.7), rgba(255,100,0,0.7));
+  }
+  
   #daily-challenge-btn, #daily-launch-btn {
     background: linear-gradient(90deg, #ffe600, #ffaa00);
     box-shadow: 0 0 25px rgba(255, 170, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
@@ -2184,7 +2205,157 @@ if ('serviceWorker' in navigator) {
   }
   var _n = (s) => 440 * Math.pow(2, s / 12);
   var BGM_MELODY = [
-    // Bar 1 – Am arpeggio + descent
+    _n(3),
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(7),
+    null,
+    _n(12),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(10),
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(3),
+    null,
+    _n(5),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(0),
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(3),
+    null,
+    _n(7),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(5),
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(2),
+    null,
+    _n(-2),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ];
+  var BGM_HARMONY = [
+    _n(-5),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(0),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(-2),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(3),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(-9),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(-5),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(-7),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    _n(-2),
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ];
+  var BGM_BASS_WALK = [
+    _n(-17) / 4,
+    _n(-17) / 4,
+    _n(-17) / 4,
+    _n(-17) / 4,
+    _n(-14) / 4,
+    _n(-14) / 4,
+    _n(-14) / 4,
+    _n(-14) / 4,
+    _n(-21) / 4,
+    _n(-21) / 4,
+    _n(-21) / 4,
+    _n(-21) / 4,
+    _n(-19) / 4,
+    _n(-19) / 4,
+    _n(-19) / 4,
+    _n(-19) / 4
+  ];
+  var BGM_DRUM_PAT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  var CHALLENGE_MELODY = [
     _n(12),
     null,
     _n(7),
@@ -2201,7 +2372,6 @@ if ('serviceWorker' in navigator) {
     null,
     _n(0),
     null,
-    // Bar 2 – F→C ascent
     _n(8),
     null,
     null,
@@ -2218,7 +2388,6 @@ if ('serviceWorker' in navigator) {
     null,
     _n(7),
     null,
-    // Bar 3 – syncopated climb
     _n(0),
     _n(3),
     null,
@@ -2235,7 +2404,6 @@ if ('serviceWorker' in navigator) {
     _n(7),
     null,
     _n(5),
-    // Bar 4 – climax + resolve
     _n(7),
     null,
     _n(10),
@@ -2253,7 +2421,7 @@ if ('serviceWorker' in navigator) {
     null,
     null
   ];
-  var BGM_HARMONY = [
+  var CHALLENGE_HARMONY = [
     _n(8),
     null,
     _n(3),
@@ -2319,221 +2487,90 @@ if ('serviceWorker' in navigator) {
     null,
     null
   ];
-  var BGM_BASS_WALK = [
-    _n(0) / 4,
-    _n(7) / 4,
-    _n(0) / 4,
-    _n(3) / 4,
-    // Bar 1: A E A C
-    _n(8) / 4,
-    _n(8) / 4,
-    _n(3) / 4,
-    _n(7) / 4,
-    // Bar 2: F F C E
-    _n(0) / 4,
-    _n(0) / 4,
-    _n(-2) / 4,
-    _n(-2) / 4,
-    // Bar 3: A A G G
-    _n(3) / 4,
-    _n(5) / 4,
-    _n(0) / 4,
-    _n(0) / 4
-    // Bar 4: C D A A
-  ];
-  var BGM_DRUM_PAT = [1, 0, 4, 0, 2, 0, 4, 0, 1, 0, 4, 0, 2, 0, 4, 0];
-  var CHALLENGE_MELODY = [
-    // Bar 1 – explosive harmonic-minor burst (G# leading tone)
-    _n(0),
-    _n(7),
-    _n(12),
-    _n(11),
-    _n(12),
-    _n(15),
-    _n(12),
-    _n(11),
-    _n(12),
-    null,
-    _n(7),
-    null,
-    _n(11),
-    _n(12),
-    _n(15),
-    null,
-    // Bar 2 – wild chromatic descent from high D
-    _n(17),
-    _n(15),
-    null,
-    _n(12),
-    _n(11),
-    null,
-    _n(10),
-    null,
-    _n(8),
-    null,
-    _n(7),
-    null,
-    _n(11),
-    _n(12),
-    null,
-    null,
-    // Bar 3 – octave leaps + syncopation
-    _n(0),
-    null,
-    _n(12),
-    null,
-    _n(7),
-    _n(11),
-    _n(12),
-    null,
-    _n(19),
-    _n(17),
-    _n(15),
-    null,
-    _n(12),
-    _n(11),
-    _n(12),
-    null,
-    // Bar 4 – full ascending run → crash
-    _n(0),
-    _n(3),
-    _n(7),
-    _n(11),
-    _n(12),
-    _n(14),
-    _n(15),
-    _n(17),
-    _n(19),
-    null,
-    _n(15),
-    null,
-    _n(12),
-    _n(7),
-    _n(0),
-    null
-  ];
-  var CHALLENGE_HARMONY = [
-    _n(-5),
-    _n(3),
-    _n(6),
-    _n(7),
-    _n(6),
-    _n(9),
-    _n(8),
-    _n(7),
-    _n(6),
-    null,
-    _n(3),
-    null,
-    _n(7),
-    _n(6),
-    _n(9),
-    null,
-    _n(11),
-    _n(9),
-    null,
-    _n(8),
-    _n(7),
-    null,
-    _n(6),
-    null,
-    _n(5),
-    null,
-    _n(3),
-    null,
-    _n(7),
-    _n(8),
-    null,
-    null,
-    _n(-5),
-    null,
-    _n(8),
-    null,
-    _n(3),
-    _n(7),
-    _n(8),
-    null,
-    _n(15),
-    _n(13),
-    _n(11),
-    null,
-    _n(8),
-    _n(7),
-    _n(8),
-    null,
-    _n(-5),
-    _n(0),
-    _n(3),
-    _n(7),
-    _n(8),
-    _n(10),
-    _n(11),
-    _n(13),
-    _n(15),
-    null,
-    _n(11),
-    null,
-    _n(8),
-    _n(3),
-    _n(-5),
-    null
-  ];
   var CHALLENGE_BASS_WALK = [
     _n(0) / 4,
     _n(7) / 4,
     _n(0) / 4,
-    _n(11) / 4,
-    // Bar 1: A E A G#
+    _n(3) / 4,
     _n(8) / 4,
-    _n(5) / 4,
-    _n(1) / 4,
-    _n(11) / 4,
-    // Bar 2: F D Bb G#
-    _n(0) / 4,
-    _n(5) / 4,
+    _n(8) / 4,
+    _n(3) / 4,
     _n(7) / 4,
-    _n(11) / 4,
-    // Bar 3: A D E G#
     _n(0) / 4,
-    _n(11) / 4,
-    _n(7) / 4,
+    _n(0) / 4,
+    _n(-2) / 4,
+    _n(-2) / 4,
+    _n(3) / 4,
+    _n(5) / 4,
+    _n(0) / 4,
     _n(0) / 4
-    // Bar 4: A G# E A
   ];
-  var CHALLENGE_DRUM_PAT = [5, 4, 5, 4, 6, 4, 5, 4, 5, 5, 4, 4, 6, 4, 5, 6];
+  var CHALLENGE_DRUM_PAT = [1, 0, 4, 0, 2, 0, 4, 0, 1, 0, 4, 0, 2, 0, 4, 0];
   var SPRINT_MELODY = [
     _n(12),
-    _n(7),
-    _n(3),
-    _n(7),
+    null,
     _n(12),
-    _n(7),
-    _n(3),
-    _n(7),
     _n(15),
+    _n(14),
+    null,
     _n(10),
+    null,
     _n(7),
+    null,
     _n(10),
+    null,
+    _n(12),
+    null,
+    null,
+    null,
+    _n(12),
+    null,
+    _n(12),
     _n(15),
-    _n(10),
-    _n(7),
-    _n(10),
     _n(14),
-    _n(9),
-    _n(5),
-    _n(9),
+    null,
+    _n(19),
+    null,
+    _n(15),
+    null,
     _n(14),
-    _n(9),
-    _n(5),
-    _n(9),
+    null,
+    _n(15),
+    null,
+    null,
+    null,
+    _n(17),
+    null,
+    _n(17),
+    _n(19),
+    _n(20),
+    null,
+    _n(19),
+    null,
+    _n(15),
+    null,
     _n(12),
+    null,
+    _n(15),
+    null,
+    null,
+    null,
+    _n(19),
+    null,
+    _n(19),
+    _n(15),
+    _n(14),
+    null,
+    _n(10),
+    null,
     _n(7),
-    _n(3),
-    _n(7),
+    null,
+    _n(10),
+    null,
     _n(12),
-    _n(7),
-    _n(3),
-    _n(7)
+    null,
+    null,
+    null
   ];
   var SPRINT_HARMONY = [
     null,
@@ -2559,6 +2596,38 @@ if ('serviceWorker' in navigator) {
     null,
     null,
     _n(1),
+    null,
+    null,
+    null,
+    _n(0),
+    null,
+    null,
+    null,
+    _n(0),
+    null,
+    null,
+    null,
+    _n(5),
+    null,
+    null,
+    null,
+    _n(5),
+    null,
+    null,
+    null,
+    _n(0),
+    null,
+    null,
+    null,
+    _n(0),
+    null,
+    null,
+    null,
+    _n(7),
+    null,
+    null,
+    null,
+    _n(7),
     null,
     null,
     null,
@@ -3300,11 +3369,12 @@ if ('serviceWorker' in navigator) {
     ];
   }
   function getBgTheme() {
-    if (S.isDailyMode) return { m: "daily", bg: "rgba(10,0,3,0.22)", hueBase: 10, core: "rgba(220,80,0,0.04)", core2: "rgba(160,20,0,0.025)", edge: "rgba(160,0,10,1)", glow: true, speed: 1.7 };
-    if (S.isBlitzMode) return { m: "blitz", bg: "rgba(8,0,8,0.18)", hueBase: 280, core: "rgba(220,0,220,0.04)", core2: "rgba(160,0,160,0.025)", edge: "rgba(160,0,160,1)", glow: true, speed: 1.5 };
-    if (S.isSprintMode) return { m: "sprint", bg: "rgba(0,5,10,0.18)", hueBase: 190, core: "rgba(0,180,255,0.04)", core2: "rgba(0,120,200,0.025)", edge: "rgba(0,160,255,1)", glow: true, speed: 2 };
-    return { m: "marathon", bg: "rgba(0,0,12,0.18)", hueBase: 240, core: "rgba(80,0,160,0.01)", core2: "rgba(40,0,80,0.01)", edge: null, glow: false, speed: 0.8 };
+    if (S.isDailyMode) return { m: "daily", type: "nebula", bg: "rgba(15,10,0,0.22)", hueBase: 45, core: "rgba(255,180,0,0.04)", core2: "rgba(200,140,0,0.025)", edge: "rgba(200,150,0,1)", glow: true, speed: 1.7 };
+    if (S.isBlitzMode) return { m: "blitz", type: "nebula", bg: "rgba(8,0,8,0.18)", hueBase: 280, core: "rgba(220,0,220,0.04)", core2: "rgba(160,0,160,0.025)", edge: "rgba(160,0,160,1)", glow: true, speed: 1.5 };
+    if (S.isSprintMode) return { m: "sprint", type: "matrix", bg: "rgba(0,5,10,0.18)", hueBase: 190, core: "rgba(0,180,255,0.04)", core2: "rgba(0,120,200,0.025)", edge: "rgba(0,160,255,1)", glow: true, speed: 2 };
+    return { m: "marathon", type: "nebula", bg: "rgba(0,0,12,0.18)", hueBase: 240, core: "rgba(80,0,160,0.01)", core2: "rgba(40,0,80,0.01)", edge: null, glow: false, speed: 0.8 };
   }
+  var _matrixDrops = null;
   function drawBackground(dtFactor = 1) {
     if (S.lowPerfMode) {
       if (S.isDailyMode) {
@@ -3320,53 +3390,76 @@ if ('serviceWorker' in navigator) {
     _cBgPulse = (_cBgPulse + 0.022 * dtFactor * th.speed) % (Math.PI * 2);
     bgx.fillStyle = th.bg;
     bgx.fillRect(0, 0, bgc.width, bgc.height);
-    for (const neb of nebulae) {
-      neb.x += neb.vx * th.speed * dtFactor;
-      neb.y += neb.vy * th.speed * dtFactor;
-      if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width) neb.vx *= -1;
-      if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
-      if (!neb.c) neb.c = {};
-      if (!neb.c[th.m]) {
-        const size = neb.r * 2;
-        const cn = document.createElement("canvas");
-        cn.width = size;
-        cn.height = size;
-        const ctxN = cn.getContext("2d");
-        const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
-        const h = th.hueBase + neb.hue % 50;
-        grN.addColorStop(0, `hsla(${h},95%,35%,0.12)`);
-        grN.addColorStop(0.5, `hsla(${(h + 40) % 360},90%,20%,0.06)`);
-        grN.addColorStop(1, "transparent");
-        ctxN.fillStyle = grN;
-        ctxN.fillRect(0, 0, size, size);
-        neb.c[th.m] = cn;
+    if (th.type === "matrix") {
+      if (!_matrixDrops) {
+        _matrixDrops = Array.from({ length: 60 }, () => ({
+          x: Math.random() * bgc.width,
+          y: Math.random() * bgc.height,
+          speed: Math.random() * 8 + 6,
+          size: Math.floor(Math.random() * 15 + 15),
+          op: Math.random() * 0.4 + 0.1
+        }));
       }
-      bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
-    }
-    bgx.fillStyle = "rgba(180,220,255,0.5)";
-    for (const s of stars) {
-      s.y += s.speed * (th.glow ? 2.8 : 1) * dtFactor;
-      s.x += s.vx * (th.glow ? 2.8 : 1) * dtFactor;
-      if (s.y > bgc.height || s.x > bgc.width) {
-        s.y = Math.random() * bgc.height * 0.4;
-        s.x = Math.random() * bgc.width * 0.6;
+      for (const d of _matrixDrops) {
+        d.y += d.speed * dtFactor;
+        if (d.y > bgc.height) {
+          d.y = -d.size * 3;
+          d.x = Math.random() * bgc.width;
+        }
+        bgx.fillStyle = `rgba(0,180,255,${d.op})`;
+        bgx.fillRect(d.x, d.y, d.size - 2, d.size - 2);
+        bgx.fillStyle = `rgba(200,240,255,${d.op * 1.5})`;
+        bgx.fillRect(d.x, d.y + d.size, d.size - 2, d.size - 2);
       }
-      if (th.glow) {
-        const tLen = s.speed * 22;
-        const tg = bgx.createLinearGradient(s.x - s.vx * 22, s.y - tLen, s.x, s.y);
-        tg.addColorStop(0, "transparent");
-        tg.addColorStop(1, `rgba(255,${80 + s.r * 40 | 0},0,${s.r * 0.22})`);
-        bgx.strokeStyle = tg;
-        bgx.lineWidth = s.r * 0.9;
-        bgx.beginPath();
-        bgx.moveTo(s.x - s.vx * 22, s.y - tLen);
-        bgx.lineTo(s.x, s.y);
-        bgx.stroke();
-      } else {
-        bgx.beginPath();
-        bgx.moveTo(s.x + s.r, s.y);
-        bgx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        bgx.fill();
+    } else {
+      for (const neb of nebulae) {
+        neb.x += neb.vx * th.speed * dtFactor;
+        neb.y += neb.vy * th.speed * dtFactor;
+        if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width) neb.vx *= -1;
+        if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
+        if (!neb.c) neb.c = {};
+        if (!neb.c[th.m]) {
+          const size = neb.r * 2;
+          const cn = document.createElement("canvas");
+          cn.width = size;
+          cn.height = size;
+          const ctxN = cn.getContext("2d");
+          const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
+          const h = th.hueBase + neb.hue % 50;
+          grN.addColorStop(0, `hsla(${h},95%,35%,0.12)`);
+          grN.addColorStop(0.5, `hsla(${(h + 40) % 360},90%,20%,0.06)`);
+          grN.addColorStop(1, "transparent");
+          ctxN.fillStyle = grN;
+          ctxN.fillRect(0, 0, size, size);
+          neb.c[th.m] = cn;
+        }
+        bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
+      }
+      bgx.fillStyle = "rgba(180,220,255,0.5)";
+      for (const s of stars) {
+        s.y += s.speed * (th.glow ? 2.8 : 1) * dtFactor;
+        s.x += s.vx * (th.glow ? 2.8 : 1) * dtFactor;
+        if (s.y > bgc.height || s.x > bgc.width) {
+          s.y = Math.random() * bgc.height * 0.4;
+          s.x = Math.random() * bgc.width * 0.6;
+        }
+        if (th.glow) {
+          const tLen = s.speed * 22;
+          const tg = bgx.createLinearGradient(s.x - s.vx * 22, s.y - tLen, s.x, s.y);
+          tg.addColorStop(0, "transparent");
+          tg.addColorStop(1, `rgba(255,${80 + s.r * 40 | 0},0,${s.r * 0.22})`);
+          bgx.strokeStyle = tg;
+          bgx.lineWidth = s.r * 0.9;
+          bgx.beginPath();
+          bgx.moveTo(s.x - s.vx * 22, s.y - tLen);
+          bgx.lineTo(s.x, s.y);
+          bgx.stroke();
+        } else {
+          bgx.beginPath();
+          bgx.moveTo(s.x + s.r, s.y);
+          bgx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          bgx.fill();
+        }
       }
     }
     if (!_staticBgCache || _staticBgCache.width !== bgc.width || _staticBgCache.height !== bgc.height || _staticBgCache.mode !== th.m) {
@@ -6722,8 +6815,12 @@ ${cta}`;
     });
   }
   function launchDailyChallenge() {
-    const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
+    document.getElementById("overlay").style.display = "none";
+    S.isSprintMode = false;
+    S.isBlitzMode = false;
     S.isDailyMode = true;
+    document.body.classList.add("daily-theme");
+    const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
     _prng = mulberry32(parseInt(todayStr, 10));
     startGame();
   }
@@ -6867,7 +6964,16 @@ ${cta}`;
   }
   function startSprintMode() {
     S.isSprintMode = true;
+    S.isBlitzMode = false;
     S.isDailyMode = false;
+    document.body.classList.remove("daily-theme");
+    startGame();
+  }
+  function startMarathonMode() {
+    S.isSprintMode = false;
+    S.isBlitzMode = false;
+    S.isDailyMode = false;
+    document.body.classList.remove("daily-theme");
     startGame();
   }
   S.flashLines = /* @__PURE__ */ new Set();
