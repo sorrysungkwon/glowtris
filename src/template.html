@@ -63,13 +63,6 @@ if ('serviceWorker' in navigator) {
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
-<script>
-window.addEventListener('error', function(e) {
-  var d = document.getElementById('js-error-banner');
-  if (!d) { d = document.createElement('div'); d.id = 'js-error-banner'; d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#c00;color:#fff;font:14px monospace;padding:8px 12px;white-space:pre-wrap'; document.body.prepend(d); }
-  d.textContent = (e.error ? e.error.stack : e.message) + '\n' + e.filename + ':' + e.lineno + ':' + e.colno;
-});
-</script>
 
 <div id="maintenance-banner" style="display:none">
   <span id="maintenance-text"></span>
