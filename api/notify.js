@@ -1,4 +1,4 @@
-import webpush from 'web-push';
+const webpush = require('web-push');
 
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -23,7 +23,7 @@ function localDateStr(utcNow, tzOffset) {
   return new Date(utcNow.getTime() - tzOffset * 60000).toISOString().slice(0, 10);
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   try {
     if (!REDIS_URL || !process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
       return res.status(400).json({ error: 'missing env vars', REDIS_URL: !!REDIS_URL, VAPID_PUB: !!process.env.VAPID_PUBLIC_KEY, VAPID_PRIV: !!process.env.VAPID_PRIVATE_KEY });
