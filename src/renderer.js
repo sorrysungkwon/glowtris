@@ -2,10 +2,15 @@ import { Application, Graphics, Text, TextStyle } from 'pixi.js';
 import { S, COLS, ROWS } from './shared.js';
 
 // ─── Internal state ───────────────────────────────────────────────────────────
-let _app  = null;
-let _gfx  = null; // board + pieces Graphics (cleared each frame)
-let _cdGfx = null; // countdown effects Graphics
-let _cdText = null; // countdown number/GO Text
+let _app     = null;
+let _gfx     = null; // board + pieces Graphics (cleared each frame)
+let _partGfx = null; // particle shapes Graphics (cleared each frame)
+let _cdGfx   = null; // countdown effects Graphics
+let _cdText  = null; // countdown number/GO Text
+
+// Text particle pool — reuse Text objects to avoid GC churn
+const _textPool    = [];
+const _activeTexts = new Map(); // particle object → Text node
 
 export let pixiCanvas  = null;
 export let pixiEnabled = false;
@@ -43,9 +48,10 @@ export async function initPixiRenderer(oldCanvas) {
     });
     app.ticker.stop(); // manual render via RAF in ui.js
 
-    // Graphics layer (redrawn every frame)
-    _gfx   = new Graphics();
-    _cdGfx = new Graphics();
+    // Graphics layers (all redrawn every frame)
+    _gfx     = new Graphics();
+    _partGfx = new Graphics();
+    _cdGfx   = new Graphics();
 
     // Countdown text
     _cdText = new Text({
@@ -62,7 +68,9 @@ export async function initPixiRenderer(oldCanvas) {
     _cdText.anchor.set(0.5, 0.5);
     _cdText.visible = false;
 
+    // Stage order (bottom → top): board → particles → countdown
     app.stage.addChild(_gfx);
+    app.stage.addChild(_partGfx);
     app.stage.addChild(_cdGfx);
     app.stage.addChild(_cdText);
 
@@ -244,6 +252,88 @@ export function drawBoardPixi(visX, visY, getGhostY) {
   }
 
   _app.renderer.render(_app.stage);
+}
+
+// ─── Particle rendering ────────────────────────────────────────────────────────
+const _PART_TEXT_STYLE = new TextStyle({
+  fontFamily: 'Orbitron, monospace',
+  fontWeight: '900',
+  fill:       '#ffffff',
+  align:      'center',
+});
+
+function _getTextNode() {
+  if (_textPool.length) return _textPool.pop();
+  const t = new Text({ text: '', style: _PART_TEXT_STYLE });
+  t.anchor.set(0.5, 0.5);
+  _app.stage.addChild(t);
+  return t;
+}
+
+function _releaseTextNode(t) {
+  t.visible = false;
+  _textPool.push(t);
+}
+
+export function updateParticlesPixi(particles) {
+  if (!_app || !_partGfx) return;
+  const g = _partGfx;
+  g.clear();
+
+  // Release text nodes for particles that have expired
+  for (const [p, node] of _activeTexts) {
+    if (p.life <= 0) { _releaseTextNode(node); _activeTexts.delete(p); }
+  }
+
+  for (const p of particles) {
+    if (p.life <= 0) continue;
+    const alpha = Math.max(0, p.life);
+
+    if (p.type === 'text') {
+      // Floating score/combo text — managed Text node
+      let node = _activeTexts.get(p);
+      if (!node) { node = _getTextNode(); _activeTexts.set(p, node); }
+      node.visible        = true;
+      node.alpha          = alpha;
+      node.position.set(p.x, p.y);
+      node.style.fontSize = p.size;
+      node.style.fill     = p.color;
+      node.text           = p.text;
+      continue;
+    }
+
+    if (p.type === 'ring' || p.type === 'radial-ring') {
+      if (S.lowPerfMode) continue;
+      const rx = (1 - p.life) * p.maxRadius;
+      if (p.type === 'ring') {
+        const ry = rx * (p.aspectRatio || 0.35);
+        g.ellipse(p.x, p.y, rx, ry)
+          .stroke({ color: hexToN(p.color), width: p.size * p.life, alpha });
+      } else {
+        g.circle(p.x, p.y, rx)
+          .stroke({ color: hexToN(p.color), width: p.size * p.life, alpha });
+      }
+      continue;
+    }
+
+    // spark + star — physics update already done by caller
+    if (p.type === 'star') {
+      const spikes = 4, outer = p.size, inner = p.size * 0.4;
+      g.beginPath();
+      for (let i = 0; i < spikes * 2; i++) {
+        const a = (i * Math.PI / spikes) - Math.PI / 2;
+        const rad = i % 2 === 0 ? outer : inner;
+        if (i === 0) g.moveTo(p.x + Math.cos(a) * rad, p.y + Math.sin(a) * rad);
+        else         g.lineTo(p.x + Math.cos(a) * rad, p.y + Math.sin(a) * rad);
+      }
+      g.closePath().fill({ color: hexToN(p.color), alpha });
+    } else {
+      // spark — motion trail line
+      g.moveTo(p.x - p.vx * 1.5, p.y - p.vy * 1.5)
+       .lineTo(p.x, p.y)
+       .stroke({ color: hexToN(p.color), width: Math.max(0.1, p.size * p.life), alpha });
+    }
+  }
 }
 
 // Countdown: dim + ring + text
