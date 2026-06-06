@@ -452,21 +452,25 @@ export function showModeSelector(){
           <div class="mode-arrow">›</div>
         </div>
 
-        <!-- BLITZ — Coming Soon -->
-        <div class="mode-card blitz mode-coming-soon" tabindex="-1">
-          <div class="mode-icon">⏱️</div>
-          <div class="mode-info">
-            <div class="mode-name">BLITZ <span class="coming-soon-badge">COMING SOON</span></div>
-            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+        <!-- TIME ATTACK GROUP — Coming Soon -->
+        <div class="mode-group-label">⏳ TIME ATTACK <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <div class="mode-group">
+          <!-- BLITZ -->
+          <div class="mode-card blitz mode-coming-soon" tabindex="-1">
+            <div class="mode-icon">⏱️</div>
+            <div class="mode-info">
+              <div class="mode-name">BLITZ</div>
+              <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+            </div>
           </div>
-        </div>
 
-        <!-- ULTRA — Coming Soon -->
-        <div class="mode-card ultra mode-coming-soon" tabindex="-1">
-          <div class="mode-icon">🌌</div>
-          <div class="mode-info">
-            <div class="mode-name">ULTRA <span class="coming-soon-badge">COMING SOON</span></div>
-            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+          <!-- ULTRA -->
+          <div class="mode-card ultra mode-coming-soon" tabindex="-1">
+            <div class="mode-icon">🌌</div>
+            <div class="mode-info">
+              <div class="mode-name">ULTRA</div>
+              <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+            </div>
           </div>
         </div>
 

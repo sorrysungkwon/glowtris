@@ -1289,6 +1289,28 @@
     margin-left: 6px;
     text-transform: uppercase;
   }
+  .mode-group-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    padding: 6px 4px 2px;
+    display: flex;
+    align-items: center;
+  }
+  .mode-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 10px;
+    background: rgba(255,255,255,0.02);
+  }
+  .mode-group .mode-card {
+    margin: 0;
+  }
 
   /* --- Pause / Game Over Elements Polish --- */
   .glass-panel .pause-header,
@@ -5742,21 +5764,25 @@ if ('serviceWorker' in navigator) {
           <div class="mode-arrow">\u203A</div>
         </div>
 
-        <!-- BLITZ \u2014 Coming Soon -->
-        <div class="mode-card blitz mode-coming-soon" tabindex="-1">
-          <div class="mode-icon">\u23F1\uFE0F</div>
-          <div class="mode-info">
-            <div class="mode-name">BLITZ <span class="coming-soon-badge">COMING SOON</span></div>
-            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+        <!-- TIME ATTACK GROUP \u2014 Coming Soon -->
+        <div class="mode-group-label">\u23F3 TIME ATTACK <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <div class="mode-group">
+          <!-- BLITZ -->
+          <div class="mode-card blitz mode-coming-soon" tabindex="-1">
+            <div class="mode-icon">\u23F1\uFE0F</div>
+            <div class="mode-info">
+              <div class="mode-name">BLITZ</div>
+              <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+            </div>
           </div>
-        </div>
 
-        <!-- ULTRA \u2014 Coming Soon -->
-        <div class="mode-card ultra mode-coming-soon" tabindex="-1">
-          <div class="mode-icon">\u{1F30C}</div>
-          <div class="mode-info">
-            <div class="mode-name">ULTRA <span class="coming-soon-badge">COMING SOON</span></div>
-            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+          <!-- ULTRA -->
+          <div class="mode-card ultra mode-coming-soon" tabindex="-1">
+            <div class="mode-icon">\u{1F30C}</div>
+            <div class="mode-info">
+              <div class="mode-name">ULTRA</div>
+              <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+            </div>
           </div>
         </div>
 
