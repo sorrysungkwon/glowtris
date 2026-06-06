@@ -504,18 +504,18 @@
   .streak-badge { font-size:10px; letter-spacing:2px; padding:4px 10px; border-radius:6px; border:1px solid rgba(255,100,0,0.5); color:#ff6400; background:rgba(255,100,0,0.1); text-shadow:0 0 8px #ff6400; }
   .combo-badge  { font-size:10px; letter-spacing:2px; padding:4px 10px; border-radius:6px; border:1px solid rgba(0,200,255,0.45); color:var(--cyan); background:rgba(0,200,255,0.08); text-shadow:0 0 8px var(--cyan); }
 
-  /* Toast popup */
-  .toast {
-    position:fixed; bottom:40px; left:50%;
-    transform:translateX(-50%) translateY(100px);
+  /* Achievement unlock toast — above game overlay (z 10001) */
+  .achievement-toast {
+    position:fixed; bottom:120px; left:50%;
+    transform:translateX(-50%) translateY(120px);
     background:rgba(4,4,30,0.85); border:1px solid #ffe600;
     box-shadow:0 0 20px rgba(255,230,0,0.4); border-radius:12px;
     padding:12px 20px; display:flex; align-items:center; gap:12px;
-    z-index:1000; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    z-index:10001; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     opacity:0; transition:transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
     pointer-events: none;
   }
-  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  .achievement-toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
   /* Achievements Badge Styling */
   .ach-badge {
@@ -1460,11 +1460,12 @@
 html.low-perf .action-btn.play-btn { animation: none !important; }
 
 /* ── z-index hierarchy ───────────────────────────────────────────────────────
-   9000  #pwa-sheet         install prompt (lowest)
-   9001  #pwa-toast         brief score/info toasts
-   9001  #pwa-update-bar    SW update bar
-   9002  #offline-bar       offline indicator (highest persistent)
-   10000 #overlay           game UI
+   9000  #pwa-sheet              install prompt (lowest)
+   9001  #pwa-toast              brief score/info toasts (bar)
+   9001  #pwa-update-bar         SW update bar
+   9002  #offline-bar            offline indicator (highest persistent bar)
+   10000 #overlay                game UI
+   10001 .achievement-toast      achievement unlock (above game overlay)
    ─────────────────────────────────────────────────────────────────────────── */
 
 /* ── Brief toast (score submitted etc.) ─────────────────────────────────── */

@@ -1162,7 +1162,7 @@ export function spawnGoldBurst(x, y) {
 export function showAchievementToast(ach) {
   sfxAchievementUnlock();
   const toast = document.createElement('div');
-  toast.className = 'toast';
+  toast.className = 'achievement-toast';
   toast.innerHTML = `
     <div style="font-size:24px">${ach.icon}</div>
     <div style="display:flex;flex-direction:column;text-align:left;">
