@@ -431,34 +431,50 @@ function hexToRgb(hex) {
 
 export function getCellSprite(color) {
   if (_cellSprites[color]) return _cellSprites[color];
-  const PAD = 14, s = S.CELL, p = PAD;
+  const PAD = 18, s = S.CELL, p = PAD;
   const sc = document.createElement('canvas');
   sc.width = sc.height = s + PAD*2;
   const sx = sc.getContext('2d');
   const {r,g,b} = hexToRgb(color);
 
-  sx.shadowColor = `rgba(${r},${g},${b},0.8)`;
-  sx.shadowBlur  = 12;
-
-  const gr = sx.createLinearGradient(p,p,p+s,p+s);
-  gr.addColorStop(0,    `rgba(${Math.min(255,r+40)},${Math.min(255,g+40)},${Math.min(255,b+40)},0.96)`);
-  gr.addColorStop(0.55, `rgba(${r},${g},${b},0.90)`);
-  gr.addColorStop(1,    `rgba(${Math.max(0,r-35)},${Math.max(0,g-35)},${Math.max(0,b-35)},0.94)`);
-  sx.fillStyle = gr; sx.fillRect(p+1, p+1, s-2, s-2);
+  // 1. Broad outer neon glow (baked)
+  sx.shadowColor = `rgba(${r},${g},${b},0.9)`;
+  sx.shadowBlur  = 16;
+  sx.fillStyle   = color;
+  sx.fillRect(p+1, p+1, s-2, s-2);
+  
+  // 2. Base rich gradient
   sx.shadowBlur = 0;
+  const gr = sx.createLinearGradient(p, p, p+s, p+s);
+  gr.addColorStop(0,    `rgba(255,255,255,0.45)`);
+  gr.addColorStop(0.25, `rgba(${Math.min(255,r+50)},${Math.min(255,g+50)},${Math.min(255,b+50)},0.96)`);
+  gr.addColorStop(0.65, `rgba(${r},${g},${b},0.92)`);
+  gr.addColorStop(1,    `rgba(${Math.max(0,r-40)},${Math.max(0,g-40)},${Math.max(0,b-40)},1)`);
+  sx.fillStyle = gr; 
+  sx.fillRect(p+1, p+1, s-2, s-2);
 
-  const sh = sx.createLinearGradient(p,p,p+s*0.62,p+s*0.62);
-  sh.addColorStop(0,   'rgba(255,255,255,0.32)');
-  sh.addColorStop(0.5, 'rgba(255,255,255,0.06)');
+  // 3. Inner glass specular highlight (top-left)
+  const sh = sx.createLinearGradient(p, p, p+s*0.6, p+s*0.6);
+  sh.addColorStop(0,   'rgba(255,255,255,0.7)');
+  sh.addColorStop(0.3, 'rgba(255,255,255,0.15)');
   sh.addColorStop(1,   'rgba(255,255,255,0)');
-  sx.fillStyle = sh; sx.fillRect(p+2, p+2, s-4, s-4);
+  sx.fillStyle = sh; 
+  sx.fillRect(p+2, p+2, s-4, s-4);
 
-  sx.strokeStyle = `rgba(${Math.min(255,r+90)},${Math.min(255,g+90)},${Math.min(255,b+90)},0.4)`;
-  sx.lineWidth = 1; sx.lineCap = 'round';
-  sx.beginPath(); sx.moveTo(p+2,p+s-2); sx.lineTo(p+2,p+2); sx.lineTo(p+s-2,p+2); sx.stroke();
+  // 4. Bright upper border reflection
+  sx.strokeStyle = `rgba(255,255,255,0.85)`;
+  sx.lineWidth = 1.5; 
+  sx.lineCap = 'round';
+  sx.beginPath(); 
+  sx.moveTo(p+2.5, p+s-3); sx.lineTo(p+2.5, p+2.5); sx.lineTo(p+s-3, p+2.5); 
+  sx.stroke();
 
-  sx.strokeStyle = `rgba(${Math.min(255,r+55)},${Math.min(255,g+55)},${Math.min(255,b+55)},0.5)`;
-  sx.lineWidth = 1; sx.strokeRect(p+1.5, p+1.5, s-3, s-3);
+  // 5. Dark lower border for depth
+  sx.strokeStyle = `rgba(0,0,0,0.5)`;
+  sx.lineWidth = 1;
+  sx.beginPath();
+  sx.moveTo(p+2.5, p+s-2.5); sx.lineTo(p+s-2.5, p+s-2.5); sx.lineTo(p+s-2.5, p+2.5);
+  sx.stroke();
 
   _cellSprites[color] = { canvas: sc, pad: PAD };
   return _cellSprites[color];
@@ -490,11 +506,21 @@ function drawCBPattern(ctx, px, py, cs, key) {
 
 function drawCell(ctx, x, y, color, alpha=1, glow=1, key=null) {
   const s = S.CELL, px = x*s, py = y*s;
+  if (S.lowPerfMode) {
+    ctx.save(); ctx.globalAlpha = alpha;
+    ctx.fillStyle = color; ctx.fillRect(px+1, py+1, s-2, s-2);
+    ctx.restore();
+    if (S.colorblindMode && key) drawCBPattern(ctx, px, py, s, key);
+    return;
+  }
   const sp = getCellSprite(color);
   ctx.save(); ctx.globalAlpha = alpha;
-  if (glow > 1.2 && !S.lowPerfMode) { ctx.shadowColor = color; ctx.shadowBlur = 9; }
+  if (glow > 1.2) { 
+    ctx.globalCompositeOperation = 'screen';
+    ctx.shadowColor = color; 
+    ctx.shadowBlur = 18; 
+  }
   ctx.drawImage(sp.canvas, px-sp.pad, py-sp.pad);
-  ctx.shadowBlur = 0;
   ctx.restore();
   if (S.colorblindMode && key) drawCBPattern(ctx, px, py, s, key);
 }
