@@ -663,26 +663,6 @@
     box-shadow: 0 0 40px rgba(0,200,255,0.8), inset 0 0 20px rgba(255,255,255,0.6) !important;
     background: linear-gradient(135deg, rgba(0,200,255,0.7), rgba(160,0,255,0.7));
   }
-  /* --- Daily Theme Action Buttons --- */
-  body.daily-theme .action-btn {
-    border-color: rgba(255, 230, 0, 0.45);
-    color: #ffe600;
-  }
-  body.daily-theme .action-btn:hover {
-    box-shadow: 0 0 25px rgba(255, 230, 0, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.4);
-    background: rgba(255, 230, 0, 0.2);
-    border-color: #fff;
-    color: #fff;
-  }
-  body.daily-theme .action-btn.play-btn {
-    background: linear-gradient(135deg, rgba(255,200,0,0.45), rgba(255,100,0,0.45));
-    text-shadow: 0 0 10px rgba(255,255,255,0.7);
-    color: #fff;
-  }
-  body.daily-theme .action-btn.play-btn:hover {
-    box-shadow: 0 0 40px rgba(255,200,0,0.8), inset 0 0 20px rgba(255,255,255,0.6) !important;
-    background: linear-gradient(135deg, rgba(255,200,0,0.7), rgba(255,100,0,0.7));
-  }
   
   #daily-challenge-btn, #daily-launch-btn {
     background: linear-gradient(90deg, #ffe600, #ffaa00);

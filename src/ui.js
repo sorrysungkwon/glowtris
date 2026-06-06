@@ -291,7 +291,7 @@ export function initStars() {
 }
 
 function getBgTheme() {
-  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,10,0,0.22)', hueBase: 45,  core: 'rgba(255,180,0,0.04)', core2: 'rgba(200,140,0,0.025)', edge: 'rgba(200,150,0,1)', glow: true, speed: 1.7 };
+  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,5,0,0.18)', hueBase: 25,  core: 'rgba(255,100,0,0.015)', core2: 'rgba(200,80,0,0.01)', edge: 'rgba(200,80,0,0.4)', glow: true, speed: 1.7 };
   if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(8,0,8,0.18)',  hueBase: 280, core: 'rgba(220,0,220,0.04)', core2: 'rgba(160,0,160,0.025)', edge: 'rgba(160,0,160,1)', glow: true, speed: 1.5 };
   if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
   return { m: 'marathon', type: 'nebula', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
@@ -317,21 +317,21 @@ export function drawBackground(dtFactor = 1) {
 
   if (th.type === 'matrix') {
     if (!_matrixDrops) {
-      _matrixDrops = Array.from({length: 60}, () => ({
+      _matrixDrops = Array.from({length: 120}, () => ({
         x: Math.random() * bgc.width, 
         y: Math.random() * bgc.height, 
-        speed: Math.random() * 8 + 6,
-        size: Math.floor(Math.random() * 15 + 15),
-        op: Math.random() * 0.4 + 0.1
+        speed: Math.random() * 2.5 + 1.0,
+        size: Math.floor(Math.random() * 6 + 4),
+        op: Math.random() * 0.15 + 0.05
       }));
     }
     for (const d of _matrixDrops) {
       d.y += d.speed * dtFactor;
       if (d.y > bgc.height) { d.y = -d.size*3; d.x = Math.random() * bgc.width; }
-      bgx.fillStyle = `rgba(0,180,255,${d.op})`;
-      bgx.fillRect(d.x, d.y, d.size-2, d.size-2);
-      bgx.fillStyle = `rgba(200,240,255,${d.op*1.5})`;
-      bgx.fillRect(d.x, d.y + d.size, d.size-2, d.size-2);
+      bgx.fillStyle = `rgba(0,150,255,${d.op})`;
+      bgx.fillRect(d.x, d.y, d.size-1, d.size-1);
+      bgx.fillStyle = `rgba(0,220,255,${d.op*1.2})`;
+      bgx.fillRect(d.x, d.y + d.size, d.size-1, d.size-1);
     }
   } else {
     for (const neb of nebulae) {
