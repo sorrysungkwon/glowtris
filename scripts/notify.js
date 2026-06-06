@@ -88,7 +88,7 @@ async function run() {
   }
 
   if (toDelete.length) {
-    await redis(`hdel/${SUBS_KEY}`, toDelete);
+    await redis('', ['hdel', SUBS_KEY, ...toDelete]);
   }
 
   console.log(`Sent: ${sent}, Total subs: ${subs.length}, Deleted: ${toDelete.length}`);
