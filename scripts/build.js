@@ -24,6 +24,8 @@ async function build() {
       format:      'iife',
       platform:    'browser',
       target:      'es2018',
+      minify:      true,
+      treeShaking: true,
     });
     js = Buffer.from(result.outputFiles[0].contents).toString();
     console.log('Mode: esbuild bundle (ES modules detected)');
