@@ -31,6 +31,18 @@ async function build() {
       treeShaking:       true,
     });
     js = Buffer.from(result.outputFiles[0].contents).toString();
+
+    // Patch pixi.js isDataUrl regex: character classes with '-' between ranges are
+    // invalid in Safari/WebKit (treated as range rather than literal hyphen).
+    // Move the hyphen to the end of each class so it is unambiguously literal.
+    const before = js.length;
+    js = js
+      .replace(/\[a-z0-9-\+\.\]/g,                              '[a-z0-9+.-]')
+      .replace(/\[a-z0-9-\.!#\$%\*\+\.\{\}\|~`\]/g,            '[a-z0-9.!#$%*+.{}|~`-]')
+      .replace(/\[a-z0-9-\.!#\$%\*\+\.\{\}\(\)_\|~`\]/g,       '[a-z0-9.!#$%*+.{}()_|~`-]');
+    const patched = before - js.length; // negative = chars added (same length expected)
+    console.log(`Patched pixi.js Safari regex (${Math.abs(patched)} chars delta)`);
+
     console.log('Mode: esbuild bundle (ES modules detected)');
   } else {
     // Plain concatenation mode: no imports yet
