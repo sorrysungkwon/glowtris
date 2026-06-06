@@ -4,12 +4,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '30 * * * *'  # fires at HH:30 UTC — matches local 11:30 for each timezone
-  workflow_dispatch:
 
 jobs:
   notify:
     runs-on: ubuntu-latest
-  workflow_dispatch:
     timeout-minutes: 2
     steps:
       - uses: actions/checkout@v3
