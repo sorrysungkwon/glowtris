@@ -1,7 +1,7 @@
 const LS_INSTALLED    = 'pwa-installed';
 const LS_SNOOZE_UNTIL = 'pwa-snooze-until';
 const SNOOZE_DAYS     = 3;
-const VAPID_PUBLIC_KEY = 'BI_rkhrMPW6oSlsvTpIBySBEECvvvkiPtxzmF5DOmtTim3fIDSxXU7P_Bn3TWMi3Vh_hapjlOZ1KyiexF8T0V4s';
+const VAPID_PUBLIC_KEY = 'BBu-74h8e7Eot6eulpSdgN6et__o8TR8XF6S-GSIa1SAP2GMnxZLjstr5unMOsCQncevBL6cKUYYa_qK7LrGZD0';
 
 function _urlBase64ToUint8Array(b64) {
   const pad = '='.repeat((4 - b64.length % 4) % 4);
@@ -82,6 +82,10 @@ function _snoozed() {
 
 export function initPWA() {
   _initOfflineIndicator();
+
+  if ('Notification' in window && Notification.permission === 'granted') {
+    _registerPushSub();
+  }
 
   if (_installed()) {
     setTimeout(_askNotif, 1500); // Ask for push notifs when launched from home screen

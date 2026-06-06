@@ -1,6 +1,7 @@
 name: Hourly Push Notification
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '30 * * * *'  # fires at HH:30 UTC — matches local 11:30 for each timezone
 
@@ -9,6 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Trigger notify endpoint
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Send Notifications
+        env:
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          IS_MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          curl -sf "https://glowtris.com/api/notify" || echo "notify returned non-2xx (non-blocking)"
+          if [ "$IS_MANUAL" = "true" ]; then
+            node scripts/notify.js --test
+          else
+            node scripts/notify.js
+          fi

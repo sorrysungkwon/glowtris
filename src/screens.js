@@ -10,7 +10,7 @@ import {
   renderLbTab, setLbMode, loadStartLeaderboard
 } from './leaderboard.js';
 import {
-  startGame, startSprintMode, launchDailyChallenge,
+  startGame, startSprintMode, startBlitzMode, startUltraMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
 import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd, hidePWABanner } from './pwa.js';
@@ -80,7 +80,7 @@ export function startDailyChallenge() {
       <div class="daily-subtitle">SAME BLOCKS FOR EVERYONE!</div>
 
       <div class="briefing-card">
-        <p style="color:#ffe600;font-weight:900;letter-spacing:1px">[WELCOME TO THE DAILY MISSION!]</p>
+        <p style="color:#ff7700;font-weight:900;letter-spacing:1px">[WELCOME TO THE DAILY MISSION!]</p>
         <p>Today, every player in the whole world will get the <strong>exact same blocks</strong> in the same order!</p>
         <p style="color:var(--cyan)">Luck doesn't matter today! Only your real skills will make you number one on the leaderboard.</p>
       </div>
@@ -437,6 +437,28 @@ export function showModeSelector(){
             <div class="mode-name">SPRINT 40L</div>
             <div class="mode-desc">Clear 40 lines as fast as possible. Fastest time wins the leaderboard.</div>
             <div class="mode-best">${sprintBest}</div>
+          </div>
+          <div class="mode-arrow">›</div>
+        </div>
+
+        <!-- BLITZ -->
+        <div class="mode-card blitz" tabindex="0" onclick="startBlitzMode()">
+          <div class="mode-icon">⏱️</div>
+          <div class="mode-info">
+            <div class="mode-name">BLITZ</div>
+            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+            <div class="mode-best">${parseInt(localStorage.getItem(LS.BLITZ_HI)||'0')>0?`<span style="color:rgba(255,100,0,0.75)">Best: ${parseInt(localStorage.getItem(LS.BLITZ_HI)||'0').toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
+          </div>
+          <div class="mode-arrow">›</div>
+        </div>
+
+        <!-- ULTRA -->
+        <div class="mode-card ultra" tabindex="0" onclick="startUltraMode()">
+          <div class="mode-icon">🌌</div>
+          <div class="mode-info">
+            <div class="mode-name">ULTRA</div>
+            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+            <div class="mode-best">${parseInt(localStorage.getItem(LS.ULTRA_HI)||'0')>0?`<span style="color:rgba(200,0,255,0.75)">Best: ${parseInt(localStorage.getItem(LS.ULTRA_HI)||'0').toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
           </div>
           <div class="mode-arrow">›</div>
         </div>

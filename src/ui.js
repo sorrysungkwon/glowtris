@@ -50,6 +50,7 @@ let _chGradCache = null, _chGradCtx = null;
 let _bgFrameCount = 0;
 const BG_GRAD_INTERVAL = 4;
 let _lpBgCache = null, _lpChBgCache = null;
+let _staticBgCache = null, _staticChEdgeCache = null, _staticChCoreCache = null;
 
 // ─── Cell sprite cache ────────────────────────────────────────────────────────
 let _cellSprites     = {};
@@ -271,12 +272,9 @@ function _buildLowPerfBg(W, H, isChallenge) {
   c.fillStyle = bg; c.fillRect(0, 0, W, H);
   return oc;
 }
-
 export function initStars() {
-  _bgGradCache = null; _bgGradCtx = null;
-  _chGradCache = null; _chGradCtx = null;
   _lpBgCache   = null; _lpChBgCache = null;
-  _bgFrameCount = 0;
+  _staticBgCache = null; _staticChEdgeCache = null; _staticChCoreCache = null;
   stars = [];
   const numStars = S.isMobile ? 80 : 150;
   for (let i = 0; i < numStars; i++) stars.push({
@@ -292,8 +290,17 @@ export function initStars() {
   ];
 }
 
+function getBgTheme() {
+  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,5,0,0.18)', hueBase: 15, hueVar: 15, core: 'rgba(255,100,0,0.015)', core2: 'rgba(200,80,0,0.01)', edge: 'rgba(200,80,0,0.4)', glow: true, speed: 1.7 };
+  if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(15,0,0,0.18)', hueBase: 10, core: 'rgba(255,50,0,0.04)', core2: 'rgba(200,20,0,0.025)', edge: 'rgba(255,50,0,1)', glow: true, speed: 2.2 };
+  if (S.isUltraMode) return { m: 'ultra', type: 'nebula', bg: 'rgba(8,0,12,0.18)', hueBase: 280, core: 'rgba(200,0,255,0.04)', core2: 'rgba(150,0,200,0.025)', edge: 'rgba(150,0,200,1)', glow: true, speed: 1.5 };
+  if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
+  return { m: 'marathon', type: 'nebula', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
+}
+
+let _matrixDrops = null;
+
 export function drawBackground(dtFactor = 1) {
-  bgHue = (bgHue + 0.05 * dtFactor) % 360;
   if (S.lowPerfMode) {
     if (S.isDailyMode) {
       if (!_lpChBgCache || _lpChBgCache.width !== bgc.width) _lpChBgCache = _buildLowPerfBg(bgc.width, bgc.height, true);
@@ -304,122 +311,110 @@ export function drawBackground(dtFactor = 1) {
     }
     return;
   }
-  _bgFrameCount++;
-  if (S.isDailyMode) { _drawChallengeBg(dtFactor); return; }
+  
+  const th = getBgTheme();
+  _cBgPulse = (_cBgPulse + 0.022 * dtFactor * th.speed) % (Math.PI*2);
+  bgx.fillStyle = th.bg; bgx.fillRect(0, 0, bgc.width, bgc.height);
 
-  bgx.fillStyle = 'rgba(0,0,8,0.18)'; bgx.fillRect(0, 0, bgc.width, bgc.height);
-
-  for (const neb of nebulae) {
-    neb.x += neb.vx * dtFactor; neb.y += neb.vy * dtFactor;
-    if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
-    if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
-    neb.hue = (neb.hue + 0.02 * dtFactor) % 360;
-  }
-
-  if (_bgFrameCount % Math.max(1, Math.floor(BG_GRAD_INTERVAL / dtFactor)) === 0) {
-    if (!_bgGradCache || _bgGradCache.width !== bgc.width || _bgGradCache.height !== bgc.height) {
-      _bgGradCache = document.createElement('canvas');
-      _bgGradCache.width = bgc.width; _bgGradCache.height = bgc.height;
-      _bgGradCtx = _bgGradCache.getContext('2d');
+  if (th.type === 'matrix') {
+    if (!_matrixDrops) {
+      _matrixDrops = Array.from({length: 80}, () => ({
+        x: Math.random() * bgc.width, 
+        y: Math.random() * bgc.height, 
+        speed: Math.random() * 1.5 + 0.5,
+        size: Math.floor(Math.random() * 4 + 3),
+        op: Math.random() * 0.1 + 0.05
+      }));
     }
-    const gc2 = _bgGradCtx;
-    gc2.clearRect(0, 0, bgc.width, bgc.height);
+    for (const d of _matrixDrops) {
+      d.y += d.speed * dtFactor;
+      if (d.y > bgc.height) { d.y = -d.size*3; d.x = Math.random() * bgc.width; }
+      bgx.fillStyle = `rgba(0,150,255,${d.op})`;
+      bgx.fillRect(d.x, d.y, d.size, d.size*2);
+    }
+  } else {
     for (const neb of nebulae) {
-      const gr = gc2.createRadialGradient(neb.x, neb.y, 0, neb.x, neb.y, neb.r);
-      gr.addColorStop(0,   `hsla(${neb.hue},95%,35%,0.12)`);
-      gr.addColorStop(0.5, `hsla(${(neb.hue+40)%360},90%,20%,0.06)`);
-      gr.addColorStop(1,   'transparent');
-      gc2.fillStyle = gr;
-      const nbx = Math.max(0, neb.x - neb.r), nby = Math.max(0, neb.y - neb.r);
-      gc2.fillRect(nbx, nby, Math.min(bgc.width, neb.x+neb.r)-nbx, Math.min(bgc.height, neb.y+neb.r)-nby);
-    }
-    const gr2 = gc2.createRadialGradient(bgc.width/2, bgc.height/2, 0, bgc.width/2, bgc.height/2, bgc.width*0.7);
-    gr2.addColorStop(0,   `hsla(${bgHue},80%,10%,0.02)`);
-    gr2.addColorStop(0.5, `hsla(${(bgHue+60)%360},80%,5%,0.015)`);
-    gr2.addColorStop(1,   'transparent');
-    gc2.fillStyle = gr2; gc2.fillRect(0, 0, bgc.width, bgc.height);
-  }
-  if (_bgGradCache) bgx.drawImage(_bgGradCache, 0, 0);
-
-  bgx.fillStyle = 'rgba(180,220,255,0.5)';
-  bgx.beginPath();
-  for (const s of stars) {
-    s.y += s.speed * dtFactor; if (s.y > bgc.height) { s.y = 0; s.x = Math.random() * bgc.width; }
-    bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-  }
-  bgx.fill();
-}
-
-function _drawChallengeBg(dtFactor = 1) {
-  _cBgPulse = (_cBgPulse + 0.022 * dtFactor) % (Math.PI*2);
-  const W = bgc.width, H = bgc.height;
-
-  bgx.fillStyle = 'rgba(10,0,3,0.22)';
-  bgx.fillRect(0, 0, W, H);
-
-  for (const neb of nebulae) {
-    neb.x += neb.vx*1.7 * dtFactor; neb.y += neb.vy*1.7 * dtFactor;
-    if (neb.x - neb.r < 0 || neb.x + neb.r > W) neb.vx *= -1;
-    if (neb.y - neb.r < 0 || neb.y + neb.r > H) neb.vy *= -1;
-    neb.hue = (neb.hue + 0.06 * dtFactor) % 55;
-  }
-  for (const s of stars) {
-    s.y += s.speed*2.8 * dtFactor; s.x += s.vx*2.8 * dtFactor;
-    if (s.y > H || s.x > W) { s.y = Math.random()*H*0.4; s.x = Math.random()*W*0.6; }
-  }
-
-  if (_bgFrameCount % Math.max(1, Math.floor(BG_GRAD_INTERVAL / dtFactor)) === 0) {
-    if (!_chGradCache || _chGradCache.width !== W || _chGradCache.height !== H) {
-      _chGradCache = document.createElement('canvas');
-      _chGradCache.width = W; _chGradCache.height = H;
-      _chGradCtx = _chGradCache.getContext('2d');
-    }
-    const gc2 = _chGradCtx;
-    gc2.clearRect(0, 0, W, H);
-
-    for (const neb of nebulae) {
-      const gr = gc2.createRadialGradient(neb.x, neb.y, 0, neb.x, neb.y, neb.r);
-      gr.addColorStop(0,   `hsla(${neb.hue},100%,28%,0.07)`);
-      gr.addColorStop(0.5, `hsla(${(neb.hue+18)%55},90%,16%,0.03)`);
-      gr.addColorStop(1,   'transparent');
-      gc2.fillStyle = gr;
-      const nx = Math.max(0, neb.x-neb.r), ny = Math.max(0, neb.y-neb.r);
-      gc2.fillRect(nx, ny, Math.min(W, neb.x+neb.r)-nx, Math.min(H, neb.y+neb.r)-ny);
+      neb.x += neb.vx * th.speed * dtFactor; neb.y += neb.vy * th.speed * dtFactor;
+      if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
+      if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
+      
+      if (!neb.c) neb.c = {};
+      if (!neb.c[th.m]) {
+        const size = neb.r * 2;
+        const cn = document.createElement('canvas'); cn.width = size; cn.height = size;
+        const ctxN = cn.getContext('2d');
+        const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
+        const variance = th.hueVar || 50;
+        const h = th.hueBase + neb.hue % variance;
+        grN.addColorStop(0,   `hsla(${h},95%,35%,0.12)`);
+        grN.addColorStop(0.5, `hsla(${(h+variance)%360},90%,20%,0.06)`);
+        grN.addColorStop(1,   'transparent');
+        ctxN.fillStyle = grN; ctxN.fillRect(0, 0, size, size);
+        neb.c[th.m] = cn;
+      }
+      bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
     }
 
+    bgx.fillStyle = 'rgba(180,220,255,0.5)';
     for (const s of stars) {
-      const tLen = s.speed * 22;
-      const tg = gc2.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
-      tg.addColorStop(0, 'transparent');
-      tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
-      gc2.strokeStyle = tg; gc2.lineWidth = s.r*0.9;
-      gc2.beginPath(); gc2.moveTo(s.x-s.vx*22, s.y-tLen); gc2.lineTo(s.x, s.y); gc2.stroke();
+      s.y += s.speed * (th.glow?2.8:1.0) * dtFactor; 
+      s.x += s.vx * (th.glow?2.8:1.0) * dtFactor;
+      if (s.y > bgc.height || s.x > bgc.width) { s.y = Math.random()*bgc.height*0.4; s.x = Math.random()*bgc.width*0.6; }
+      
+      if (th.glow) {
+        const tLen = s.speed * 22;
+        const tg = bgx.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
+        tg.addColorStop(0, 'transparent');
+        tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
+        bgx.strokeStyle = tg; bgx.lineWidth = s.r*0.9;
+        bgx.beginPath(); bgx.moveTo(s.x-s.vx*22, s.y-tLen); bgx.lineTo(s.x, s.y); bgx.stroke();
+      } else {
+        bgx.beginPath(); bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2); bgx.fill();
+      }
     }
-
-    const coreY = H*0.82;
-    const pulse = 0.5 + Math.sin(_cBgPulse)*0.5;
-    const cg2 = gc2.createRadialGradient(W/2, coreY, 0, W/2, coreY, W*0.55);
-    cg2.addColorStop(0,   `rgba(220,80,0,${0.04*pulse})`);
-    cg2.addColorStop(0.4, `rgba(160,20,0,${0.025*pulse})`);
-    cg2.addColorStop(1,   'transparent');
-    gc2.fillStyle = cg2; gc2.fillRect(0, 0, W, H);
-
-    const vA = 0.07 + Math.sin(_cBgPulse)*0.02;
-    const vc = `rgba(160,0,10,${vA})`;
-    const vTop = gc2.createLinearGradient(0,0,0,H*0.14);
-    vTop.addColorStop(0, vc); vTop.addColorStop(1, 'transparent');
-    gc2.fillStyle = vTop; gc2.fillRect(0, 0, W, H*0.14);
-    const vBot = gc2.createLinearGradient(0,H,0,H*0.86);
-    vBot.addColorStop(0, vc); vBot.addColorStop(1, 'transparent');
-    gc2.fillStyle = vBot; gc2.fillRect(0, H*0.86, W, H*0.14);
-    const vLft = gc2.createLinearGradient(0,0,W*0.10,0);
-    vLft.addColorStop(0, vc); vLft.addColorStop(1, 'transparent');
-    gc2.fillStyle = vLft; gc2.fillRect(0, 0, W*0.10, H);
-    const vRgt = gc2.createLinearGradient(W,0,W*0.90,0);
-    vRgt.addColorStop(0, vc); vRgt.addColorStop(1, 'transparent');
-    gc2.fillStyle = vRgt; gc2.fillRect(W*0.90, 0, W*0.10, H);
   }
-  if (_chGradCache) bgx.drawImage(_chGradCache, 0, 0);
+
+  if (!_staticBgCache || _staticBgCache.width !== bgc.width || _staticBgCache.height !== bgc.height || _staticBgCache.mode !== th.m) {
+    _staticBgCache = document.createElement('canvas'); _staticBgCache.width = bgc.width; _staticBgCache.height = bgc.height;
+    _staticBgCache.mode = th.m;
+    const sCtx = _staticBgCache.getContext('2d');
+    
+    const coreY = th.glow ? bgc.height*0.82 : bgc.height*0.5;
+    const cg2 = sCtx.createRadialGradient(bgc.width/2, coreY, 0, bgc.width/2, coreY, bgc.width*(th.glow?0.55:0.7));
+    cg2.addColorStop(0,   th.core);
+    cg2.addColorStop(th.glow?0.4:0.5, th.core2);
+    cg2.addColorStop(1,   'transparent');
+    sCtx.fillStyle = cg2; sCtx.fillRect(0, 0, bgc.width, bgc.height);
+
+    if (th.edge) {
+      _staticChEdgeCache = document.createElement('canvas'); _staticChEdgeCache.width = bgc.width; _staticChEdgeCache.height = bgc.height;
+      const eCtx = _staticChEdgeCache.getContext('2d');
+      const vTop = eCtx.createLinearGradient(0,0,0,bgc.height*0.14); vTop.addColorStop(0, th.edge); vTop.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vTop; eCtx.fillRect(0, 0, bgc.width, bgc.height*0.14);
+      const vBot = eCtx.createLinearGradient(0,bgc.height,0,bgc.height*0.86); vBot.addColorStop(0, th.edge); vBot.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vBot; eCtx.fillRect(0, bgc.height*0.86, bgc.width, bgc.height*0.14);
+      const vLft = eCtx.createLinearGradient(0,0,bgc.width*0.10,0); vLft.addColorStop(0, th.edge); vLft.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vLft; eCtx.fillRect(0, 0, bgc.width*0.10, bgc.height);
+      const vRgt = eCtx.createLinearGradient(bgc.width,0,bgc.width*0.90,0); vRgt.addColorStop(0, th.edge); vRgt.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vRgt; eCtx.fillRect(bgc.width*0.90, 0, bgc.width*0.10, bgc.height);
+    } else {
+      _staticChEdgeCache = null;
+    }
+  }
+
+  bgx.save();
+  if (th.glow) {
+    bgx.globalAlpha = 0.5 + Math.sin(_cBgPulse)*0.5;
+    bgx.drawImage(_staticBgCache, 0, 0);
+    if (_staticChEdgeCache) {
+      bgx.globalAlpha = 0.07 + Math.sin(_cBgPulse)*0.02;
+      bgx.drawImage(_staticChEdgeCache, 0, 0);
+    }
+  } else {
+    bgx.globalAlpha = 0.8 + Math.sin(_cBgPulse)*0.2;
+    bgx.drawImage(_staticBgCache, 0, 0);
+  }
+  bgx.restore();
 }
 
 // ─── Drawing helpers ──────────────────────────────────────────────────────────
@@ -499,16 +494,9 @@ function drawCBPattern(ctx, px, py, cs, key) {
 
 function drawCell(ctx, x, y, color, alpha=1, glow=1, key=null) {
   const s = S.CELL, px = x*s, py = y*s;
-  if (S.lowPerfMode) {
-    ctx.save(); ctx.globalAlpha = alpha;
-    ctx.fillStyle = color; ctx.fillRect(px+1, py+1, s-2, s-2);
-    ctx.restore();
-    if (S.colorblindMode && key) drawCBPattern(ctx, px, py, s, key);
-    return;
-  }
   const sp = getCellSprite(color);
   ctx.save(); ctx.globalAlpha = alpha;
-  if (glow > 1.2) { 
+  if (!S.lowPerfMode && glow > 1.2) { 
     ctx.globalCompositeOperation = 'screen';
     ctx.shadowColor = color; 
     ctx.shadowBlur = 18; 
@@ -1030,9 +1018,24 @@ export function updateUI() {
 }
 
 export function updateSprintTimer() {
-  const elapsed = S._sprintStartTime > 0 ? performance.now() - S._sprintStartTime : 0;
-  const fmt = fmtTime(elapsed);
-  $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
+  if (S.isSprintMode) {
+    const elapsed = S._sprintStartTime > 0 ? performance.now() - S._sprintStartTime : 0;
+    const fmt = fmtTime(elapsed);
+    $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
+    $lines.textContent = Math.max(0, SPRINT_LINES - S.lines); if ($linesM) $linesM.textContent = Math.max(0, SPRINT_LINES - S.lines);
+  } else if (S.isBlitzMode || S.isUltraMode) {
+    const totalTime = S.isBlitzMode ? 120000 : 180000;
+    const elapsed = S._timeAttackStartTime > 0 ? performance.now() - S._timeAttackStartTime : 0;
+    const remain = Math.max(0, totalTime - elapsed);
+    const fmt = fmtTime(remain);
+    $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
+    $lines.textContent = S.score.toLocaleString(); if ($linesM) $linesM.textContent = S.score.toLocaleString();
+    
+    // Time's up!
+    if (remain <= 0 && S.gameRunning) {
+      import('./game.js').then(m => m.endTimeAttack());
+    }
+  }
 }
 
 export function showScorePopup(pts, n, tspin=false, b2b=false) {
