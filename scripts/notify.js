@@ -36,6 +36,8 @@ async function run() {
   const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
   const hashData = await redis(`hgetall/${SUBS_KEY}`);
+  console.log('Redis response:', hashData);
+  
   const raw = hashData.result;
 
   if (!raw || raw.length === 0) {
