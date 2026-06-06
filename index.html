@@ -3356,19 +3356,10 @@ if ('serviceWorker' in navigator) {
   }
   function drawCell(ctx, x, y, color, alpha = 1, glow = 1, key = null) {
     const s = S.CELL, px = x * s, py = y * s;
-    if (S.lowPerfMode) {
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = color;
-      ctx.fillRect(px + 1, py + 1, s - 2, s - 2);
-      ctx.restore();
-      if (S.colorblindMode && key) drawCBPattern(ctx, px, py, s, key);
-      return;
-    }
     const sp = getCellSprite(color);
     ctx.save();
     ctx.globalAlpha = alpha;
-    if (glow > 1.2) {
+    if (!S.lowPerfMode && glow > 1.2) {
       ctx.globalCompositeOperation = "screen";
       ctx.shadowColor = color;
       ctx.shadowBlur = 18;
