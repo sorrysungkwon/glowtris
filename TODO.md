@@ -6,7 +6,19 @@
 - **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push".** Docs-only commits accumulate locally and are bundled with the next code push.
 
 ## 📝 Latest Sync Notes & Future Suggestions (Handover to Antigravity)
-**Recently Completed (Claude Sync - 2026-06-06):**
+**Recently Completed (Antigravity Sync - 2026-06-06):**
+
+### ✅ FIXED: Push Notification Delivery (BUG-015)
+- **Root causes resolved:**
+  1. Migrated notification sender from `api/notify.js` (Vercel Serverless — timed out) to GitHub Actions (`scripts/notify.js` + `.github/workflows/notify-cron.yml`)
+  2. Fixed `api/subscribe.js` Upstash REST API syntax (`hset` array body format)
+  3. Restored `pwa.js` VAPID public key to `BBu-74...` matching all 30k+ existing user subscriptions
+  4. Fixed corrupted `notify-cron.yml` YAML (duplicate `workflow_dispatch:` keys)
+  5. Updated GitHub Actions secrets `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` to match Vercel env vars
+- **Result:** Notifications confirmed working — `Sent: 2, Total: 3` on test run
+- **See:** `BUGS.md → BUG-015`, `ROBOT.md → Push Notification Architecture`
+
+**Previously Completed (Claude Sync - 2026-06-06):**
 
 ### ✅ FIXED: v0.5 PixiJS — Safari/iPad Regression (Rolled Back)
 - **Action Taken**: Executed **Option A — Full rollback** as requested by user.
