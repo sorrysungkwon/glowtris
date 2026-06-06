@@ -6,21 +6,18 @@
 - **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push".** Docs-only commits accumulate locally and are bundled with the next code push.
 
 ## 🔐 SECURITY AUDIT — PRIORITY (Do before any feature work)
-- [ ] **Audit all plaintext credentials**: Search entire codebase (docs, source, config, comments) for passwords, API keys, tokens
-  - Search: `grep -r "password\|token\|key\|secret\|<ADMIN_PASSWORD>\|VAPID\|Upstash" --include="*.md" --include="*.js" --include="*.ts" --include="*.json" .`
-  - Files to check: `README.md`, `CLAUDE.md`, `AGENTS.md`, `ROBOT.md`, `WALKTHROUGH.md`, all docs
-  - Remove any found plaintext secrets from docs immediately
-- [ ] **Create/update .gitignore**: Ensure all secret files are protected
-  ```
-  .env
-  .env.local
-  .env.*.local
-  **/secrets.*
-  **/credentials.*
-  ```
-- [ ] **Document required env vars** (reference only, no values): List which env vars are needed, not their contents
-- [ ] **Check git history**: Verify no secrets were previously committed (`git log -S "password" --oneline`)
-  - If found, use `git filter-branch` or `BFG Repo-Cleaner` to remove
+- [x] **Audit all plaintext credentials** (2026-06-06): Found & removed VAPID keys from ROBOT.md, BUGS.md
+- [x] **Create/update .gitignore** (verified): `.env*` already protected
+- [ ] **Backup & delete .env.local** (when user ready): Copy to secure location, then delete from working directory
+- [ ] **Rotate exposed tokens** (HIGH PRIORITY):
+  - [ ] New Upstash Redis API token (old token in 13 git commits)
+  - [ ] New Vercel OIDC token (exposed in 2 commits)
+  - Update Vercel env vars and GitHub Secrets
+- [ ] **Clean git history** (requires force push, coordinate with Antigravity):
+  - 13 commits with `UPSTASH_REDIS_REST_TOKEN`
+  - 7 commits with VAPID key references
+  - 2 commits with `VERCEL_OIDC_TOKEN`
+  - Use: `git filter-branch` or BFG to remove
 
 **Why:** Prevents unauthorized access, data breach, compliance violation. See: [[security-credentials-audit]]
 
