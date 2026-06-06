@@ -1,5 +1,11 @@
-import { Application, Graphics, Text, TextStyle } from 'pixi.js';
+import { Application, Graphics, Text, TextStyle, FillGradient } from 'pixi.js';
 import { S, COLS, ROWS } from './shared.js';
+
+// ─── Cell gradient cache ──────────────────────────────────────────────────────
+// Keyed by hex color string; values are { grad, glowColor } for the cell size.
+// Invalidated when S.CELL changes.
+const _cellGradCache = new Map();
+let   _cellGradCacheSize = 0; // S.CELL value when cache was built
 
 // ─── Internal state ───────────────────────────────────────────────────────────
 let _app     = null;
@@ -29,6 +35,65 @@ function hslToN(h, s, l) {
     return Math.round((l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)) * 255);
   };
   return (f(0) << 16) | (f(8) << 8) | f(4);
+}
+
+// ─── Cell rendering ───────────────────────────────────────────────────────────
+// Cached per-color diagonal FillGradient (textureSpace:'local' = normalised 0..1).
+// Invalidated when S.CELL changes.
+function _getCellGrad(hex) {
+  if (_cellGradCacheSize !== S.CELL) { _cellGradCache.clear(); _cellGradCacheSize = S.CELL; }
+  if (_cellGradCache.has(hex)) return _cellGradCache.get(hex);
+
+  const n = hexToN(hex);
+  const r = (n >> 16) & 0xff, g = (n >> 8) & 0xff, b = n & 0xff;
+  const lim = (ch, d) => Math.min(255, Math.max(0, ch + d));
+
+  const grad = new FillGradient({
+    type:  'linear',
+    start: { x: 0, y: 0 },
+    end:   { x: 1, y: 1 },
+    colorStops: [
+      { offset: 0,    color: `rgb(${lim(r,42)},${lim(g,42)},${lim(b,42)})` },
+      { offset: 0.55, color: hex },
+      { offset: 1,    color: `rgb(${lim(r,-35)},${lim(g,-35)},${lim(b,-35)})` },
+    ],
+    textureSpace: 'local',
+  });
+
+  _cellGradCache.set(hex, grad);
+  return grad;
+}
+
+// Draw one cell at grid coords (cx, cy).
+// glowScale: 0 = no glow, 1 = normal, 1.5 = strong (active piece).
+function _drawCell(g, cx, cy, hex, alpha = 1, glowScale = 1) {
+  const cs = S.CELL;
+  const px = cx * cs, py = cy * cs;
+  const cn = hexToN(hex);
+
+  // Glow halo (WebGL-only perk)
+  if (glowScale > 0.4 && !S.lowPerfMode) {
+    const pad = Math.round(cs * 0.5);
+    g.rect(px - pad, py - pad, cs + pad * 2, cs + pad * 2)
+     .fill({ color: cn, alpha: 0.13 * glowScale * alpha });
+    if (glowScale > 1.2) {
+      // Extra tight glow for active piece
+      const pad2 = Math.round(cs * 0.22);
+      g.rect(px - pad2, py - pad2, cs + pad2 * 2, cs + pad2 * 2)
+       .fill({ color: cn, alpha: 0.22 * alpha });
+    }
+  }
+
+  // Gradient fill
+  g.rect(px + 1, py + 1, cs - 2, cs - 2).fill({ fill: _getCellGrad(hex), alpha });
+
+  // Edge highlight (top + left sides)
+  g.moveTo(px + 2, py + cs - 2).lineTo(px + 2, py + 2).lineTo(px + cs - 2, py + 2)
+   .stroke({ color: 0xffffff, width: 1, alpha: 0.28 * alpha });
+
+  // Subtle border
+  g.rect(px + 1.5, py + 1.5, cs - 3, cs - 3)
+   .stroke({ color: cn, width: 1, alpha: 0.45 * alpha });
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
@@ -136,7 +201,7 @@ export function drawBoardPixi(visX, visY, getGhostY) {
   }
   g.fill({ color: 0x00ffff, alpha: gridA * 3 });
 
-  // ── Placed cells ────────────────────────────────────────────────────────────
+  // ── Placed cells (gradient + glow) ──────────────────────────────────────────
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (!S.board[r][c]) continue;
@@ -145,8 +210,7 @@ export function drawBoardPixi(visX, visY, getGhostY) {
         g.rect(c * cs + 1, r * cs + 1, cs - 2, cs - 2)
           .fill({ color: 0xffffff, alpha: 0.5 + 0.5 * Math.sin(t * Math.PI * 4) });
       } else {
-        g.rect(c * cs + 1, r * cs + 1, cs - 2, cs - 2)
-          .fill({ color: hexToN(S.board[r][c]), alpha: 0.9 });
+        _drawCell(g, c, r, S.board[r][c]);
       }
     }
   }
@@ -175,7 +239,6 @@ export function drawBoardPixi(visX, visY, getGhostY) {
       }
       const lx = (visX + minCol) * cs, rx = (visX + maxCol + 1) * cs;
       const y0 = (visY + S.current.shape.length) * cs, y1 = ghostY * cs;
-      // Dashed lines via short segments
       const dashLen = 4, gapLen = 4;
       for (let y = y0; y > y1; y -= dashLen + gapLen) {
         const seg = Math.min(dashLen, y - y1);
@@ -200,16 +263,13 @@ export function drawBoardPixi(visX, visY, getGhostY) {
         .fill({ color: pc, alpha: 0.75 });
     }
 
-    // Current piece cells
+    // Current piece — stronger glow (glowScale 1.5)
     for (let row = 0; row < S.current.shape.length; row++) {
       for (let col = 0; col < S.current.shape[row].length; col++) {
         if (!S.current.shape[row][col]) continue;
-        g.rect((visX + col) * cs + 1, (visY + row) * cs + 1, cs - 2, cs - 2)
-          .fill({ color: pc, alpha: 0.9 });
+        _drawCell(g, visX + col, visY + row, S.current.color, 1, 1.5);
       }
     }
-
-    // Border color sync (callers update gc.style directly; PixiJS canvas has same id)
   }
 
   // ── Overlay effects ──────────────────────────────────────────────────────────
