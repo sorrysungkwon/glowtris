@@ -68,22 +68,42 @@ const _n=s=>440*Math.pow(2,s/12);
 
 // ── NORMAL BGM (MARATHON): Minecraft-like Ambient (Sparse, Slow, C Major/Am) ───────────────
 const BGM_MELODY=[
-  _n(3), null, null, null,  null, null, _n(7), null,  _n(12), null, null, null,  null, null, null, null,
-  _n(10), null, null, null, null, null, _n(3), null,  _n(5), null, null, null,   null, null, null, null,
-  _n(0), null, null, null,  null, null, _n(3), null,  _n(7), null, null, null,   null, null, null, null,
-  _n(5), null, null, null,  null, null, _n(2), null,  _n(-2), null, null, null,  null, null, null, null,
+  // Bar 1 (C Major)
+  _n(3), null, null, null,  null, null, _n(10), null,  _n(7), null, null, null,  null, null, null, null,
+  // Bar 2 (F Major)
+  _n(8), null, null, null,  null, null, _n(3), null,  _n(0), null, null, null,  null, null, null, null,
+  // Bar 3 (G Major)
+  _n(10), null, null, null,  null, null, _n(5), null,  _n(2), null, null, null,  null, null, null, null,
+  // Bar 4 (C Major)
+  _n(7), null, null, null,  null, null, _n(-2), null,  _n(3), null, null, null,  null, null, null, null,
+  // Bar 5 (C Major higher)
+  _n(15), null, null, null,  null, null, _n(10), null,  _n(7), null, null, null,  null, null, null, null,
+  // Bar 6 (F Major)
+  _n(12), null, null, null,  null, null, _n(8), null,  _n(3), null, null, null,  null, null, null, null,
+  // Bar 7 (G Major)
+  _n(14), null, null, null,  null, null, _n(10), null,  _n(5), null, null, null,  null, null, null, null,
+  // Bar 8 (C Major)
+  _n(15), null, null, null,  _n(7), null, null, null,  _n(10), null, null, null,  _n(3), null, null, null,
 ];
 const BGM_HARMONY=[
   _n(-5), null, null, null, null, null, null, null,   _n(0), null, null, null, null, null, null, null,
-  _n(-2), null, null, null, null, null, null, null,   _n(3), null, null, null, null, null, null, null,
-  _n(-9), null, null, null, null, null, null, null,   _n(-5), null, null, null, null, null, null, null,
+  _n(-4), null, null, null, null, null, null, null,   _n(0), null, null, null, null, null, null, null,
   _n(-7), null, null, null, null, null, null, null,   _n(-2), null, null, null, null, null, null, null,
+  _n(-9), null, null, null, null, null, null, null,   _n(-5), null, null, null, null, null, null, null,
+  _n(-5), null, null, null, null, null, null, null,   _n(3), null, null, null, null, null, null, null,
+  _n(-4), null, null, null, null, null, null, null,   _n(3), null, null, null, null, null, null, null,
+  _n(-2), null, null, null, null, null, null, null,   _n(5), null, null, null, null, null, null, null,
+  _n(-5), null, null, null, null, null, null, null,   _n(0), null, null, null, null, null, null, null,
 ];
 const BGM_BASS_WALK=[
-  _n(-17)/4, _n(-17)/4, _n(-17)/4, _n(-17)/4,
+  _n(-21)/4, _n(-21)/4, _n(-21)/4, _n(-21)/4,
+  _n(-16)/4, _n(-16)/4, _n(-16)/4, _n(-16)/4,
   _n(-14)/4, _n(-14)/4, _n(-14)/4, _n(-14)/4,
   _n(-21)/4, _n(-21)/4, _n(-21)/4, _n(-21)/4,
-  _n(-19)/4, _n(-19)/4, _n(-19)/4, _n(-19)/4,
+  _n(-21)/4, _n(-21)/4, _n(-21)/4, _n(-21)/4,
+  _n(-16)/4, _n(-16)/4, _n(-16)/4, _n(-16)/4,
+  _n(-14)/4, _n(-14)/4, _n(-14)/4, _n(-14)/4,
+  _n(-21)/4, _n(-21)/4, _n(-21)/4, _n(-21)/4,
 ];
 const BGM_DRUM_PAT=[0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
 
