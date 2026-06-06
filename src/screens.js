@@ -452,8 +452,8 @@ export function showModeSelector(){
           <div class="mode-arrow">›</div>
         </div>
 
-        <!-- TIME ATTACK GROUP — Coming Soon -->
-        <div class="mode-group-label">⏳ TIME ATTACK <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <!-- SPEED RUN GROUP — Coming Soon -->
+        <div class="mode-group-label">⏳ SPEED RUN <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
         <div class="mode-group">
           <!-- BLITZ -->
           <div class="mode-card blitz mode-coming-soon" tabindex="-1">
