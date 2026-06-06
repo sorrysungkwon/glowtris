@@ -321,8 +321,8 @@ export function drawBackground(dtFactor = 1) {
         x: Math.random() * bgc.width, 
         y: Math.random() * bgc.height, 
         speed: Math.random() * 1.5 + 0.5,
-        size: Math.floor(Math.random() * 2 + 2),
-        op: Math.random() * 0.06 + 0.02
+        size: Math.floor(Math.random() * 4 + 3),
+        op: Math.random() * 0.1 + 0.05
       }));
     }
     for (const d of _matrixDrops) {

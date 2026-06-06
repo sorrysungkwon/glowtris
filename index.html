@@ -704,17 +704,17 @@
   }
   
   #daily-challenge-btn, #daily-launch-btn {
-    background: linear-gradient(90deg, #ffe600, #ffaa00);
-    box-shadow: 0 0 25px rgba(255, 170, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
-    border-color: #ffe600;
-    color: #000;
+    background: linear-gradient(90deg, #ff7700, #ff3300);
+    box-shadow: 0 0 25px rgba(255, 51, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
+    border-color: #ff7700;
+    color: #fff;
     font-weight: 900;
-    text-shadow: none;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
   }
   #daily-challenge-btn:hover, #daily-launch-btn:hover {
     border-color: #fff;
-    box-shadow: 0 0 40px rgba(255, 230, 0, 1), 0 0 15px rgba(255, 170, 0, 0.8), inset 0 0 15px rgba(255,255,255,0.8);
-    color: #000;
+    box-shadow: 0 0 40px rgba(255, 119, 0, 1), 0 0 15px rgba(255, 51, 0, 0.8), inset 0 0 15px rgba(255,255,255,0.8);
+    color: #fff;
     transform: scale(1.1);
   }
 
@@ -1248,18 +1248,18 @@
   }
   .mode-card.sprint:hover .mode-arrow { color: #00ff88; }
 
-  /* Daily Challenge Theme (Gold/Amber) */
+  /* Daily Challenge Theme (Orange) */
   .mode-card.daily {
-    border-color: rgba(255, 230, 0, 0.22);
-    background: rgba(255, 230, 0, 0.03);
+    border-color: rgba(255, 119, 0, 0.22);
+    background: rgba(255, 119, 0, 0.03);
   }
-  .mode-card.daily .mode-name { color: #ffe600; text-shadow: 0 0 8px rgba(255, 230, 0, 0.3); }
+  .mode-card.daily .mode-name { color: #ff7700; text-shadow: 0 0 8px rgba(255, 119, 0, 0.3); }
   .mode-card.daily:hover {
-    border-color: rgba(255, 230, 0, 0.55);
-    background: rgba(255, 230, 0, 0.1);
-    box-shadow: 0 4px 20px rgba(255, 230, 0, 0.15), 0 0 10px rgba(255, 230, 0, 0.05);
+    border-color: rgba(255, 119, 0, 0.55);
+    background: rgba(255, 119, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(255, 119, 0, 0.15), 0 0 10px rgba(255, 119, 0, 0.05);
   }
-  .mode-card.daily:hover .mode-arrow { color: #ffe600; }
+  .mode-card.daily:hover .mode-arrow { color: #ff7700; }
 
   /* --- Pause / Game Over Elements Polish --- */
   .glass-panel .pause-header,
@@ -1302,8 +1302,8 @@
   /* --- Daily Challenge Overlay Polish --- */
   .daily-header {
     font-size: 18px !important; margin-bottom: 14px !important;
-    color: #ffe600 !important; text-shadow: 0 0 10px #ffe600, 0 0 20px rgba(255,230,0,0.2) !important;
-    background: none !important; -webkit-text-fill-color: #ffe600 !important;
+    color: #ff7700 !important; text-shadow: 0 0 10px #ff7700, 0 0 20px rgba(255,119,0,0.2) !important;
+    background: none !important; -webkit-text-fill-color: #ff7700 !important;
     animation: pulse 2s ease-in-out infinite !important;
     letter-spacing: 2px !important;
   }
@@ -3376,8 +3376,8 @@ if ('serviceWorker' in navigator) {
           x: Math.random() * bgc.width,
           y: Math.random() * bgc.height,
           speed: Math.random() * 1.5 + 0.5,
-          size: Math.floor(Math.random() * 2 + 2),
-          op: Math.random() * 0.06 + 0.02
+          size: Math.floor(Math.random() * 4 + 3),
+          op: Math.random() * 0.1 + 0.05
         }));
       }
       for (const d of _matrixDrops) {
@@ -4859,7 +4859,7 @@ if ('serviceWorker' in navigator) {
       <div class="daily-subtitle">SAME BLOCKS FOR EVERYONE!</div>
 
       <div class="briefing-card">
-        <p style="color:#ffe600;font-weight:900;letter-spacing:1px">[WELCOME TO THE DAILY MISSION!]</p>
+        <p style="color:#ff7700;font-weight:900;letter-spacing:1px">[WELCOME TO THE DAILY MISSION!]</p>
         <p>Today, every player in the whole world will get the <strong>exact same blocks</strong> in the same order!</p>
         <p style="color:var(--cyan)">Luck doesn't matter today! Only your real skills will make you number one on the leaderboard.</p>
       </div>
@@ -5520,7 +5520,7 @@ ${cta}`;
           myScore: S.score
         };
         const rankMsg = `
-        <div class="sub" style="color:#ffe600;margin-bottom:2px">TODAY: #${data.challengeRank}</div>
+        <div class="sub" style="color:#ff7700;margin-bottom:2px">TODAY: #${data.challengeRank}</div>
         <div class="sub" style="color:#00c8ff;margin-bottom:6px">ALL TIME: #${data.challengeAlltimeRank}</div>`;
         inp.style.display = "none";
         btn.closest(".btn-row").style.display = "none";
@@ -5634,7 +5634,7 @@ ${cta}`;
     ctx.strokeRect(px, py, pw, ph);
     ctx.textAlign = "center";
     if (isDaily) {
-      ctx.fillStyle = "#ffe600";
+      ctx.fillStyle = "#ff7700";
       ctx.font = "900 52px Orbitron, monospace";
       ctx.shadowColor = "rgba(255,230,0,0.6)";
       ctx.shadowBlur = 20;
@@ -5663,8 +5663,8 @@ ${cta}`;
     ctx.letterSpacing = "6px";
     ctx.fillText("FINAL SCORE", px + pw / 2, py + 210);
     ctx.font = "900 70px Orbitron, monospace";
-    ctx.fillStyle = "#ffe600";
-    ctx.shadowColor = "#ffe600";
+    ctx.fillStyle = isDaily ? "#ff7700" : "#ffe600";
+    ctx.shadowColor = isDaily ? "#ff7700" : "#ffe600";
     ctx.shadowBlur = 25;
     ctx.letterSpacing = "2px";
     ctx.fillText(sc.toLocaleString(), px + pw / 2, py + 290);
