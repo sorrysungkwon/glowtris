@@ -83,6 +83,10 @@ function _snoozed() {
 export function initPWA() {
   _initOfflineIndicator();
 
+  if ('Notification' in window && Notification.permission === 'granted') {
+    _registerPushSub();
+  }
+
   if (_installed()) {
     setTimeout(_askNotif, 1500); // Ask for push notifs when launched from home screen
     return;
