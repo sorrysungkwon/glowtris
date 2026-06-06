@@ -1486,7 +1486,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   font-weight: 700;
   letter-spacing: 1.5px;
   color: rgba(0, 255, 136, 0.9);
-  max-width: calc(100vw - 32px);
+  width: calc(100vw - 32px);
   box-sizing: border-box;
   pointer-events: none;
   opacity: 0;
@@ -1497,9 +1497,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   word-break: break-word;
   overflow-wrap: break-word;
   text-align: center;
-  line-height: 1.5;
-  max-height: 3em;
-  overflow: hidden;
+  flex: 1;
 }
 #pwa-toast.visible {
   opacity: 1;
