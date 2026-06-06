@@ -1,7 +1,7 @@
 const LS_INSTALLED    = 'pwa-installed';
 const LS_SNOOZE_UNTIL = 'pwa-snooze-until';
 const SNOOZE_DAYS     = 3;
-const VAPID_PUBLIC_KEY = 'BLSkoa8yLux4CiJca6N7BDgdDiuT5Kr-GSLULC3eB25aJ9tjI1k3lR5eI-ocXbailXn3a1ABP2LF18ssIMQ3200';
+const VAPID_PUBLIC_KEY = '<VAPID_PUBLIC_KEY>';
 
 function _urlBase64ToUint8Array(b64) {
   const pad = '='.repeat((4 - b64.length % 4) % 4);
