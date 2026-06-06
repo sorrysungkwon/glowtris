@@ -720,12 +720,20 @@ makeTouchBtn('btn-pause', ()=>togglePause(),'any');
 
 // ─── Game loop ────────────────────────────────────────────────────────────────
 // RAF drives rendering; logic advances on a fixed 1ms tick inside tickLoop.
+let lastFrameTs = 0;
 function gameLoop(ts){
+  if (!lastFrameTs) lastFrameTs = ts;
+  const dt = ts - lastFrameTs;
+  lastFrameTs = ts;
+  const dtFactor = Math.min(dt / 16.666, 3); // 1.0 at 60Hz, 0.41 at 144Hz. Cap at 3 for lag spikes.
+
   measureFPS(ts);
   tickLoop(ts, { onInput: processInput, onTick: gameTick });
-  drawBackground();
+  drawBackground(dtFactor);
   if(S.isSprintMode&&S.gameRunning&&!S.gamePaused&&!S._countdownVal)updateSprintTimer();
-  drawBoard();updateParticles();applyShake();
+  drawBoard(dtFactor);
+  updateParticles(dtFactor);
+  applyShake(dtFactor);
   animFrame=requestAnimationFrame(gameLoop);
 }
 

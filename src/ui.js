@@ -292,8 +292,8 @@ export function initStars() {
   ];
 }
 
-export function drawBackground() {
-  bgHue = (bgHue + 0.05) % 360;
+export function drawBackground(dtFactor = 1) {
+  bgHue = (bgHue + 0.05 * dtFactor) % 360;
   if (S.lowPerfMode) {
     if (S.isDailyMode) {
       if (!_lpChBgCache || _lpChBgCache.width !== bgc.width) _lpChBgCache = _buildLowPerfBg(bgc.width, bgc.height, true);
@@ -305,18 +305,18 @@ export function drawBackground() {
     return;
   }
   _bgFrameCount++;
-  if (S.isDailyMode) { _drawChallengeBg(); return; }
+  if (S.isDailyMode) { _drawChallengeBg(dtFactor); return; }
 
   bgx.fillStyle = 'rgba(0,0,8,0.18)'; bgx.fillRect(0, 0, bgc.width, bgc.height);
 
   for (const neb of nebulae) {
-    neb.x += neb.vx; neb.y += neb.vy;
+    neb.x += neb.vx * dtFactor; neb.y += neb.vy * dtFactor;
     if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
     if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
-    neb.hue = (neb.hue + 0.02) % 360;
+    neb.hue = (neb.hue + 0.02 * dtFactor) % 360;
   }
 
-  if (_bgFrameCount % BG_GRAD_INTERVAL === 0) {
+  if (_bgFrameCount % Math.max(1, Math.floor(BG_GRAD_INTERVAL / dtFactor)) === 0) {
     if (!_bgGradCache || _bgGradCache.width !== bgc.width || _bgGradCache.height !== bgc.height) {
       _bgGradCache = document.createElement('canvas');
       _bgGradCache.width = bgc.width; _bgGradCache.height = bgc.height;
@@ -344,31 +344,31 @@ export function drawBackground() {
   bgx.fillStyle = 'rgba(180,220,255,0.5)';
   bgx.beginPath();
   for (const s of stars) {
-    s.y += s.speed; if (s.y > bgc.height) { s.y = 0; s.x = Math.random() * bgc.width; }
+    s.y += s.speed * dtFactor; if (s.y > bgc.height) { s.y = 0; s.x = Math.random() * bgc.width; }
     bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2);
   }
   bgx.fill();
 }
 
-function _drawChallengeBg() {
-  _cBgPulse = (_cBgPulse + 0.022) % (Math.PI*2);
+function _drawChallengeBg(dtFactor = 1) {
+  _cBgPulse = (_cBgPulse + 0.022 * dtFactor) % (Math.PI*2);
   const W = bgc.width, H = bgc.height;
 
   bgx.fillStyle = 'rgba(10,0,3,0.22)';
   bgx.fillRect(0, 0, W, H);
 
   for (const neb of nebulae) {
-    neb.x += neb.vx*1.7; neb.y += neb.vy*1.7;
+    neb.x += neb.vx*1.7 * dtFactor; neb.y += neb.vy*1.7 * dtFactor;
     if (neb.x - neb.r < 0 || neb.x + neb.r > W) neb.vx *= -1;
     if (neb.y - neb.r < 0 || neb.y + neb.r > H) neb.vy *= -1;
-    neb.hue = (neb.hue + 0.06) % 55;
+    neb.hue = (neb.hue + 0.06 * dtFactor) % 55;
   }
   for (const s of stars) {
-    s.y += s.speed*2.8; s.x += s.vx*2.8;
+    s.y += s.speed*2.8 * dtFactor; s.x += s.vx*2.8 * dtFactor;
     if (s.y > H || s.x > W) { s.y = Math.random()*H*0.4; s.x = Math.random()*W*0.6; }
   }
 
-  if (_bgFrameCount % BG_GRAD_INTERVAL === 0) {
+  if (_bgFrameCount % Math.max(1, Math.floor(BG_GRAD_INTERVAL / dtFactor)) === 0) {
     if (!_chGradCache || _chGradCache.width !== W || _chGradCache.height !== H) {
       _chGradCache = document.createElement('canvas');
       _chGradCache.width = W; _chGradCache.height = H;
@@ -522,7 +522,7 @@ let visX = null;
 let visY = null;
 let _lastPieceRef = null;
 
-export function drawBoard() {
+export function drawBoard(dtFactor = 1) {
   const W = COLS*S.CELL, H = ROWS*S.CELL;
   gctx.clearRect(0, 0, W, H);
   gctx.globalAlpha = 1;
@@ -563,8 +563,9 @@ export function drawBoard() {
       visX = S.current.x;
       visY = S.current.y;
     } else {
-      visX += (S.current.x - visX) * 0.45;
-      visY += (S.current.y - visY) * 0.45;
+      const ease = 1 - Math.pow(0.55, dtFactor);
+      visX += (S.current.x - visX) * ease;
+      visY += (S.current.y - visY) * ease;
     }
 
     const ghostY = _getGhostY();
@@ -895,12 +896,12 @@ export function spawnDropTrail(current) {
   S.particles.push({ x:cx, y:cy, vx:(Math.random()-.5)*0.4, vy:-0.3-Math.random()*0.3, life:1, decay:0.08, color:current.color, size:Math.random()*1.5+0.6, type:'spark' });
 }
 
-export function updateParticles() {
+export function updateParticles(dtFactor = 1) {
   pctx.clearRect(0, 0, pc.width, pc.height);
   S.particles = S.particles.filter(p => p.life > 0);
   for (const p of S.particles) {
     if (p.type === 'text') {
-      p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+      p.x += p.vx * dtFactor; p.y += p.vy * dtFactor; p.life -= p.decay * dtFactor;
       pctx.save(); pctx.globalAlpha = Math.max(0, p.life);
       pctx.font = `900 ${p.size}px Orbitron, monospace`;
       pctx.textAlign = 'center';
@@ -909,7 +910,7 @@ export function updateParticles() {
       continue;
     }
     if (p.type === 'ring' || p.type === 'radial-ring') {
-      p.life -= p.decay;
+      p.life -= p.decay * dtFactor;
       if (S.lowPerfMode) { continue; }
       pctx.save(); pctx.globalAlpha = Math.max(0, p.life);
       pctx.strokeStyle = p.color; pctx.lineWidth = p.size*p.life;
@@ -921,8 +922,10 @@ export function updateParticles() {
       pctx.stroke(); pctx.restore();
       continue;
     }
-    p.vx *= 0.94; p.vy += 0.15;
-    p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+    // Damping applied over dtFactor (approximated for small dt)
+    p.vx *= Math.pow(0.94, dtFactor); 
+    p.vy += 0.15 * dtFactor;
+    p.x += p.vx * dtFactor; p.y += p.vy * dtFactor; p.life -= p.decay * dtFactor;
     pctx.save(); pctx.globalAlpha = Math.max(0, p.life);
     const {r,g,b} = hexToRgb(p.color);
     if (p.type === 'star') {
@@ -977,7 +980,7 @@ export function spawnHardDropParticles(current) {
   }
 }
 
-export function applyShake() {
+export function applyShake(dtFactor = 1) {
   if (S.animIntensity !== 'full' || S.lowPerfMode) {
     if (!_nudgeActive) $app.style.transform = '';
     S.shakeFrames = 0; S.shakeAllDir = false; return;
@@ -987,8 +990,8 @@ export function applyShake() {
     const x = (Math.random()-.5)*m;
     const y = S.shakeAllDir ? (Math.random()-.5)*m : 0;
     $app.style.transform = `translate(${x}px,${y}px)`;
-    S.shakeFrames--;
-    if (!S.shakeFrames) { S.shakeMag = 0.4; S.shakeAllDir = false; }
+    S.shakeFrames -= 1 * dtFactor;
+    if (S.shakeFrames <= 0) { S.shakeFrames = 0; S.shakeMag = 0.4; S.shakeAllDir = false; }
   } else if (!_nudgeActive) {
     $app.style.transform = '';
   }
