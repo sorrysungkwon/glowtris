@@ -1271,6 +1271,19 @@
   }
   .mode-group .mode-card {
     margin: 0;
+    padding: 9px 12px;
+    gap: 10px;
+  }
+  .mode-group .mode-card .mode-icon {
+    font-size: 22px;
+  }
+  .mode-group .mode-card .mode-desc {
+    font-size: 8.5px;
+    line-height: 1.35;
+  }
+  .mode-group .mode-card .mode-name {
+    font-size: 11px;
+    margin-bottom: 2px;
   }
 
   /* --- Pause / Game Over Elements Polish --- */
