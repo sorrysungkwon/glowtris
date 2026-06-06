@@ -272,7 +272,6 @@ function _buildLowPerfBg(W, H, isChallenge) {
   c.fillStyle = bg; c.fillRect(0, 0, W, H);
   return oc;
 }
-
 export function initStars() {
   _lpBgCache   = null; _lpChBgCache = null;
   _staticBgCache = null; _staticChEdgeCache = null; _staticChCoreCache = null;
@@ -289,28 +288,16 @@ export function initStars() {
     { x: w*0.75, y: h*0.6,  r: Math.min(w,h)*0.55, vx: -0.1,  vy: -0.12, hue: 280 },
     { x: w*0.5,  y: h*0.45, r: Math.min(w,h)*0.35, vx:  0.07, vy: -0.07, hue: 330 },
   ];
-  for (const neb of nebulae) {
-    const size = neb.r * 2;
-    neb.cn = document.createElement('canvas'); neb.cn.width = size; neb.cn.height = size;
-    const ctxN = neb.cn.getContext('2d');
-    const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
-    grN.addColorStop(0,   `hsla(${neb.hue},95%,35%,0.12)`);
-    grN.addColorStop(0.5, `hsla(${(neb.hue+40)%360},90%,20%,0.06)`);
-    grN.addColorStop(1,   'transparent');
-    ctxN.fillStyle = grN; ctxN.fillRect(0, 0, size, size);
+}
 
-    neb.cc = document.createElement('canvas'); neb.cc.width = size; neb.cc.height = size;
-    const ctxC = neb.cc.getContext('2d');
-    const grC = ctxC.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
-    grC.addColorStop(0,   `hsla(${neb.hue%55},100%,28%,0.07)`);
-    grC.addColorStop(0.5, `hsla(${(neb.hue+18)%55},90%,16%,0.03)`);
-    grC.addColorStop(1,   'transparent');
-    ctxC.fillStyle = grC; ctxC.fillRect(0, 0, size, size);
-  }
+function getBgTheme() {
+  if (S.isDailyMode) return { m: 'daily', bg: 'rgba(10,0,3,0.22)', hueBase: 10,  core: 'rgba(220,80,0,0.04)', core2: 'rgba(160,20,0,0.025)', edge: 'rgba(160,0,10,1)', glow: true, speed: 1.7 };
+  if (S.isBlitzMode) return { m: 'blitz', bg: 'rgba(8,0,8,0.18)',  hueBase: 280, core: 'rgba(220,0,220,0.04)', core2: 'rgba(160,0,160,0.025)', edge: 'rgba(160,0,160,1)', glow: true, speed: 1.5 };
+  if (S.isSprintMode)return { m: 'sprint', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
+  return { m: 'marathon', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
 }
 
 export function drawBackground(dtFactor = 1) {
-  bgHue = (bgHue + 0.05 * dtFactor) % 360;
   if (S.lowPerfMode) {
     if (S.isDailyMode) {
       if (!_lpChBgCache || _lpChBgCache.width !== bgc.width) _lpChBgCache = _buildLowPerfBg(bgc.width, bgc.height, true);
@@ -321,84 +308,91 @@ export function drawBackground(dtFactor = 1) {
     }
     return;
   }
-  bgx.fillStyle = 'rgba(0,0,8,0.18)'; bgx.fillRect(0, 0, bgc.width, bgc.height);
+  
+  const th = getBgTheme();
+  _cBgPulse = (_cBgPulse + 0.022 * dtFactor * th.speed) % (Math.PI*2);
+  bgx.fillStyle = th.bg; bgx.fillRect(0, 0, bgc.width, bgc.height);
 
   for (const neb of nebulae) {
-    neb.x += neb.vx * dtFactor; neb.y += neb.vy * dtFactor;
+    neb.x += neb.vx * th.speed * dtFactor; neb.y += neb.vy * th.speed * dtFactor;
     if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
     if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
-    bgx.drawImage(neb.cn, neb.x - neb.r, neb.y - neb.r);
+    
+    if (!neb.c) neb.c = {};
+    if (!neb.c[th.m]) {
+      const size = neb.r * 2;
+      const cn = document.createElement('canvas'); cn.width = size; cn.height = size;
+      const ctxN = cn.getContext('2d');
+      const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
+      const h = th.hueBase + neb.hue % 50;
+      grN.addColorStop(0,   `hsla(${h},95%,35%,0.12)`);
+      grN.addColorStop(0.5, `hsla(${(h+40)%360},90%,20%,0.06)`);
+      grN.addColorStop(1,   'transparent');
+      ctxN.fillStyle = grN; ctxN.fillRect(0, 0, size, size);
+      neb.c[th.m] = cn;
+    }
+    bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
   }
-  
-  if (!_staticBgCache || _staticBgCache.width !== bgc.width || _staticBgCache.height !== bgc.height) {
-    _staticBgCache = document.createElement('canvas');
-    _staticBgCache.width = bgc.width; _staticBgCache.height = bgc.height;
-    const sCtx = _staticBgCache.getContext('2d');
-    const gr2 = sCtx.createRadialGradient(bgc.width/2, bgc.height/2, 0, bgc.width/2, bgc.height/2, bgc.width*0.7);
-    gr2.addColorStop(0,   `hsla(${bgHue},80%,10%,0.02)`);
-    gr2.addColorStop(0.5, `hsla(${(bgHue+60)%360},80%,5%,0.015)`);
-    gr2.addColorStop(1,   'transparent');
-    sCtx.fillStyle = gr2; sCtx.fillRect(0, 0, bgc.width, bgc.height);
-  }
-
-  bgx.drawImage(_staticBgCache, 0, 0);
 
   bgx.fillStyle = 'rgba(180,220,255,0.5)';
-  bgx.beginPath();
   for (const s of stars) {
-    s.y += s.speed * dtFactor; if (s.y > bgc.height) { s.y = 0; s.x = Math.random() * bgc.width; }
-    bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-  }
-  bgx.fill();
-}
-
-function _drawChallengeBg(dtFactor = 1) {
-  _cBgPulse = (_cBgPulse + 0.022 * dtFactor) % (Math.PI*2);
-  const W = bgc.width, H = bgc.height;
-
-  bgx.fillStyle = 'rgba(10,0,3,0.22)';
-  bgx.fillRect(0, 0, W, H);
-
-  for (const neb of nebulae) {
-    neb.x += neb.vx*1.7 * dtFactor; neb.y += neb.vy*1.7 * dtFactor;
-    if (neb.x - neb.r < 0 || neb.x + neb.r > W) neb.vx *= -1;
-    if (neb.y - neb.r < 0 || neb.y + neb.r > H) neb.vy *= -1;
-    bgx.drawImage(neb.cc, neb.x - neb.r, neb.y - neb.r);
-  }
-  for (const s of stars) {
-    s.y += s.speed*2.8 * dtFactor; s.x += s.vx*2.8 * dtFactor;
-    if (s.y > H || s.x > W) { s.y = Math.random()*H*0.4; s.x = Math.random()*W*0.6; }
-    const tLen = s.speed * 22;
-    const tg = bgx.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
-    tg.addColorStop(0, 'transparent');
-    tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
-    bgx.strokeStyle = tg; bgx.lineWidth = s.r*0.9;
-    bgx.beginPath(); bgx.moveTo(s.x-s.vx*22, s.y-tLen); bgx.lineTo(s.x, s.y); bgx.stroke();
+    s.y += s.speed * (th.glow?2.8:1.0) * dtFactor; 
+    s.x += s.vx * (th.glow?2.8:1.0) * dtFactor;
+    if (s.y > bgc.height || s.x > bgc.width) { s.y = Math.random()*bgc.height*0.4; s.x = Math.random()*bgc.width*0.6; }
+    
+    if (th.glow) {
+      const tLen = s.speed * 22;
+      const tg = bgx.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
+      tg.addColorStop(0, 'transparent');
+      tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
+      bgx.strokeStyle = tg; bgx.lineWidth = s.r*0.9;
+      bgx.beginPath(); bgx.moveTo(s.x-s.vx*22, s.y-tLen); bgx.lineTo(s.x, s.y); bgx.stroke();
+    } else {
+      bgx.beginPath(); bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2); bgx.fill();
+    }
   }
 
-  if (!_staticChCoreCache || _staticChCoreCache.width !== W || _staticChCoreCache.height !== H) {
-    _staticChCoreCache = document.createElement('canvas'); _staticChCoreCache.width = W; _staticChCoreCache.height = H;
-    const cCtx = _staticChCoreCache.getContext('2d');
-    const coreY = H*0.82;
-    const cg2 = cCtx.createRadialGradient(W/2, coreY, 0, W/2, coreY, W*0.55);
-    cg2.addColorStop(0,   `rgba(220,80,0,0.04)`);
-    cg2.addColorStop(0.4, `rgba(160,20,0,0.025)`);
+  if (!_staticBgCache || _staticBgCache.width !== bgc.width || _staticBgCache.height !== bgc.height || _staticBgCache.mode !== th.m) {
+    _staticBgCache = document.createElement('canvas'); _staticBgCache.width = bgc.width; _staticBgCache.height = bgc.height;
+    _staticBgCache.mode = th.m;
+    const sCtx = _staticBgCache.getContext('2d');
+    
+    const coreY = th.glow ? bgc.height*0.82 : bgc.height*0.5;
+    const cg2 = sCtx.createRadialGradient(bgc.width/2, coreY, 0, bgc.width/2, coreY, bgc.width*(th.glow?0.55:0.7));
+    cg2.addColorStop(0,   th.core);
+    cg2.addColorStop(th.glow?0.4:0.5, th.core2);
     cg2.addColorStop(1,   'transparent');
-    cCtx.fillStyle = cg2; cCtx.fillRect(0, 0, W, H);
-  }
+    sCtx.fillStyle = cg2; sCtx.fillRect(0, 0, bgc.width, bgc.height);
 
+    if (th.edge) {
+      _staticChEdgeCache = document.createElement('canvas'); _staticChEdgeCache.width = bgc.width; _staticChEdgeCache.height = bgc.height;
+      const eCtx = _staticChEdgeCache.getContext('2d');
+      const vTop = eCtx.createLinearGradient(0,0,0,bgc.height*0.14); vTop.addColorStop(0, th.edge); vTop.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vTop; eCtx.fillRect(0, 0, bgc.width, bgc.height*0.14);
+      const vBot = eCtx.createLinearGradient(0,bgc.height,0,bgc.height*0.86); vBot.addColorStop(0, th.edge); vBot.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vBot; eCtx.fillRect(0, bgc.height*0.86, bgc.width, bgc.height*0.14);
+      const vLft = eCtx.createLinearGradient(0,0,bgc.width*0.10,0); vLft.addColorStop(0, th.edge); vLft.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vLft; eCtx.fillRect(0, 0, bgc.width*0.10, bgc.height);
+      const vRgt = eCtx.createLinearGradient(bgc.width,0,bgc.width*0.90,0); vRgt.addColorStop(0, th.edge); vRgt.addColorStop(1, 'transparent');
+      eCtx.fillStyle = vRgt; eCtx.fillRect(bgc.width*0.90, 0, bgc.width*0.10, bgc.height);
+    } else {
+      _staticChEdgeCache = null;
+    }
+  }
 
   bgx.save();
-  bgx.globalAlpha = 0.5 + Math.sin(_cBgPulse)*0.5;
-  bgx.drawImage(_staticChCoreCache, 0, 0);
-  bgx.restore();
-
-  if (!S.lowPerfMode) {
-    const vA = 0.03 + Math.sin(_cBgPulse)*0.015;
-    bgx.strokeStyle = `rgba(160,0,10,${vA})`;
-    bgx.lineWidth = 15;
-    bgx.strokeRect(0, 0, W, H);
+  if (th.glow) {
+    bgx.globalAlpha = 0.5 + Math.sin(_cBgPulse)*0.5;
+    bgx.drawImage(_staticBgCache, 0, 0);
+    if (_staticChEdgeCache) {
+      bgx.globalAlpha = 0.07 + Math.sin(_cBgPulse)*0.02;
+      bgx.drawImage(_staticChEdgeCache, 0, 0);
+    }
+  } else {
+    bgx.globalAlpha = 0.8 + Math.sin(_cBgPulse)*0.2;
+    bgx.drawImage(_staticBgCache, 0, 0);
   }
+  bgx.restore();
 }
 
 // ─── Drawing helpers ──────────────────────────────────────────────────────────

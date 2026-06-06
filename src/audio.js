@@ -126,6 +126,36 @@ const CHALLENGE_BASS_WALK=[
 // 5=kick+hihat, 6=snare+hihat, 4=hihat only
 const CHALLENGE_DRUM_PAT=[5,4,5,4, 6,4,5,4, 5,5,4,4, 6,4,5,6];
 
+// ── SPRINT BGM: Driving Bassline (150+ BPM) ──────────────
+const SPRINT_MELODY=[
+  _n(12),_n(7),_n(3),_n(7), _n(12),_n(7),_n(3),_n(7), _n(15),_n(10),_n(7),_n(10), _n(15),_n(10),_n(7),_n(10),
+  _n(14),_n(9),_n(5),_n(9), _n(14),_n(9),_n(5),_n(9), _n(12),_n(7),_n(3),_n(7), _n(12),_n(7),_n(3),_n(7),
+];
+const SPRINT_HARMONY=[
+  null,null,_n(0),null, null,null,_n(0),null, null,null,_n(2),null, null,null,_n(2),null,
+  null,null,_n(1),null, null,null,_n(1),null, null,null,_n(0),null, null,null,_n(0),null,
+];
+const SPRINT_BASS_WALK=[
+  _n(0)/4, _n(0)/4, _n(0)/4, _n(0)/4,  _n(2)/4, _n(2)/4, _n(2)/4, _n(2)/4,
+  _n(1)/4, _n(1)/4, _n(1)/4, _n(1)/4,  _n(0)/4, _n(0)/4, _n(-2)/4, _n(-2)/4,
+];
+const SPRINT_DRUM_PAT=[5,4,5,4, 5,4,5,4, 5,4,5,4, 5,4,5,4];
+
+// ── BLITZ/ULTRA BGM: Syncopated Techno (130 BPM) ──────────────
+const BLITZ_MELODY=[
+  null,_n(12),null,null, _n(12),null,_n(15),null, null,_n(15),null,_n(17), null,null,_n(17),null,
+  null,_n(10),null,null, _n(10),null,_n(14),null, null,_n(14),null,_n(12), null,null,_n(12),null,
+];
+const BLITZ_HARMONY=[
+  _n(0),null,_n(3),null, _n(7),null,_n(0),null, _n(3),null,_n(7),null, _n(10),null,_n(7),null,
+  _n(-2),null,_n(2),null, _n(5),null,_n(-2),null, _n(2),null,_n(5),null, _n(8),null,_n(5),null,
+];
+const BLITZ_BASS_WALK=[
+  _n(0)/4, _n(3)/4, _n(7)/4, _n(0)/4, _n(0)/4, _n(3)/4, _n(7)/4, _n(0)/4,
+  _n(-2)/4, _n(2)/4, _n(5)/4, _n(-2)/4, _n(-2)/4, _n(2)/4, _n(5)/4, _n(-2)/4,
+];
+const BLITZ_DRUM_PAT=[1,4,6,4, 1,4,6,4, 1,4,6,4, 1,4,6,4];
+
 // ── Drum synthesis (noise buffer, created lazily per AudioContext) ─────────
 let _drumBuffer=null,_drumBufCtx=null;
 function _getDrumBuf(){
@@ -184,8 +214,11 @@ function bgmScheduleHihat(t){
 }
 
 function getBGMBeat(){
-  const baseBpm=S.isDailyMode?165:135;
-  const bpm=Math.min(210,baseBpm+(S.level||1)*5);
+  let baseBpm = 100;
+  if (S.isSprintMode) baseBpm = 150;
+  else if (S.isBlitzMode) baseBpm = 130;
+  else if (S.isDailyMode) baseBpm = 165;
+  const bpm = Math.min(210, baseBpm + (S.level || 1) * 5);
   return 60/bpm/4;
 }
 
@@ -206,10 +239,16 @@ function bgmScheduleLoop(){
   // Guard: if tab was hidden, audioCtx.currentTime may have jumped far ahead of
   // bgmNextTime — clamp to avoid scheduling a massive backlog of nodes at once.
   if(bgmNextTime < audioCtx.currentTime - 0.2) bgmNextTime=audioCtx.currentTime;
-  const melody=S.isDailyMode?CHALLENGE_MELODY:BGM_MELODY;
-  const harmony=S.isDailyMode?CHALLENGE_HARMONY:BGM_HARMONY;
-  const bassWalk=S.isDailyMode?CHALLENGE_BASS_WALK:BGM_BASS_WALK;
-  const drumPat=S.isDailyMode?CHALLENGE_DRUM_PAT:BGM_DRUM_PAT;
+  
+  let melody = BGM_MELODY, harmony = BGM_HARMONY, bassWalk = BGM_BASS_WALK, drumPat = BGM_DRUM_PAT;
+  if (S.isSprintMode) {
+    melody = SPRINT_MELODY; harmony = SPRINT_HARMONY; bassWalk = SPRINT_BASS_WALK; drumPat = SPRINT_DRUM_PAT;
+  } else if (S.isBlitzMode) {
+    melody = BLITZ_MELODY; harmony = BLITZ_HARMONY; bassWalk = BLITZ_BASS_WALK; drumPat = BLITZ_DRUM_PAT;
+  } else if (S.isDailyMode) {
+    melody = CHALLENGE_MELODY; harmony = CHALLENGE_HARMONY; bassWalk = CHALLENGE_BASS_WALK; drumPat = CHALLENGE_DRUM_PAT;
+  }
+  
   while(bgmNextTime<audioCtx.currentTime+0.5){
     const beat=getBGMBeat();
     const idx=bgmBeat%melody.length;
