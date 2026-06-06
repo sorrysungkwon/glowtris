@@ -1,5 +1,5 @@
 import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime } from './shared.js';
-import { sfxAchievementUnlock, playBeep, toggleMute, applyMuteToGain } from './audio.js';
+import { sfxAchievementUnlock, sfxAllClear, sfxLevelUp, toggleMute, applyMuteToGain } from './audio.js';
 
 // ─── Canvas refs ──────────────────────────────────────────────────────────────
 export const gc   = document.getElementById('game-canvas');
@@ -1129,7 +1129,7 @@ export function triggerAllClearFlash() {
     });
   }
   if (S.animIntensity !== 'off' && !S.lowPerfMode) { S.rainbowBorder = 90; S.shakeFrames = 30; S.shakeMag = 0.9; }
-  [523,659,784,880,1047,1319].forEach((f,i) => playBeep(f,'sawtooth',.22,.35,i*.07));
+  sfxAllClear();
   if (S.animIntensity === 'full' && S.particles.length < MAX_PARTICLES) {
     for (let i = 0; i < 80; i++) {
       const a = Math.random()*Math.PI*2, sp = Math.random()*12+4;
@@ -1205,7 +1205,7 @@ export function triggerLevelUpVisuals() {
     const a = Math.random()*Math.PI*2, sp = Math.random()*11+3;
     S.particles.push({x:(COLS/2)*S.CELL,y:(ROWS/2)*S.CELL,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:0.012,color:PAL[Math.floor(Math.random()*5)],size:Math.random()*8+4,type:'star'});
   }
-  [261,329,392,523,659,784].forEach((f,i) => playBeep(f,'square',0.16,0.22,i*0.05));
+  sfxLevelUp();
   S.levelUpScanline = 0.01;
 }
 
