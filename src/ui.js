@@ -1,9 +1,11 @@
 import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime } from './shared.js';
 import { sfxAchievementUnlock, playBeep, toggleMute, applyMuteToGain } from './audio.js';
+import { initPixiRenderer, drawBoardPixi, resizePixiRenderer, pixiEnabled } from './renderer.js';
 
 // ─── Canvas refs ──────────────────────────────────────────────────────────────
-export const gc   = document.getElementById('game-canvas');
-export const gctx = gc.getContext('2d');
+// gc is `let` so the live binding updates when PixiJS swaps the canvas element.
+export let gc    = document.getElementById('game-canvas');
+export const gctx = gc.getContext('2d'); // Canvas2D context; stays on original canvas as fallback
 export const pc   = document.getElementById('particle-canvas');
 const pctx = pc.getContext('2d');
 // Desktop previews
@@ -167,11 +169,15 @@ export function _applyTouchCELL() {
     hcM.style.width = MINI_W + 'px'; hcM.style.height = MINI_H + 'px';
   }
 
-  if (newCELL === S.CELL && gc.width === gameW && gc.height === gameH) return;
+  if (newCELL === S.CELL && (pixiEnabled ? false : (gc.width === gameW && gc.height === gameH))) return;
 
   S.CELL = newCELL;
   _cellSprites = {};
-  gc.width  = gameW; gc.height = gameH;
+  if (pixiEnabled) {
+    resizePixiRenderer(gameW, gameH);
+  } else {
+    gc.width  = gameW; gc.height = gameH;
+  }
   pc.width  = gameW; pc.height = gameH;
   ncD.width = 4 * newCELL; ncD.height = 9 * newCELL;
   ncD.style.width = (4 * newCELL) + 'px'; ncD.style.height = (9 * newCELL) + 'px';
@@ -191,10 +197,15 @@ export function initLayout() {
   } else {
     if (S.CELL !== 30) { _cellSprites = {}; }
     S.CELL = 30;
-    gc.width  = COLS * S.CELL; gc.height = ROWS * S.CELL;
-    gc.style.width  = (COLS * S.CELL) + 'px'; gc.style.height = (ROWS * S.CELL) + 'px';
-    pc.width  = COLS * S.CELL; pc.height = ROWS * S.CELL;
-    pc.style.width  = (COLS * S.CELL) + 'px'; pc.style.height = (ROWS * S.CELL) + 'px';
+    const gW = COLS * S.CELL, gH = ROWS * S.CELL;
+    if (pixiEnabled) {
+      resizePixiRenderer(gW, gH);
+    } else {
+      gc.width  = gW; gc.height = gH;
+    }
+    gc.style.width  = gW + 'px'; gc.style.height = gH + 'px';
+    pc.width  = gW; pc.height = gH;
+    pc.style.width  = gW + 'px'; pc.style.height = gH + 'px';
     ncD.width = 4 * S.CELL; ncD.height = 9 * S.CELL;
     ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (9 * S.CELL) + 'px';
     hcD.width = 4 * S.CELL; hcD.height = 3 * S.CELL;
@@ -228,7 +239,7 @@ export function _disableKbMode() {
   if (!S._kbMode) return;
   S._kbMode = false;
   document.documentElement.classList.remove('kb-mode');
-  gc.width = 0;
+  if (!pixiEnabled) gc.width = 0; // force clear; not needed in PixiJS mode
   initLayout(); initStars();
   if (S.gameRunning) { drawBoard(); drawNext(); drawHold(); }
 }
@@ -505,6 +516,39 @@ let _lastPieceRef = null;
 
 export function drawBoard() {
   const W = COLS*S.CELL, H = ROWS*S.CELL;
+
+  // ── Lerp for smooth piece motion (shared by both renderers) ─────────────────
+  if (S.gameRunning && !S.gamePaused && S.current) {
+    if (_lastPieceRef !== S.current) { visX = S.current.x; visY = S.current.y; _lastPieceRef = S.current; }
+    if (S.lowPerfMode) { visX = S.current.x; visY = S.current.y; }
+    else { visX += (S.current.x - visX) * 0.45; visY += (S.current.y - visY) * 0.45; }
+  }
+
+  // ── PixiJS path ─────────────────────────────────────────────────────────────
+  if (pixiEnabled) {
+    drawBoardPixi(visX ?? (S.current?.x ?? 0), visY ?? (S.current?.y ?? 0), _getGhostY);
+    // Border color: applied on gc which now IS the PixiJS canvas (same id, live binding)
+    if (S.gameRunning && !S.gamePaused && S.current) {
+      if (_lastBorderColor !== S.current.color) {
+        _lastBorderColor = S.current.color;
+        const {r,g,b} = hexToRgb(S.current.color);
+        gc.style.borderColor = `rgba(${r},${g},${b},0.6)`;
+        gc.style.boxShadow   = S.lowPerfMode ? 'none' : `0 0 25px rgba(${r},${g},${b},0.35), 0 0 60px rgba(${r},${g},${b},0.15)`;
+      }
+    } else {
+      if (_lastBorderColor !== null) {
+        _lastBorderColor = null;
+        gc.style.borderColor = 'rgba(0,200,255,0.35)';
+        gc.style.boxShadow   = S.lowPerfMode ? 'none' : '0 0 36px rgba(0,200,255,0.25), 0 0 70px rgba(0,100,255,0.12)';
+      }
+    }
+    if (S.flashTimer > 0) S.flashTimer--;
+    if (S.comboFlash > 0 && !S.lowPerfMode) S.comboFlash--; else if (S.lowPerfMode) S.comboFlash = 0;
+    if (S.rainbowBorder > 0 && !S.lowPerfMode) S.rainbowBorder--; else if (S.lowPerfMode) S.rainbowBorder = 0;
+    return;
+  }
+
+  // ── Canvas2D path (fallback) ─────────────────────────────────────────────────
   gctx.clearRect(0, 0, W, H);
   gctx.globalAlpha = 1;
   gctx.shadowBlur = 0;
@@ -535,19 +579,6 @@ export function drawBoard() {
   }
 
   if (S.gameRunning && !S.gamePaused && S.current) {
-    if (_lastPieceRef !== S.current) {
-      visX = S.current.x;
-      visY = S.current.y;
-      _lastPieceRef = S.current;
-    }
-    if (S.lowPerfMode) {
-      visX = S.current.x;
-      visY = S.current.y;
-    } else {
-      visX += (S.current.x - visX) * 0.45;
-      visY += (S.current.y - visY) * 0.45;
-    }
-
     const ghostY = _getGhostY();
     if (S.ghostVisible && ghostY !== S.current.y) {
       const {r,g,b} = hexToRgb(S.current.color);
@@ -1293,4 +1324,10 @@ export function hideAchTooltip() {
   tooltip.style.transform = 'translate(-50%,-105%)';
   setTimeout(() => { if (tooltip.style.opacity === '0') tooltip.style.display = 'none'; }, 150);
 }
+
+// ─── PixiJS initialisation (async, fires at startup) ─────────────────────────
+// Runs before the user can start a game; updates gc live binding on success.
+initPixiRenderer(gc).then(newCanvas => {
+  if (newCanvas) gc = newCanvas;
+});
 
