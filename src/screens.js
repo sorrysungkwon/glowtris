@@ -441,28 +441,6 @@ export function showModeSelector(){
           <div class="mode-arrow">›</div>
         </div>
 
-        <!-- BLITZ -->
-        <div class="mode-card blitz" tabindex="0" onclick="startBlitzMode()">
-          <div class="mode-icon">⏱️</div>
-          <div class="mode-info">
-            <div class="mode-name">BLITZ</div>
-            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
-            <div class="mode-best">${parseInt(localStorage.getItem(LS.BLITZ_HI)||'0')>0?`<span style="color:rgba(255,100,0,0.75)">Best: ${parseInt(localStorage.getItem(LS.BLITZ_HI)||'0').toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
-          </div>
-          <div class="mode-arrow">›</div>
-        </div>
-
-        <!-- ULTRA -->
-        <div class="mode-card ultra" tabindex="0" onclick="startUltraMode()">
-          <div class="mode-icon">🌌</div>
-          <div class="mode-info">
-            <div class="mode-name">ULTRA</div>
-            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
-            <div class="mode-best">${parseInt(localStorage.getItem(LS.ULTRA_HI)||'0')>0?`<span style="color:rgba(200,0,255,0.75)">Best: ${parseInt(localStorage.getItem(LS.ULTRA_HI)||'0').toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
-          </div>
-          <div class="mode-arrow">›</div>
-        </div>
-
         <!-- DAILY CHALLENGE -->
         <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
           <div class="mode-icon">🏆</div>
@@ -472,6 +450,24 @@ export function showModeSelector(){
             <div class="mode-best">${dailySub}</div>
           </div>
           <div class="mode-arrow">›</div>
+        </div>
+
+        <!-- BLITZ — Coming Soon -->
+        <div class="mode-card blitz mode-coming-soon" tabindex="-1">
+          <div class="mode-icon">⏱️</div>
+          <div class="mode-info">
+            <div class="mode-name">BLITZ <span class="coming-soon-badge">COMING SOON</span></div>
+            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+          </div>
+        </div>
+
+        <!-- ULTRA — Coming Soon -->
+        <div class="mode-card ultra mode-coming-soon" tabindex="-1">
+          <div class="mode-icon">🌌</div>
+          <div class="mode-info">
+            <div class="mode-name">ULTRA <span class="coming-soon-badge">COMING SOON</span></div>
+            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+          </div>
         </div>
 
       </div>

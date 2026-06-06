@@ -1262,6 +1262,34 @@
   }
   .mode-card.daily:hover .mode-arrow { color: #ff7700; }
 
+  /* --- Coming Soon mode cards --- */
+  .mode-card.mode-coming-soon {
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
+    filter: grayscale(0.4);
+  }
+  .mode-card.mode-coming-soon:hover {
+    transform: none;
+    border-color: inherit;
+    background: inherit;
+    box-shadow: none;
+  }
+  .coming-soon-badge {
+    display: inline-block;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 2px 6px;
+    vertical-align: middle;
+    margin-left: 6px;
+    text-transform: uppercase;
+  }
+
   /* --- Pause / Game Over Elements Polish --- */
   .glass-panel .pause-header,
   .glass-panel .game-over-header {
@@ -5703,28 +5731,6 @@ if ('serviceWorker' in navigator) {
           <div class="mode-arrow">\u203A</div>
         </div>
 
-        <!-- BLITZ -->
-        <div class="mode-card blitz" tabindex="0" onclick="startBlitzMode()">
-          <div class="mode-icon">\u23F1\uFE0F</div>
-          <div class="mode-info">
-            <div class="mode-name">BLITZ</div>
-            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
-            <div class="mode-best">${parseInt(localStorage.getItem(LS.BLITZ_HI) || "0") > 0 ? `<span style="color:rgba(255,100,0,0.75)">Best: ${parseInt(localStorage.getItem(LS.BLITZ_HI) || "0").toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
-        <!-- ULTRA -->
-        <div class="mode-card ultra" tabindex="0" onclick="startUltraMode()">
-          <div class="mode-icon">\u{1F30C}</div>
-          <div class="mode-info">
-            <div class="mode-name">ULTRA</div>
-            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
-            <div class="mode-best">${parseInt(localStorage.getItem(LS.ULTRA_HI) || "0") > 0 ? `<span style="color:rgba(200,0,255,0.75)">Best: ${parseInt(localStorage.getItem(LS.ULTRA_HI) || "0").toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
         <!-- DAILY CHALLENGE -->
         <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
           <div class="mode-icon">\u{1F3C6}</div>
@@ -5734,6 +5740,24 @@ if ('serviceWorker' in navigator) {
             <div class="mode-best">${dailySub}</div>
           </div>
           <div class="mode-arrow">\u203A</div>
+        </div>
+
+        <!-- BLITZ \u2014 Coming Soon -->
+        <div class="mode-card blitz mode-coming-soon" tabindex="-1">
+          <div class="mode-icon">\u23F1\uFE0F</div>
+          <div class="mode-info">
+            <div class="mode-name">BLITZ <span class="coming-soon-badge">COMING SOON</span></div>
+            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+          </div>
+        </div>
+
+        <!-- ULTRA \u2014 Coming Soon -->
+        <div class="mode-card ultra mode-coming-soon" tabindex="-1">
+          <div class="mode-icon">\u{1F30C}</div>
+          <div class="mode-info">
+            <div class="mode-name">ULTRA <span class="coming-soon-badge">COMING SOON</span></div>
+            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+          </div>
         </div>
 
       </div>
