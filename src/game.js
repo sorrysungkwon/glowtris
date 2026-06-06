@@ -1,5 +1,5 @@
 import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime } from './shared.js';
-import { toggleMute, startBGM, stopBGM, pauseBGM, resumeBGM, playBeep, sfxMove, sfxRotate, sfxHardDrop, sfxHold, sfxLineClear, sfxGameOver, sfxTSpin, sfxAchievementUnlock, applyMuteToGain, onPageHide, onPageShow, closeAudio, sfxUIHover, sfxUIClick } from './audio.js';
+import { toggleMute, startBGM, stopBGM, pauseBGM, resumeBGM, sfxMove, sfxRotate, sfxHardDrop, sfxHold, sfxLineClear, sfxGameOver, sfxTSpin, sfxAchievementUnlock, applyMuteToGain, onPageHide, onPageShow, closeAudio, sfxUIHover, sfxUIClick, sfxCountdownTick, sfxCountdownGo, sfxSprintGoal, sfxDailyComplete } from './audio.js';
 
 document.addEventListener('mouseover', (e) => {
   const btn = e.target.closest('.action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap');
@@ -720,12 +720,20 @@ makeTouchBtn('btn-pause', ()=>togglePause(),'any');
 
 // ─── Game loop ────────────────────────────────────────────────────────────────
 // RAF drives rendering; logic advances on a fixed 1ms tick inside tickLoop.
+let lastFrameTs = 0;
 function gameLoop(ts){
+  if (!lastFrameTs) lastFrameTs = ts;
+  const dt = ts - lastFrameTs;
+  lastFrameTs = ts;
+  const dtFactor = Math.min(dt / 16.666, 3); // 1.0 at 60Hz, 0.41 at 144Hz. Cap at 3 for lag spikes.
+
   measureFPS(ts);
   tickLoop(ts, { onInput: processInput, onTick: gameTick });
-  drawBackground();
+  drawBackground(dtFactor);
   if(S.isSprintMode&&S.gameRunning&&!S.gamePaused&&!S._countdownVal)updateSprintTimer();
-  drawBoard();updateParticles();applyShake();
+  drawBoard(dtFactor);
+  updateParticles(dtFactor);
+  applyShake(dtFactor);
   animFrame=requestAnimationFrame(gameLoop);
 }
 
@@ -838,8 +846,7 @@ export function startCountdown(onComplete) {
   S._countdownGo=0;
   S._countdownVal=3;
   S._countdownTs=performance.now();
-  clearInterval(_countdownTimer);
-  if(!S.muteAudio)playBeep(440,'square',.13,.18,0);
+  if(!S.muteAudio) sfxCountdownTick(3);
   _countdownTimer=setInterval(()=>{
     S._countdownVal--;
     S._countdownTs=performance.now();
@@ -847,10 +854,9 @@ export function startCountdown(onComplete) {
       clearInterval(_countdownTimer);_countdownTimer=null;S._countdownVal=0;
       S._countdownGo=55;
       if(onComplete)onComplete();
-      if(!S.muteAudio){[523,659,784].forEach((f,i)=>playBeep(f,'sawtooth',.16,.3,i*.04));}
+      if(!S.muteAudio) sfxCountdownGo();
     }else{
-      const pitch={2:550,1:660}[S._countdownVal]||440;
-      if(!S.muteAudio)playBeep(pitch,'square',.13,.18,0);
+      if(!S.muteAudio) sfxCountdownTick(S._countdownVal);
     }
   },1000);
 }
@@ -903,7 +909,7 @@ function endGame(){
   S.shakeFrames=40;S.shakeMag=0.7;
 
   if(stats.isNewBest){
-    [523,659,784,1047].forEach((f,i)=>playBeep(f,'sawtooth',.18,.28,i*.06+.3));
+    sfxSprintGoal();
     for(let i=0;i<60;i++){
       const a=Math.random()*Math.PI*2,sp=Math.random()*10+3;
       S.particles.push({x:(Math.random()*COLS)*S.CELL,y:(Math.random()*ROWS*0.5)*S.CELL,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:Math.random()*.01+.005,color:['#ffe600','#ffaa00','#ffffff'][Math.floor(Math.random()*3)],size:Math.random()*6+2,type:'star'});
@@ -918,6 +924,7 @@ function endSprint(){
   const timeMs=Math.round(S._sprintEndTime-S._sprintStartTime);
   S.gameRunning=false;gameOver=true;
   stopBGM();
+  sfxSprintGoal();
 
   const prevBest=S._sprintHiTime;
   const isNewBest=prevBest===0||timeMs<prevBest;
@@ -940,7 +947,7 @@ function endSprint(){
       S.particles.push({x:(Math.random()*COLS)*S.CELL,y:(Math.random()*ROWS*0.5)*S.CELL,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:Math.random()*.01+.005,color:['#00ff88','#00c8ff','#ffe600','#ffffff'][Math.floor(Math.random()*4)],size:Math.random()*6+2,type:'star'});
     }
   }
-  [523,659,784,1047,1319].forEach((f,i)=>playBeep(f,'sawtooth',.18,.28,i*.07+.1));
+  sfxSprintGoal();
   setTimeout(()=>_renderSprintScreen(timeMs,isNewBest,prevBest),600);
 }
 

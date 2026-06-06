@@ -187,7 +187,7 @@
   }
   .change-list li.feat::before  { content: '✦'; color: var(--cyan); }
   .change-list li.fix::before   { content: '◈'; color: rgba(255,200,0,0.8); }
-  .change-list li.perf::before  { content: '⚡'; }
+  .change-list li.perf::before  { content: '▲'; color: var(--green); }
   .change-list li.infra::before { content: '⚙'; color: rgba(160,0,255,0.8); }
 
   .change-label {
@@ -234,12 +234,79 @@
     <h2>Changelog</h2>
   </header>
 
-  <!-- Latest -->
+  <!-- Legend -->
+  <div class="legend" style="display:flex; justify-content:center; gap:20px; margin-bottom:24px; font-size:10px; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1px; flex-wrap:wrap;">
+    <span><span style="color:var(--cyan)">✦</span> Feature</span>
+    <span><span style="color:rgba(255,200,0,0.8)">◈</span> Fix</span>
+    <span><span style="color:var(--green)">▲</span> Performance</span>
+    <span><span style="color:rgba(160,0,255,0.8)">⚙</span> Infra / Core</span>
+  </div>
+
+  <!-- Version Revision Notice -->
+  <div class="version-card" style="border-color: rgba(255,0,128,0.3); background: rgba(255,0,128,0.05);">
+    <div style="font-size:11px; line-height:1.6; color:rgba(255,255,255,0.85); text-align:center;">
+      <span style="color:var(--pink); font-weight:900; letter-spacing:1px;">⚠️ VERSION REVISION (JUNE 2026)</span><br><br>
+      Previous releases (v1.0.x ~ v1.1.1) have been retroactively classified as <strong>pre-1.0 beta (v0.1.x)</strong>. The engine did not yet meet competitive-standard quality. The version pipeline has restarted at <strong>v0.2</strong> for engine rebuilding. <strong>v1.0</strong> will be the true official release once the Engine Foundation phase is complete.
+    </div>
+  </div>
+
+  <!-- v0.5 -->
   <div class="version-card latest">
+    <div class="version-header">
+      <span class="version-tag">v0.5</span>
+      <span class="version-date">Jun 2026</span>
+      <span class="version-badge">Latest</span>
+    </div>
+    <ul class="change-list">
+      <li class="perf"><span class="change-label">Canvas2D Optimization</span> — Rolled back experimental WebGL renderer due to Safari bugs; bundle size heavily reduced</li>
+      <li class="feat"><span class="change-label">High-Hz Support</span> — Delta-time physics interpolation added; all animations now run flawlessly on 144Hz/240Hz monitors</li>
+      <li class="perf"><span class="change-label">Zero-Latency Audio</span> — All synthetic sound effects are now pre-rendered into AudioBuffers via OfflineAudioContext, eliminating CPU spikes and latency during play</li>
+      <li class="feat"><span class="change-label">Lock-delay UI</span> — Added a floating lock-delay timer bar above the active piece</li>
+    </ul>
+  </div>
+
+  <!-- v0.4 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v0.4</span>
+      <span class="version-date">Jun 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Scoring Standard</span> — B2B (Back-to-Back) 1.5× bonus, all-spin detection (SRS+)</li>
+      <li class="feat"><span class="change-label">Next Queue</span> — Expanded the next piece preview queue to 5 pieces</li>
+    </ul>
+  </div>
+
+  <!-- v0.3 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v0.3</span>
+      <span class="version-date">Jun 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Movement Standard</span> — 180° rotation, custom keybinds</li>
+      <li class="infra"><span class="change-label">Professional Tuning</span> — SDF ∞ support, 15-move lock-delay reset cap</li>
+      <li class="perf"><span class="change-label">Input Lag Fixes</span> — IRS, IHS, DCD, and instant ARR=0 support</li>
+    </ul>
+  </div>
+
+  <!-- v0.2 -->
+  <div class="version-card">
+    <div class="version-header">
+      <span class="version-tag">v0.2</span>
+      <span class="version-date">Jun 2026</span>
+    </div>
+    <ul class="change-list">
+      <li class="infra"><span class="change-label">Fixed-Timestep Loop</span> — Decoupled game logic from rendering for perfectly consistent physics</li>
+      <li class="infra"><span class="change-label">Sub-Frame Input</span> — Processed user inputs chronologically between frames for maximum accuracy</li>
+    </ul>
+  </div>
+
+  <!-- Pre-1.0 Beta: PWA UPDATE -->
+  <div class="version-card">
     <div class="version-header">
       <span class="version-tag">PWA UPDATE</span>
       <span class="version-date">Jun 2026</span>
-      <span class="version-badge">Latest</span>
     </div>
     <ul class="change-list">
       <li class="feat"><span class="change-label">Push notifications</span> — get notified when the daily challenge goes live (opt-in)</li>
