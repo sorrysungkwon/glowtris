@@ -231,8 +231,8 @@ function bgmScheduleHihat(t){
 }
 
 function getBGMBeat(){
-  let baseBpm = 100;
-  if (S.isSprintMode) baseBpm = 125;
+  let baseBpm = 112;
+  if (S.isSprintMode) baseBpm = 135;
   else if (S.isBlitzMode) baseBpm = 130;
   else if (S.isDailyMode) baseBpm = 165;
   const bpm = Math.min(210, baseBpm + (S.level || 1) * 5);
