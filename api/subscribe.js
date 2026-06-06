@@ -28,6 +28,6 @@ module.exports = async function handler(req, res) {
     tzOffset: parseInt(tzOffset) || 0,
   });
 
-  const r = await redis(`hset/${SUBS_KEY}`, [field, value]);
+  const r = await redis('', ["hset", SUBS_KEY, field, value]);
   return res.status(200).json({ ok: true, r });
 }
