@@ -1471,9 +1471,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 /* ── Brief toast (score submitted etc.) ─────────────────────────────────── */
 #pwa-toast {
   position: fixed;
-  bottom: 80px;
+  top: max(16px, calc(env(safe-area-inset-top, 0px) + 16px));
   left: 50%;
-  transform: translateX(-50%) translateY(12px);
+  transform: translateX(-50%) translateY(-12px);
   z-index: 9001;
   display: flex;
   align-items: center;
@@ -1505,6 +1505,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+#pwa-toast.below-1bar  { top: max(62px,  calc(env(safe-area-inset-top, 0px) + 62px));  }
+#pwa-toast.below-2bars { top: max(108px, calc(env(safe-area-inset-top, 0px) + 108px)); }
 
 /* ── SW update bar ───────────────────────────────────────────────────────── */
 #pwa-update-bar {

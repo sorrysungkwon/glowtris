@@ -30,6 +30,13 @@ export function showToast(msg, { icon = '', duration = 3000 } = {}) {
   el.innerHTML = icon
     ? `<span class="material-icons-round" style="font-size:14px;flex-shrink:0">${icon}</span><span class="toast-text">${msg}</span>`
     : `<span class="toast-text">${msg}</span>`;
+  // Push toast below any visible top bars
+  const barCount = ['offline-bar', 'pwa-update-bar'].filter(id => {
+    const b = document.getElementById(id);
+    return b && b.classList.contains('visible');
+  }).length;
+  el.classList.toggle('below-1bar', barCount === 1);
+  el.classList.toggle('below-2bars', barCount >= 2);
   el.classList.add('visible');
   clearTimeout(el._timer);
   el._timer = setTimeout(() => el.classList.remove('visible'), duration);
