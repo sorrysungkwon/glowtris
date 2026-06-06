@@ -819,6 +819,7 @@ let _sprintPauseTs = 0;
 
 export function pauseGameTiming() {
   if (S.isSprintMode && S._sprintStartTime > 0) _sprintPauseTs = performance.now();
+  if (_countdownTimer) { clearInterval(_countdownTimer); _countdownTimer = null; }
 }
 
 export function resumeGameTiming() {
