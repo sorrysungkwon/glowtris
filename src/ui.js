@@ -292,7 +292,8 @@ export function initStars() {
 
 function getBgTheme() {
   if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,5,0,0.18)', hueBase: 15, hueVar: 15, core: 'rgba(255,100,0,0.015)', core2: 'rgba(200,80,0,0.01)', edge: 'rgba(200,80,0,0.4)', glow: true, speed: 1.7 };
-  if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(8,0,8,0.18)',  hueBase: 280, core: 'rgba(220,0,220,0.04)', core2: 'rgba(160,0,160,0.025)', edge: 'rgba(160,0,160,1)', glow: true, speed: 1.5 };
+  if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(15,0,0,0.18)', hueBase: 10, core: 'rgba(255,50,0,0.04)', core2: 'rgba(200,20,0,0.025)', edge: 'rgba(255,50,0,1)', glow: true, speed: 2.2 };
+  if (S.isUltraMode) return { m: 'ultra', type: 'nebula', bg: 'rgba(8,0,12,0.18)', hueBase: 280, core: 'rgba(200,0,255,0.04)', core2: 'rgba(150,0,200,0.025)', edge: 'rgba(150,0,200,1)', glow: true, speed: 1.5 };
   if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
   return { m: 'marathon', type: 'nebula', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
 }
@@ -1017,9 +1018,24 @@ export function updateUI() {
 }
 
 export function updateSprintTimer() {
-  const elapsed = S._sprintStartTime > 0 ? performance.now() - S._sprintStartTime : 0;
-  const fmt = fmtTime(elapsed);
-  $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
+  if (S.isSprintMode) {
+    const elapsed = S._sprintStartTime > 0 ? performance.now() - S._sprintStartTime : 0;
+    const fmt = fmtTime(elapsed);
+    $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
+    $lines.textContent = Math.max(0, SPRINT_LINES - S.lines); if ($linesM) $linesM.textContent = Math.max(0, SPRINT_LINES - S.lines);
+  } else if (S.isBlitzMode || S.isUltraMode) {
+    const totalTime = S.isBlitzMode ? 120000 : 180000;
+    const elapsed = S._timeAttackStartTime > 0 ? performance.now() - S._timeAttackStartTime : 0;
+    const remain = Math.max(0, totalTime - elapsed);
+    const fmt = fmtTime(remain);
+    $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
+    $lines.textContent = S.score.toLocaleString(); if ($linesM) $linesM.textContent = S.score.toLocaleString();
+    
+    // Time's up!
+    if (remain <= 0 && S.gameRunning) {
+      import('./game.js').then(m => m.endTimeAttack());
+    }
+  }
 }
 
 export function showScorePopup(pts, n, tspin=false, b2b=false) {
