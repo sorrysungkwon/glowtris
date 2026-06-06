@@ -50,6 +50,7 @@ let _chGradCache = null, _chGradCtx = null;
 let _bgFrameCount = 0;
 const BG_GRAD_INTERVAL = 4;
 let _lpBgCache = null, _lpChBgCache = null;
+let _staticBgCache = null, _staticChEdgeCache = null, _staticChCoreCache = null;
 
 // ─── Cell sprite cache ────────────────────────────────────────────────────────
 let _cellSprites     = {};
@@ -273,10 +274,8 @@ function _buildLowPerfBg(W, H, isChallenge) {
 }
 
 export function initStars() {
-  _bgGradCache = null; _bgGradCtx = null;
-  _chGradCache = null; _chGradCtx = null;
   _lpBgCache   = null; _lpChBgCache = null;
-  _bgFrameCount = 0;
+  _staticBgCache = null; _staticChEdgeCache = null; _staticChCoreCache = null;
   stars = [];
   const numStars = S.isMobile ? 80 : 150;
   for (let i = 0; i < numStars; i++) stars.push({
@@ -290,6 +289,24 @@ export function initStars() {
     { x: w*0.75, y: h*0.6,  r: Math.min(w,h)*0.55, vx: -0.1,  vy: -0.12, hue: 280 },
     { x: w*0.5,  y: h*0.45, r: Math.min(w,h)*0.35, vx:  0.07, vy: -0.07, hue: 330 },
   ];
+  for (const neb of nebulae) {
+    const size = neb.r * 2;
+    neb.cn = document.createElement('canvas'); neb.cn.width = size; neb.cn.height = size;
+    const ctxN = neb.cn.getContext('2d');
+    const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
+    grN.addColorStop(0,   `hsla(${neb.hue},95%,35%,0.12)`);
+    grN.addColorStop(0.5, `hsla(${(neb.hue+40)%360},90%,20%,0.06)`);
+    grN.addColorStop(1,   'transparent');
+    ctxN.fillStyle = grN; ctxN.fillRect(0, 0, size, size);
+
+    neb.cc = document.createElement('canvas'); neb.cc.width = size; neb.cc.height = size;
+    const ctxC = neb.cc.getContext('2d');
+    const grC = ctxC.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
+    grC.addColorStop(0,   `hsla(${neb.hue%55},100%,28%,0.07)`);
+    grC.addColorStop(0.5, `hsla(${(neb.hue+18)%55},90%,16%,0.03)`);
+    grC.addColorStop(1,   'transparent');
+    ctxC.fillStyle = grC; ctxC.fillRect(0, 0, size, size);
+  }
 }
 
 export function drawBackground(dtFactor = 1) {
@@ -304,42 +321,27 @@ export function drawBackground(dtFactor = 1) {
     }
     return;
   }
-  _bgFrameCount++;
-  if (S.isDailyMode) { _drawChallengeBg(dtFactor); return; }
-
   bgx.fillStyle = 'rgba(0,0,8,0.18)'; bgx.fillRect(0, 0, bgc.width, bgc.height);
 
   for (const neb of nebulae) {
     neb.x += neb.vx * dtFactor; neb.y += neb.vy * dtFactor;
     if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
     if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
-    neb.hue = (neb.hue + 0.02 * dtFactor) % 360;
+    bgx.drawImage(neb.cn, neb.x - neb.r, neb.y - neb.r);
   }
-
-  if (_bgFrameCount % Math.max(1, Math.floor(BG_GRAD_INTERVAL / dtFactor)) === 0) {
-    if (!_bgGradCache || _bgGradCache.width !== bgc.width || _bgGradCache.height !== bgc.height) {
-      _bgGradCache = document.createElement('canvas');
-      _bgGradCache.width = bgc.width; _bgGradCache.height = bgc.height;
-      _bgGradCtx = _bgGradCache.getContext('2d');
-    }
-    const gc2 = _bgGradCtx;
-    gc2.clearRect(0, 0, bgc.width, bgc.height);
-    for (const neb of nebulae) {
-      const gr = gc2.createRadialGradient(neb.x, neb.y, 0, neb.x, neb.y, neb.r);
-      gr.addColorStop(0,   `hsla(${neb.hue},95%,35%,0.12)`);
-      gr.addColorStop(0.5, `hsla(${(neb.hue+40)%360},90%,20%,0.06)`);
-      gr.addColorStop(1,   'transparent');
-      gc2.fillStyle = gr;
-      const nbx = Math.max(0, neb.x - neb.r), nby = Math.max(0, neb.y - neb.r);
-      gc2.fillRect(nbx, nby, Math.min(bgc.width, neb.x+neb.r)-nbx, Math.min(bgc.height, neb.y+neb.r)-nby);
-    }
-    const gr2 = gc2.createRadialGradient(bgc.width/2, bgc.height/2, 0, bgc.width/2, bgc.height/2, bgc.width*0.7);
+  
+  if (!_staticBgCache || _staticBgCache.width !== bgc.width || _staticBgCache.height !== bgc.height) {
+    _staticBgCache = document.createElement('canvas');
+    _staticBgCache.width = bgc.width; _staticBgCache.height = bgc.height;
+    const sCtx = _staticBgCache.getContext('2d');
+    const gr2 = sCtx.createRadialGradient(bgc.width/2, bgc.height/2, 0, bgc.width/2, bgc.height/2, bgc.width*0.7);
     gr2.addColorStop(0,   `hsla(${bgHue},80%,10%,0.02)`);
     gr2.addColorStop(0.5, `hsla(${(bgHue+60)%360},80%,5%,0.015)`);
     gr2.addColorStop(1,   'transparent');
-    gc2.fillStyle = gr2; gc2.fillRect(0, 0, bgc.width, bgc.height);
+    sCtx.fillStyle = gr2; sCtx.fillRect(0, 0, bgc.width, bgc.height);
   }
-  if (_bgGradCache) bgx.drawImage(_bgGradCache, 0, 0);
+
+  bgx.drawImage(_staticBgCache, 0, 0);
 
   bgx.fillStyle = 'rgba(180,220,255,0.5)';
   bgx.beginPath();
@@ -361,57 +363,42 @@ function _drawChallengeBg(dtFactor = 1) {
     neb.x += neb.vx*1.7 * dtFactor; neb.y += neb.vy*1.7 * dtFactor;
     if (neb.x - neb.r < 0 || neb.x + neb.r > W) neb.vx *= -1;
     if (neb.y - neb.r < 0 || neb.y + neb.r > H) neb.vy *= -1;
-    neb.hue = (neb.hue + 0.06 * dtFactor) % 55;
+    bgx.drawImage(neb.cc, neb.x - neb.r, neb.y - neb.r);
   }
   for (const s of stars) {
     s.y += s.speed*2.8 * dtFactor; s.x += s.vx*2.8 * dtFactor;
     if (s.y > H || s.x > W) { s.y = Math.random()*H*0.4; s.x = Math.random()*W*0.6; }
+    const tLen = s.speed * 22;
+    const tg = bgx.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
+    tg.addColorStop(0, 'transparent');
+    tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
+    bgx.strokeStyle = tg; bgx.lineWidth = s.r*0.9;
+    bgx.beginPath(); bgx.moveTo(s.x-s.vx*22, s.y-tLen); bgx.lineTo(s.x, s.y); bgx.stroke();
   }
 
-  if (_bgFrameCount % Math.max(1, Math.floor(BG_GRAD_INTERVAL / dtFactor)) === 0) {
-    if (!_chGradCache || _chGradCache.width !== W || _chGradCache.height !== H) {
-      _chGradCache = document.createElement('canvas');
-      _chGradCache.width = W; _chGradCache.height = H;
-      _chGradCtx = _chGradCache.getContext('2d');
-    }
-    const gc2 = _chGradCtx;
-    gc2.clearRect(0, 0, W, H);
-
-    for (const neb of nebulae) {
-      const gr = gc2.createRadialGradient(neb.x, neb.y, 0, neb.x, neb.y, neb.r);
-      gr.addColorStop(0,   `hsla(${neb.hue},100%,28%,0.07)`);
-      gr.addColorStop(0.5, `hsla(${(neb.hue+18)%55},90%,16%,0.03)`);
-      gr.addColorStop(1,   'transparent');
-      gc2.fillStyle = gr;
-      const nx = Math.max(0, neb.x-neb.r), ny = Math.max(0, neb.y-neb.r);
-      gc2.fillRect(nx, ny, Math.min(W, neb.x+neb.r)-nx, Math.min(H, neb.y+neb.r)-ny);
-    }
-
-    for (const s of stars) {
-      const tLen = s.speed * 22;
-      const tg = gc2.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
-      tg.addColorStop(0, 'transparent');
-      tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
-      gc2.strokeStyle = tg; gc2.lineWidth = s.r*0.9;
-      gc2.beginPath(); gc2.moveTo(s.x-s.vx*22, s.y-tLen); gc2.lineTo(s.x, s.y); gc2.stroke();
-    }
-
+  if (!_staticChCoreCache || _staticChCoreCache.width !== W || _staticChCoreCache.height !== H) {
+    _staticChCoreCache = document.createElement('canvas'); _staticChCoreCache.width = W; _staticChCoreCache.height = H;
+    const cCtx = _staticChCoreCache.getContext('2d');
     const coreY = H*0.82;
-    const pulse = 0.5 + Math.sin(_cBgPulse)*0.5;
-    const cg2 = gc2.createRadialGradient(W/2, coreY, 0, W/2, coreY, W*0.55);
-    cg2.addColorStop(0,   `rgba(220,80,0,${0.04*pulse})`);
-    cg2.addColorStop(0.4, `rgba(160,20,0,${0.025*pulse})`);
+    const cg2 = cCtx.createRadialGradient(W/2, coreY, 0, W/2, coreY, W*0.55);
+    cg2.addColorStop(0,   `rgba(220,80,0,0.04)`);
+    cg2.addColorStop(0.4, `rgba(160,20,0,0.025)`);
     cg2.addColorStop(1,   'transparent');
-    gc2.fillStyle = cg2; gc2.fillRect(0, 0, W, H);
-
-    if (!S.lowPerfMode) {
-      const vA = 0.03 + Math.sin(_cBgPulse)*0.015;
-      gc2.strokeStyle = `rgba(160,0,10,${vA})`;
-      gc2.lineWidth = 15;
-      gc2.strokeRect(0, 0, W, H);
-    }
+    cCtx.fillStyle = cg2; cCtx.fillRect(0, 0, W, H);
   }
-  if (_chGradCache) bgx.drawImage(_chGradCache, 0, 0);
+
+
+  bgx.save();
+  bgx.globalAlpha = 0.5 + Math.sin(_cBgPulse)*0.5;
+  bgx.drawImage(_staticChCoreCache, 0, 0);
+  bgx.restore();
+
+  if (!S.lowPerfMode) {
+    const vA = 0.03 + Math.sin(_cBgPulse)*0.015;
+    bgx.strokeStyle = `rgba(160,0,10,${vA})`;
+    bgx.lineWidth = 15;
+    bgx.strokeRect(0, 0, W, H);
+  }
 }
 
 // ─── Drawing helpers ──────────────────────────────────────────────────────────
