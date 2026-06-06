@@ -48,7 +48,7 @@
 | **v0.2 Loop & Input Core** | Decoupled fixed-timestep loop, ordered sub-frame input handling | ARCH-001, ARCH-002 | ✅ Done |
 | **v0.3 Movement Standard** | ~~180° rotation~~, custom keybinds, ~~SDF (+ ∞)~~, ~~lock-delay reset cap~~, ~~IRS~~, ~~IHS~~, ~~DCD~~, ~~instant ARR=0~~ | FEAT-001/002/003/006/007/008/012, ARCH-003 | ✅ Done |
 | **v0.4 Scoring Standard** | B2B 1.5×, 3-piece next queue, all-spin (SRS+), BUG-012/013 | FEAT-004/005/010 | ✅ Done |
-| **v0.5 Renderer & Audio** | PixiJS-based WebGL2 renderer migration (staged v0.5.0~v0.5.3), render interpolation, low-latency audio | ARCH-004/005 | 🔄 In Progress |
+| **v0.5 Renderer & Audio** | Canvas2D High-Hz Interpolation, low-latency audio pre-rendering | ARCH-004/005 | ✅ Done |
 | **v0.6 Modes & Metrics** | Ultra/Blitz mode, in-game APM/PPS | FEAT-009/011 | 🔲 |
 | **v0.7 Social Ranking + Account** | Anonymous UUID on first visit → optional Google backup (Clerk/NextAuth); percentile display, rival system, async challenge links, weekly tournament, push notifications | SOCIAL-001~005 | 🔲 |
 
@@ -103,9 +103,9 @@
 - [ ] Antigravity: shader parameter tuning, signature neon glow identity
 
 ### v0.5.4 — ARCH-005 Low-latency audio
-- [ ] Audit current audio dispatch path; pre-decode all SFX to `AudioBuffer`
-- [ ] SFX triggered via `AudioBufferSourceNode` + `AudioContext.currentTime` scheduling
-- [ ] Verify trigger-to-output latency < 5ms
+- [x] Audit current audio dispatch path; pre-decode all SFX to `AudioBuffer`
+- [x] SFX triggered via `AudioBufferSourceNode` + `AudioContext.currentTime` scheduling
+- [x] Verify trigger-to-output latency < 5ms
 
 ---
 
