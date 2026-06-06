@@ -23,9 +23,12 @@ async function build() {
       write:       false,
       format:      'iife',
       platform:    'browser',
-      target:      'es2018',
-      minify:      true,
-      treeShaking: true,
+      target:           'es2018',
+      minifyWhitespace:  true,
+      minifyIdentifiers: true,
+      minifySyntax:      false, // disabled: esbuild regex optimisation produces invalid ranges in Safari/WebKit
+      charset:           'utf8',
+      treeShaking:       true,
     });
     js = Buffer.from(result.outputFiles[0].contents).toString();
     console.log('Mode: esbuild bundle (ES modules detected)');
