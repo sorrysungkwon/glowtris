@@ -293,11 +293,9 @@ export function initStars() {
 function getBgTheme() {
   if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,5,0,0.18)', hueBase: 25,  core: 'rgba(255,100,0,0.015)', core2: 'rgba(200,80,0,0.01)', edge: 'rgba(200,80,0,0.4)', glow: true, speed: 1.7 };
   if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(8,0,8,0.18)',  hueBase: 280, core: 'rgba(220,0,220,0.04)', core2: 'rgba(160,0,160,0.025)', edge: 'rgba(160,0,160,1)', glow: true, speed: 1.5 };
-  if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
+  if (S.isSprintMode)return { m: 'sprint', type: 'nebula', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
   return { m: 'marathon', type: 'nebula', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
 }
-
-let _matrixDrops = null;
 
 export function drawBackground(dtFactor = 1) {
   if (S.lowPerfMode) {
@@ -315,23 +313,7 @@ export function drawBackground(dtFactor = 1) {
   _cBgPulse = (_cBgPulse + 0.022 * dtFactor * th.speed) % (Math.PI*2);
   bgx.fillStyle = th.bg; bgx.fillRect(0, 0, bgc.width, bgc.height);
 
-  if (th.type === 'matrix') {
-    if (!_matrixDrops) {
-      _matrixDrops = Array.from({length: 80}, () => ({
-        x: Math.random() * bgc.width, 
-        y: Math.random() * bgc.height, 
-        speed: Math.random() * 1.5 + 0.5,
-        size: Math.floor(Math.random() * 4 + 3),
-        op: Math.random() * 0.1 + 0.05
-      }));
-    }
-    for (const d of _matrixDrops) {
-      d.y += d.speed * dtFactor;
-      if (d.y > bgc.height) { d.y = -d.size*3; d.x = Math.random() * bgc.width; }
-      bgx.fillStyle = `rgba(0,150,255,${d.op})`;
-      bgx.fillRect(d.x, d.y, d.size, d.size*2);
-    }
-  } else {
+
     for (const neb of nebulae) {
       neb.x += neb.vx * th.speed * dtFactor; neb.y += neb.vy * th.speed * dtFactor;
       if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width)  neb.vx *= -1;
@@ -370,7 +352,6 @@ export function drawBackground(dtFactor = 1) {
         bgx.beginPath(); bgx.moveTo(s.x + s.r, s.y); bgx.arc(s.x, s.y, s.r, 0, Math.PI*2); bgx.fill();
       }
     }
-  }
 
   if (!_staticBgCache || _staticBgCache.width !== bgc.width || _staticBgCache.height !== bgc.height || _staticBgCache.mode !== th.m) {
     _staticBgCache = document.createElement('canvas'); _staticBgCache.width = bgc.width; _staticBgCache.height = bgc.height;
