@@ -460,7 +460,7 @@ export function showModeSelector(){
             <div class="mode-icon">⏱️</div>
             <div class="mode-info">
               <div class="mode-name">BLITZ</div>
-              <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+              <div class="mode-desc">Score as high as possible in 2 minutes.</div>
             </div>
           </div>
 
@@ -469,7 +469,7 @@ export function showModeSelector(){
             <div class="mode-icon">🌌</div>
             <div class="mode-info">
               <div class="mode-name">ULTRA</div>
-              <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+              <div class="mode-desc">Plan strategically for massive scores in 3 minutes.</div>
             </div>
           </div>
         </div>
