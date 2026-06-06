@@ -1486,7 +1486,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   font-weight: 700;
   letter-spacing: 1.5px;
   color: rgba(0, 255, 136, 0.9);
-  width: calc(100vw - 32px);
+  width: max-content;
+  max-width: calc(100vw - 32px);
   box-sizing: border-box;
   pointer-events: none;
   opacity: 0;
