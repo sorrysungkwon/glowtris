@@ -469,13 +469,6 @@ export function getCellSprite(color) {
   sx.moveTo(p+2.5, p+s-3); sx.lineTo(p+2.5, p+2.5); sx.lineTo(p+s-3, p+2.5); 
   sx.stroke();
 
-  // 5. Dark lower border for depth
-  sx.strokeStyle = `rgba(0,0,0,0.5)`;
-  sx.lineWidth = 1;
-  sx.beginPath();
-  sx.moveTo(p+2.5, p+s-2.5); sx.lineTo(p+s-2.5, p+s-2.5); sx.lineTo(p+s-2.5, p+2.5);
-  sx.stroke();
-
   _cellSprites[color] = { canvas: sc, pad: PAD };
   return _cellSprites[color];
 }
