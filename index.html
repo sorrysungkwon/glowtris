@@ -552,6 +552,7 @@
     padding:12px 20px; display:flex; align-items:center; gap:12px;
     z-index:1000; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     opacity:0; transition:transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+    pointer-events: none;
   }
   .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
@@ -1928,76 +1929,17 @@ if ('serviceWorker' in navigator) {
 
 <script>
 (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __esm = (fn, res) => function __init() {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  };
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+
   // src/shared.js
-  var COLS = 10;
-  var ROWS = 20;
-  var PIECES = {
-    I: { shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], color: "#00d8ff" },
-    O: { shape: [[1, 1], [1, 1]], color: "#ffe000" },
-    T: { shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], color: "#cc00ff" },
-    S: { shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], color: "#00ffaa" },
-    Z: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], color: "#ff2040" },
-    J: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], color: "#2979ff" },
-    L: { shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], color: "#ff8c00" }
-  };
-  var SCORE_TABLE = [0, 100, 300, 500, 800];
-  var TSPIN_SCORE = [400, 800, 1200, 1600];
-  var TSPIN_MINI_SCORE = [0, 200, 400];
-  var LEVEL_LINES = 10;
-  var SPRINT_LINES = 40;
-  var MAX_PARTICLES = 400;
-  var SUPPORT_URL = "https://ko-fi.com/sorrysungkwon";
-  var COLOR_TO_KEY = {};
-  for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
-  var LS = {
-    HI: "glowTrisHi",
-    HISTORY: "glowTrisHistory",
-    STREAK: "glowTrisStreak",
-    MAX_COMBO: "glowTrisMaxCombo",
-    TOTAL_GAMES: "glowTrisTotalGames",
-    TOTAL_SCORE: "glowTrisTotalScore",
-    BEST_LEVEL: "glowTrisBestLevel",
-    TOTAL_LINES: "glowTrisTotalLines",
-    MAX_LINES: "glowTrisMaxLines",
-    LIFETIME: "glowTrisLifetime",
-    DAILY_DATE: "glowTrisDailyDate",
-    NAME: "glowTrisName",
-    MUTE: "glowTrisMute",
-    DAS: "glowTrisDAS",
-    SDF: "glowTrisSDF",
-    DCD: "glowTrisDCD",
-    ARR: "glowTrisARR",
-    LOCK: "glowTrisLock",
-    GHOST: "glowTrisGhost",
-    COLORBLIND: "glowTrisColorblind",
-    ANIM: "glowTrisAnim",
-    LOW_PERF: "glowTrisLowPerf",
-    ACHIEVEMENTS: "glowTrisAchievements",
-    SPRINT_HI: "glowTrisSprintHi"
-  };
-  var ACHIEVEMENTS = [
-    { id: "first_game", label: "First Stack", description: "Complete your first game", icon: "\u{1F9F1}" },
-    { id: "glowtris_1", label: "Glowtris!", description: "Clear 4 lines at once", icon: "\u26A1" },
-    { id: "tspin_1", label: "T-Spin Initiate", description: "Perform a T-Spin", icon: "\u{1F504}" },
-    { id: "tspin_triple", label: "Apex Spin", description: "Perform a T-Spin Triple", icon: "\u{1F300}" },
-    { id: "all_clear", label: "Void Clear", description: "Achieve an All-Clear bonus", icon: "\u{1F31F}" },
-    { id: "combo_5", label: "Combo Cadet", description: "Reach a 5x combo", icon: "\u{1F525}" },
-    { id: "combo_10", label: "Combo Master", description: "Reach a 10x combo", icon: "\u{1F451}" },
-    { id: "level_5", label: "Cruising", description: "Reach Level 5", icon: "\u{1F680}" },
-    { id: "level_10", label: "Hyperdrive", description: "Reach Level 10", icon: "\u{1F320}" },
-    { id: "level_15", label: "Light Speed", description: "Reach Level 15", icon: "\u{1F30C}" },
-    { id: "score_50k", label: "High Roller", description: "Score 50,000 points", icon: "\u{1F4B0}" },
-    { id: "score_100k", label: "Elite Stacker", description: "Score 100,000 points", icon: "\u{1F48E}" },
-    { id: "score_250k", label: "Neon God", description: "Score 250,000 points", icon: "\u{1F47E}" },
-    { id: "games_10", label: "Hooked", description: "Play 10 total games", icon: "\u{1F3AE}" },
-    { id: "games_50", label: "Obsessed", description: "Play 50 total games", icon: "\u2764\uFE0F" },
-    { id: "lines_100", label: "Centurion", description: "Clear 100 cumulative lines", icon: "\u{1F4AF}" },
-    { id: "lines_1000", label: "Grandmaster Stacker", description: "Clear 1,000 cumulative lines", icon: "\u{1F3C6}" },
-    { id: "daily_challenge_1", label: "Daily Pioneer", description: "Complete your first Daily Challenge", icon: "\u{1F3C5}" },
-    { id: "streak_5", label: "On Fire", description: "Reach a 5-game PB streak", icon: "\u{1F525}" },
-    { id: "submit_lb", label: "Public Record", description: "Submit a score to online leaderboard", icon: "\u{1F310}" },
-    { id: "sprint_finish", label: "Sprint Runner", description: "Complete a 40-line sprint", icon: "\u26A1" }
-  ];
   function _getAchievements() {
     if (!S._achievementsCache)
       S._achievementsCache = JSON.parse(localStorage.getItem(LS.ACHIEVEMENTS) || "[]");
@@ -2023,108 +1965,182 @@ if ('serviceWorker' in navigator) {
     const mins = Math.floor(total / 6e3);
     return `${mins > 0 ? mins + ":" : ""}${secs.toString().padStart(2, "0")}.${cs.toString().padStart(2, "0")}`;
   }
-  var S = {
-    // Layout / device
-    CELL: 30,
-    // px per cell — recalculated by ui.js on init & resize
-    isMobile: false,
-    // set by ui.js initLayout, read by game.js key handler
-    _kbMode: false,
-    // iPad + external keyboard mode (ui.js writes, game.js reads)
-    // Live board data (game.js writes, ui.js reads each frame)
-    board: null,
-    current: null,
-    lockResets: 0,
-    lowestY: 0,
-    next: [],
-    held: null,
-    // Score HUD (game.js writes, ui.js updateUI reads)
-    score: 0,
-    lines: 0,
-    level: 1,
-    combo: 0,
-    hiScore: 0,
-    b2b: false,
-    // Game control flags (game.js writes, audio.js + ui.js read)
-    gameRunning: false,
-    gamePaused: false,
-    isDailyMode: false,
-    isSprintMode: false,
-    // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
-    _countdownVal: 0,
-    _countdownGo: 0,
-    _countdownTs: 0,
-    // Leaderboard state (game.js initialises, leaderboard.js reads/writes)
-    lbMode: "marathon",
-    _lbCache: {
-      board: [],
-      dailyBoard: [],
-      weeklyBoard: [],
-      challengeBoard: [],
-      challengeRank: 0,
-      challengeAlltimeBoard: [],
-      challengeAlltimeRank: 0,
-      sprintBoard: [],
-      sprintDailyBoard: [],
-      sprintWeeklyBoard: [],
-      sprintRank: 0,
-      sprintDailyRank: 0,
-      sprintWeeklyRank: 0,
-      mySprintTime: 0
-    },
-    // Audio / visual settings (written by audio.js or ui.js, read by both)
-    muteAudio: false,
-    animIntensity: "full",
-    // 'full' | 'reduced' | 'off'
-    lowPerfMode: false,
-    colorblindMode: false,
-    ghostVisible: true,
-    // Per-frame visual effects (game.js lockPiece writes, ui.js drawBoard reads)
-    flashLines: null,
-    // initialized to new Set() in game.js startup
-    flashTimer: 0,
-    shakeFrames: 0,
-    shakeMag: 0.4,
-    shakeAllDir: false,
-    comboFlash: 0,
-    comboFlashColor: "#00c8ff",
-    rainbowBorder: 0,
-    dangerPulse: 0,
-    levelUpScanline: 0,
-    // Game mechanics (game.js writes, ui.js drawBoard reads for lock progress bar)
-    lockActive: false,
-    lockTimer: 0,
-    lockMs: 500,
-    // Input settings (ui.js settings fns write, game.js DAS timer reads)
-    das: 150,
-    sdf: 40,
-    // 0 = Infinity
-    arr: 50,
-    dcd: 16,
-    dcdTimer: 0,
-    // Sprint timing (game.js writes, ui.js updateUI/updateSprintTimer reads)
-    _sprintStartTime: 0,
-    _sprintEndTime: 0,
-    // only game.js uses, kept here for symmetry
-    _sprintHiTime: 0,
-    // Perf lock (ui.js measureFPS writes, game.js _doStartGame reads)
-    _perfLocked: false,
-    // Particle array (game.js endGame/endSprint push directly; ui.js renders)
-    particles: [],
-    // Achievement & lifetime caches (written lazily, used by both modules)
-    _achievementsCache: null,
-    _lifetimeCache: null
-  };
+  var COLS, ROWS, PIECES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, LEVEL_LINES, SPRINT_LINES, MAX_PARTICLES, SUPPORT_URL, COLOR_TO_KEY, LS, ACHIEVEMENTS, S;
+  var init_shared = __esm({
+    "src/shared.js"() {
+      COLS = 10;
+      ROWS = 20;
+      PIECES = {
+        I: { shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], color: "#00d8ff" },
+        O: { shape: [[1, 1], [1, 1]], color: "#ffe000" },
+        T: { shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], color: "#cc00ff" },
+        S: { shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], color: "#00ffaa" },
+        Z: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], color: "#ff2040" },
+        J: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], color: "#2979ff" },
+        L: { shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], color: "#ff8c00" }
+      };
+      SCORE_TABLE = [0, 100, 300, 500, 800];
+      TSPIN_SCORE = [400, 800, 1200, 1600];
+      TSPIN_MINI_SCORE = [0, 200, 400];
+      LEVEL_LINES = 10;
+      SPRINT_LINES = 40;
+      MAX_PARTICLES = 400;
+      SUPPORT_URL = "https://ko-fi.com/sorrysungkwon";
+      COLOR_TO_KEY = {};
+      for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
+      LS = {
+        HI: "glowTrisHi",
+        HISTORY: "glowTrisHistory",
+        STREAK: "glowTrisStreak",
+        MAX_COMBO: "glowTrisMaxCombo",
+        TOTAL_GAMES: "glowTrisTotalGames",
+        TOTAL_SCORE: "glowTrisTotalScore",
+        BEST_LEVEL: "glowTrisBestLevel",
+        TOTAL_LINES: "glowTrisTotalLines",
+        MAX_LINES: "glowTrisMaxLines",
+        LIFETIME: "glowTrisLifetime",
+        DAILY_DATE: "glowTrisDailyDate",
+        NAME: "glowTrisName",
+        MUTE: "glowTrisMute",
+        DAS: "glowTrisDAS",
+        SDF: "glowTrisSDF",
+        DCD: "glowTrisDCD",
+        ARR: "glowTrisARR",
+        LOCK: "glowTrisLock",
+        GHOST: "glowTrisGhost",
+        COLORBLIND: "glowTrisColorblind",
+        ANIM: "glowTrisAnim",
+        LOW_PERF: "glowTrisLowPerf",
+        ACHIEVEMENTS: "glowTrisAchievements",
+        SPRINT_HI: "glowTrisSprintHi",
+        BLITZ_HI: "glowTrisBlitzHi",
+        ULTRA_HI: "glowTrisUltraHi"
+      };
+      ACHIEVEMENTS = [
+        { id: "first_game", label: "First Stack", description: "Complete your first game", icon: "\u{1F9F1}" },
+        { id: "glowtris_1", label: "Glowtris!", description: "Clear 4 lines at once", icon: "\u26A1" },
+        { id: "tspin_1", label: "T-Spin Initiate", description: "Perform a T-Spin", icon: "\u{1F504}" },
+        { id: "tspin_triple", label: "Apex Spin", description: "Perform a T-Spin Triple", icon: "\u{1F300}" },
+        { id: "all_clear", label: "Void Clear", description: "Achieve an All-Clear bonus", icon: "\u{1F31F}" },
+        { id: "combo_5", label: "Combo Cadet", description: "Reach a 5x combo", icon: "\u{1F525}" },
+        { id: "combo_10", label: "Combo Master", description: "Reach a 10x combo", icon: "\u{1F451}" },
+        { id: "level_5", label: "Cruising", description: "Reach Level 5", icon: "\u{1F680}" },
+        { id: "level_10", label: "Hyperdrive", description: "Reach Level 10", icon: "\u{1F320}" },
+        { id: "level_15", label: "Light Speed", description: "Reach Level 15", icon: "\u{1F30C}" },
+        { id: "score_50k", label: "High Roller", description: "Score 50,000 points", icon: "\u{1F4B0}" },
+        { id: "score_100k", label: "Elite Stacker", description: "Score 100,000 points", icon: "\u{1F48E}" },
+        { id: "score_250k", label: "Neon God", description: "Score 250,000 points", icon: "\u{1F47E}" },
+        { id: "games_10", label: "Hooked", description: "Play 10 total games", icon: "\u{1F3AE}" },
+        { id: "games_50", label: "Obsessed", description: "Play 50 total games", icon: "\u2764\uFE0F" },
+        { id: "lines_100", label: "Centurion", description: "Clear 100 cumulative lines", icon: "\u{1F4AF}" },
+        { id: "lines_1000", label: "Grandmaster Stacker", description: "Clear 1,000 cumulative lines", icon: "\u{1F3C6}" },
+        { id: "daily_challenge_1", label: "Daily Pioneer", description: "Complete your first Daily Challenge", icon: "\u{1F3C5}" },
+        { id: "streak_5", label: "On Fire", description: "Reach a 5-game PB streak", icon: "\u{1F525}" },
+        { id: "submit_lb", label: "Public Record", description: "Submit a score to online leaderboard", icon: "\u{1F310}" },
+        { id: "sprint_finish", label: "Sprint Runner", description: "Complete a 40-line sprint", icon: "\u26A1" }
+      ];
+      S = {
+        // Layout / device
+        CELL: 30,
+        // px per cell — recalculated by ui.js on init & resize
+        isMobile: false,
+        // set by ui.js initLayout, read by game.js key handler
+        _kbMode: false,
+        // iPad + external keyboard mode (ui.js writes, game.js reads)
+        // Live board data (game.js writes, ui.js reads each frame)
+        board: null,
+        current: null,
+        lockResets: 0,
+        lowestY: 0,
+        next: [],
+        held: null,
+        // Score HUD (game.js writes, ui.js updateUI reads)
+        score: 0,
+        lines: 0,
+        level: 1,
+        combo: 0,
+        hiScore: 0,
+        b2b: false,
+        // Game control flags (game.js writes, audio.js + ui.js read)
+        gameRunning: false,
+        gamePaused: false,
+        isDailyMode: false,
+        isSprintMode: false,
+        isBlitzMode: false,
+        isUltraMode: false,
+        // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
+        _countdownVal: 0,
+        _countdownGo: 0,
+        _countdownTs: 0,
+        // Leaderboard state (game.js initialises, leaderboard.js reads/writes)
+        lbMode: "marathon",
+        _lbCache: {
+          board: [],
+          dailyBoard: [],
+          weeklyBoard: [],
+          challengeBoard: [],
+          challengeRank: 0,
+          challengeAlltimeBoard: [],
+          challengeAlltimeRank: 0,
+          sprintBoard: [],
+          sprintDailyBoard: [],
+          sprintWeeklyBoard: [],
+          sprintRank: 0,
+          sprintDailyRank: 0,
+          sprintWeeklyRank: 0,
+          mySprintTime: 0
+        },
+        // Audio / visual settings (written by audio.js or ui.js, read by both)
+        muteAudio: false,
+        animIntensity: "full",
+        // 'full' | 'reduced' | 'off'
+        lowPerfMode: false,
+        colorblindMode: false,
+        ghostVisible: true,
+        // Per-frame visual effects (game.js lockPiece writes, ui.js drawBoard reads)
+        flashLines: null,
+        // initialized to new Set() in game.js startup
+        flashTimer: 0,
+        shakeFrames: 0,
+        shakeMag: 0.4,
+        shakeAllDir: false,
+        comboFlash: 0,
+        comboFlashColor: "#00c8ff",
+        rainbowBorder: 0,
+        dangerPulse: 0,
+        levelUpScanline: 0,
+        // Game mechanics (game.js writes, ui.js drawBoard reads for lock progress bar)
+        lockActive: false,
+        lockTimer: 0,
+        lockMs: 500,
+        // Input settings (ui.js settings fns write, game.js DAS timer reads)
+        das: 150,
+        sdf: 40,
+        // 0 = Infinity
+        arr: 50,
+        dcd: 16,
+        dcdTimer: 0,
+        // Sprint timing (game.js writes, ui.js updateUI/updateSprintTimer reads)
+        _sprintStartTime: 0,
+        _sprintEndTime: 0,
+        // only game.js uses, kept here for symmetry
+        _sprintHiTime: 0,
+        // Time Attack timing (Blitz/Ultra)
+        _timeAttackStartTime: 0,
+        _blitzHiScore: 0,
+        _ultraHiScore: 0,
+        // Perf lock (ui.js measureFPS writes, game.js _doStartGame reads)
+        _perfLocked: false,
+        // Particle array (game.js endGame/endSprint push directly; ui.js renders)
+        particles: [],
+        // Achievement & lifetime caches (written lazily, used by both modules)
+        _achievementsCache: null,
+        _lifetimeCache: null
+      };
+    }
+  });
 
   // src/audio.js
-  var audioCtx = null;
-  var masterGain = null;
-  var bgmPlaying = false;
-  var bgmNextTime = 0;
-  var bgmBeat = 0;
-  var bgmScheduler = null;
-  var bgmNodes = [];
-  var _speakerUnlocked = false;
   function unlockSpeaker() {
     if (_speakerUnlocked) return;
     _speakerUnlocked = true;
@@ -2183,549 +2199,6 @@ if ('serviceWorker' in navigator) {
       }
     });
   }
-  var _n = (s) => 440 * Math.pow(2, s / 12);
-  var BGM_MELODY = [
-    _n(3),
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(7),
-    null,
-    _n(12),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(10),
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(3),
-    null,
-    _n(5),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(0),
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(3),
-    null,
-    _n(7),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(5),
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(2),
-    null,
-    _n(-2),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null
-  ];
-  var BGM_HARMONY = [
-    _n(-5),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(0),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(-2),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(3),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(-9),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(-5),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(-7),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    _n(-2),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null
-  ];
-  var BGM_BASS_WALK = [
-    _n(-17) / 4,
-    _n(-17) / 4,
-    _n(-17) / 4,
-    _n(-17) / 4,
-    _n(-14) / 4,
-    _n(-14) / 4,
-    _n(-14) / 4,
-    _n(-14) / 4,
-    _n(-21) / 4,
-    _n(-21) / 4,
-    _n(-21) / 4,
-    _n(-21) / 4,
-    _n(-19) / 4,
-    _n(-19) / 4,
-    _n(-19) / 4,
-    _n(-19) / 4
-  ];
-  var BGM_DRUM_PAT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  var CHALLENGE_MELODY = [
-    _n(12),
-    null,
-    _n(7),
-    null,
-    _n(3),
-    _n(7),
-    null,
-    _n(10),
-    null,
-    _n(7),
-    null,
-    _n(3),
-    _n(2),
-    null,
-    _n(0),
-    null,
-    _n(8),
-    null,
-    null,
-    _n(10),
-    _n(12),
-    null,
-    _n(10),
-    null,
-    _n(8),
-    _n(7),
-    null,
-    null,
-    _n(5),
-    null,
-    _n(7),
-    null,
-    _n(0),
-    _n(3),
-    null,
-    _n(5),
-    _n(7),
-    null,
-    _n(10),
-    null,
-    _n(12),
-    null,
-    _n(10),
-    _n(8),
-    null,
-    _n(7),
-    null,
-    _n(5),
-    _n(7),
-    null,
-    _n(10),
-    null,
-    _n(12),
-    _n(10),
-    _n(8),
-    null,
-    _n(7),
-    null,
-    _n(5),
-    null,
-    _n(0),
-    null,
-    null,
-    null
-  ];
-  var CHALLENGE_HARMONY = [
-    _n(8),
-    null,
-    _n(3),
-    null,
-    _n(0),
-    _n(3),
-    null,
-    _n(7),
-    null,
-    _n(3),
-    null,
-    _n(0),
-    _n(-2),
-    null,
-    _n(-5),
-    null,
-    _n(5),
-    null,
-    null,
-    _n(7),
-    _n(8),
-    null,
-    _n(7),
-    null,
-    _n(5),
-    _n(3),
-    null,
-    null,
-    _n(2),
-    null,
-    _n(3),
-    null,
-    _n(-5),
-    _n(0),
-    null,
-    _n(2),
-    _n(3),
-    null,
-    _n(7),
-    null,
-    _n(8),
-    null,
-    _n(7),
-    _n(5),
-    null,
-    _n(3),
-    null,
-    _n(2),
-    _n(3),
-    null,
-    _n(7),
-    null,
-    _n(8),
-    _n(7),
-    _n(5),
-    null,
-    _n(3),
-    null,
-    _n(2),
-    null,
-    _n(-5),
-    null,
-    null,
-    null
-  ];
-  var CHALLENGE_BASS_WALK = [
-    _n(0) / 4,
-    _n(7) / 4,
-    _n(0) / 4,
-    _n(3) / 4,
-    _n(8) / 4,
-    _n(8) / 4,
-    _n(3) / 4,
-    _n(7) / 4,
-    _n(0) / 4,
-    _n(0) / 4,
-    _n(-2) / 4,
-    _n(-2) / 4,
-    _n(3) / 4,
-    _n(5) / 4,
-    _n(0) / 4,
-    _n(0) / 4
-  ];
-  var CHALLENGE_DRUM_PAT = [1, 0, 4, 0, 2, 0, 4, 0, 1, 0, 4, 0, 2, 0, 4, 0];
-  var SPRINT_MELODY = [
-    _n(15),
-    null,
-    _n(12),
-    null,
-    _n(10),
-    null,
-    _n(7),
-    null,
-    _n(10),
-    null,
-    _n(12),
-    null,
-    _n(15),
-    null,
-    null,
-    null,
-    _n(17),
-    null,
-    _n(15),
-    null,
-    _n(12),
-    null,
-    _n(10),
-    null,
-    _n(12),
-    null,
-    _n(15),
-    null,
-    _n(17),
-    null,
-    null,
-    null,
-    _n(19),
-    null,
-    _n(15),
-    null,
-    _n(12),
-    null,
-    _n(10),
-    null,
-    _n(7),
-    null,
-    _n(5),
-    null,
-    _n(3),
-    null,
-    null,
-    null,
-    _n(5),
-    null,
-    _n(7),
-    null,
-    _n(10),
-    null,
-    _n(12),
-    null,
-    _n(15),
-    null,
-    _n(17),
-    null,
-    _n(15),
-    null,
-    null,
-    null
-  ];
-  var SPRINT_HARMONY = [
-    _n(3),
-    null,
-    null,
-    null,
-    _n(7),
-    null,
-    null,
-    null,
-    _n(3),
-    null,
-    null,
-    null,
-    _n(7),
-    null,
-    null,
-    null,
-    _n(5),
-    null,
-    null,
-    null,
-    _n(8),
-    null,
-    null,
-    null,
-    _n(5),
-    null,
-    null,
-    null,
-    _n(8),
-    null,
-    null,
-    null,
-    _n(7),
-    null,
-    null,
-    null,
-    _n(10),
-    null,
-    null,
-    null,
-    _n(3),
-    null,
-    null,
-    null,
-    _n(7),
-    null,
-    null,
-    null,
-    _n(5),
-    null,
-    null,
-    null,
-    _n(10),
-    null,
-    null,
-    null,
-    _n(7),
-    null,
-    null,
-    null,
-    _n(3),
-    null,
-    null,
-    null
-  ];
-  var SPRINT_BASS_WALK = [
-    _n(-9) / 4,
-    _n(-9) / 4,
-    _n(-9) / 4,
-    _n(-9) / 4,
-    _n(-5) / 4,
-    _n(-5) / 4,
-    _n(-5) / 4,
-    _n(-5) / 4,
-    _n(-7) / 4,
-    _n(-7) / 4,
-    _n(-7) / 4,
-    _n(-7) / 4,
-    _n(-5) / 4,
-    _n(-5) / 4,
-    _n(-5) / 4,
-    _n(-5) / 4
-  ];
-  var SPRINT_DRUM_PAT = [1, 0, 3, 0, 2, 0, 3, 0, 1, 0, 3, 0, 2, 0, 3, 0];
-  var BLITZ_MELODY = [
-    null,
-    _n(12),
-    null,
-    null,
-    _n(12),
-    null,
-    _n(15),
-    null,
-    null,
-    _n(15),
-    null,
-    _n(17),
-    null,
-    null,
-    _n(17),
-    null,
-    null,
-    _n(10),
-    null,
-    null,
-    _n(10),
-    null,
-    _n(14),
-    null,
-    null,
-    _n(14),
-    null,
-    _n(12),
-    null,
-    null,
-    _n(12),
-    null
-  ];
-  var BLITZ_HARMONY = [
-    _n(0),
-    null,
-    _n(3),
-    null,
-    _n(7),
-    null,
-    _n(0),
-    null,
-    _n(3),
-    null,
-    _n(7),
-    null,
-    _n(10),
-    null,
-    _n(7),
-    null,
-    _n(-2),
-    null,
-    _n(2),
-    null,
-    _n(5),
-    null,
-    _n(-2),
-    null,
-    _n(2),
-    null,
-    _n(5),
-    null,
-    _n(8),
-    null,
-    _n(5),
-    null
-  ];
-  var BLITZ_BASS_WALK = [
-    _n(0) / 4,
-    _n(3) / 4,
-    _n(7) / 4,
-    _n(0) / 4,
-    _n(0) / 4,
-    _n(3) / 4,
-    _n(7) / 4,
-    _n(0) / 4,
-    _n(-2) / 4,
-    _n(2) / 4,
-    _n(5) / 4,
-    _n(-2) / 4,
-    _n(-2) / 4,
-    _n(2) / 4,
-    _n(5) / 4,
-    _n(-2) / 4
-  ];
-  var BLITZ_DRUM_PAT = [1, 4, 6, 4, 1, 4, 6, 4, 1, 4, 6, 4, 1, 4, 6, 4];
-  var _drumBuffer = null;
-  var _drumBufCtx = null;
   function _getDrumBuf() {
     if (_drumBuffer && _drumBufCtx === audioCtx) return _drumBuffer;
     if (!audioCtx) return null;
@@ -2797,9 +2270,9 @@ if ('serviceWorker' in navigator) {
     _bgmRegister(src, filt, g);
   }
   function getBGMBeat() {
-    let baseBpm = 100;
-    if (S.isSprintMode) baseBpm = 125;
-    else if (S.isBlitzMode) baseBpm = 130;
+    let baseBpm = 112;
+    if (S.isSprintMode) baseBpm = 135;
+    else if (S.isBlitzMode || S.isUltraMode) baseBpm = 130;
     else if (S.isDailyMode) baseBpm = 165;
     const bpm = Math.min(210, baseBpm + (S.level || 1) * 5);
     return 60 / bpm / 4;
@@ -2826,7 +2299,7 @@ if ('serviceWorker' in navigator) {
       harmony = SPRINT_HARMONY;
       bassWalk = SPRINT_BASS_WALK;
       drumPat = SPRINT_DRUM_PAT;
-    } else if (S.isBlitzMode) {
+    } else if (S.isBlitzMode || S.isUltraMode) {
       melody = BLITZ_MELODY;
       harmony = BLITZ_HARMONY;
       bassWalk = BLITZ_BASS_WALK;
@@ -2902,7 +2375,6 @@ if ('serviceWorker' in navigator) {
     bgmNextTime = audioCtx.currentTime + 0.1;
     bgmScheduleLoop();
   }
-  var _sfxCache = {};
   async function _renderBuffer(key, instructions, totalDur) {
     if (_sfxCache[key]) return _sfxCache[key];
     const sr = 44100;
@@ -3008,7 +2480,6 @@ if ('serviceWorker' in navigator) {
   function sfxLevelUp() {
     playSFX("levelUp");
   }
-  var _lastUIClick = 0;
   function sfxUIClick() {
     const now = performance.now();
     if (now - _lastUIClick < 50) return;
@@ -3038,58 +2509,1005 @@ if ('serviceWorker' in navigator) {
       masterGain = null;
     }
   }
-  if (window.OfflineAudioContext || window.webkitOfflineAudioContext) {
-    preDecodeSFX().catch((e) => console.warn("SFX pre-render failed:", e));
-  }
+  var audioCtx, masterGain, bgmPlaying, bgmNextTime, bgmBeat, bgmScheduler, bgmNodes, _speakerUnlocked, _n, BGM_MELODY, BGM_HARMONY, BGM_BASS_WALK, BGM_DRUM_PAT, CHALLENGE_MELODY, CHALLENGE_HARMONY, CHALLENGE_BASS_WALK, CHALLENGE_DRUM_PAT, SPRINT_MELODY, SPRINT_HARMONY, SPRINT_BASS_WALK, SPRINT_DRUM_PAT, BLITZ_MELODY, BLITZ_HARMONY, BLITZ_BASS_WALK, BLITZ_DRUM_PAT, _drumBuffer, _drumBufCtx, _sfxCache, _lastUIClick;
+  var init_audio = __esm({
+    "src/audio.js"() {
+      init_shared();
+      audioCtx = null;
+      masterGain = null;
+      bgmPlaying = false;
+      bgmNextTime = 0;
+      bgmBeat = 0;
+      bgmScheduler = null;
+      bgmNodes = [];
+      _speakerUnlocked = false;
+      _n = (s) => 440 * Math.pow(2, s / 12);
+      BGM_MELODY = [
+        // Bar 1 (C Major)
+        _n(3),
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        // Bar 2 (F Major)
+        _n(8),
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        _n(0),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        // Bar 3 (G Major)
+        _n(10),
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(5),
+        null,
+        _n(2),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        // Bar 4 (C Major)
+        _n(7),
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-2),
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        // Bar 5 (C Major higher)
+        _n(15),
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        // Bar 6 (F Major)
+        _n(12),
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(8),
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        // Bar 7 (G Major)
+        _n(14),
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        _n(5),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        // Bar 8 (C Major)
+        _n(15),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null
+      ];
+      BGM_HARMONY = [
+        _n(-5),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(0),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-4),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(0),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-7),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-2),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-9),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-5),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-5),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-4),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-2),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(5),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(-5),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        _n(0),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ];
+      BGM_BASS_WALK = [
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-16) / 4,
+        _n(-16) / 4,
+        _n(-16) / 4,
+        _n(-16) / 4,
+        _n(-14) / 4,
+        _n(-14) / 4,
+        _n(-14) / 4,
+        _n(-14) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-16) / 4,
+        _n(-16) / 4,
+        _n(-16) / 4,
+        _n(-16) / 4,
+        _n(-14) / 4,
+        _n(-14) / 4,
+        _n(-14) / 4,
+        _n(-14) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4,
+        _n(-21) / 4
+      ];
+      BGM_DRUM_PAT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      CHALLENGE_MELODY = [
+        // Bar 1
+        _n(10),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(5),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        // Bar 2
+        _n(12),
+        null,
+        _n(15),
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        // Bar 3
+        _n(10),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(5),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        // Bar 4
+        _n(5),
+        null,
+        _n(3),
+        null,
+        _n(5),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(5),
+        null,
+        _n(3),
+        null,
+        // Bar 5 (Climax)
+        _n(15),
+        null,
+        _n(19),
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        // Bar 6
+        _n(17),
+        null,
+        _n(19),
+        null,
+        _n(22),
+        null,
+        _n(19),
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        // Bar 7
+        _n(15),
+        null,
+        _n(19),
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        // Bar 8
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(5),
+        null,
+        _n(3),
+        null,
+        _n(5),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null
+      ];
+      CHALLENGE_HARMONY = [
+        // Fast pulsing chords: C, F, C, G
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(2),
+        null,
+        _n(5),
+        null,
+        _n(2),
+        null,
+        _n(5),
+        null,
+        _n(2),
+        null,
+        _n(5),
+        null,
+        _n(2),
+        null,
+        _n(5),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(8),
+        null,
+        _n(12),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(5),
+        null,
+        _n(10),
+        null,
+        _n(5),
+        null,
+        _n(10),
+        null,
+        _n(5),
+        null,
+        _n(10),
+        null,
+        _n(5),
+        null,
+        _n(10),
+        null
+      ];
+      CHALLENGE_BASS_WALK = [
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-4) / 4,
+        _n(-4) / 4,
+        _n(-4) / 4,
+        _n(-4) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-4) / 4,
+        _n(-4) / 4,
+        _n(-4) / 4,
+        _n(-4) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4
+      ];
+      CHALLENGE_DRUM_PAT = [1, 0, 4, 0, 2, 0, 4, 0, 1, 0, 4, 0, 2, 0, 4, 0];
+      SPRINT_MELODY = [
+        // Bar 1-4 (A Section)
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        null,
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        _n(17),
+        null,
+        null,
+        null,
+        _n(19),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(5),
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        _n(5),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        null,
+        null,
+        // Bar 5-8 (B Section - Higher & Energetic)
+        _n(19),
+        null,
+        _n(24),
+        null,
+        _n(19),
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        _n(17),
+        null,
+        _n(19),
+        null,
+        null,
+        null,
+        _n(17),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        _n(17),
+        null,
+        null,
+        null,
+        _n(24),
+        null,
+        _n(19),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        _n(19),
+        null,
+        _n(24),
+        null,
+        null,
+        null,
+        _n(19),
+        null,
+        _n(15),
+        null,
+        _n(12),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(5),
+        null,
+        _n(3),
+        null,
+        null,
+        null
+      ];
+      SPRINT_HARMONY = [
+        _n(3),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(5),
+        null,
+        null,
+        null,
+        _n(8),
+        null,
+        null,
+        null,
+        _n(5),
+        null,
+        null,
+        null,
+        _n(8),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(5),
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        null,
+        null,
+        _n(15),
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        null,
+        null,
+        _n(15),
+        null,
+        null,
+        null,
+        _n(8),
+        null,
+        null,
+        null,
+        _n(12),
+        null,
+        null,
+        null,
+        _n(8),
+        null,
+        null,
+        null,
+        _n(12),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(10),
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        _n(7),
+        null,
+        null,
+        null,
+        _n(5),
+        null,
+        null,
+        null,
+        _n(8),
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null,
+        _n(3),
+        null,
+        null,
+        null
+      ];
+      SPRINT_BASS_WALK = [
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-9) / 4,
+        _n(-5) / 4,
+        _n(-5) / 4,
+        _n(-5) / 4,
+        _n(-5) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-7) / 4,
+        _n(-5) / 4,
+        _n(-5) / 4,
+        _n(-5) / 4,
+        _n(-5) / 4
+      ];
+      SPRINT_DRUM_PAT = [1, 0, 3, 0, 2, 0, 3, 0, 1, 0, 3, 0, 2, 0, 3, 0];
+      BLITZ_MELODY = [
+        null,
+        _n(12),
+        null,
+        null,
+        _n(12),
+        null,
+        _n(15),
+        null,
+        null,
+        _n(15),
+        null,
+        _n(17),
+        null,
+        null,
+        _n(17),
+        null,
+        null,
+        _n(10),
+        null,
+        null,
+        _n(10),
+        null,
+        _n(14),
+        null,
+        null,
+        _n(14),
+        null,
+        _n(12),
+        null,
+        null,
+        _n(12),
+        null
+      ];
+      BLITZ_HARMONY = [
+        _n(0),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(0),
+        null,
+        _n(3),
+        null,
+        _n(7),
+        null,
+        _n(10),
+        null,
+        _n(7),
+        null,
+        _n(-2),
+        null,
+        _n(2),
+        null,
+        _n(5),
+        null,
+        _n(-2),
+        null,
+        _n(2),
+        null,
+        _n(5),
+        null,
+        _n(8),
+        null,
+        _n(5),
+        null
+      ];
+      BLITZ_BASS_WALK = [
+        _n(0) / 4,
+        _n(3) / 4,
+        _n(7) / 4,
+        _n(0) / 4,
+        _n(0) / 4,
+        _n(3) / 4,
+        _n(7) / 4,
+        _n(0) / 4,
+        _n(-2) / 4,
+        _n(2) / 4,
+        _n(5) / 4,
+        _n(-2) / 4,
+        _n(-2) / 4,
+        _n(2) / 4,
+        _n(5) / 4,
+        _n(-2) / 4
+      ];
+      BLITZ_DRUM_PAT = [1, 4, 6, 4, 1, 4, 6, 4, 1, 4, 6, 4, 1, 4, 6, 4];
+      _drumBuffer = null;
+      _drumBufCtx = null;
+      _sfxCache = {};
+      _lastUIClick = 0;
+      if (window.OfflineAudioContext || window.webkitOfflineAudioContext) {
+        preDecodeSFX().catch((e) => console.warn("SFX pre-render failed:", e));
+      }
+    }
+  });
 
   // src/ui.js
-  var gc = document.getElementById("game-canvas");
-  var gctx = gc.getContext("2d");
-  var pc = document.getElementById("particle-canvas");
-  var pctx = pc.getContext("2d");
-  var ncD = document.getElementById("next-canvas");
-  var ncDx = ncD.getContext("2d");
-  var hcD = document.getElementById("hold-canvas");
-  var hcDx = hcD.getContext("2d");
-  var ncM = document.getElementById("next-canvas-m");
-  var ncMx = ncM.getContext("2d");
-  var hcM = document.getElementById("hold-canvas-m");
-  var hcMx = hcM.getContext("2d");
-  var bgc = document.getElementById("bg-canvas");
-  var bgx = bgc.getContext("2d");
-  var $score = document.getElementById("score-display");
-  var $scoreM = document.getElementById("score-display-m");
-  var $lines = document.getElementById("lines-display");
-  var $linesM = document.getElementById("lines-display-m");
-  var $level = document.getElementById("level-display");
-  var $levelM = document.getElementById("level-display-m");
-  var $hiScore = document.getElementById("hi-score");
-  var $hiScoreM = document.getElementById("hi-score-m");
-  var $levelBar = document.getElementById("level-bar");
-  var $bpmEl = document.getElementById("bpm-display");
-  var $combo = document.getElementById("combo-display");
-  var $app = document.getElementById("app");
-  var $flash = document.getElementById("screen-flash");
-  var $scorePopup = document.getElementById("score-popup");
-  var _rgbCache = /* @__PURE__ */ new Map();
-  var _nudgeActive = false;
-  var stars = [];
-  var nebulae = [];
-  var _cBgPulse = 0;
-  var _lpBgCache = null;
-  var _lpChBgCache = null;
-  var _staticBgCache = null;
-  var _staticChEdgeCache = null;
-  var _staticChCoreCache = null;
-  var _cellSprites = {};
-  var _lastBorderColor = null;
-  var _fpsCnt = 0;
-  var _fpsLast = 0;
-  var _fpsLowCount = 0;
-  var _perfHold = 0;
-  var _htpOpenTs = 0;
-  var _statsOpenTs = 0;
-  var PAL = ["#00c8ff", "#a000ff", "#ff0080", "#ffe600", "#00ff88"];
   function measureFPS(ts) {
     _fpsCnt++;
     const dt = ts - _fpsLast;
@@ -3280,18 +3698,6 @@ if ('serviceWorker' in navigator) {
       drawHold();
     }
   }
-  document.addEventListener("touchstart", () => {
-    if (S._kbMode && !S.gamePaused) _disableKbMode();
-  }, { passive: true });
-  var _resizeTimer;
-  window.addEventListener("resize", () => {
-    clearTimeout(_resizeTimer);
-    _resizeTimer = setTimeout(() => {
-      initLayout();
-      initStars();
-      if (S.gameRunning) drawBoard();
-    }, 150);
-  });
   function _buildLowPerfBg(W, H, isChallenge) {
     const oc = document.createElement("canvas");
     oc.width = W;
@@ -3350,8 +3756,9 @@ if ('serviceWorker' in navigator) {
   }
   function getBgTheme() {
     if (S.isDailyMode) return { m: "daily", type: "nebula", bg: "rgba(15,5,0,0.18)", hueBase: 15, hueVar: 15, core: "rgba(255,100,0,0.015)", core2: "rgba(200,80,0,0.01)", edge: "rgba(200,80,0,0.4)", glow: true, speed: 1.7 };
-    if (S.isBlitzMode) return { m: "blitz", type: "nebula", bg: "rgba(8,0,8,0.18)", hueBase: 280, core: "rgba(220,0,220,0.04)", core2: "rgba(160,0,160,0.025)", edge: "rgba(160,0,160,1)", glow: true, speed: 1.5 };
-    if (S.isSprintMode) return { m: "sprint", type: "nebula", bg: "rgba(0,5,10,0.18)", hueBase: 190, core: "rgba(0,180,255,0.04)", core2: "rgba(0,120,200,0.025)", edge: "rgba(0,160,255,1)", glow: true, speed: 2 };
+    if (S.isBlitzMode) return { m: "blitz", type: "nebula", bg: "rgba(15,0,0,0.18)", hueBase: 10, core: "rgba(255,50,0,0.04)", core2: "rgba(200,20,0,0.025)", edge: "rgba(255,50,0,1)", glow: true, speed: 2.2 };
+    if (S.isUltraMode) return { m: "ultra", type: "nebula", bg: "rgba(8,0,12,0.18)", hueBase: 280, core: "rgba(200,0,255,0.04)", core2: "rgba(150,0,200,0.025)", edge: "rgba(150,0,200,1)", glow: true, speed: 1.5 };
+    if (S.isSprintMode) return { m: "sprint", type: "matrix", bg: "rgba(0,5,10,0.18)", hueBase: 190, core: "rgba(0,180,255,0.04)", core2: "rgba(0,120,200,0.025)", edge: "rgba(0,160,255,1)", glow: true, speed: 2 };
     return { m: "marathon", type: "nebula", bg: "rgba(0,0,12,0.18)", hueBase: 240, core: "rgba(80,0,160,0.01)", core2: "rgba(40,0,80,0.01)", edge: null, glow: false, speed: 0.8 };
   }
   function drawBackground(dtFactor = 1) {
@@ -3369,54 +3776,75 @@ if ('serviceWorker' in navigator) {
     _cBgPulse = (_cBgPulse + 0.022 * dtFactor * th.speed) % (Math.PI * 2);
     bgx.fillStyle = th.bg;
     bgx.fillRect(0, 0, bgc.width, bgc.height);
-    for (const neb of nebulae) {
-      neb.x += neb.vx * th.speed * dtFactor;
-      neb.y += neb.vy * th.speed * dtFactor;
-      if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width) neb.vx *= -1;
-      if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
-      if (!neb.c) neb.c = {};
-      if (!neb.c[th.m]) {
-        const size = neb.r * 2;
-        const cn = document.createElement("canvas");
-        cn.width = size;
-        cn.height = size;
-        const ctxN = cn.getContext("2d");
-        const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
-        const variance = th.hueVar || 50;
-        const h = th.hueBase + neb.hue % variance;
-        grN.addColorStop(0, `hsla(${h},95%,35%,0.12)`);
-        grN.addColorStop(0.5, `hsla(${(h + variance) % 360},90%,20%,0.06)`);
-        grN.addColorStop(1, "transparent");
-        ctxN.fillStyle = grN;
-        ctxN.fillRect(0, 0, size, size);
-        neb.c[th.m] = cn;
+    if (th.type === "matrix") {
+      if (!_matrixDrops) {
+        _matrixDrops = Array.from({ length: 80 }, () => ({
+          x: Math.random() * bgc.width,
+          y: Math.random() * bgc.height,
+          speed: Math.random() * 1.5 + 0.5,
+          size: Math.floor(Math.random() * 4 + 3),
+          op: Math.random() * 0.1 + 0.05
+        }));
       }
-      bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
-    }
-    bgx.fillStyle = "rgba(180,220,255,0.5)";
-    for (const s of stars) {
-      s.y += s.speed * (th.glow ? 2.8 : 1) * dtFactor;
-      s.x += s.vx * (th.glow ? 2.8 : 1) * dtFactor;
-      if (s.y > bgc.height || s.x > bgc.width) {
-        s.y = Math.random() * bgc.height * 0.4;
-        s.x = Math.random() * bgc.width * 0.6;
+      for (const d of _matrixDrops) {
+        d.y += d.speed * dtFactor;
+        if (d.y > bgc.height) {
+          d.y = -d.size * 3;
+          d.x = Math.random() * bgc.width;
+        }
+        bgx.fillStyle = `rgba(0,150,255,${d.op})`;
+        bgx.fillRect(d.x, d.y, d.size, d.size * 2);
       }
-      if (th.glow) {
-        const tLen = s.speed * 22;
-        const tg = bgx.createLinearGradient(s.x - s.vx * 22, s.y - tLen, s.x, s.y);
-        tg.addColorStop(0, "transparent");
-        tg.addColorStop(1, `rgba(255,${80 + s.r * 40 | 0},0,${s.r * 0.22})`);
-        bgx.strokeStyle = tg;
-        bgx.lineWidth = s.r * 0.9;
-        bgx.beginPath();
-        bgx.moveTo(s.x - s.vx * 22, s.y - tLen);
-        bgx.lineTo(s.x, s.y);
-        bgx.stroke();
-      } else {
-        bgx.beginPath();
-        bgx.moveTo(s.x + s.r, s.y);
-        bgx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        bgx.fill();
+    } else {
+      for (const neb of nebulae) {
+        neb.x += neb.vx * th.speed * dtFactor;
+        neb.y += neb.vy * th.speed * dtFactor;
+        if (neb.x - neb.r < 0 || neb.x + neb.r > bgc.width) neb.vx *= -1;
+        if (neb.y - neb.r < 0 || neb.y + neb.r > bgc.height) neb.vy *= -1;
+        if (!neb.c) neb.c = {};
+        if (!neb.c[th.m]) {
+          const size = neb.r * 2;
+          const cn = document.createElement("canvas");
+          cn.width = size;
+          cn.height = size;
+          const ctxN = cn.getContext("2d");
+          const grN = ctxN.createRadialGradient(neb.r, neb.r, 0, neb.r, neb.r, neb.r);
+          const variance = th.hueVar || 50;
+          const h = th.hueBase + neb.hue % variance;
+          grN.addColorStop(0, `hsla(${h},95%,35%,0.12)`);
+          grN.addColorStop(0.5, `hsla(${(h + variance) % 360},90%,20%,0.06)`);
+          grN.addColorStop(1, "transparent");
+          ctxN.fillStyle = grN;
+          ctxN.fillRect(0, 0, size, size);
+          neb.c[th.m] = cn;
+        }
+        bgx.drawImage(neb.c[th.m], neb.x - neb.r, neb.y - neb.r);
+      }
+      bgx.fillStyle = "rgba(180,220,255,0.5)";
+      for (const s of stars) {
+        s.y += s.speed * (th.glow ? 2.8 : 1) * dtFactor;
+        s.x += s.vx * (th.glow ? 2.8 : 1) * dtFactor;
+        if (s.y > bgc.height || s.x > bgc.width) {
+          s.y = Math.random() * bgc.height * 0.4;
+          s.x = Math.random() * bgc.width * 0.6;
+        }
+        if (th.glow) {
+          const tLen = s.speed * 22;
+          const tg = bgx.createLinearGradient(s.x - s.vx * 22, s.y - tLen, s.x, s.y);
+          tg.addColorStop(0, "transparent");
+          tg.addColorStop(1, `rgba(255,${80 + s.r * 40 | 0},0,${s.r * 0.22})`);
+          bgx.strokeStyle = tg;
+          bgx.lineWidth = s.r * 0.9;
+          bgx.beginPath();
+          bgx.moveTo(s.x - s.vx * 22, s.y - tLen);
+          bgx.lineTo(s.x, s.y);
+          bgx.stroke();
+        } else {
+          bgx.beginPath();
+          bgx.moveTo(s.x + s.r, s.y);
+          bgx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          bgx.fill();
+        }
       }
     }
     if (!_staticBgCache || _staticBgCache.width !== bgc.width || _staticBgCache.height !== bgc.height || _staticBgCache.mode !== th.m) {
@@ -3580,9 +4008,6 @@ if ('serviceWorker' in navigator) {
     ctx.restore();
     if (S.colorblindMode && key) drawCBPattern(ctx, px, py, s, key);
   }
-  var visX = null;
-  var visY = null;
-  var _lastPieceRef = null;
   function drawBoard(dtFactor = 1) {
     const W = COLS * S.CELL, H = ROWS * S.CELL;
     gctx.clearRect(0, 0, W, H);
@@ -4171,10 +4596,26 @@ if ('serviceWorker' in navigator) {
     $bpmEl.textContent = Math.min(200, 135 + S.level * 5) + " BPM";
   }
   function updateSprintTimer() {
-    const elapsed = S._sprintStartTime > 0 ? performance.now() - S._sprintStartTime : 0;
-    const fmt = fmtTime(elapsed);
-    $score.textContent = fmt;
-    if ($scoreM) $scoreM.textContent = fmt;
+    if (S.isSprintMode) {
+      const elapsed = S._sprintStartTime > 0 ? performance.now() - S._sprintStartTime : 0;
+      const fmt = fmtTime(elapsed);
+      $score.textContent = fmt;
+      if ($scoreM) $scoreM.textContent = fmt;
+      $lines.textContent = Math.max(0, SPRINT_LINES - S.lines);
+      if ($linesM) $linesM.textContent = Math.max(0, SPRINT_LINES - S.lines);
+    } else if (S.isBlitzMode || S.isUltraMode) {
+      const totalTime = S.isBlitzMode ? 12e4 : 18e4;
+      const elapsed = S._timeAttackStartTime > 0 ? performance.now() - S._timeAttackStartTime : 0;
+      const remain = Math.max(0, totalTime - elapsed);
+      const fmt = fmtTime(remain);
+      $score.textContent = fmt;
+      if ($scoreM) $scoreM.textContent = fmt;
+      $lines.textContent = S.score.toLocaleString();
+      if ($linesM) $linesM.textContent = S.score.toLocaleString();
+      if (remain <= 0 && S.gameRunning) {
+        Promise.resolve().then(() => (init_game(), game_exports)).then((m) => m.endTimeAttack());
+      }
+    }
   }
   function showScorePopup(pts, n, tspin = false, b2b = false) {
     const popup = $scorePopup;
@@ -4493,12 +4934,77 @@ if ('serviceWorker' in navigator) {
       if (tooltip.style.opacity === "0") tooltip.style.display = "none";
     }, 150);
   }
+  var gc, gctx, pc, pctx, ncD, ncDx, hcD, hcDx, ncM, ncMx, hcM, hcMx, bgc, bgx, $score, $scoreM, $lines, $linesM, $level, $levelM, $hiScore, $hiScoreM, $levelBar, $bpmEl, $combo, $app, $flash, $scorePopup, _rgbCache, _nudgeActive, stars, nebulae, _cBgPulse, _lpBgCache, _lpChBgCache, _staticBgCache, _staticChEdgeCache, _staticChCoreCache, _cellSprites, _lastBorderColor, _fpsCnt, _fpsLast, _fpsLowCount, _perfHold, _htpOpenTs, _statsOpenTs, PAL, _resizeTimer, _matrixDrops, visX, visY, _lastPieceRef;
+  var init_ui = __esm({
+    "src/ui.js"() {
+      init_shared();
+      init_audio();
+      gc = document.getElementById("game-canvas");
+      gctx = gc.getContext("2d");
+      pc = document.getElementById("particle-canvas");
+      pctx = pc.getContext("2d");
+      ncD = document.getElementById("next-canvas");
+      ncDx = ncD.getContext("2d");
+      hcD = document.getElementById("hold-canvas");
+      hcDx = hcD.getContext("2d");
+      ncM = document.getElementById("next-canvas-m");
+      ncMx = ncM.getContext("2d");
+      hcM = document.getElementById("hold-canvas-m");
+      hcMx = hcM.getContext("2d");
+      bgc = document.getElementById("bg-canvas");
+      bgx = bgc.getContext("2d");
+      $score = document.getElementById("score-display");
+      $scoreM = document.getElementById("score-display-m");
+      $lines = document.getElementById("lines-display");
+      $linesM = document.getElementById("lines-display-m");
+      $level = document.getElementById("level-display");
+      $levelM = document.getElementById("level-display-m");
+      $hiScore = document.getElementById("hi-score");
+      $hiScoreM = document.getElementById("hi-score-m");
+      $levelBar = document.getElementById("level-bar");
+      $bpmEl = document.getElementById("bpm-display");
+      $combo = document.getElementById("combo-display");
+      $app = document.getElementById("app");
+      $flash = document.getElementById("screen-flash");
+      $scorePopup = document.getElementById("score-popup");
+      _rgbCache = /* @__PURE__ */ new Map();
+      _nudgeActive = false;
+      stars = [];
+      nebulae = [];
+      _cBgPulse = 0;
+      _lpBgCache = null;
+      _lpChBgCache = null;
+      _staticBgCache = null;
+      _staticChEdgeCache = null;
+      _staticChCoreCache = null;
+      _cellSprites = {};
+      _lastBorderColor = null;
+      _fpsCnt = 0;
+      _fpsLast = 0;
+      _fpsLowCount = 0;
+      _perfHold = 0;
+      _htpOpenTs = 0;
+      _statsOpenTs = 0;
+      PAL = ["#00c8ff", "#a000ff", "#ff0080", "#ffe600", "#00ff88"];
+      document.addEventListener("touchstart", () => {
+        if (S._kbMode && !S.gamePaused) _disableKbMode();
+      }, { passive: true });
+      window.addEventListener("resize", () => {
+        clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(() => {
+          initLayout();
+          initStars();
+          if (S.gameRunning) drawBoard();
+        }, 150);
+      });
+      _matrixDrops = null;
+      visX = null;
+      visY = null;
+      _lastPieceRef = null;
+    }
+  });
 
   // src/pwa.js
-  var LS_INSTALLED = "pwa-installed";
-  var LS_SNOOZE_UNTIL = "pwa-snooze-until";
-  var SNOOZE_DAYS = 3;
-  var VAPID_PUBLIC_KEY = "BI_rkhrMPW6oSlsvTpIBySBEECvvvkiPtxzmF5DOmtTim3fIDSxXU7P_Bn3TWMi3Vh_hapjlOZ1KyiexF8T0V4s";
   function _urlBase64ToUint8Array(b64) {
     const pad = "=".repeat((4 - b64.length % 4) % 4);
     const base64 = (b64 + pad).replace(/-/g, "+").replace(/_/g, "/");
@@ -4527,19 +5033,6 @@ if ('serviceWorker' in navigator) {
     clearTimeout(el._timer);
     el._timer = setTimeout(() => el.classList.remove("visible"), duration);
   }
-  window._pwaShowUpdateToast = function() {
-    let el = document.getElementById("pwa-update-bar");
-    if (el) return;
-    el = document.createElement("div");
-    el.id = "pwa-update-bar";
-    el.innerHTML = `<span class="material-icons-round" style="font-size:14px">system_update</span>New version available<button class="pwa-update-refresh" onclick="window.location.reload()">REFRESH</button>`;
-    if (document.getElementById("offline-bar")) el.classList.add("below-offline");
-    document.body.appendChild(el);
-    requestAnimationFrame(() => el.classList.add("visible"));
-  };
-  var _deferred = null;
-  var _gameActive = false;
-  var _bannerTimer = null;
   function _installed() {
     return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || !!localStorage.getItem(LS_INSTALLED);
   }
@@ -4561,6 +5054,9 @@ if ('serviceWorker' in navigator) {
   }
   function initPWA() {
     _initOfflineIndicator();
+    if ("Notification" in window && Notification.permission === "granted") {
+      _registerPushSub();
+    }
     if (_installed()) {
       setTimeout(_askNotif, 1500);
       return;
@@ -4673,30 +5169,6 @@ if ('serviceWorker' in navigator) {
     const el = document.getElementById("pwa-banner");
     if (el) el.classList.remove("visible");
   }
-  window._pwaDismiss = function() {
-    sessionStorage.setItem("pwa-closed", "1");
-    hidePWABanner();
-  };
-  window._pwaSnooze = function() {
-    const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
-    localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
-    hidePWABanner();
-  };
-  window._pwaInstall = function() {
-    hidePWABanner();
-    if (_deferred) {
-      _deferred.prompt();
-      _deferred.userChoice.then((r) => {
-        _deferred = null;
-        if (r.outcome === "accepted") {
-          localStorage.setItem(LS_INSTALLED, "1");
-          setTimeout(_askNotif, 800);
-        }
-      });
-    } else if (_iOS()) {
-      _showIOSModal();
-    }
-  };
   function _showIOSModal() {
     _removeModal();
     const el = document.createElement("div");
@@ -4717,10 +5189,6 @@ if ('serviceWorker' in navigator) {
     document.body.appendChild(el);
     requestAnimationFrame(() => el.classList.add("visible"));
   }
-  window._pwaIOSDone = function() {
-    _removeModal();
-    setTimeout(_askNotif, 400);
-  };
   function _askNotif() {
     if (!("Notification" in window)) return;
     if (Notification.permission !== "default") return;
@@ -4745,41 +5213,90 @@ if ('serviceWorker' in navigator) {
     el.classList.remove("visible");
     setTimeout(() => el.remove(), 350);
   }
-  window._pwaNotifAllow = function() {
-    _removeModal();
-    Notification.requestPermission().then((p) => {
-      localStorage.setItem("pwa-notif", p);
-      if (p === "granted") _registerPushSub();
-    });
-  };
-  window._pwaNotifDeny = function() {
-    _removeModal();
-    localStorage.setItem("pwa-notif-snooze", "forever");
-  };
-  window._pwaNotifToggle = function() {
-    if (!("Notification" in window)) {
-      showToast("Notifications not supported on this browser.", { icon: "notifications_off" });
-      return;
+  var LS_INSTALLED, LS_SNOOZE_UNTIL, SNOOZE_DAYS, VAPID_PUBLIC_KEY, _deferred, _gameActive, _bannerTimer;
+  var init_pwa = __esm({
+    "src/pwa.js"() {
+      LS_INSTALLED = "pwa-installed";
+      LS_SNOOZE_UNTIL = "pwa-snooze-until";
+      SNOOZE_DAYS = 3;
+      VAPID_PUBLIC_KEY = "BBu-74h8e7Eot6eulpSdgN6et__o8TR8XF6S-GSIa1SAP2GMnxZLjstr5unMOsCQncevBL6cKUYYa_qK7LrGZD0";
+      window._pwaShowUpdateToast = function() {
+        let el = document.getElementById("pwa-update-bar");
+        if (el) return;
+        el = document.createElement("div");
+        el.id = "pwa-update-bar";
+        el.innerHTML = `<span class="material-icons-round" style="font-size:14px">system_update</span>New version available<button class="pwa-update-refresh" onclick="window.location.reload()">REFRESH</button>`;
+        if (document.getElementById("offline-bar")) el.classList.add("below-offline");
+        document.body.appendChild(el);
+        requestAnimationFrame(() => el.classList.add("visible"));
+      };
+      _deferred = null;
+      _gameActive = false;
+      _bannerTimer = null;
+      window._pwaDismiss = function() {
+        sessionStorage.setItem("pwa-closed", "1");
+        hidePWABanner();
+      };
+      window._pwaSnooze = function() {
+        const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
+        localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
+        hidePWABanner();
+      };
+      window._pwaInstall = function() {
+        hidePWABanner();
+        if (_deferred) {
+          _deferred.prompt();
+          _deferred.userChoice.then((r) => {
+            _deferred = null;
+            if (r.outcome === "accepted") {
+              localStorage.setItem(LS_INSTALLED, "1");
+              setTimeout(_askNotif, 800);
+            }
+          });
+        } else if (_iOS()) {
+          _showIOSModal();
+        }
+      };
+      window._pwaIOSDone = function() {
+        _removeModal();
+        setTimeout(_askNotif, 400);
+      };
+      window._pwaNotifAllow = function() {
+        _removeModal();
+        Notification.requestPermission().then((p) => {
+          localStorage.setItem("pwa-notif", p);
+          if (p === "granted") _registerPushSub();
+        });
+      };
+      window._pwaNotifDeny = function() {
+        _removeModal();
+        localStorage.setItem("pwa-notif-snooze", "forever");
+      };
+      window._pwaNotifToggle = function() {
+        if (!("Notification" in window)) {
+          showToast("Notifications not supported on this browser.", { icon: "notifications_off" });
+          return;
+        }
+        if (Notification.permission === "granted") {
+          showToast("To turn off notifications, go to your browser/device settings.", { icon: "notifications", duration: 4e3 });
+          return;
+        }
+        if (Notification.permission === "denied") {
+          showToast("Notifications are blocked. Enable them in device settings.", { icon: "notifications_off", duration: 4e3 });
+          return;
+        }
+        Notification.requestPermission().then((p) => {
+          localStorage.setItem("pwa-notif", p);
+          if (p === "granted") {
+            _registerPushSub();
+            showToast("Notifications enabled!", { icon: "notifications_active" });
+          }
+        });
+      };
     }
-    if (Notification.permission === "granted") {
-      showToast("To turn off notifications, go to your browser/device settings.", { icon: "notifications", duration: 4e3 });
-      return;
-    }
-    if (Notification.permission === "denied") {
-      showToast("Notifications are blocked. Enable them in device settings.", { icon: "notifications_off", duration: 4e3 });
-      return;
-    }
-    Notification.requestPermission().then((p) => {
-      localStorage.setItem("pwa-notif", p);
-      if (p === "granted") {
-        _registerPushSub();
-        showToast("Notifications enabled!", { icon: "notifications_active" });
-      }
-    });
-  };
+  });
 
   // src/screens.js
-  var $overlay = document.getElementById("overlay");
   function rollNumber(el, val, dur) {
     if (!el) return;
     const start = performance.now();
@@ -4791,7 +5308,6 @@ if ('serviceWorker' in navigator) {
     }
     requestAnimationFrame(update);
   }
-  var _gateTimer = null;
   function showDailyGateOverlay(todayStr) {
     clearInterval(_gateTimer);
     const updateCountdown = () => {
@@ -5183,6 +5699,28 @@ if ('serviceWorker' in navigator) {
           <div class="mode-arrow">\u203A</div>
         </div>
 
+        <!-- BLITZ -->
+        <div class="mode-card blitz" tabindex="0" onclick="startBlitzMode()">
+          <div class="mode-icon">\u23F1\uFE0F</div>
+          <div class="mode-info">
+            <div class="mode-name">BLITZ</div>
+            <div class="mode-desc">2-minute time attack. Maximize your score before time runs out!</div>
+            <div class="mode-best">${parseInt(localStorage.getItem(LS.BLITZ_HI) || "0") > 0 ? `<span style="color:rgba(255,100,0,0.75)">Best: ${parseInt(localStorage.getItem(LS.BLITZ_HI) || "0").toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
+          </div>
+          <div class="mode-arrow">\u203A</div>
+        </div>
+
+        <!-- ULTRA -->
+        <div class="mode-card ultra" tabindex="0" onclick="startUltraMode()">
+          <div class="mode-icon">\u{1F30C}</div>
+          <div class="mode-info">
+            <div class="mode-name">ULTRA</div>
+            <div class="mode-desc">3-minute time attack. Strategic long-term planning for massive scores.</div>
+            <div class="mode-best">${parseInt(localStorage.getItem(LS.ULTRA_HI) || "0") > 0 ? `<span style="color:rgba(200,0,255,0.75)">Best: ${parseInt(localStorage.getItem(LS.ULTRA_HI) || "0").toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>'}</div>
+          </div>
+          <div class="mode-arrow">\u203A</div>
+        </div>
+
         <!-- DAILY CHALLENGE -->
         <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
           <div class="mode-icon">\u{1F3C6}</div>
@@ -5200,9 +5738,21 @@ if ('serviceWorker' in navigator) {
     </div>`;
     $overlay.style.display = "flex";
   }
+  var $overlay, _gateTimer;
+  var init_screens = __esm({
+    "src/screens.js"() {
+      init_shared();
+      init_audio();
+      init_ui();
+      init_leaderboard();
+      init_game();
+      init_pwa();
+      $overlay = document.getElementById("overlay");
+      _gateTimer = null;
+    }
+  });
 
   // src/leaderboard.js
-  var LS_SCORE_QUEUE = "glowtris-score-queue";
   function _enqueueScore(payload) {
     const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || "[]");
     q.push(payload);
@@ -5222,10 +5772,6 @@ if ('serviceWorker' in navigator) {
       }
     }
     localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(remaining));
-  }
-  window.addEventListener("online", _flushScoreQueue);
-  if (navigator.onLine) {
-    setTimeout(_flushScoreQueue, 1e3);
   }
   function _openDonation() {
     if (!SUPPORT_URL) return;
@@ -5822,16 +6368,25 @@ ${cta}`;
     }
     loadStartLeaderboard();
   }
-  window.addEventListener("online", () => {
-    if (document.querySelector(".lb-offline")) loadStartLeaderboard();
+  var LS_SCORE_QUEUE;
+  var init_leaderboard = __esm({
+    "src/leaderboard.js"() {
+      init_shared();
+      init_ui();
+      init_screens();
+      init_pwa();
+      LS_SCORE_QUEUE = "glowtris-score-queue";
+      window.addEventListener("online", _flushScoreQueue);
+      if (navigator.onLine) {
+        setTimeout(_flushScoreQueue, 1e3);
+      }
+      window.addEventListener("online", () => {
+        if (document.querySelector(".lb-offline")) loadStartLeaderboard();
+      });
+    }
   });
 
   // src/loop.js
-  var TICK_RATE = 1;
-  var ACCUMULATOR_CAP = 250;
-  var inputQueue = [];
-  var lastTickTs = 0;
-  var accumulator = 0;
   function enqueueInput(code, type) {
     inputQueue.push({ code, type, t: performance.now() });
   }
@@ -5855,43 +6410,33 @@ ${cta}`;
       callbacks.onTick(TICK_RATE);
     }
   }
+  var TICK_RATE, ACCUMULATOR_CAP, inputQueue, lastTickTs, accumulator;
+  var init_loop = __esm({
+    "src/loop.js"() {
+      TICK_RATE = 1;
+      ACCUMULATOR_CAP = 250;
+      inputQueue = [];
+      lastTickTs = 0;
+      accumulator = 0;
+    }
+  });
 
   // src/game.js
-  document.addEventListener("mouseover", (e) => {
-    const btn = e.target.closest(".action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap");
-    if (btn && (!e.relatedTarget || !btn.contains(e.relatedTarget))) sfxUIHover();
+  var game_exports = {};
+  __export(game_exports, {
+    endTimeAttack: () => endTimeAttack,
+    launchDailyChallenge: () => launchDailyChallenge,
+    pauseGameTiming: () => pauseGameTiming,
+    resumeGameTiming: () => resumeGameTiming,
+    resumeWithCountdown: () => resumeWithCountdown,
+    startBlitzMode: () => startBlitzMode,
+    startCountdown: () => startCountdown,
+    startGame: () => startGame,
+    startMarathonMode: () => startMarathonMode,
+    startSprintMode: () => startSprintMode,
+    startUltraMode: () => startUltraMode,
+    stopGameAndReset: () => stopGameAndReset
   });
-  document.addEventListener("pointerdown", (e) => {
-    document.body.classList.remove("using-kb");
-    if (e.target.closest(".action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap")) sfxUIClick();
-  }, { passive: true });
-  document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
-  document.addEventListener("gesturechange", (e) => e.preventDefault(), { passive: false });
-  document.addEventListener("touchmove", (e) => {
-    if (e.touches.length > 1) e.preventDefault();
-  }, { passive: false });
-  var canHold;
-  var gameOver;
-  var dropInterval;
-  var animFrame;
-  var bag = [];
-  var _countdownTimer = null;
-  var _prng = null;
-  var lastWasRotate = false;
-  var lastKickNonZero = false;
-  var _keyGuide = {
-    move: document.getElementById("key-move"),
-    rotate: document.getElementById("key-rotate"),
-    rotateCcw: document.getElementById("key-rotate-ccw"),
-    rotate180: document.getElementById("key-rotate-180"),
-    soft: document.getElementById("key-soft"),
-    hard: document.getElementById("key-hard"),
-    hold: document.getElementById("key-hold"),
-    pause: document.getElementById("key-pause"),
-    mute: document.getElementById("key-mute")
-  };
-  var $overlay2 = document.getElementById("overlay");
-  var $combo2 = document.getElementById("combo-display");
   function refillBag() {
     bag = [...Object.keys(PIECES)];
     for (let i = bag.length - 1; i > 0; i--) {
@@ -5908,36 +6453,6 @@ ${cta}`;
     const d = PIECES[key];
     return { key, shape: d.shape.map((r) => [...r]), color: d.color, x: Math.floor((COLS - d.shape[0].length) / 2), y: -1, rot: 0 };
   }
-  var KICKS_JLSTZ = {
-    "0>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
-    "1>0": [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]],
-    "1>2": [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]],
-    "2>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
-    "2>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],
-    "3>2": [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],
-    "3>0": [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],
-    "0>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
-  };
-  var KICKS_I = {
-    "0>1": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
-    "1>0": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
-    "1>2": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],
-    "2>1": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
-    "2>3": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
-    "3>2": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
-    "3>0": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
-    "0>3": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]]
-  };
-  var KICKS_180 = {
-    "0>2": [[0, 0], [1, 0], [-1, 0], [0, -1], [1, -1], [-1, -1]],
-    // N→S: horiz first, up 1 last
-    "2>0": [[0, 0], [-1, 0], [1, 0], [0, 1], [-1, 1], [1, 1]],
-    // S→N: horiz first, down 1 last
-    "1>3": [[0, 0], [0, -1], [1, -1], [-1, -1], [1, 0], [-1, 0]],
-    // E→W
-    "3>1": [[0, 0], [0, -1], [-1, -1], [1, -1], [-1, 0], [1, 0]]
-    // W→E
-  };
   function createBoard() {
     return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
   }
@@ -6261,7 +6776,6 @@ ${cta}`;
     if (S.current.key === "O") return false;
     return lastKickNonZero ? "allspin" : false;
   }
-  var KEYS = {};
   function updateKeyGuideState(code, isPressed) {
     let el = null;
     if (code === "ArrowLeft" || code === "ArrowRight") el = _keyGuide.move;
@@ -6346,27 +6860,6 @@ ${cta}`;
     }
     return false;
   }
-  document.addEventListener("keydown", (e) => {
-    document.body.classList.add("using-kb");
-    if (e.code === "KeyM") toggleMute();
-    if (handleUINavigation(e)) return;
-    updateKeyGuideState(e.code, true);
-    if (!S._kbMode && window.matchMedia("(any-pointer:coarse)").matches) _enableKbMode();
-    if (KEYS[e.code]) return;
-    KEYS[e.code] = true;
-    if (!S.gameRunning) return;
-    if (e.code === "KeyP" || e.code === "Escape") {
-      togglePause();
-      return;
-    }
-    if (S.gamePaused || S._countdownVal) return;
-    if (e.code === "ArrowDown" || e.code === "Space") e.preventDefault();
-    enqueueInput(e.code, "down");
-  });
-  document.addEventListener("keyup", (e) => {
-    updateKeyGuideState(e.code, false);
-    KEYS[e.code] = false;
-  });
   function processInput(input) {
     if (input.type !== "down") return;
     if (!S.current) {
@@ -6634,26 +7127,6 @@ ${cta}`;
       window.addEventListener("mouseup", up);
     });
   }
-  makeDpadSlide(".nes-dpad", {
-    "btn-left": { press: () => {
-      moveX(-1);
-      S.dasCharge.left = 0;
-    }, keyTarget: "ArrowLeft" },
-    "btn-right": { press: () => {
-      moveX(1);
-      S.dasCharge.right = 0;
-    }, keyTarget: "ArrowRight" },
-    "btn-soft": { press: () => {
-      S.dasCharge.down = 0;
-    }, keyTarget: "ArrowDown" },
-    "btn-drop": { press: () => hardDrop() }
-  });
-  makeTouchBtn("btn-rotate", () => rotatePiece(1), "game");
-  makeTouchBtn("btn-rotate-ccw", () => rotatePiece(-1), "game");
-  makeTouchBtn("btn-rotate-180", () => rotatePiece(2), "game");
-  makeTouchBtn("btn-hold", () => holdPiece(), "game");
-  makeTouchBtn("btn-pause", () => togglePause(), "any");
-  var lastFrameTs = 0;
   function gameLoop(ts) {
     if (!lastFrameTs) lastFrameTs = ts;
     const dt = ts - lastFrameTs;
@@ -6747,12 +7220,19 @@ ${cta}`;
     gameOver = false;
     const psl = document.getElementById("panel-score-label");
     const lsl = document.getElementById("lines-sub-label");
+    const isTimeAttack = S.isBlitzMode || S.isUltraMode;
     if (S.isSprintMode) {
       S._sprintHiTime = parseInt(localStorage.getItem(LS.SPRINT_HI) || "0");
       S._sprintEndTime = 0;
       S._sprintStartTime = 0;
       if (psl) psl.textContent = "TIME";
       if (lsl) lsl.textContent = "LEFT";
+    } else if (isTimeAttack) {
+      if (S.isBlitzMode) S._blitzHiScore = parseInt(localStorage.getItem(LS.BLITZ_HI) || "0");
+      if (S.isUltraMode) S._ultraHiScore = parseInt(localStorage.getItem(LS.ULTRA_HI) || "0");
+      S._timeAttackStartTime = 0;
+      if (psl) psl.textContent = "TIME";
+      if (lsl) lsl.textContent = "SCORE";
     } else {
       if (psl) psl.textContent = "SCORE";
       if (lsl) lsl.textContent = "CLEARED";
@@ -6761,7 +7241,7 @@ ${cta}`;
     drawNext();
     drawHold();
     updateUI();
-    if (S.isSprintMode) updateSprintTimer();
+    if (S.isSprintMode || isTimeAttack) updateSprintTimer();
     if (animFrame) cancelAnimationFrame(animFrame);
     resetLoop(performance.now());
     startBGM();
@@ -6769,6 +7249,7 @@ ${cta}`;
     startCountdown(() => {
       S.gravityTimer = 0;
       if (S.isSprintMode) S._sprintStartTime = performance.now();
+      if (S.isBlitzMode || S.isUltraMode) S._timeAttackStartTime = performance.now();
     });
   }
   function launchDailyChallenge() {
@@ -6780,7 +7261,6 @@ ${cta}`;
     _prng = mulberry32(parseInt(todayStr, 10));
     startGame();
   }
-  var _sprintPauseTs = 0;
   function pauseGameTiming() {
     if (S.isSprintMode && S._sprintStartTime > 0) _sprintPauseTs = performance.now();
     if (_countdownTimer) {
@@ -6918,117 +7398,288 @@ ${cta}`;
     sfxSprintGoal();
     setTimeout(() => _renderSprintScreen(timeMs, isNewBest, prevBest), 600);
   }
+  function endTimeAttack() {
+    S.gameRunning = false;
+    gameOver = true;
+    stopBGM();
+    sfxSprintGoal();
+    const isBlitz = S.isBlitzMode;
+    const prevBest = isBlitz ? S._blitzHiScore : S._ultraHiScore;
+    const isNewBest = S.score > prevBest;
+    if (isNewBest) {
+      if (isBlitz) {
+        S._blitzHiScore = S.score;
+        localStorage.setItem(LS.BLITZ_HI, S.score);
+      } else {
+        S._ultraHiScore = S.score;
+        localStorage.setItem(LS.ULTRA_HI, S.score);
+      }
+    }
+    if (S.animIntensity !== "off") {
+      if (isNewBest) {
+        triggerAllClearFlash();
+        spawnGoldBurst(COLS / 2 * S.CELL, ROWS / 2 * S.CELL);
+        spawnGoldBurst(COLS / 2 * S.CELL - 60, ROWS / 2 * S.CELL + 40);
+        spawnGoldBurst(COLS / 2 * S.CELL + 60, ROWS / 2 * S.CELL - 20);
+      } else {
+        triggerScreenFlash();
+        spawnGoldBurst(COLS / 2 * S.CELL, ROWS / 2 * S.CELL);
+      }
+      for (let i = 0; i < 60; i++) {
+        const a = Math.random() * Math.PI * 2, sp = Math.random() * 10 + 3;
+        S.particles.push({ x: Math.random() * COLS * S.CELL, y: Math.random() * ROWS * 0.5 * S.CELL, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, decay: Math.random() * 0.01 + 5e-3, color: ["#ff2040", "#cc00ff", "#ffe600", "#ffffff"][Math.floor(Math.random() * 4)], size: Math.random() * 6 + 2, type: "star" });
+      }
+    }
+    setTimeout(() => {
+      const stats = _saveGameStats();
+      stats.isNewBest = isNewBest;
+      _renderGameOverScreen(stats);
+    }, 600);
+  }
   function startSprintMode() {
     S.isSprintMode = true;
     S.isBlitzMode = false;
+    S.isUltraMode = false;
+    S.isDailyMode = false;
+    startGame();
+  }
+  function startBlitzMode() {
+    S.isSprintMode = false;
+    S.isBlitzMode = true;
+    S.isUltraMode = false;
+    S.isDailyMode = false;
+    startGame();
+  }
+  function startUltraMode() {
+    S.isSprintMode = false;
+    S.isBlitzMode = false;
+    S.isUltraMode = true;
     S.isDailyMode = false;
     startGame();
   }
   function startMarathonMode() {
     S.isSprintMode = false;
     S.isBlitzMode = false;
+    S.isUltraMode = false;
     S.isDailyMode = false;
     startGame();
   }
-  S.flashLines = /* @__PURE__ */ new Set();
-  initLayout();
-  initStars();
-  loadSettings();
-  S.hiScore = parseInt(localStorage.getItem(LS.HI) || "0");
-  var $hiScore2 = document.getElementById("hi-score");
-  var $hiScoreM2 = document.getElementById("hi-score-m");
-  if ($hiScore2) $hiScore2.textContent = S.hiScore.toLocaleString();
-  if ($hiScoreM2) $hiScoreM2.textContent = S.hiScore.toLocaleString();
-  fetch("/api/maintenance").then((r) => r.json()).then((data) => {
-    if (!data || !data.time) return;
-    const el = document.getElementById("maintenance-banner");
-    if (!el) return;
-    const t = data.time ? new Date(data.time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
-    document.getElementById("maintenance-text").textContent = t ? `\u26A0 ${data.msg} \u2014 ${t}` : `\u26A0 ${data.msg}`;
-    el.style.display = "block";
-  }).catch(() => {
-  });
-  document.fonts.ready.then(() => {
-    initPWA();
-    animFrame = requestAnimationFrame(function bgOnly(ts) {
-      drawBackground();
-      if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly);
-    });
-    showStartScreen();
-    const mode = new URLSearchParams(window.location.search).get("mode");
-    if (mode === "marathon") setTimeout(startGame, 100);
-    else if (mode === "sprint") setTimeout(startSprintMode, 100);
-    else if (mode === "daily") setTimeout(startDailyChallenge, 100);
-  });
-  (window.requestIdleCallback || function(cb) {
-    setTimeout(cb, 200);
-  })(function() {
-    for (var k in PIECES) getCellSprite(PIECES[k].color);
-  }, { timeout: 8e3 });
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      onPageHide();
-    } else {
-      onPageShow();
+  var canHold, gameOver, dropInterval, animFrame, bag, _countdownTimer, _prng, lastWasRotate, lastKickNonZero, _keyGuide, $overlay2, $combo2, KICKS_JLSTZ, KICKS_I, KICKS_180, KEYS, lastFrameTs, _sprintPauseTs, $hiScore2, $hiScoreM2, _VERSION;
+  var init_game = __esm({
+    "src/game.js"() {
+      init_shared();
+      init_audio();
+      init_ui();
+      init_leaderboard();
+      init_screens();
+      init_loop();
+      init_pwa();
+      document.addEventListener("mouseover", (e) => {
+        const btn = e.target.closest(".action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap");
+        if (btn && (!e.relatedTarget || !btn.contains(e.relatedTarget))) sfxUIHover();
+      });
+      document.addEventListener("pointerdown", (e) => {
+        document.body.classList.remove("using-kb");
+        if (e.target.closest(".action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap")) sfxUIClick();
+      }, { passive: true });
+      document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
+      document.addEventListener("gesturechange", (e) => e.preventDefault(), { passive: false });
+      document.addEventListener("touchmove", (e) => {
+        if (e.touches.length > 1) e.preventDefault();
+      }, { passive: false });
+      bag = [];
+      _countdownTimer = null;
+      _prng = null;
+      lastWasRotate = false;
+      lastKickNonZero = false;
+      _keyGuide = {
+        move: document.getElementById("key-move"),
+        rotate: document.getElementById("key-rotate"),
+        rotateCcw: document.getElementById("key-rotate-ccw"),
+        rotate180: document.getElementById("key-rotate-180"),
+        soft: document.getElementById("key-soft"),
+        hard: document.getElementById("key-hard"),
+        hold: document.getElementById("key-hold"),
+        pause: document.getElementById("key-pause"),
+        mute: document.getElementById("key-mute")
+      };
+      $overlay2 = document.getElementById("overlay");
+      $combo2 = document.getElementById("combo-display");
+      KICKS_JLSTZ = {
+        "0>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
+        "1>0": [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]],
+        "1>2": [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]],
+        "2>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
+        "2>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],
+        "3>2": [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],
+        "3>0": [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],
+        "0>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
+      };
+      KICKS_I = {
+        "0>1": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
+        "1>0": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
+        "1>2": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],
+        "2>1": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
+        "2>3": [[0, 0], [2, 0], [-1, 0], [2, -1], [-1, 2]],
+        "3>2": [[0, 0], [-2, 0], [1, 0], [-2, 1], [1, -2]],
+        "3>0": [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],
+        "0>3": [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]]
+      };
+      KICKS_180 = {
+        "0>2": [[0, 0], [1, 0], [-1, 0], [0, -1], [1, -1], [-1, -1]],
+        // N→S: horiz first, up 1 last
+        "2>0": [[0, 0], [-1, 0], [1, 0], [0, 1], [-1, 1], [1, 1]],
+        // S→N: horiz first, down 1 last
+        "1>3": [[0, 0], [0, -1], [1, -1], [-1, -1], [1, 0], [-1, 0]],
+        // E→W
+        "3>1": [[0, 0], [0, -1], [-1, -1], [1, -1], [-1, 0], [1, 0]]
+        // W→E
+      };
+      KEYS = {};
+      document.addEventListener("keydown", (e) => {
+        document.body.classList.add("using-kb");
+        if (e.code === "KeyM") toggleMute();
+        if (handleUINavigation(e)) return;
+        updateKeyGuideState(e.code, true);
+        if (!S._kbMode && window.matchMedia("(any-pointer:coarse)").matches) _enableKbMode();
+        if (KEYS[e.code]) return;
+        KEYS[e.code] = true;
+        if (!S.gameRunning) return;
+        if (e.code === "KeyP" || e.code === "Escape") {
+          togglePause();
+          return;
+        }
+        if (S.gamePaused || S._countdownVal) return;
+        if (e.code === "ArrowDown" || e.code === "Space") e.preventDefault();
+        enqueueInput(e.code, "down");
+      });
+      document.addEventListener("keyup", (e) => {
+        updateKeyGuideState(e.code, false);
+        KEYS[e.code] = false;
+      });
+      makeDpadSlide(".nes-dpad", {
+        "btn-left": { press: () => {
+          moveX(-1);
+          S.dasCharge.left = 0;
+        }, keyTarget: "ArrowLeft" },
+        "btn-right": { press: () => {
+          moveX(1);
+          S.dasCharge.right = 0;
+        }, keyTarget: "ArrowRight" },
+        "btn-soft": { press: () => {
+          S.dasCharge.down = 0;
+        }, keyTarget: "ArrowDown" },
+        "btn-drop": { press: () => hardDrop() }
+      });
+      makeTouchBtn("btn-rotate", () => rotatePiece(1), "game");
+      makeTouchBtn("btn-rotate-ccw", () => rotatePiece(-1), "game");
+      makeTouchBtn("btn-rotate-180", () => rotatePiece(2), "game");
+      makeTouchBtn("btn-hold", () => holdPiece(), "game");
+      makeTouchBtn("btn-pause", () => togglePause(), "any");
+      lastFrameTs = 0;
+      _sprintPauseTs = 0;
+      S.flashLines = /* @__PURE__ */ new Set();
+      initLayout();
+      initStars();
+      loadSettings();
+      S.hiScore = parseInt(localStorage.getItem(LS.HI) || "0");
+      $hiScore2 = document.getElementById("hi-score");
+      $hiScoreM2 = document.getElementById("hi-score-m");
+      if ($hiScore2) $hiScore2.textContent = S.hiScore.toLocaleString();
+      if ($hiScoreM2) $hiScoreM2.textContent = S.hiScore.toLocaleString();
+      fetch("/api/maintenance").then((r) => r.json()).then((data) => {
+        if (!data || !data.time) return;
+        const el = document.getElementById("maintenance-banner");
+        if (!el) return;
+        const t = data.time ? new Date(data.time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+        document.getElementById("maintenance-text").textContent = t ? `\u26A0 ${data.msg} \u2014 ${t}` : `\u26A0 ${data.msg}`;
+        el.style.display = "block";
+      }).catch(() => {
+      });
+      document.fonts.ready.then(() => {
+        initPWA();
+        animFrame = requestAnimationFrame(function bgOnly(ts) {
+          drawBackground();
+          if (!S.gameRunning) animFrame = requestAnimationFrame(bgOnly);
+        });
+        showStartScreen();
+        const mode = new URLSearchParams(window.location.search).get("mode");
+        if (mode === "marathon") setTimeout(startGame, 100);
+        else if (mode === "sprint") setTimeout(startSprintMode, 100);
+        else if (mode === "daily") setTimeout(startDailyChallenge, 100);
+      });
+      (window.requestIdleCallback || function(cb) {
+        setTimeout(cb, 200);
+      })(function() {
+        for (var k in PIECES) getCellSprite(PIECES[k].color);
+      }, { timeout: 8e3 });
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          onPageHide();
+        } else {
+          onPageShow();
+        }
+      });
+      window.addEventListener("beforeunload", () => {
+        closeAudio();
+        if (animFrame) {
+          cancelAnimationFrame(animFrame);
+          animFrame = null;
+        }
+      });
+      _VERSION = "v0.3.3";
+      window.onerror = function(msg, src, line, col, err) {
+        console.error("[glowtris " + _VERSION + "] uncaught error", {
+          msg,
+          src: src ? src.replace(window.location.origin, "") : src,
+          line,
+          col,
+          stack: err && err.stack ? err.stack.split("\n").slice(0, 5).join("\n") : null
+        });
+      };
+      window.onunhandledrejection = function(e) {
+        const reason = e.reason;
+        console.error("[glowtris " + _VERSION + "] unhandled rejection", {
+          msg: reason instanceof Error ? reason.message : String(reason),
+          stack: reason instanceof Error && reason.stack ? reason.stack.split("\n").slice(0, 5).join("\n") : null
+        });
+      };
+      Object.assign(window, {
+        startGame,
+        startSprintMode,
+        startDailyChallenge,
+        launchDailyChallenge,
+        togglePause,
+        showStartScreen,
+        showModeSelector,
+        openSettings,
+        submitScore,
+        submitSprintScore,
+        shareScore,
+        shareSprintScore,
+        renderLbTab,
+        setLbMode,
+        loadStartLeaderboard,
+        toggleMute,
+        updateDAS,
+        updateARR,
+        updateSDF,
+        updateLockDelay,
+        updateGhost,
+        updateColorblind,
+        cycleAnimIntensity,
+        togglePerfMode,
+        openHowToPlay,
+        closeHowToPlay,
+        openStats,
+        closeStats,
+        showAchTooltip,
+        hideAchTooltip,
+        _openDonation
+      });
     }
   });
-  window.addEventListener("beforeunload", () => {
-    closeAudio();
-    if (animFrame) {
-      cancelAnimationFrame(animFrame);
-      animFrame = null;
-    }
-  });
-  var _VERSION = "v0.3.3";
-  window.onerror = function(msg, src, line, col, err) {
-    console.error("[glowtris " + _VERSION + "] uncaught error", {
-      msg,
-      src: src ? src.replace(window.location.origin, "") : src,
-      line,
-      col,
-      stack: err && err.stack ? err.stack.split("\n").slice(0, 5).join("\n") : null
-    });
-  };
-  window.onunhandledrejection = function(e) {
-    const reason = e.reason;
-    console.error("[glowtris " + _VERSION + "] unhandled rejection", {
-      msg: reason instanceof Error ? reason.message : String(reason),
-      stack: reason instanceof Error && reason.stack ? reason.stack.split("\n").slice(0, 5).join("\n") : null
-    });
-  };
-  Object.assign(window, {
-    startGame,
-    startSprintMode,
-    startDailyChallenge,
-    launchDailyChallenge,
-    togglePause,
-    showStartScreen,
-    showModeSelector,
-    openSettings,
-    submitScore,
-    submitSprintScore,
-    shareScore,
-    shareSprintScore,
-    renderLbTab,
-    setLbMode,
-    loadStartLeaderboard,
-    toggleMute,
-    updateDAS,
-    updateARR,
-    updateSDF,
-    updateLockDelay,
-    updateGhost,
-    updateColorblind,
-    cycleAnimIntensity,
-    togglePerfMode,
-    openHowToPlay,
-    closeHowToPlay,
-    openStats,
-    closeStats,
-    showAchTooltip,
-    hideAchTooltip,
-    _openDonation
-  });
+  init_game();
 })();
 </script>
 </body>
