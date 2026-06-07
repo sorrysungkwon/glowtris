@@ -5733,13 +5733,16 @@ if ('serviceWorker' in navigator) {
       </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
-        <a href="https://blog.glowtris.com" class="footer-link">BLOG</a>
-        <span style="color:rgba(255,255,255,0.12)">\xB7</span>
-        <a href="/privacy.html" class="footer-link">PRIVACY</a>
-        <span style="color:rgba(255,255,255,0.12)">\xB7</span>
-        <a href="/terms.html" class="footer-link">TERMS</a>
-        <span style="color:rgba(255,255,255,0.12)">\xB7</span>
-        <a href="/changelog.html" class="footer-link">CHANGELOG</a>
+        <div style="margin-bottom: 6px;">
+          <a href="/privacy.html" class="footer-link">PRIVACY</a>
+          <span style="color:rgba(255,255,255,0.12)">\xB7</span>
+          <a href="/terms.html" class="footer-link">TERMS</a>
+          <span style="color:rgba(255,255,255,0.12)">\xB7</span>
+          <a href="/changelog.html" class="footer-link">CHANGELOG</a>
+        </div>
+        <div style="margin-top: 6px;">
+          <a href="https://blog.glowtris.com" class="footer-link" style="color:var(--cyan); font-weight:700;">BLOG</a>
+        </div>
       </div>
     </div>`;
     $overlay.style.display = "flex";
