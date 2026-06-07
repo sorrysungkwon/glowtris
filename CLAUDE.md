@@ -1,6 +1,22 @@
 # Instructions for Claude Code
 > Read this file first, then `ROBOT.md`, then `TODO.md`, then `GROWTHPLAN.md` before starting any task.
 
+## 🔐 CREDENTIALS SECURITY (CRITICAL - READ FIRST)
+
+**NEVER put credentials in GitHub:**
+- ❌ NO passwords, tokens, API keys, secrets in README, TODO, CLAUDE, AGENTS, ROBOT, WALKTHROUGH, code
+- ✅ CREDENTIALS.md ONLY (git-ignored, server backup)
+- ✅ USE PLACEHOLDERS: `<API_TOKEN>`, `<PASSWORD>` with "see CREDENTIALS.md"
+- ✅ PRE-COMMIT CHECK: before `git add`, search files for `password=`, `token=`, `secret=`
+
+If you find plaintext credentials:
+1. Delete immediately
+2. Replace with placeholder
+3. Commit: "security: remove plaintext credentials"
+4. Note: CREDENTIALS.md has server backup
+
+---
+
 ## 🔄 SYNC — Mandatory Session Start Protocol
 
 The user will say **"sync"** at the start of a session. When this happens (or at the start of any new session before any task):
