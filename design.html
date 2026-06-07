@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glowtris Design System Specification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080814;
+      --surface: #0e0e20;
+      --surface-2: #141428;
+      --surface-3: #1c1c34;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hi: rgba(255, 255, 255, 0.12);
+      
+      --cyan: #00c8ff;
+      --purple: #a855f7;
+      --pink: #f472b6;
+      --green: #34d399;
+      --amber: #fbbf24;
+      
+      --font-brand: 'Orbitron', sans-serif;
+      --font-body: 'Pretendard Variable', 'Pretendard', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --r-full: 9999px;
+      --r-xl: 18px;
+      --r-lg: 12px;
+      --r-md: 8px;
+      --r-sm: 6px;
+      --r-xs: 4px;
+      
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+      
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --t-fast: 120ms;
+      --t-mid: 200ms;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: rgba(240, 240, 255, 0.9);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 280px;
+      background: #06060f;
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-logo {
+      font-family: var(--font-brand);
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.35));
+    }
+
+    .brand-tagline {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(240, 240, 255, 0.35);
+      font-weight: 700;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(240, 240, 255, 0.45);
+      text-decoration: none;
+      border-radius: var(--r-md);
+      transition: all var(--t-fast) var(--ease-out);
+    }
+
+    .nav-link:hover {
+      color: var(--cyan);
+      background: rgba(0, 200, 255, 0.04);
+    }
+
+    .nav-link.active {
+      color: var(--bg);
+      background: var(--cyan);
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(0, 200, 255, 0.4);
+    }
+
+    /* Main Content */
+    .content {
+      margin-left: 280px;
+      flex: 1;
+      padding: 80px 64px;
+      max-width: 1200px;
+    }
+
+    section {
+      margin-bottom: 80px;
+      scroll-margin-top: 80px;
+    }
+
+    h2 {
+      font-family: var(--font-brand);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--cyan);
+      text-shadow: 0 0 8px rgba(0, 200, 255, 0.15);
+      text-transform: uppercase;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: rgba(240, 240, 255, 0.7);
+    }
+
+    /* Colors Section */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .color-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--t-mid) var(--ease-out);
+    }
+
+    .color-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--cyan);
+      box-shadow: var(--shadow-md), 0 0 12px rgba(0, 200, 255, 0.1);
+    }
+
+    .color-preview {
+      height: 120px;
+      position: relative;
+    }
+
+    .color-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .color-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .color-hex {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(240, 240, 255, 0.4);
+    }
+
+    /* Typography Playground */
+    .playground-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border-hi);
+      padding: 14px 18px;
+      border-radius: var(--r-md);
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: #fff;
+      outline: none;
+      transition: all var(--t-fast);
+      margin-bottom: 32px;
+    }
+
+    .playground-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0, 200, 255, 0.15);
+    }
+
+    .type-scale-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 20px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .type-meta {
+      display: flex;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(240, 240, 255, 0.35);
+    }
+
+    .type-sample {
+      word-break: break-all;
+      transition: color var(--t-fast);
+    }
+
+    /* Shape Previews */
+    .shape-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .shape-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .shape-box {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: transform var(--t-mid) var(--ease-spring);
+    }
+
+    .shape-box:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .shape-name {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* Elevation Section */
+    .elevation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .elev-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all var(--t-mid) var(--ease-out);
+    }
+
+    .elev-name {
+      font-family: var(--font-brand);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    /* Motion Section */
+    .motion-container {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .motion-demo {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .motion-bar {
+      flex: 1;
+      height: 48px;
+      background: var(--surface-3);
+      border-radius: var(--r-md);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .motion-block {
+      width: 48px;
+      height: 46px;
+      background: linear-gradient(to right, var(--cyan), var(--purple));
+      position: absolute;
+      left: 0;
+      top: 0;
+      border-radius: var(--r-md);
+      transition-property: left;
+      transition-duration: var(--t-mid);
+    }
+
+    .motion-btn {
+      background: var(--cyan);
+      color: var(--bg);
+      font-family: var(--font-brand);
+      font-size: 11px;
+      font-weight: 900;
+      padding: 12px 24px;
+      border-radius: var(--r-full);
+      cursor: pointer;
+      border: none;
+      transition: all var(--t-fast) var(--ease-out);
+      box-shadow: 0 0 12px rgba(0, 200, 255, 0.3);
+    }
+
+    .motion-btn:hover {
+      box-shadow: 0 0 20px rgba(0, 200, 255, 0.6);
+      transform: translateY(-2px);
+    }
+
+    /* Tooltip Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: var(--green);
+      color: var(--bg);
+      padding: 12px 24px;
+      border-radius: var(--r-md);
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: var(--shadow-lg), 0 0 16px rgba(52, 211, 153, 0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.30s var(--ease-spring);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-logo">GLOWTRIS</span>
+      <span class="brand-tagline">Design System</span>
+    </div>
+    <ul class="nav-list">
+      <li><a href="#overview" class="nav-link active">Overview</a></li>
+      <li><a href="#colors" class="nav-link">Colors</a></li>
+      <li><a href="#typography" class="nav-link">Typography</a></li>
+      <li><a href="#shapes" class="nav-link">Shapes</a></li>
+      <li><a href="#elevation" class="nav-link">Elevation</a></li>
+      <li><a href="#motion" class="nav-link">Motion</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    
+    <!-- Overview -->
+    <section id="overview">
+      <h2>01. Overview</h2>
+      <p>글로우트리스 디자인 시스템은 <strong>구글 머티리얼 디자인 3 (Material 3)</strong>의 구조적 카테고리를 준수하면서, 게임과 블로그가 공유하는 특유의 어두운 전경(High-contrast cosmos-dark surfaces)과 전기 네온 아케이드 그리드(Electric neon wireframes)의 감성을 조합하여 정립되었습니다.</p>
+      <p>본 대시보드는 로컬에 정의된 핵심 CSS 토큰 및 스펙을 시각적으로 체험하고 조율할 수 있도록 제작된 동적 디자인 가이드입니다.</p>
+    </section>
+
+    <!-- Colors -->
+    <section id="colors">
+      <h2>02. Colors</h2>
+      <p>클릭하여 각 토큰 변수명을 클립보드에 복사할 수 있습니다.</p>
+      
+      <h3 style="font-size: 14px; margin: 24px 0 12px; letter-spacing: 1px; color: rgba(240,240,255,0.4);">CORE NEONS</h3>
+      <div class="color-grid">
+        <div class="color-card" onclick="copyToken('--cyan')">
+          <div class="color-preview" style="background: var(--cyan); box-shadow: inset 0 0 20px rgba(255,255,255,0.2), 0 0 15px rgba(0, 200, 255, 0.4);"></div>
+          <div class="color-info">
+            <span class="color-name">--cyan</span>
+            <span class="color-hex">#00c8ff</span>
+          </div>
+        </div>
+        <div class="color-card" onclick="copyToken('--purple')">
+          <div class="color-preview" style="background: var(--purple); box-shadow: inset 0 0 20px rgba(255,255,255,0.2), 0 0 15px rgba(168, 85, 247, 0.4);"></div>
+          <div class="color-info">
+            <span class="color-name">--purple</span>
+            <span class="color-hex">#a855f7</span>
+          </div>
+        </div>
+        <div class="color-card" onclick="copyToken('--pink')">
+          <div class="color-preview" style="background: var(--pink); box-shadow: inset 0 0 20px rgba(255,255,255,0.2), 0 0 15px rgba(244, 114, 182, 0.4);"></div>
+          <div class="color-info">
+            <span class="color-name">--pink</span>
+            <span class="color-hex">#f472b6</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size: 14px; margin: 36px 0 12px; letter-spacing: 1px; color: rgba(240,240,255,0.4);">FUNCTIONAL STATES</h3>
+      <div class="color-grid">
+        <div class="color-card" onclick="copyToken('--green')">
+          <div class="color-preview" style="background: var(--green);"></div>
+          <div class="color-info">
+            <span class="color-name">--green (Success)</span>
+            <span class="color-hex">#34d399</span>
+          </div>
+        </div>
+        <div class="color-card" onclick="copyToken('--amber')">
+          <div class="color-preview" style="background: var(--amber);"></div>
+          <div class="color-info">
+            <span class="color-name">--amber (Warning)</span>
+            <span class="color-hex">#fbbf24</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography -->
+    <section id="typography">
+      <h2>03. Typography</h2>
+      <p>원하는 텍스트를 입력해 브랜드 타이포그라피 효과를 실시간으로 테스트해 보세요.</p>
+      <input type="text" class="playground-input" value="Behind the blocks: Glowtris Arcade Spec." placeholder="텍스트를 입력하면 아래 프리뷰가 변경됩니다.">
+      
+      <div class="type-scale-row">
+        <div class="type-meta">DISPLAY LARGE (Orbitron 900) - Hero Title</div>
+        <div class="type-sample" id="sample-display" style="font-family: var(--font-brand); font-size: 48px; font-weight: 900; background: linear-gradient(135deg, #fff, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 8px rgba(0,200,255,0.35));"></div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-meta">HEADLINE MEDIUM (Pretendard Bold) - Post Title</div>
+        <div class="type-sample" id="sample-headline" style="font-family: var(--font-body); font-size: 21px; font-weight: 700; color: #fff;"></div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-meta">BODY MEDIUM (Pretendard Regular) - General Paragraph</div>
+        <div class="type-sample" id="sample-body" style="font-family: var(--font-body); font-size: 15px; font-weight: 400; color: rgba(240, 240, 255, 0.75);"></div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-meta">CODE BLOCK (JetBrains Mono) - Systems & Logs</div>
+        <div class="type-sample" id="sample-code" style="font-family: var(--font-mono); font-size: 13px; color: var(--cyan);"></div>
+      </div>
+    </section>
+
+    <!-- Shapes -->
+    <section id="shapes">
+      <h2>04. Shapes & Corners</h2>
+      <p>UI 맥락에 최적화된 둥글기 스케일입니다. (상자 위로 마우스를 올려 모션 반발을 체험해보세요.)</p>
+      
+      <div class="shape-grid">
+        <div class="shape-card">
+          <div class="shape-box" style="border-radius: var(--r-xs);"></div>
+          <span class="shape-name">--r-xs (4px)</span>
+          <p style="font-size: 11px; color: rgba(240,240,255,0.4); margin: 0;">인라인 코드 칩, 언어 선택 토글 등 초소형 요소</p>
+        </div>
+        <div class="shape-card">
+          <div class="shape-box" style="border-radius: var(--r-md);"></div>
+          <span class="shape-name">--r-md (8px)</span>
+          <p style="font-size: 11px; color: rgba(240,240,255,0.4); margin: 0;">기본 인풋 필드, 컨트롤 버튼, 셀렉트 박스</p>
+        </div>
+        <div class="shape-card">
+          <div class="shape-box" style="border-radius: var(--r-lg);"></div>
+          <span class="shape-name">--r-lg (12px)</span>
+          <p style="font-size: 11px; color: rgba(240,240,255,0.4); margin: 0;">일반 블로그 포스트 카드, 어드민 카드</p>
+        </div>
+        <div class="shape-card">
+          <div class="shape-box" style="border-radius: var(--r-xl);"></div>
+          <span class="shape-name">--r-xl (18px)</span>
+          <p style="font-size: 11px; color: rgba(240,240,255,0.4); margin: 0;">메인 피처드 카드, 설정 모달, 슬라이드 패널</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Elevation -->
+    <section id="elevation">
+      <h2>05. Elevation & Shadows</h2>
+      <p>구글 머티리얼 3의 레이어 기법을 글로우트리스 네온 그림자 깊이로 해석했습니다. (마우스를 올릴 시 고도 상승)</p>
+      
+      <div class="elevation-grid">
+        <div class="elev-card" style="box-shadow: var(--shadow-xs);">
+          <span class="elev-name" style="color: rgba(240,240,255,0.4);">Elevation 1 (XS)</span>
+          <p style="font-size: 12px; margin: 0;">미세한 심도. 토글 컴포넌트, 인라인 카드 등에 사용</p>
+        </div>
+        <div class="elev-card" style="box-shadow: var(--shadow-sm); hover-shadow: var(--shadow-md);">
+          <span class="elev-name" style="color: var(--cyan);">Elevation 2 (SM)</span>
+          <p style="font-size: 12px; margin: 0;">기본 심도. 포스트 리스트 카드에 적용</p>
+        </div>
+        <div class="elev-card" style="box-shadow: var(--shadow-md);">
+          <span class="elev-name" style="color: var(--purple);">Elevation 3 (MD)</span>
+          <p style="font-size: 12px; margin: 0;">강조 레이어. 네비게이션 헤더 및 피처드 카드에 적용</p>
+        </div>
+        <div class="elev-card" style="box-shadow: var(--shadow-lg); border-color: rgba(0, 200, 255, 0.25);">
+          <span class="elev-name" style="color: var(--pink);">Elevation 4 (LG / Glow)</span>
+          <p style="font-size: 12px; margin: 0;">최상단 레이어. 에디터 설정 드롭다운 및 모달 팝업</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Motion -->
+    <section id="motion">
+      <h2>06. Motion & Timing</h2>
+      <p>글로우트리스의 트랜지션 애니메이션 이징 테스터입니다.</p>
+      
+      <div class="motion-container">
+        <div>
+          <span style="font-size: 12px; font-weight: 700; color: rgba(240,240,255,0.4); margin-bottom: 8px; display: block;">FAST EASE OUT (120ms - UI 피드백 전용)</span>
+          <div class="motion-demo">
+            <div class="motion-bar">
+              <div class="motion-block" id="block-fast" style="transition-timing-function: var(--ease-out); transition-duration: var(--t-fast);"></div>
+            </div>
+            <button class="motion-btn" onclick="runDemo('fast')">TRIGGER</button>
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 12px; font-weight: 700; color: rgba(240,240,255,0.4); margin-bottom: 8px; display: block;">SPRING BOUNCE (340ms - 카드 및 모달 등장 전용)</span>
+          <div class="motion-demo">
+            <div class="motion-bar">
+              <div class="motion-block" id="block-spring" style="transition-timing-function: var(--ease-spring); transition-duration: 340ms;"></div>
+            </div>
+            <button class="motion-btn" onclick="runDemo('spring')">TRIGGER</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Tooltip -->
+  <div class="toast" id="toast">복사 완료!</div>
+
+  <script>
+    // Copy token to clipboard
+    function copyToken(token) {
+      navigator.clipboard.writeText('var(' + token + ')');
+      const toast = document.getElementById('toast');
+      toast.innerText = 'Copied: var(' + token + ')';
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1500);
+    }
+
+    // Typography live update
+    const input = document.querySelector('.playground-input');
+    const samples = {
+      display: document.getElementById('sample-display'),
+      headline: document.getElementById('sample-headline'),
+      body: document.getElementById('sample-body'),
+      code: document.getElementById('sample-code')
+    };
+
+    function updateSamples() {
+      const val = input.value;
+      samples.display.innerText = val;
+      samples.headline.innerText = val;
+      samples.body.innerText = val;
+      samples.code.innerText = val;
+    }
+
+    input.addEventListener('input', updateSamples);
+    updateSamples();
+
+    // Motion animation trigger
+    const states = { fast: false, spring: false };
+    function runDemo(type) {
+      const block = document.getElementById('block-' + type);
+      const isMoved = states[type];
+      block.style.left = isMoved ? '0px' : 'calc(100% - 48px)';
+      states[type] = !isMoved;
+    }
+
+    // Sidebar navigation active state
+    const links = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      const sections = document.querySelectorAll('section');
+      sections.forEach(s => {
+        const top = s.offsetTop;
+        if (pageYOffset >= top - 120) {
+          current = s.getAttribute('id');
+        }
+      });
+      links.forEach(l => {
+        l.classList.remove('active');
+        if (l.getAttribute('href') === '#' + current) {
+          l.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
