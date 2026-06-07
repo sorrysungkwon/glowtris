@@ -1,6 +1,22 @@
 # Instructions for Antigravity
 > Read this file first, then `ROBOT.md`, then `TODO.md` before starting any task.
 
+## 🔐 CREDENTIALS SECURITY (CRITICAL - READ FIRST)
+
+**NEVER put credentials in GitHub-tracked files:**
+- ❌ NO passwords, tokens, API keys, secrets in: README.md, ROBOT.md, AGENTS.md, CLAUDE.md, TODO.md, WALKTHROUGH.md, or source code
+- ✅ USE CREDENTIALS.md ONLY (git-ignored, server-only backup)
+- ✅ USE PLACEHOLDERS in docs: `<TOKEN>`, `<PASSWORD>` → reference "see CREDENTIALS.md"
+- ✅ CHECK before commit: search for `password=`, `token=`, `secret=` in staged files
+
+**If you see plaintext credentials in any file:**
+1. IMMEDIATELY remove them
+2. Replace with placeholder: `<CREDENTIAL_NAME>`
+3. Add comment: "see CREDENTIALS.md"
+4. Commit: "security: remove plaintext credentials"
+
+---
+
 ## 🔄 SYNC — Mandatory Session Start Protocol
 
 The user will say **"sync"** at the start of a session. When this happens (or at the start of any new session before any task):

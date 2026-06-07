@@ -11,6 +11,27 @@
 - **Respect Multi-Branch Previews**: When the user wants to compare multiple implementation routes (e.g., Option A vs Option B), do NOT rush to resolve them or force a single solution into `master`. Maintain the branch isolation, ensure preview environments are fully built and functioning, and act strictly as an observer/helper until a decision is declared by the user.
 - **No Over-Engineering**: Adhere strictly to the requested feature scope. Do not perform unsolicited massive refactoring or overwrite unrelated layout sections.
 
+## 🔐 SECURITY REQUIREMENT: CREDENTIALS MUST NEVER BE IN GITHUB-TRACKED FILES
+
+**ABSOLUTE RULE:**
+- **All sensitive information** (passwords, API tokens, webhook tokens, VAPID keys, database credentials) MUST ONLY be stored in **CREDENTIALS.md** (git-ignored, server-only)
+- **GITHUB-TRACKED FILES (README, TODO, CLAUDE, AGENTS, ROBOT, WALKTHROUGH, source code) MUST CONTAIN ZERO plaintext credentials**
+- If documentation needs to reference a credential, use **PLACEHOLDER format only**: `<TOKEN_NAME>`, `<API_KEY>`, `<PASSWORD>` with note: "see CREDENTIALS.md"
+- **NEVER commit**: `.env`, `.env.local`, API keys, passwords, tokens, private VAPID keys
+- **REVIEW BEFORE COMMIT**: Always search for: `token=`, `password=`, `secret=`, `key=` before staging files
+
+**Example ✅:**
+```bash
+# CORRECT — in ROBOT.md
+-d '{"token": "<MOSHI_WEBHOOK_TOKEN>", "title": "..."}' # see CREDENTIALS.md
+```
+
+**Example ❌:**
+```bash
+# WRONG — never do this
+-d '{"token": "<MOSHI_WEBHOOK_TOKEN>", "title": "..."}' # EXPOSED
+```
+
 ---
 
 ## Project Context
