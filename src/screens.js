@@ -392,6 +392,8 @@ export function showStartScreen(){
       </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
+        <a href="https://blog.glowtris.com" class="footer-link">BLOG</a>
+        <span style="color:rgba(255,255,255,0.12)">·</span>
         <a href="/privacy.html" class="footer-link">PRIVACY</a>
         <span style="color:rgba(255,255,255,0.12)">·</span>
         <a href="/terms.html" class="footer-link">TERMS</a>
