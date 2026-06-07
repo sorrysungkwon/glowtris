@@ -11,6 +11,27 @@
 - **Respect Multi-Branch Previews**: When the user wants to compare multiple implementation routes (e.g., Option A vs Option B), do NOT rush to resolve them or force a single solution into `master`. Maintain the branch isolation, ensure preview environments are fully built and functioning, and act strictly as an observer/helper until a decision is declared by the user.
 - **No Over-Engineering**: Adhere strictly to the requested feature scope. Do not perform unsolicited massive refactoring or overwrite unrelated layout sections.
 
+## 🔐 SECURITY REQUIREMENT: CREDENTIALS MUST NEVER BE IN GITHUB-TRACKED FILES
+
+**ABSOLUTE RULE:**
+- **All sensitive information** (passwords, API tokens, webhook tokens, VAPID keys, database credentials) MUST ONLY be stored in **CREDENTIALS.md** (git-ignored, server-only)
+- **GITHUB-TRACKED FILES (README, TODO, CLAUDE, AGENTS, ROBOT, WALKTHROUGH, source code) MUST CONTAIN ZERO plaintext credentials**
+- If documentation needs to reference a credential, use **PLACEHOLDER format only**: `<TOKEN_NAME>`, `<API_KEY>`, `<PASSWORD>` with note: "see CREDENTIALS.md"
+- **NEVER commit**: `.env`, `.env.local`, API keys, passwords, tokens, private VAPID keys
+- **REVIEW BEFORE COMMIT**: Always search for: `token=`, `password=`, `secret=`, `key=` before staging files
+
+**Example ✅:**
+```bash
+# CORRECT — in ROBOT.md
+-d '{"token": "<MOSHI_WEBHOOK_TOKEN>", "title": "..."}' # see CREDENTIALS.md
+```
+
+**Example ❌:**
+```bash
+# WRONG — never do this
+-d '{"token": "<MOSHI_WEBHOOK_TOKEN>", "title": "..."}' # EXPOSED
+```
+
 ---
 
 ## Project Context
@@ -98,8 +119,9 @@ Push notifications run via **GitHub Actions** (NOT Vercel Serverless — Vercel 
 
 - **Public key location**: `src/pwa.js` → `const VAPID_PUBLIC_KEY`
 - **Private key location**: GitHub Actions secret `VAPID_PRIVATE_KEY`
-- **Both must always be the matching pair**: `BBu-74h8e7Eot6eulpSdgN6et__o8TR8XF6S-GSIa1SAP2GMnxZLjstr5unMOsCQncevBL6cKUYYa_qK7LrGZD0` (public)
+- **Both must always be a matching pair** — Stored in Vercel/GitHub secrets only
 - **Source of truth**: Vercel Dashboard → Settings → Environment Variables → `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`
+- **Do NOT store plaintext VAPID keys in documentation or code** — Use environment variables only
 
 ### Redis push subscription format
 
@@ -117,7 +139,7 @@ gh workflow run notify-cron.yml --ref master
 ### Known invalid data in Redis
 - `fd61a03af4f77d87` → `{"endpoint":"test3","keys":{"p256dh":"test3","auth":"test3"}}` — leftover test entry. Causes `p256dh value should be 65 bytes long` error on every run. Safe to delete with:
 ```bash
-curl -X POST "https://immortal-killdeer-134695.upstash.io/hdel/glowtris-push-subs/fd61a03af4f77d87" \
+curl -X POST "<UPSTASH_REDIS_REST_URL>/hdel/glowtris-push-subs/fd61a03af4f77d87" \
   -H "Authorization: Bearer <UPSTASH_REDIS_REST_TOKEN>"
 ```
 
@@ -417,7 +439,7 @@ The maintenance banner is driven by two Redis keys. When both are absent, no ban
 ### Activate banner (before maintenance)
 
 ```bash
-REDIS_URL="https://immortal-killdeer-134695.upstash.io"
+REDIS_URL="<UPSTASH_REDIS_REST_URL>"
 REDIS_TOKEN="<token from .env.local>"
 
 # With scheduled time (Unix ms — e.g. get from: date -d "2026-06-10 03:00 KST" +%s%3N)

@@ -13,7 +13,7 @@ import {
   startGame, startSprintMode, startBlitzMode, startUltraMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
-import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd, hidePWABanner } from './pwa.js';
+import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd, hidePWASheet } from './pwa.js';
 
 const $overlay = document.getElementById('overlay');
 
@@ -392,11 +392,16 @@ export function showStartScreen(){
       </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
-        <a href="/privacy.html" class="footer-link">PRIVACY</a>
-        <span style="color:rgba(255,255,255,0.12)">·</span>
-        <a href="/terms.html" class="footer-link">TERMS</a>
-        <span style="color:rgba(255,255,255,0.12)">·</span>
-        <a href="/changelog.html" class="footer-link">CHANGELOG</a>
+        <div style="margin-bottom: 6px;">
+          <a href="/privacy.html" class="footer-link">PRIVACY</a>
+          <span style="color:rgba(255,255,255,0.12)">·</span>
+          <a href="/terms.html" class="footer-link">TERMS</a>
+          <span style="color:rgba(255,255,255,0.12)">·</span>
+          <a href="/changelog.html" class="footer-link">CHANGELOG</a>
+        </div>
+        <div style="margin-top: 6px;">
+          <a href="https://blog.glowtris.com" class="footer-link" style="color:var(--cyan); font-weight:700;">BLOG</a>
+        </div>
       </div>
     </div>`;
   $overlay.style.display='flex';
@@ -405,7 +410,7 @@ export function showStartScreen(){
 }
 
 export function showModeSelector(){
-  hidePWABanner();
+  hidePWASheet();
   const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
   const hiS=parseInt(localStorage.getItem(LS.HI)||'0');
   const marathonBest=hiS>0?`<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
@@ -452,8 +457,8 @@ export function showModeSelector(){
           <div class="mode-arrow">›</div>
         </div>
 
-        <!-- TIME ATTACK GROUP — Coming Soon -->
-        <div class="mode-group-label">⏳ TIME ATTACK <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <!-- SPEED RUN GROUP — Coming Soon -->
+        <div class="mode-group-label">⏳ SPEED RUN <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
         <div class="mode-group">
           <!-- BLITZ -->
           <div class="mode-card blitz mode-coming-soon" tabindex="-1">

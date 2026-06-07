@@ -39,11 +39,11 @@
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-  @keyframes bannerSlideDown {
+  @keyframes barSlideDown {
     from { transform: translateY(-100%); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  #maintenance-banner {
+  #maintenance-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 99999;
@@ -60,12 +60,12 @@
     letter-spacing: 0.08em;
     word-break: keep-all;
     overflow-wrap: break-word;
-    animation: bannerSlideDown 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    animation: barSlideDown 0.35s cubic-bezier(0.22,1,0.36,1) both;
   }
   @media (max-width: 480px) {
-    #maintenance-banner { padding: 9px 36px 9px 12px; text-align: left; font-size: 10px; }
+    #maintenance-bar { padding: 9px 36px 9px 12px; text-align: left; font-size: 10px; }
   }
-  #maintenance-banner::before {
+  #maintenance-bar::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -543,18 +543,18 @@
   .streak-badge { font-size:10px; letter-spacing:2px; padding:4px 10px; border-radius:6px; border:1px solid rgba(255,100,0,0.5); color:#ff6400; background:rgba(255,100,0,0.1); text-shadow:0 0 8px #ff6400; }
   .combo-badge  { font-size:10px; letter-spacing:2px; padding:4px 10px; border-radius:6px; border:1px solid rgba(0,200,255,0.45); color:var(--cyan); background:rgba(0,200,255,0.08); text-shadow:0 0 8px var(--cyan); }
 
-  /* Toast popup */
-  .toast {
-    position:fixed; bottom:40px; left:50%;
-    transform:translateX(-50%) translateY(100px);
+  /* Achievement unlock toast — above game overlay (z 10001) */
+  .achievement-toast {
+    position:fixed; bottom:120px; left:50%;
+    transform:translateX(-50%) translateY(120px);
     background:rgba(4,4,30,0.85); border:1px solid #ffe600;
     box-shadow:0 0 20px rgba(255,230,0,0.4); border-radius:12px;
     padding:12px 20px; display:flex; align-items:center; gap:12px;
-    z-index:1000; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    z-index:10001; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     opacity:0; transition:transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
     pointer-events: none;
   }
-  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  .achievement-toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
   /* Achievements Badge Styling */
   .ach-badge {
@@ -1499,19 +1499,20 @@
 html.low-perf .action-btn.play-btn { animation: none !important; }
 
 /* ── z-index hierarchy ───────────────────────────────────────────────────────
-   9000  #pwa-banner        install prompt (lowest)
-   9001  #pwa-toast         brief score/info toasts
-   9001  #pwa-update-bar    SW update bar
-   9002  #offline-bar       offline indicator (highest persistent)
-   10000 #overlay           game UI
+   9000  #pwa-sheet              install prompt (lowest)
+   9001  #pwa-toast              brief score/info toasts (bar)
+   9001  #pwa-update-bar         SW update bar
+   9002  #offline-bar            offline indicator (highest persistent bar)
+   10000 #overlay                game UI
+   10001 .achievement-toast      achievement unlock (above game overlay)
    ─────────────────────────────────────────────────────────────────────────── */
 
 /* ── Brief toast (score submitted etc.) ─────────────────────────────────── */
 #pwa-toast {
   position: fixed;
-  bottom: 80px;
+  top: max(16px, calc(env(safe-area-inset-top, 0px) + 16px));
   left: 50%;
-  transform: translateX(-50%) translateY(12px);
+  transform: translateX(-50%) translateY(-12px);
   z-index: 9001;
   display: flex;
   align-items: center;
@@ -1524,19 +1525,26 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   font-weight: 700;
   letter-spacing: 1.5px;
   color: rgba(0, 255, 136, 0.9);
-  white-space: nowrap;
+  width: max-content;
   max-width: calc(100vw - 32px);
-  overflow: hidden;
-  text-overflow: ellipsis;
   box-sizing: border-box;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
 }
+#pwa-toast .toast-text {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
+  flex: 1;
+}
 #pwa-toast.visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+#pwa-toast.below-1bar  { top: max(62px,  calc(env(safe-area-inset-top, 0px) + 62px));  }
+#pwa-toast.below-2bars { top: max(108px, calc(env(safe-area-inset-top, 0px) + 108px)); }
 
 /* ── SW update bar ───────────────────────────────────────────────────────── */
 #pwa-update-bar {
@@ -1622,8 +1630,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 #offline-bar.game-active { top: -80px; }
 #offline-bar.swiped { top: -80px; transition: top 0.2s ease-in; }
 
-/* ── PWA Install Banner ──────────────────────────────────────────────────── */
-#pwa-banner {
+/* ── PWA Install Sheet ───────────────────────────────────────────────────── */
+#pwa-sheet {
   position: fixed;
   bottom: -220px;
   left: 0;
@@ -1634,9 +1642,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   padding: 0 16px 20px;
   transition: bottom 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
-#pwa-banner.visible { bottom: 0 !important; }
-#pwa-banner.game-active { bottom: -220px; }
-.pwa-banner-inner {
+#pwa-sheet.visible { bottom: 0 !important; }
+#pwa-sheet.game-active { bottom: -220px; }
+.pwa-sheet-inner {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1648,26 +1656,26 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   padding: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
-.pwa-banner-top {
+.pwa-sheet-top {
   display: flex;
   align-items: center;
   gap: 14px;
 }
-.pwa-banner-icon { font-size: 28px; flex-shrink: 0; }
-.pwa-banner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.pwa-banner-title {
+.pwa-sheet-icon { font-size: 28px; flex-shrink: 0; }
+.pwa-sheet-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pwa-sheet-title {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 1px;
   color: #fff;
   line-height: 1.1;
 }
-.pwa-banner-sub {
+.pwa-sheet-sub {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.3;
 }
-.pwa-banner-close {
+.pwa-sheet-close {
   align-self: flex-start;
   font-size: 18px;
   color: rgba(255, 255, 255, 0.3);
@@ -1678,15 +1686,15 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   margin: -4px -4px 0 0;
   transition: color 0.2s;
 }
-.pwa-banner-close:hover { color: rgba(255, 255, 255, 0.8); }
+.pwa-sheet-close:hover { color: rgba(255, 255, 255, 0.8); }
 
-.pwa-banner-btns {
+.pwa-sheet-btns {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-top: 4px;
 }
-.pwa-banner-add {
+.pwa-sheet-add {
   font-family: 'Orbitron', sans-serif;
   font-size: 12px;
   font-weight: 800;
@@ -1701,8 +1709,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   box-shadow: 0 4px 16px rgba(0, 200, 255, 0.25);
   transition: transform 0.1s, opacity 0.2s;
 }
-.pwa-banner-add:active { transform: scale(0.97); }
-.pwa-banner-snooze {
+.pwa-sheet-add:active { transform: scale(0.97); }
+.pwa-sheet-snooze {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.5);
   background: rgba(255, 255, 255, 0.05);
@@ -1715,7 +1723,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   flex-shrink: 0;
   transition: background 0.2s, color 0.2s;
 }
-.pwa-banner-snooze:active { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.pwa-sheet-snooze:active { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
 /* ── PWA Modals ──────────────────────────────────────────────────────────── */
 #pwa-modal {
@@ -1811,9 +1819,9 @@ if ('serviceWorker' in navigator) {
 </head>
 <body>
 
-<div id="maintenance-banner" style="display:none">
+<div id="maintenance-bar" style="display:none">
   <span id="maintenance-text"></span>
-  <button id="maintenance-close" onclick="document.getElementById('maintenance-banner').style.display='none'" aria-label="Close">✕</button>
+  <button id="maintenance-close" onclick="document.getElementById('maintenance-bar').style.display='none'" aria-label="Close">✕</button>
 </div>
 
 <canvas id="bg-canvas"></canvas>
@@ -4845,7 +4853,7 @@ if ('serviceWorker' in navigator) {
   function showAchievementToast(ach) {
     sfxAchievementUnlock();
     const toast = document.createElement("div");
-    toast.className = "toast";
+    toast.className = "achievement-toast";
     toast.innerHTML = `
     <div style="font-size:24px">${ach.icon}</div>
     <div style="display:flex;flex-direction:column;text-align:left;">
@@ -5095,7 +5103,13 @@ if ('serviceWorker' in navigator) {
       el.id = "pwa-toast";
       document.body.appendChild(el);
     }
-    el.innerHTML = icon ? `<span class="material-icons-round" style="font-size:14px">${icon}</span>${msg}` : msg;
+    el.innerHTML = icon ? `<span class="material-icons-round" style="font-size:14px;flex-shrink:0">${icon}</span><span class="toast-text">${msg}</span>` : `<span class="toast-text">${msg}</span>`;
+    const barCount = ["offline-bar", "pwa-update-bar"].filter((id) => {
+      const b = document.getElementById(id);
+      return b && b.classList.contains("visible");
+    }).length;
+    el.classList.toggle("below-1bar", barCount === 1);
+    el.classList.toggle("below-2bars", barCount >= 2);
     el.classList.add("visible");
     clearTimeout(el._timer);
     el._timer = setTimeout(() => el.classList.remove("visible"), duration);
@@ -5112,7 +5126,7 @@ if ('serviceWorker' in navigator) {
   function _installLabel() {
     return _isDesktop() ? "\u{1F4BB} INSTALL APP" : "\u{1F4F2} ADD TO HOME SCREEN";
   }
-  function _bannerSubtext() {
+  function _sheetSubtext() {
     return _isDesktop() ? "Launch from desktop \xB7 no browser bar" : "Play offline \xB7 no browser bar";
   }
   function _snoozed() {
@@ -5135,11 +5149,11 @@ if ('serviceWorker' in navigator) {
     window.addEventListener("appinstalled", () => {
       localStorage.setItem(LS_INSTALLED, "1");
       _deferred = null;
-      hidePWABanner();
+      hidePWASheet();
     });
     if (!_snoozed()) {
-      clearTimeout(_bannerTimer);
-      _bannerTimer = setTimeout(_showBanner, 500);
+      clearTimeout(_sheetTimer);
+      _sheetTimer = setTimeout(_showSheet, 500);
     }
   }
   function _initOfflineIndicator() {
@@ -5171,10 +5185,10 @@ if ('serviceWorker' in navigator) {
   function offlineBarGameStart() {
     var _a, _b, _c;
     _gameActive = true;
-    clearTimeout(_bannerTimer);
+    clearTimeout(_sheetTimer);
     (_a = document.getElementById("offline-bar")) == null ? void 0 : _a.classList.add("game-active");
-    (_b = document.getElementById("pwa-banner")) == null ? void 0 : _b.classList.add("game-active");
-    (_c = document.getElementById("pwa-banner")) == null ? void 0 : _c.classList.remove("visible");
+    (_b = document.getElementById("pwa-sheet")) == null ? void 0 : _b.classList.add("game-active");
+    (_c = document.getElementById("pwa-sheet")) == null ? void 0 : _c.classList.remove("visible");
   }
   function offlineBarGameEnd() {
     var _a;
@@ -5194,36 +5208,36 @@ if ('serviceWorker' in navigator) {
   function onPWAGameOver() {
     if (_installed() || _snoozed()) return;
     _gameActive = false;
-    clearTimeout(_bannerTimer);
-    _bannerTimer = setTimeout(_showBanner, 500);
+    clearTimeout(_sheetTimer);
+    _sheetTimer = setTimeout(_showSheet, 500);
   }
   function pwaInstallBtnHTML(p) {
     if (_installed()) return "";
     if (!_deferred && !_iOS()) return "";
     return `<button class="toggle-btn pwa-install-btn" id="${p}-pwa-btn" onclick="window._pwaInstall()" style="touch-action:manipulation">${_installLabel()}</button>`;
   }
-  function _showBanner() {
+  function _showSheet() {
     if (_installed() || _snoozed()) return;
     if (sessionStorage.getItem("pwa-closed")) return;
     if (!_deferred && !_iOS()) return;
     if (_gameActive) return;
-    let el = document.getElementById("pwa-banner");
+    let el = document.getElementById("pwa-sheet");
     if (!el) {
       el = document.createElement("div");
-      el.id = "pwa-banner";
+      el.id = "pwa-sheet";
       el.innerHTML = `
-      <div class="pwa-banner-inner">
-        <div class="pwa-banner-top">
-          <span class="pwa-banner-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
-          <div class="pwa-banner-text">
-            <div class="pwa-banner-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
-            <div class="pwa-banner-sub">${_bannerSubtext()}</div>
+      <div class="pwa-sheet-inner">
+        <div class="pwa-sheet-top">
+          <span class="pwa-sheet-icon">${_isDesktop() ? "\u{1F4BB}" : "\u{1F4F2}"}</span>
+          <div class="pwa-sheet-text">
+            <div class="pwa-sheet-title">${_isDesktop() ? "INSTALL APP" : "ADD TO HOME SCREEN"}</div>
+            <div class="pwa-sheet-sub">${_sheetSubtext()}</div>
           </div>
-          <button class="pwa-banner-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
+          <button class="pwa-sheet-close" onclick="window._pwaDismiss()" aria-label="Dismiss">\u2715</button>
         </div>
-        <div class="pwa-banner-btns">
-          <button class="pwa-banner-add" onclick="window._pwaInstall()">ADD</button>
-          <button class="pwa-banner-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
+        <div class="pwa-sheet-btns">
+          <button class="pwa-sheet-add" onclick="window._pwaInstall()">ADD</button>
+          <button class="pwa-sheet-snooze" onclick="window._pwaSnooze()">Don't show for ${SNOOZE_DAYS} days</button>
         </div>
       </div>`;
       document.body.appendChild(el);
@@ -5231,9 +5245,9 @@ if ('serviceWorker' in navigator) {
     el.offsetHeight;
     if (!_gameActive) el.classList.add("visible");
   }
-  function hidePWABanner() {
-    clearTimeout(_bannerTimer);
-    const el = document.getElementById("pwa-banner");
+  function hidePWASheet() {
+    clearTimeout(_sheetTimer);
+    const el = document.getElementById("pwa-sheet");
     if (el) el.classList.remove("visible");
   }
   function _showIOSModal() {
@@ -5280,13 +5294,13 @@ if ('serviceWorker' in navigator) {
     el.classList.remove("visible");
     setTimeout(() => el.remove(), 350);
   }
-  var LS_INSTALLED, LS_SNOOZE_UNTIL, SNOOZE_DAYS, VAPID_PUBLIC_KEY, _deferred, _gameActive, _bannerTimer;
+  var LS_INSTALLED, LS_SNOOZE_UNTIL, SNOOZE_DAYS, VAPID_PUBLIC_KEY, _deferred, _gameActive, _sheetTimer;
   var init_pwa = __esm({
     "src/pwa.js"() {
       LS_INSTALLED = "pwa-installed";
       LS_SNOOZE_UNTIL = "pwa-snooze-until";
       SNOOZE_DAYS = 3;
-      VAPID_PUBLIC_KEY = "BBu-74h8e7Eot6eulpSdgN6et__o8TR8XF6S-GSIa1SAP2GMnxZLjstr5unMOsCQncevBL6cKUYYa_qK7LrGZD0";
+      VAPID_PUBLIC_KEY = "<VAPID_PUBLIC_KEY>";
       window._pwaShowUpdateToast = function() {
         let el = document.getElementById("pwa-update-bar");
         if (el) return;
@@ -5299,18 +5313,18 @@ if ('serviceWorker' in navigator) {
       };
       _deferred = null;
       _gameActive = false;
-      _bannerTimer = null;
+      _sheetTimer = null;
       window._pwaDismiss = function() {
         sessionStorage.setItem("pwa-closed", "1");
-        hidePWABanner();
+        hidePWASheet();
       };
       window._pwaSnooze = function() {
         const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
         localStorage.setItem(LS_SNOOZE_UNTIL, String(until));
-        hidePWABanner();
+        hidePWASheet();
       };
       window._pwaInstall = function() {
-        hidePWABanner();
+        hidePWASheet();
         if (_deferred) {
           _deferred.prompt();
           _deferred.userChoice.then((r) => {
@@ -5719,11 +5733,16 @@ if ('serviceWorker' in navigator) {
       </div>
       ${_donationHTML()}
       <div class="footer-links-wrap">
-        <a href="/privacy.html" class="footer-link">PRIVACY</a>
-        <span style="color:rgba(255,255,255,0.12)">\xB7</span>
-        <a href="/terms.html" class="footer-link">TERMS</a>
-        <span style="color:rgba(255,255,255,0.12)">\xB7</span>
-        <a href="/changelog.html" class="footer-link">CHANGELOG</a>
+        <div style="margin-bottom: 6px;">
+          <a href="/privacy.html" class="footer-link">PRIVACY</a>
+          <span style="color:rgba(255,255,255,0.12)">\xB7</span>
+          <a href="/terms.html" class="footer-link">TERMS</a>
+          <span style="color:rgba(255,255,255,0.12)">\xB7</span>
+          <a href="/changelog.html" class="footer-link">CHANGELOG</a>
+        </div>
+        <div style="margin-top: 6px;">
+          <a href="https://blog.glowtris.com" class="footer-link" style="color:var(--cyan); font-weight:700;">BLOG</a>
+        </div>
       </div>
     </div>`;
     $overlay.style.display = "flex";
@@ -5731,7 +5750,7 @@ if ('serviceWorker' in navigator) {
     onPWAGameOver();
   }
   function showModeSelector() {
-    hidePWABanner();
+    hidePWASheet();
     const sprintBest = S._sprintHiTime > 0 ? `<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
     const hiS = parseInt(localStorage.getItem(LS.HI) || "0");
     const marathonBest = hiS > 0 ? `<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
@@ -5777,8 +5796,8 @@ if ('serviceWorker' in navigator) {
           <div class="mode-arrow">\u203A</div>
         </div>
 
-        <!-- TIME ATTACK GROUP \u2014 Coming Soon -->
-        <div class="mode-group-label">\u23F3 TIME ATTACK <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <!-- SPEED RUN GROUP \u2014 Coming Soon -->
+        <div class="mode-group-label">\u23F3 SPEED RUN <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
         <div class="mode-group">
           <!-- BLITZ -->
           <div class="mode-card blitz mode-coming-soon" tabindex="-1">
@@ -7656,7 +7675,7 @@ ${cta}`;
       if ($hiScoreM2) $hiScoreM2.textContent = S.hiScore.toLocaleString();
       fetch("/api/maintenance").then((r) => r.json()).then((data) => {
         if (!data || !data.time) return;
-        const el = document.getElementById("maintenance-banner");
+        const el = document.getElementById("maintenance-bar");
         if (!el) return;
         const t = data.time ? new Date(data.time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
         document.getElementById("maintenance-text").textContent = t ? `\u26A0 ${data.msg} \u2014 ${t}` : `\u26A0 ${data.msg}`;

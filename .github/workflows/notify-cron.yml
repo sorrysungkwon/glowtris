@@ -3,7 +3,15 @@ name: Hourly Push Notification
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 * * * *'  # fires at HH:30 UTC — matches local 11:30 for each timezone
+    - cron: '30 2 * * *'   # UTC 2:30 → Korea (UTC+9) 11:30 lunch time
+    - cron: '30 5 * * *'   # UTC 5:30 → covers UTC-4:00 to UTC-0:00 users at local 11:30
+    - cron: '30 7 * * *'   # UTC 7:30 → Korea 16:30 (TEST)
+    - cron: '30 8 * * *'   # UTC 8:30 → covers UTC-1:00 to UTC+3:00 users at local 11:30
+    - cron: '30 11 * * *'  # UTC 11:30 → covers UTC+4:00 to UTC+8:00 users at local 11:30
+    - cron: '30 14 * * *'  # UTC 14:30 → covers UTC+7:00 to UTC+11:00 users at local 11:30
+    - cron: '30 17 * * *'  # UTC 17:30 → covers UTC+10:00 to UTC+14:00 users at local 11:30
+    - cron: '30 20 * * *'  # UTC 20:30 → covers UTC+13:00 to UTC+17:00 users at local 11:30
+    - cron: '30 23 * * *'  # UTC 23:30 → covers UTC+16:00 to UTC+20:00 users at local 11:30
 
 jobs:
   notify:

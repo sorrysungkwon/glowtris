@@ -5,6 +5,20 @@
 - **English-Only Rule**: All code changes, comments, logs, documentation, and Git commit messages MUST be written entirely in English.
 - **Workflow Integrity**: Before starting any task, read your agent doc (`CLAUDE.md` or `AGENTS.md`) first, then this file. `README.md` is human-facing — use it for feature context only. After completing any task, update progress here (`[x]`) and in `README.md`'s roadmap, then `git add . && git commit -m "description"` — report to user and wait. **Push only when user says "push".** Docs-only commits accumulate locally and are bundled with the next code push.
 
+## 🔐 SECURITY AUDIT — PRIORITY (Do before any feature work)
+- [x] **Audit all plaintext credentials** (2026-06-06): Found & removed VAPID keys from ROBOT.md, BUGS.md
+- [x] **Create/update .gitignore** (2026-06-06): Strengthened to prevent future credential exposure
+- [x] **Clean git history** (2026-06-06): Force pushed preview branch, `.env.local` removed from 654 commits
+  - ✅ 654 commits rewritten
+  - ✅ Token values removed from discoverable history
+  - ✅ Tokens still active on server (.env.local preserved)
+- [ ] **Backup & delete .env.local** (when user ready): Copy to secure location, then delete from working directory
+- ~~[ ] **Rotate exposed tokens**~~ — NOT needed (current tokens still active on server)
+
+**Why:** Prevents unauthorized access, data breach, compliance violation. See: [[security-credentials-audit]]
+
+---
+
 ## 📝 Latest Sync Notes & Future Suggestions (Handover to Antigravity)
 **Recently Completed (Antigravity Sync - 2026-06-06):**
 
