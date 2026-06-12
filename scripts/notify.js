@@ -3,17 +3,12 @@ const webpush = require('web-push');
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
-const NOTIFY_HOUR = 17; // local 17:30 (evening) — accounts for up to 30m GitHub Actions delay
 
 async function redis(path, body) {
   const opts = { headers: { Authorization: `Bearer ${REDIS_TOKEN}` } };
   if (body) { opts.method = 'POST'; opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
   const res = await fetch(`${REDIS_URL}/${path}`, opts);
   return res.json();
-}
-
-function localHour(utcMinutes, tzOffset) {
-  return Math.floor(((utcMinutes - tzOffset) % 1440 + 1440) % 1440 / 60);
 }
 
 function localDateStr(utcNow, tzOffset) {
@@ -33,7 +28,6 @@ async function run() {
   );
 
   const now = new Date();
-  const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
   const hashData = await redis(`hgetall/${SUBS_KEY}`);
   console.log('Redis response:', hashData);
@@ -60,8 +54,6 @@ async function run() {
     const tz = sub.tzOffset || 0;
     
     if (!isTest) {
-      if (localHour(utcMinutes, tz) !== NOTIFY_HOUR) continue;
-
       const localDate = localDateStr(now, tz);
       const dedupKey  = encodeURIComponent(`glowtris-notif:${localDate}:${sub.field}`);
       const nx = await redis(`set/${dedupKey}/1/ex/90000/nx`);
