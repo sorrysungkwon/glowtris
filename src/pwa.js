@@ -1,3 +1,4 @@
+import { gtag } from './shared.js';
 const LS_INSTALLED    = 'pwa-installed';
 const LS_SNOOZE_UNTIL = 'pwa-snooze-until';
 const SNOOZE_DAYS     = 3;
@@ -16,6 +17,7 @@ async function _registerPushSub() {
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
     await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subscription: sub.toJSON(), tzOffset: new Date().getTimezoneOffset() }) });
+    gtag('notification_subscribe');
   } catch (e) { console.warn('[pwa] push sub failed', e); }
 }
 

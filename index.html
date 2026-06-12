@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PMZTHX9N');</script>
 <!-- End Google Tag Manager -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>GLOWTRIS</title>
-<meta name="description" content="Neon-styled block stacking game with online leaderboard. Compete for the top rank!">
+<title>Glowtris — Free Online Tetris-Style Block Game</title>
+<meta name="description" content="Play Glowtris free in your browser — a neon block-stacking game with daily challenges, global leaderboard, and sprint mode. No download needed.">
+<meta name="keywords" content="tetris online free, neon tetris, block puzzle game, tetris browser, daily tetris challenge, block stacking game, tetris leaderboard, free tetris">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -18,20 +19,20 @@
 <!-- Open Graph (Facebook, KakaoTalk, Line, Discord, Slack, etc.) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Glowtris">
-<meta property="og:title" content="GLOWTRIS — Neon Block Stacking">
-<meta property="og:description" content="Neon-styled block stacking game with online leaderboard. Compete for the top rank!">
+<meta property="og:title" content="Glowtris — Free Online Tetris-Style Block Game">
+<meta property="og:description" content="Play free in your browser — neon block-stacking with daily challenges, global leaderboard, and sprint mode. No download needed.">
 <meta property="og:url" content="https://glowtris.com">
 <meta property="og:image" content="https://glowtris.com/api/og">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="GLOWTRIS — Neon Block Stacking Game">
-<meta property="og:locale" content="ko_KR">
-<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ko_KR">
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="GLOWTRIS — Neon Block Stacking">
-<meta name="twitter:description" content="Neon-styled block stacking game with online leaderboard. Compete for the top rank!">
+<meta name="twitter:title" content="Glowtris — Free Online Tetris-Style Block Game">
+<meta name="twitter:description" content="Play free in your browser — neon block-stacking with daily challenges, global leaderboard, and sprint mode.">
 <meta name="twitter:image" content="https://glowtris.com/api/og">
 <meta name="twitter:image:alt" content="GLOWTRIS — Neon Block Stacking Game">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1819,6 +1820,23 @@ if ('serviceWorker' in navigator) {
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Glowtris",
+  "description": "Free neon-styled block-stacking game playable in any browser. Features daily challenges, global leaderboard, sprint mode, and PWA support.",
+  "url": "https://glowtris.com",
+  "image": "https://glowtris.com/api/og",
+  "genre": ["Puzzle", "Arcade"],
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "sorrysungkwon" },
+  "inLanguage": ["en", "ko"]
+}
+</script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -2045,6 +2063,17 @@ if ('serviceWorker' in navigator) {
     const secs = Math.floor(total / 100) % 60;
     const mins = Math.floor(total / 6e3);
     return `${mins > 0 ? mins + ":" : ""}${secs.toString().padStart(2, "0")}.${cs.toString().padStart(2, "0")}`;
+  }
+  function gtag(event2, params = {}) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: event2, ...params });
+  }
+  function getGameMode() {
+    if (S.isDailyMode) return "daily";
+    if (S.isSprintMode) return "sprint";
+    if (S.isBlitzMode) return "blitz";
+    if (S.isUltraMode) return "ultra";
+    return "classic";
   }
   var COLS, ROWS, PIECES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, LEVEL_LINES, SPRINT_LINES, MAX_PARTICLES, SUPPORT_URL, COLOR_TO_KEY, LS, ACHIEVEMENTS, S;
   var init_shared = __esm({
@@ -5098,6 +5127,7 @@ if ('serviceWorker' in navigator) {
       let sub = await reg.pushManager.getSubscription();
       if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
       await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscription: sub.toJSON(), tzOffset: (/* @__PURE__ */ new Date()).getTimezoneOffset() }) });
+      gtag("notification_subscribe");
     } catch (e) {
       console.warn("[pwa] push sub failed", e);
     }
@@ -5303,6 +5333,7 @@ if ('serviceWorker' in navigator) {
   var LS_INSTALLED, LS_SNOOZE_UNTIL, SNOOZE_DAYS, VAPID_PUBLIC_KEY, _deferred, _gameActive, _sheetTimer;
   var init_pwa = __esm({
     "src/pwa.js"() {
+      init_shared();
       LS_INSTALLED = "pwa-installed";
       LS_SNOOZE_UNTIL = "pwa-snooze-until";
       SNOOZE_DAYS = 3;
@@ -5976,6 +6007,7 @@ if ('serviceWorker' in navigator) {
     }
   }
   async function shareSprintScore(timeMs, rank) {
+    gtag("share_score", { game_mode: "sprint", time_ms: timeMs, rank });
     const btn = event && event.target ? event.target : null;
     if (btn) {
       btn.disabled = true;
@@ -6317,6 +6349,7 @@ ${cta}`;
     return new Promise((res) => c.toBlob(res, "image/png"));
   }
   async function shareScore(sc, rank) {
+    gtag("share_score", { game_mode: S.isDailyMode ? "daily" : "classic", score: sc, rank });
     const btn = event && event.target ? event.target : null;
     if (btn) {
       btn.disabled = true;
@@ -6365,6 +6398,7 @@ ${cta}`;
   async function loadStartLeaderboard() {
     const el = document.getElementById("start-lb");
     if (!el) return;
+    gtag("leaderboard_view", { lb_mode: S.lbMode || "classic" });
     try {
       const url = S.lbMode === "daily" ? "/api/leaderboard?mode=daily" : S.lbMode === "sprint" ? "/api/leaderboard?mode=sprint" : "/api/leaderboard";
       const r = await fetch(url);
@@ -7310,6 +7344,7 @@ ${cta}`;
     S.gameRunning = true;
     S.gamePaused = false;
     gameOver = false;
+    gtag("game_start", { game_mode: getGameMode() });
     const psl = document.getElementById("panel-score-label");
     const lsl = document.getElementById("lines-sub-label");
     const isTimeAttack = S.isBlitzMode || S.isUltraMode;
@@ -7443,6 +7478,7 @@ ${cta}`;
       return;
     }
     const stats = _saveGameStats();
+    gtag("game_over", { game_mode: getGameMode(), score: S.score, lines: S.lines, level: S.level, is_new_best: stats.isNewBest });
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
       if (!S.board[r][c]) continue;
       const a = Math.random() * Math.PI * 2, sp = Math.random() * 6 + 2;
@@ -7471,6 +7507,7 @@ ${cta}`;
       S._sprintHiTime = timeMs;
       localStorage.setItem(LS.SPRINT_HI, timeMs);
     }
+    gtag("game_over", { game_mode: "sprint", time_ms: timeMs, is_new_best: isNewBest });
     unlockAchievement("sprint_finish");
     if (S.animIntensity !== "off") {
       if (isNewBest) {
