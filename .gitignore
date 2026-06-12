@@ -20,3 +20,5 @@ GROWTHPLAN.md
 
 # Build output
 /index.html
+nohup.out
+*.log
