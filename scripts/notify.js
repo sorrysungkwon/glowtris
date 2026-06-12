@@ -78,7 +78,8 @@ async function run() {
           title: '🏆 Daily Challenge',
           body: `${displayDate} challenge is live — can you top the leaderboard?`,
           url: '/?mode=daily',
-        })
+        }),
+        { TTL: 43200 } // 12 hours — queue if device is offline
       );
       sent++;
     } catch (e) {
