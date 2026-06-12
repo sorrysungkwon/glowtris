@@ -1,4 +1,4 @@
-import { S, LS, SUPPORT_URL, SPRINT_LINES, fmtTime } from './shared.js';
+import { S, LS, SUPPORT_URL, SPRINT_LINES, fmtTime, gtag } from './shared.js';
 import { unlockAchievement } from './ui.js';
 import { showStartScreen } from './screens.js';
 import { showToast } from './pwa.js';
@@ -125,6 +125,7 @@ export async function submitSprintScore(timeMs){
 }
 
 export async function shareSprintScore(timeMs,rank){
+  gtag('share_score', { game_mode: 'sprint', time_ms: timeMs, rank });
   const btn=event&&event.target?event.target:null;
   if(btn){btn.disabled=true;btn.textContent='GENERATING...';}
   try{
@@ -432,6 +433,7 @@ export async function captureGameImage(sc, rank, isDaily=false) {
 }
 
 export async function shareScore(sc,rank){
+  gtag('share_score', { game_mode: S.isDailyMode ? 'daily' : 'classic', score: sc, rank });
   const btn = event && event.target ? event.target : null;
   if(btn){btn.disabled=true; btn.textContent='GENERATING...';}
   try {
@@ -474,6 +476,7 @@ export async function shareScore(sc,rank){
 export async function loadStartLeaderboard(){
   const el=document.getElementById('start-lb');
   if(!el)return;
+  gtag('leaderboard_view', { lb_mode: S.lbMode || 'classic' });
   try{
     const url=S.lbMode==='daily'?'/api/leaderboard?mode=daily'
              :S.lbMode==='sprint'?'/api/leaderboard?mode=sprint'

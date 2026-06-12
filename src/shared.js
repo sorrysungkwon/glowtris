@@ -213,3 +213,16 @@ export const S = {
   _achievementsCache: null,
   _lifetimeCache:     null,
 };
+
+export function gtag(event, params = {}) {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event, ...params });
+}
+
+export function getGameMode() {
+  if (S.isDailyMode)  return 'daily';
+  if (S.isSprintMode) return 'sprint';
+  if (S.isBlitzMode)  return 'blitz';
+  if (S.isUltraMode)  return 'ultra';
+  return 'classic';
+}

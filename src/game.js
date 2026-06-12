@@ -1,4 +1,4 @@
-import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime } from './shared.js';
+import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime, gtag, getGameMode } from './shared.js';
 import { toggleMute, startBGM, stopBGM, pauseBGM, resumeBGM, sfxMove, sfxRotate, sfxHardDrop, sfxHold, sfxLineClear, sfxGameOver, sfxTSpin, sfxAchievementUnlock, applyMuteToGain, onPageHide, onPageShow, closeAudio, sfxUIHover, sfxUIClick, sfxCountdownTick, sfxCountdownGo, sfxSprintGoal, sfxDailyComplete } from './audio.js';
 
 document.addEventListener('mouseover', (e) => {
@@ -782,6 +782,7 @@ function _doStartGame(){
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
   bag=[];refillBag();S.next=[];for(let i=0;i<3;i++)S.next.push(makePiece(nextFromBag()));S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
+  gtag('game_start', { game_mode: getGameMode() });
 
   // ── Sprint & Time Attack init ──────────────────────────────────────────────
   const psl=document.getElementById('panel-score-label');
@@ -913,6 +914,7 @@ function endGame(){
   }
 
   const stats = _saveGameStats();
+  gtag('game_over', { game_mode: getGameMode(), score: S.score, lines: S.lines, level: S.level, is_new_best: stats.isNewBest });
 
   // Explode all board pieces into spark particles
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
@@ -943,6 +945,7 @@ function endSprint(){
   const prevBest=S._sprintHiTime;
   const isNewBest=prevBest===0||timeMs<prevBest;
   if(isNewBest){S._sprintHiTime=timeMs;localStorage.setItem(LS.SPRINT_HI,timeMs);}
+  gtag('game_over', { game_mode: 'sprint', time_ms: timeMs, is_new_best: isNewBest });
   unlockAchievement('sprint_finish');
 
   if(S.animIntensity!=='off'){
