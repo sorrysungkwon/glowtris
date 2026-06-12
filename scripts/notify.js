@@ -3,7 +3,7 @@ const webpush = require('web-push');
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
-const NOTIFY_HOUR = 11; // local 11:30 (Lunchtime) — accounts for up to 30m GitHub Actions delay
+const NOTIFY_HOUR = 17; // local 17:30 (evening) — accounts for up to 30m GitHub Actions delay
 
 async function redis(path, body) {
   const opts = { headers: { Authorization: `Bearer ${REDIS_TOKEN}` } };
