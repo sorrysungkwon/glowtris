@@ -131,7 +131,7 @@ export async function shareSprintScore(timeMs,rank){
   try{
     const lpm=Math.round(SPRINT_LINES/(timeMs/60000));
     const rankLine=rank?`⚡ Sprint 40L in ${fmtTime(timeMs)} · Rank #${rank} All Time`:`⚡ Sprint 40L in ${fmtTime(timeMs)} (${lpm} LPM)`;
-    const cta=rank?`Can you go faster? → ${window.location.origin}`:`Can you clear 40 lines faster? → ${window.location.origin}`;
+    const cta=rank?`Can you go faster? → https://glowtris.com`:`Can you clear 40 lines faster? → https://glowtris.com`;
     const text=`${rankLine}\n${cta}`;
     const blob=await captureSprintImage(timeMs,rank,lpm);
     const file=new File([blob],'glowtris-sprint.png',{type:'image/png'});
@@ -441,11 +441,11 @@ export async function shareScore(sc,rank){
     let text;
     if (isChallenge) {
       const rankLine = rank ? `🏆 Daily Challenge · Rank #${rank} Today · ${sc.toLocaleString()} pts` : `🏆 Glowtris Daily Challenge — ${sc.toLocaleString()} pts`;
-      const cta = rank ? `Same board for everyone — can you beat me? → ${window.location.origin}` : `Same board for everyone today — try it! → ${window.location.origin}`;
+      const cta = rank ? `Same board for everyone — can you beat me? → https://glowtris.com` : `Same board for everyone today — try it! → https://glowtris.com`;
       text = `${rankLine}\n${cta}`;
     } else {
       const rankLine = rank ? `🎮 Rank #${rank} All Time · ${sc.toLocaleString()} pts on Glowtris` : `🎮 Glowtris — ${sc.toLocaleString()} pts`;
-      const cta = rank ? `Think you can beat me? → ${window.location.origin}` : `Can you top this? → ${window.location.origin}`;
+      const cta = rank ? `Think you can beat me? → https://glowtris.com` : `Can you top this? → https://glowtris.com`;
       text = `${rankLine}\n${cta}`;
     }
     const blob = await captureGameImage(sc, rank, isChallenge);
