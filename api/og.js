@@ -7,18 +7,7 @@ function h(type, props, ...children) {
   return { type, key: null, ref: null, props: { ...props, children: kids }, _owner: null, _store: {} };
 }
 
-export default async function handler() {
-  // Load Orbitron 900 from Google Fonts
-  let fontData = null;
-  try {
-    const css = await fetch(
-      'https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap',
-      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)' } }
-    ).then(r => r.text());
-    const fontUrl = css.match(/src: url\(([^)]+)\) format\('woff2'\)/)?.[1];
-    if (fontUrl) fontData = await fetch(fontUrl).then(r => r.arrayBuffer());
-  } catch (_) {}
-
+export default function handler() {
   return new ImageResponse(
     h('div', {
       style: {
@@ -48,43 +37,36 @@ export default async function handler() {
     h('div', { style: { position:'absolute', bottom:'-80px', right:'-50px', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(160,0,255,0.06) 0%, transparent 70%)' } }),
     h('div', { style: { position:'absolute', top:'115px', left:'200px', width:'800px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(255,0,128,0.04) 0%, transparent 70%)' } }),
 
-    // GLOWTRIS logo — centered, Orbitron 900, split neon colors
+    // GLOWTRIS logo
     h('div', {
       style: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        letterSpacing: '22px',
       },
     },
     h('span', {
       style: {
         fontSize: 148,
         fontWeight: 900,
-        fontFamily: fontData ? 'Orbitron, monospace' : 'monospace',
+        fontFamily: 'monospace',
         letterSpacing: '22px',
         color: '#00c8ff',
-        textShadow: '0 0 40px rgba(0,200,255,0.9), 0 0 80px rgba(0,200,255,0.5)',
       },
     }, 'GLOW'),
     h('span', {
       style: {
         fontSize: 148,
         fontWeight: 900,
-        fontFamily: fontData ? 'Orbitron, monospace' : 'monospace',
+        fontFamily: 'monospace',
         letterSpacing: '22px',
         color: '#a000ff',
-        textShadow: '0 0 40px rgba(160,0,255,0.9), 0 0 80px rgba(160,0,255,0.5)',
       },
     }, 'TRIS'),
     ),
 
     ),
-    {
-      width: 1200,
-      height: 630,
-      fonts: fontData ? [{ name: 'Orbitron', data: fontData, weight: 900, style: 'normal' }] : [],
-    }
+    { width: 1200, height: 630 }
   );
 }
