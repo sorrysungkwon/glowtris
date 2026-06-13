@@ -3,6 +3,13 @@ const webpush = require('web-push');
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
+
+// Allow 17:00–18:59 local time — covers target 17:30 plus up to ~90min GitHub Actions schedule delay
+const NOTIFY_HOURS = new Set([17, 18]);
+function localHour(utcMinutes, tzOffset) {
+  return Math.floor(((utcMinutes - tzOffset) % 1440 + 1440) % 1440 / 60);
+}
+
 async function redis(path, body) {
   const opts = { headers: { Authorization: `Bearer ${REDIS_TOKEN}` } };
   if (body) { opts.method = 'POST'; opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
@@ -46,12 +53,16 @@ async function run() {
   // If run with --test, we bypass the time/dedup checks
   const isTest = process.argv.includes('--test');
 
+  const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+
   let sent = 0;
   const toDelete = [];
 
   for (const sub of subs) {
     const tz = sub.tzOffset || 0;
-    
+
+    if (!isTest && !NOTIFY_HOURS.has(localHour(utcMinutes, tz))) continue;
+
     if (!isTest) {
       const localDate = localDateStr(now, tz);
       const dedupKey  = encodeURIComponent(`glowtris-notif:${localDate}:${sub.field}`);
