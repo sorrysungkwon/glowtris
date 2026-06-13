@@ -118,7 +118,7 @@ export default function handler() {
         fontSize: 22, fontFamily: 'monospace',
         letterSpacing: 3,
       },
-    }, 'glowtris.vercel.app'),
+    }, 'glowtris.com'),
     ),
     ),
     ),
