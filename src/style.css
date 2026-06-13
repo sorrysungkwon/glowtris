@@ -97,6 +97,9 @@
     padding-bottom:max(8px, var(--safe-bottom));
     gap:8px;
   }
+  @media (min-width:600px) {
+    #app { justify-content:center; }
+  }
 
   /* ════════════════════════════════
      DESKTOP  (≥ 600 px)
