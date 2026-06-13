@@ -46,15 +46,16 @@ export default async function handler() {
     // Nebula glows
     h('div', { style: { position:'absolute', top:'-100px', left:'-50px', width:'500px', height:'500px', borderRadius:'50%', background:'radial-gradient(circle, rgba(0,200,255,0.07) 0%, transparent 70%)' } }),
     h('div', { style: { position:'absolute', bottom:'-80px', right:'-50px', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(160,0,255,0.06) 0%, transparent 70%)' } }),
-    h('div', { style: { position:'absolute', top:'50%', left:'50%', width:'800px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(255,0,128,0.04) 0%, transparent 70%)', transform:'translate(-50%,-50%)' } }),
+    h('div', { style: { position:'absolute', top:'115px', left:'200px', width:'800px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(255,0,128,0.04) 0%, transparent 70%)' } }),
 
-    // GLOWTRIS logo — centered, Orbitron 900, gradient text
+    // GLOWTRIS logo — centered, Orbitron 900, split neon colors
     h('div', {
       style: {
         display: 'flex',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        transform: 'scaleX(1.18)',
+        letterSpacing: '22px',
       },
     },
     h('span', {
@@ -62,14 +63,21 @@ export default async function handler() {
         fontSize: 148,
         fontWeight: 900,
         fontFamily: fontData ? 'Orbitron, monospace' : 'monospace',
-        letterSpacing: '18px',
-        background: 'linear-gradient(90deg, #00c8ff 0%, #a000ff 40%, #ff0080 70%, #00c8ff 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        color: 'transparent',
-        filter: 'drop-shadow(0 0 40px rgba(0,200,255,0.55)) drop-shadow(0 0 15px rgba(160,0,255,0.4))',
+        letterSpacing: '22px',
+        color: '#00c8ff',
+        textShadow: '0 0 40px rgba(0,200,255,0.9), 0 0 80px rgba(0,200,255,0.5)',
       },
-    }, 'GLOWTRIS'),
+    }, 'GLOW'),
+    h('span', {
+      style: {
+        fontSize: 148,
+        fontWeight: 900,
+        fontFamily: fontData ? 'Orbitron, monospace' : 'monospace',
+        letterSpacing: '22px',
+        color: '#a000ff',
+        textShadow: '0 0 40px rgba(160,0,255,0.9), 0 0 80px rgba(160,0,255,0.5)',
+      },
+    }, 'TRIS'),
     ),
 
     ),
