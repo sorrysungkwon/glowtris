@@ -206,7 +206,7 @@
   <text x="822" y="562"
         font-family="Arial, Helvetica, sans-serif"
         font-size="17" text-anchor="middle"
-        letter-spacing="3" fill="#00c8ff" opacity="0.30">glowtris.vercel.app</text>
+        letter-spacing="3" fill="#00c8ff" opacity="0.30">glowtris.com</text>
 
   <!-- Subtle decorative blocks — top-right -->
   <g opacity="0.18" filter="url(#glow-soft)">

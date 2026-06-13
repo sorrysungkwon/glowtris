@@ -2,26 +2,20 @@ import { ImageResponse } from '@vercel/og';
 
 export const config = { runtime: 'edge' };
 
-// Build React-compatible VNodes without JSX (no build step needed)
 function h(type, props, ...children) {
   const kids = children.length === 0 ? undefined : children.length === 1 ? children[0] : children;
   return { type, key: null, ref: null, props: { ...props, children: kids }, _owner: null, _store: {} };
 }
 
-const PIECE_COLORS = ['#00d8ff','#ffe000','#cc00ff','#00ffaa','#ff2040','#2979ff','#ff8c00'];
+export default async function handler() {
+  const fontData = await fetch(
+    new URL('./Orbitron-GLOWTRIS.ttf', import.meta.url)
+  ).then(r => r.arrayBuffer());
 
-// 3×3 block grid for the "G" mark on the left
-const GRID_BLOCKS = [
-  [1,0,1],
-  [1,1,1],
-  [1,0,1],
-];
-
-export default function handler() {
   return new ImageResponse(
     h('div', {
       style: {
-        background: 'linear-gradient(145deg, #060012 0%, #08001a 45%, #040010 100%)',
+        background: '#04041e',
         width: '100%', height: '100%',
         display: 'flex',
         alignItems: 'center',
@@ -30,7 +24,8 @@ export default function handler() {
         overflow: 'hidden',
       },
     },
-    // ── Grid background ──────────────────────────────────────────────────────
+
+    // Subtle grid
     h('div', {
       style: {
         position: 'absolute', inset: 0,
@@ -40,88 +35,82 @@ export default function handler() {
         backgroundSize: '60px 60px',
       },
     }),
-    // ── Nebula glows ─────────────────────────────────────────────────────────
-    h('div', { style: { position:'absolute', top:'-80px', left:'60px', width:'500px', height:'500px', borderRadius:'50%', background:'radial-gradient(circle, rgba(0,200,255,0.07) 0%, transparent 70%)' } }),
-    h('div', { style: { position:'absolute', bottom:'-100px', right:'80px', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(160,0,255,0.06) 0%, transparent 70%)' } }),
 
-    // ── Main content row ─────────────────────────────────────────────────────
+    // Nebula glows
+    h('div', { style: { position:'absolute', top:'-100px', left:'-50px', width:'500px', height:'500px', borderRadius:'50%', background:'radial-gradient(circle, rgba(0,200,255,0.07) 0%, transparent 70%)' } }),
+    h('div', { style: { position:'absolute', bottom:'-80px', right:'-50px', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(160,0,255,0.06) 0%, transparent 70%)' } }),
+    h('div', { style: { position:'absolute', top:'115px', left:'200px', width:'800px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(255,0,128,0.04) 0%, transparent 70%)' } }),
+
+    // Content column
     h('div', {
       style: {
-        display: 'flex', flexDirection: 'row',
-        alignItems: 'center', gap: 80,
-        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 0,
       },
     },
-    // Left: 3×3 block grid mark
-    h('div', {
-      style: { display: 'flex', flexDirection: 'column', gap: 10 },
-    },
-    ...GRID_BLOCKS.map((row, ri) =>
-      h('div', { key: ri, style: { display: 'flex', gap: 10 } },
-        ...row.map((on, ci) =>
-          h('div', {
-            key: ci,
-            style: {
-              width: 80, height: 80,
-              borderRadius: 10,
-              background: on ? PIECE_COLORS[(ri * 3 + ci) % PIECE_COLORS.length] : 'transparent',
-              boxShadow: on ? `0 0 20px ${PIECE_COLORS[(ri * 3 + ci) % PIECE_COLORS.length]}88` : 'none',
-              border: on ? 'none' : '1px solid rgba(0,200,255,0.08)',
-            },
-          })
-        )
-      )
-    )),
 
-    // Right: title + subtitle
-    h('div', {
-      style: { display: 'flex', flexDirection: 'column', gap: 18 },
-    },
     // GLOWTRIS logo
     h('div', {
-      style: { display: 'flex', flexDirection: 'row', letterSpacing: '-3px' },
+      style: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 28,
+      },
     },
     h('span', {
       style: {
-        fontSize: 110, fontWeight: 900, fontFamily: 'monospace',
+        fontSize: 104,
+        fontWeight: 900,
+        fontFamily: 'Orbitron',
+        letterSpacing: '18px',
         color: '#00c8ff',
-        textShadow: '0 0 30px rgba(0,200,255,0.9), 0 0 70px rgba(0,200,255,0.4)',
+        textShadow: '0 0 18px rgba(0,200,255,0.75), 0 0 40px rgba(0,200,255,0.25)',
       },
     }, 'GLOW'),
     h('span', {
       style: {
-        fontSize: 110, fontWeight: 900, fontFamily: 'monospace',
+        fontSize: 104,
+        fontWeight: 900,
+        fontFamily: 'Orbitron',
+        letterSpacing: '18px',
         color: '#a000ff',
-        textShadow: '0 0 30px rgba(160,0,255,0.9), 0 0 70px rgba(160,0,255,0.4)',
+        textShadow: '0 0 18px rgba(160,0,255,0.75), 0 0 40px rgba(160,0,255,0.25)',
       },
     }, 'TRIS'),
     ),
-    // Separator line
+
+    // Separator
     h('div', {
       style: {
-        height: 2, width: '100%',
-        background: 'linear-gradient(90deg, #00c8ff55, #a000ff55)',
+        width: 520,
+        height: 1,
+        background: 'linear-gradient(90deg, transparent, rgba(0,200,255,0.5), rgba(160,0,255,0.5), transparent)',
+        marginBottom: 24,
       },
     }),
-    // Subtitle
+
+    // URL
     h('div', {
       style: {
-        color: 'rgba(255,255,255,0.45)',
-        fontSize: 26, fontFamily: 'monospace',
-        letterSpacing: 4,
-        textTransform: 'uppercase',
+        fontSize: 22,
+        fontFamily: 'monospace',
+        letterSpacing: '6px',
+        color: 'rgba(255,255,255,0.35)',
       },
-    }, 'Neon Block Stacking'),
-    h('div', {
-      style: {
-        color: 'rgba(0,200,255,0.6)',
-        fontSize: 22, fontFamily: 'monospace',
-        letterSpacing: 3,
-      },
-    }, 'glowtris.vercel.app'),
+    }, 'glowtris.com'),
+
     ),
+
     ),
-    ),
-    { width: 1200, height: 630 }
+    {
+      width: 1200,
+      height: 630,
+      fonts: [{ name: 'Orbitron', data: fontData, weight: 900, style: 'normal' }],
+    }
   );
 }

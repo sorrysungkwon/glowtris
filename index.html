@@ -7,7 +7,7 @@
 <!-- End Google Tag Manager -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Free Neon Block Game — Glowtris | Play Online, No Download</title>
-<meta name="description" content="Glowtris is a free tetris-style neon block game you can play in any browser. Daily challenges, global leaderboard, sprint mode — no download, no ads.">
+<meta name="description" content="Free neon block-stacking game — daily challenges, global leaderboard, sprint mode. No download, no ads. Play in any browser.">
 <meta name="keywords" content="neon tetris, tetris-style game online, free block puzzle game, daily tetris challenge, tetris sprint mode, browser block game, tetris leaderboard, glowtris">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -38,6 +38,10 @@
 <meta name="twitter:description" content="Tetris-inspired neon block game in your browser. Daily challenges, global leaderboard, sprint mode — free, no ads.">
 <meta name="twitter:image" content="https://glowtris.com/api/og">
 <meta name="twitter:image:alt" content="GLOWTRIS — Neon Block Stacking Game">
+<link rel="canonical" href="https://glowtris.com">
+<link rel="alternate" hreflang="en" href="https://glowtris.com">
+<link rel="alternate" hreflang="ko" href="https://glowtris.com">
+<link rel="alternate" hreflang="x-default" href="https://glowtris.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" as="style">
@@ -142,6 +146,9 @@
     padding-top:max(8px, var(--safe-top));
     padding-bottom:max(8px, var(--safe-bottom));
     gap:8px;
+  }
+  @media (min-width:600px) {
+    #app { justify-content:center; }
   }
 
   /* ════════════════════════════════
@@ -1909,7 +1916,7 @@ if ('serviceWorker' in navigator) {
 
 <div id="ach-tooltip" style="position:fixed;display:none;pointer-events:none;background:rgba(4,4,30,0.96);border:1px solid var(--cyan);box-shadow:0 0 15px rgba(0,200,255,0.45);padding:8px 10px;border-radius:8px;z-index:9999;font-family:'Orbitron',monospace;width:max-content;max-width:200px;font-size:8px;line-height:1.4;transition:opacity 0.15s ease,transform 0.15s ease;transform:translate(-50%, -105%);opacity:0"></div>
 
-<div id="app">
+<div id="app" data-nosnippet>
 
   <!-- Desktop title header -->
   <div id="desktop-header">
@@ -6035,7 +6042,7 @@ if ('serviceWorker' in navigator) {
     try {
       const lpm = Math.round(SPRINT_LINES / (timeMs / 6e4));
       const rankLine = rank ? `\u26A1 Sprint 40L in ${fmtTime(timeMs)} \xB7 Rank #${rank} All Time` : `\u26A1 Sprint 40L in ${fmtTime(timeMs)} (${lpm} LPM)`;
-      const cta = rank ? `Can you go faster? \u2192 ${window.location.origin}` : `Can you clear 40 lines faster? \u2192 ${window.location.origin}`;
+      const cta = rank ? `Can you go faster? \u2192 https://glowtris.com` : `Can you clear 40 lines faster? \u2192 https://glowtris.com`;
       const text = `${rankLine}
 ${cta}`;
       const blob = await captureSprintImage(timeMs, rank, lpm);
@@ -6379,12 +6386,12 @@ ${cta}`;
       let text;
       if (isChallenge) {
         const rankLine = rank ? `\u{1F3C6} Daily Challenge \xB7 Rank #${rank} Today \xB7 ${sc.toLocaleString()} pts` : `\u{1F3C6} Glowtris Daily Challenge \u2014 ${sc.toLocaleString()} pts`;
-        const cta = rank ? `Same board for everyone \u2014 can you beat me? \u2192 ${window.location.origin}` : `Same board for everyone today \u2014 try it! \u2192 ${window.location.origin}`;
+        const cta = rank ? `Same board for everyone \u2014 can you beat me? \u2192 https://glowtris.com` : `Same board for everyone today \u2014 try it! \u2192 https://glowtris.com`;
         text = `${rankLine}
 ${cta}`;
       } else {
         const rankLine = rank ? `\u{1F3AE} Rank #${rank} All Time \xB7 ${sc.toLocaleString()} pts on Glowtris` : `\u{1F3AE} Glowtris \u2014 ${sc.toLocaleString()} pts`;
-        const cta = rank ? `Think you can beat me? \u2192 ${window.location.origin}` : `Can you top this? \u2192 ${window.location.origin}`;
+        const cta = rank ? `Think you can beat me? \u2192 https://glowtris.com` : `Can you top this? \u2192 https://glowtris.com`;
         text = `${rankLine}
 ${cta}`;
       }
