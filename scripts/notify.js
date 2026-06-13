@@ -3,7 +3,6 @@ const webpush = require('web-push');
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBS_KEY    = 'glowtris-push-subs';
-
 async function redis(path, body) {
   const opts = { headers: { Authorization: `Bearer ${REDIS_TOKEN}` } };
   if (body) { opts.method = 'POST'; opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
