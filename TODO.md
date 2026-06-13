@@ -100,35 +100,13 @@
 
 ---
 
-## 🔄 In Progress: v0.5 Renderer & Audio — staged PixiJS migration
+## ✅ Completed: v0.5 Renderer & Audio
 
-> **Division of labor:**
-> - **Claude Code** — architecture, PixiJS app setup, scene structure, render loop wiring, Canvas2D → PixiJS logic migration. Game logic (`game.js`) untouched.
-> - **Antigravity** — visual polish: colors, glow/bloom shaders, particle effects, neon aesthetics on top of Claude's skeleton.
->
-> Each substage: Claude ships skeleton → Antigravity polishes → merge to preview → verify → next substage.
+> **PixiJS plan rolled back (2026-06-06):** PixiJS integration caused Safari/iPad blank screen regression.
+> Rolled back to Canvas2D at commit `80bd42d`. Bundle size restored to ~250KB.
+> PixiJS renderer path may be revisited post-v1.0 if the Safari issue is resolved.
 
-### v0.5.0 — PixiJS foundation + board render (Claude)
-- [ ] Add PixiJS to build pipeline (esbuild bundle, no CDN)
-- [ ] `PIXI.Application` setup replacing game canvas; Canvas2D fallback branch for WebGL-unsupported devices
-- [ ] Board, current piece, ghost piece migrated to `PIXI.Graphics` (solid colors, no effects yet)
-- [ ] `drawBoard()` rewritten to use PixiJS scene; `game.js` logic untouched
-- [ ] Render interpolation between 1ms logic ticks (smooth motion at 144Hz+)
-- [ ] `npm run build` passes; gameplay identical to Canvas2D baseline
-
-### v0.5.1 — Particle system (Claude skeleton → Antigravity polish)
-- [ ] `PIXI.ParticleContainer` replacing current Canvas2D particle loop (Claude)
-- [ ] Antigravity: particle color/size/lifetime tuning, spark trails, hard drop impact
-
-### v0.5.2 — Background nebula (Claude skeleton → Antigravity polish)
-- [ ] Background migrated to `PIXI.Filter` (shader gradient replacing Canvas2D nebula) (Claude)
-- [ ] Antigravity: nebula hue, pulse animation, color scheme
-
-### v0.5.3 — Glow/neon shader effects (Claude skeleton → Antigravity polish)
-- [ ] Line-clear / T-spin / Glowtris effects via `PIXI.Filter` (bloom, RGB split, distortion) (Claude)
-- [ ] Antigravity: shader parameter tuning, signature neon glow identity
-
-### v0.5.4 — ARCH-005 Low-latency audio
+### v0.5.4 — ARCH-005 Low-latency audio ✅
 - [x] Audit current audio dispatch path; pre-decode all SFX to `AudioBuffer`
 - [x] SFX triggered via `AudioBufferSourceNode` + `AudioContext.currentTime` scheduling
 - [x] Verify trigger-to-output latency < 5ms

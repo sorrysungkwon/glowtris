@@ -4,13 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '30 8 * * *'   # UTC 8:30 → Korea (UTC+9) 17:30 evening
-    - cron: '30 11 * * *'  # UTC 11:30 → UTC+6 users at local 17:30
-    - cron: '30 14 * * *'  # UTC 14:30 → UTC+3 users at local 17:30
-    - cron: '30 17 * * *'  # UTC 17:30 → UTC+0 users at local 17:30
-    - cron: '30 20 * * *'  # UTC 20:30 → UTC-3 users at local 17:30
-    - cron: '30 23 * * *'  # UTC 23:30 → UTC-6 users at local 17:30
-    - cron: '30 2 * * *'   # UTC 2:30 → UTC-9 users at local 17:30
-    - cron: '30 5 * * *'   # UTC 5:30 → UTC+12 users at local 17:30
 
 jobs:
   notify:
