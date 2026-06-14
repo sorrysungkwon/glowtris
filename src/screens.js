@@ -36,7 +36,10 @@ export function showDailyGateOverlay(todayStr) {
   clearInterval(_gateTimer);
   const updateCountdown = () => {
     const now = new Date();
-    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    // Daily challenge is global (same puzzle + board worldwide) and resets at
+    // UTC midnight. Count down to UTC midnight so the timer matches the actual
+    // server-side reset — not the device's local midnight.
+    const nextMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
     const diffMs = nextMidnight - now;
     if (diffMs <= 0) {
       clearInterval(_gateTimer);
@@ -68,7 +71,7 @@ export function showDailyGateOverlay(todayStr) {
 }
 
 export function startDailyChallenge() {
-  const todayStr = new Date().toLocaleDateString('sv').replace(/-/g, '');
+  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   if (localStorage.getItem(LS.DAILY_DATE) === todayStr) {
     showDailyGateOverlay(todayStr);
     return;
@@ -187,7 +190,7 @@ export function togglePause(){
 }
 
 export function _saveGameStats() {
-  const todayStr = new Date().toLocaleDateString('sv').replace(/-/g, '');
+  const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   if (S.isDailyMode) localStorage.setItem(LS.DAILY_DATE, todayStr);
 
   const isNewBest = S.score > S.hiScore;
@@ -429,7 +432,7 @@ export function showModeSelector(){
 
   const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,200,255,0.8)">Best: ${fmtTime(S._sprintHiTime)}</span>`:noRec;
 
-  const todayStr=new Date().toLocaleDateString('sv').replace(/-/g,'');
+  const todayStr=new Date().toISOString().slice(0,10).replace(/-/g,'');
   const dailyDone=localStorage.getItem(LS.DAILY_DATE)===todayStr;
   const dailySub=dailyDone?'<span style="color:rgba(255,230,0,0.75)">✓ Completed today</span>':'<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
 
