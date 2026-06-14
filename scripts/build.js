@@ -3,10 +3,20 @@
 
 const fs   = require('fs');
 const path = require('path');
+const { lint } = require('./lint-design');
 
 const root = path.resolve(__dirname, '..');
 
 async function build() {
+  console.log('Verifying Design System compliance...');
+  const designErrors = lint();
+  if (designErrors.length > 0) {
+    console.error('\x1b[31m%s\x1b[0m', 'Design System Verification Failed:');
+    designErrors.forEach(e => console.error('\x1b[31m%s\x1b[0m', `  - ${e}`));
+    process.exit(1);
+  }
+  console.log('\x1b[32m%s\x1b[0m', 'Design System compliant.');
+
   const template = fs.readFileSync(path.join(root, 'src/template.html'), 'utf8');
   const css      = fs.readFileSync(path.join(root, 'src/style.css'),     'utf8');
 

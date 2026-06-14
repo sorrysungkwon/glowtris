@@ -1,4 +1,4 @@
-import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime } from './shared.js';
+import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime, initializeSystemTheme } from './shared.js';
 import { sfxAchievementUnlock, sfxAllClear, sfxLevelUp, toggleMute, applyMuteToGain } from './audio.js';
 
 // ─── Canvas refs ──────────────────────────────────────────────────────────────
@@ -182,6 +182,7 @@ export function _applyTouchCELL() {
 }
 
 export function initLayout() {
+  initializeSystemTheme();
   const W = window.innerWidth, H = window.innerHeight;
   const isCoarse = window.matchMedia('(any-pointer:coarse)').matches;
   S.isMobile = (W < 600) || (isCoarse && !S._kbMode);

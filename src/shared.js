@@ -28,7 +28,6 @@ export const SUPPORT_URL     = 'https://ko-fi.com/sorrysungkwon';
 
 // Reverse map: color → piece key (used for colorblind pattern lookup)
 export const COLOR_TO_KEY = {};
-for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
 
 // Per-mode signature colors (mirror the --mode-* CSS vars in style.css).
 // Used by canvas code (background themes, share cards) where CSS vars aren't available.
@@ -46,6 +45,35 @@ export const MODE_COLORS = {
 export function hexToRgba(hex, a = 1) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
+// JS-CSS Bridge helper to get CSS variable color
+export function getCssVarColor(varName, fallback) {
+  if (typeof window === 'undefined') return fallback;
+  const val = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  return val || fallback;
+}
+
+// Dynamic initialization from CSS design tokens
+export function initializeSystemTheme() {
+  PIECES.I.color = getCssVarColor('--primary', '#00d8ff');
+  PIECES.O.color = getCssVarColor('--mode-blitz', '#ffe000');
+  PIECES.T.color = getCssVarColor('--secondary', '#cc00ff');
+  PIECES.S.color = getCssVarColor('--mode-marathon', '#00ffaa');
+  PIECES.Z.color = getCssVarColor('--tertiary', '#ff2040');
+  PIECES.J.color = getCssVarColor('--cyan', '#2979ff');
+  PIECES.L.color = getCssVarColor('--warning', '#ff8c00');
+
+  // Re-sync COLOR_TO_KEY mapping
+  for (const k in COLOR_TO_KEY) delete COLOR_TO_KEY[k];
+  for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
+
+  MODE_COLORS.marathon = getCssVarColor('--mode-marathon', '#00ff88');
+  MODE_COLORS.classic  = getCssVarColor('--mode-marathon', '#00ff88');
+  MODE_COLORS.flow     = getCssVarColor('--mode-flow', '#a000ff');
+  MODE_COLORS.sprint   = getCssVarColor('--mode-sprint', '#00c8ff');
+  MODE_COLORS.blitz    = getCssVarColor('--mode-blitz', '#ffd000');
+  MODE_COLORS.daily    = getCssVarColor('--mode-daily', '#ff7700');
 }
 
 // ─── localStorage keys ────────────────────────────────────────────────────────
