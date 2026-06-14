@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-const CACHE      = 'glowtris-028edd';
+const CACHE      = 'glowtris-59a2ef';
 =======
 const CACHE      = 'glowtris-6a2139';
 >>>>>>> 1b35828 (fix: open blog link in new tab; update itch.io zip)

@@ -58,9 +58,11 @@
 
 ---
 
-## 🎨 Design System — Single Source of Truth (NO hardcoded colors)
+## 🎨 Design System — Single Source of Truth (NO hardcoded values)
 
-**Rule: never hardcode a design value (especially mode colors) inline. Always reference the central token.** When a new color/style decision is made, add it to the token source first, then reference it everywhere.
+> **Full spec: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)** — Material-3-structured foundations (color, typography, spacing, shape, elevation, motion, state) + the implemented `:root` token list (§11). Read it before any visual change.
+
+**Rule: never hardcode a design value (color, size, radius, duration, easing) inline. Always reference the central token.** When a new color/style decision is made, add it to the token source first, then reference it everywhere. Token layer lives in `:root` (`src/style.css`) + `MODE_COLORS` (`src/shared.js`) for canvas.
 
 ### Mode signature colors
 Each game mode has ONE signature color, grouped by intent. These are the canonical tokens — do not retype the hex anywhere else:

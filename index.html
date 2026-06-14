@@ -118,6 +118,61 @@
     --mode-blitz:    #ffd000; /* SPEED — yellow, electric burst */
     --mode-daily:    #ff7700; /* CHALLENGE — orange, daily streak */
     --mode-ultra:    #ff0080; /* CHALLENGE — magenta, cosmic high score */
+
+    /* ───────────────────────────────────────────────────────────────────────
+       DESIGN SYSTEM TOKENS — single source of truth. See DESIGN_SYSTEM.md.
+       Reference these vars; do NOT hardcode raw values in component CSS.
+       ─────────────────────────────────────────────────────────────────────── */
+
+    /* Semantic color roles (built on brand + neutrals) */
+    --surface:        rgba(4,4,30,0.75);     /* panels / dialogs */
+    --surface-2:      rgba(255,255,255,0.04);/* raised card on a panel */
+    --surface-glass:  rgba(0,0,20,0.72);     /* glassy HUD panel (= --panel-bg) */
+    --on-surface:       rgba(255,255,255,0.92); /* primary text */
+    --on-surface-muted: rgba(255,255,255,0.60); /* secondary text */
+    --on-surface-faint: rgba(255,255,255,0.30); /* disabled / hints */
+    --outline:        rgba(0,200,255,0.28);  /* default hairline (= --border) */
+    --outline-strong: rgba(0,200,255,0.55);
+    --success: #00ff88;
+    --warning: #ffb347;
+    --error:   #ff0080;
+
+    /* Typography — Orbitron is the single typeface (display + UI) */
+    --font-display: 'Orbitron', sans-serif;
+    --font-ui:      'Orbitron', monospace;   /* numerics / HUD — tabular feel */
+    --fw-regular: 400; --fw-bold: 700; --fw-black: 900;
+    /* Type scale (px) — Material-style roles, tuned to this game's density */
+    --type-display-l: 44px; --type-display-m: 36px; --type-display-s: 28px;
+    --type-headline:  22px; --type-title-l: 18px; --type-title-m: 15px; --type-title-s: 13px;
+    --type-body-l: 12px; --type-body-m: 11px; --type-body-s: 10px;
+    --type-label-l: 9px; --type-label-m: 8px; --type-label-s: 7px;
+    /* Letter-spacing (Orbitron caps read best with tracking) */
+    --tracking-normal: 1px; --tracking-wide: 2px; --tracking-wider: 4px; --tracking-widest: 6px;
+
+    /* Spacing — 4px baseline grid */
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+    /* Shape — corner radius scale */
+    --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-2xl: 20px; --r-full: 9999px;
+
+    /* Elevation — neon glow size (pair with a color) + ambient depth shadow */
+    --glow-sm: 0 0 8px; --glow-md: 0 0 14px; --glow-lg: 0 0 25px;
+    --shadow-sm: 0 4px 15px rgba(0,0,0,0.4);
+    --shadow-md: 0 8px 30px rgba(0,0,0,0.55);
+
+    /* Motion — durations */
+    --t-fast: 120ms; --t-mid: 200ms; --t-slow: 300ms; --t-slowest: 600ms;
+    /* Motion — easing */
+    --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);     /* legacy decelerate */
+    --ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);      /* general UI */
+    --ease-decelerate: cubic-bezier(0.22, 1, 0.36, 1);    /* entrances */
+    --ease-emphasized: cubic-bezier(0.34, 1.56, 0.64, 1); /* playful overshoot — house style */
+    --ease-spring:     cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* State */
+    --state-disabled-opacity: 0.45;
+    --focus-ring: 2px solid var(--cyan);
   }
 
   html, body {
