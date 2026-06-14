@@ -254,7 +254,7 @@ function bgmScheduleHihat(t){
 function getBGMBeat(){
   let baseBpm = 112;
   if (S.isSprintMode) baseBpm = 135;
-  else if (S.isBlitzMode || S.isUltraMode) baseBpm = 130;
+  else if (S.isBlitzMode) baseBpm = 130;
   else if (S.isDailyMode) baseBpm = 165;
   const bpm = Math.min(210, baseBpm + (S.level || 1) * 5);
   return 60/bpm/4;
@@ -281,7 +281,7 @@ function bgmScheduleLoop(){
   let melody = BGM_MELODY, harmony = BGM_HARMONY, bassWalk = BGM_BASS_WALK, drumPat = BGM_DRUM_PAT;
   if (S.isSprintMode) {
     melody = SPRINT_MELODY; harmony = SPRINT_HARMONY; bassWalk = SPRINT_BASS_WALK; drumPat = SPRINT_DRUM_PAT;
-  } else if (S.isBlitzMode || S.isUltraMode) {
+  } else if (S.isBlitzMode) {
     melody = BLITZ_MELODY; harmony = BLITZ_HARMONY; bassWalk = BLITZ_BASS_WALK; drumPat = BLITZ_DRUM_PAT;
   } else if (S.isDailyMode) {
     melody = CHALLENGE_MELODY; harmony = CHALLENGE_HARMONY; bassWalk = CHALLENGE_BASS_WALK; drumPat = CHALLENGE_DRUM_PAT;

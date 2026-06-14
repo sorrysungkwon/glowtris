@@ -117,7 +117,6 @@
     --mode-sprint:   #00c8ff; /* SPEED — cyan, fast focus */
     --mode-blitz:    #ffd000; /* SPEED — yellow, electric burst */
     --mode-daily:    #ff7700; /* CHALLENGE — orange, daily streak */
-    --mode-ultra:    #ff0080; /* CHALLENGE — magenta, cosmic high score */
 
     /* ───────────────────────────────────────────────────────────────────────
        DESIGN SYSTEM TOKENS — single source of truth. See DESIGN_SYSTEM.md.
@@ -1387,18 +1386,7 @@
   }
   .mode-card.daily:hover .mode-arrow { color: var(--mode-daily); }
 
-  /* CHALLENGE — Ultra Theme (Magenta) */
-  .mode-card.ultra {
-    border-color: rgba(255, 0, 128, 0.22);
-    background: rgba(255, 0, 128, 0.04);
-  }
-  .mode-card.ultra .mode-name { color: var(--mode-ultra); text-shadow: 0 0 8px rgba(255, 0, 128, 0.3); }
-  .mode-card.ultra:hover {
-    border-color: rgba(255, 0, 128, 0.55);
-    background: rgba(255, 0, 128, 0.12);
-    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.15), 0 0 10px rgba(255, 0, 128, 0.05);
-  }
-  .mode-card.ultra:hover .mode-arrow { color: var(--mode-ultra); }
+
 
   /* --- Coming Soon mode cards --- */
   .mode-card.mode-coming-soon {
@@ -2230,7 +2218,6 @@ if ('serviceWorker' in navigator) {
     if (S.isDailyMode) return "daily";
     if (S.isSprintMode) return "sprint";
     if (S.isBlitzMode) return "blitz";
-    if (S.isUltraMode) return "ultra";
     if (S.isFlowMode) return "flow";
     return "classic";
   }
@@ -2263,8 +2250,7 @@ if ('serviceWorker' in navigator) {
         flow: "#a000ff",
         sprint: "#00c8ff",
         blitz: "#ffd000",
-        daily: "#ff7700",
-        ultra: "#ff0080"
+        daily: "#ff7700"
       };
       LS = {
         HI: "glowTrisHi",
@@ -2292,7 +2278,6 @@ if ('serviceWorker' in navigator) {
         ACHIEVEMENTS: "glowTrisAchievements",
         SPRINT_HI: "glowTrisSprintHi",
         BLITZ_HI: "glowTrisBlitzHi",
-        ULTRA_HI: "glowTrisUltraHi",
         FLOW_HI: "glowTrisFlowHi"
       };
       ACHIEVEMENTS = [
@@ -2346,7 +2331,6 @@ if ('serviceWorker' in navigator) {
         isDailyMode: false,
         isSprintMode: false,
         isBlitzMode: false,
-        isUltraMode: false,
         isFlowMode: false,
         // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
         _countdownVal: 0,
@@ -2405,10 +2389,9 @@ if ('serviceWorker' in navigator) {
         _sprintEndTime: 0,
         // only game.js uses, kept here for symmetry
         _sprintHiTime: 0,
-        // Time Attack timing (Blitz/Ultra)
+        // Time Attack timing (Blitz)
         _timeAttackStartTime: 0,
         _blitzHiScore: 0,
-        _ultraHiScore: 0,
         // Flow endless mode (game.js writes, ui.js reads): cumulative score survives
         // board top-outs; each top-out collapses the board and increments the round.
         _flowHiScore: 0,
@@ -2556,7 +2539,7 @@ if ('serviceWorker' in navigator) {
   function getBGMBeat() {
     let baseBpm = 112;
     if (S.isSprintMode) baseBpm = 135;
-    else if (S.isBlitzMode || S.isUltraMode) baseBpm = 130;
+    else if (S.isBlitzMode) baseBpm = 130;
     else if (S.isDailyMode) baseBpm = 165;
     const bpm = Math.min(210, baseBpm + (S.level || 1) * 5);
     return 60 / bpm / 4;
@@ -2583,7 +2566,7 @@ if ('serviceWorker' in navigator) {
       harmony = SPRINT_HARMONY;
       bassWalk = SPRINT_BASS_WALK;
       drumPat = SPRINT_DRUM_PAT;
-    } else if (S.isBlitzMode || S.isUltraMode) {
+    } else if (S.isBlitzMode) {
       melody = BLITZ_MELODY;
       harmony = BLITZ_HARMONY;
       bassWalk = BLITZ_BASS_WALK;
@@ -4041,7 +4024,6 @@ if ('serviceWorker' in navigator) {
   function getBgTheme() {
     if (S.isDailyMode) return { m: "daily", type: "nebula", bg: "rgba(15,7,0,0.18)", hueBase: 28, hueVar: 16, core: "rgba(255,120,0,0.035)", core2: "rgba(200,90,0,0.022)", edge: "rgba(255,120,0,0.85)", trail: [255, 150, 0], glow: true, speed: 1.7 };
     if (S.isBlitzMode) return { m: "blitz", type: "nebula", bg: "rgba(14,11,0,0.18)", hueBase: 49, hueVar: 14, core: "rgba(255,210,0,0.04)", core2: "rgba(200,160,0,0.025)", edge: "rgba(255,210,0,1)", trail: [255, 225, 0], glow: true, speed: 2.2 };
-    if (S.isUltraMode) return { m: "ultra", type: "nebula", bg: "rgba(12,0,7,0.18)", hueBase: 330, hueVar: 16, core: "rgba(255,0,130,0.04)", core2: "rgba(190,0,100,0.025)", edge: "rgba(255,0,130,1)", trail: [255, 0, 130], glow: true, speed: 1.5 };
     if (S.isSprintMode) return { m: "sprint", type: "matrix", bg: "rgba(0,6,12,0.18)", hueBase: 195, hueVar: 20, core: "rgba(0,200,255,0.04)", core2: "rgba(0,140,210,0.025)", edge: "rgba(0,200,255,1)", matrix: [0, 200, 255], glow: true, speed: 2 };
     if (S.isFlowMode) return { m: "flow", type: "nebula", bg: "rgba(7,0,14,0.18)", hueBase: 275, hueVar: 30, core: "rgba(160,0,255,0.018)", core2: "rgba(110,0,180,0.012)", edge: null, glow: false, speed: 0.9 };
     return { m: "marathon", type: "nebula", bg: "rgba(0,9,5,0.18)", hueBase: 150, hueVar: 40, core: "rgba(0,170,95,0.012)", core2: "rgba(0,110,65,0.01)", edge: null, glow: false, speed: 0.8 };
@@ -4890,8 +4872,8 @@ if ('serviceWorker' in navigator) {
       if ($scoreM) $scoreM.textContent = fmt;
       $lines.textContent = Math.max(0, SPRINT_LINES - S.lines);
       if ($linesM) $linesM.textContent = Math.max(0, SPRINT_LINES - S.lines);
-    } else if (S.isBlitzMode || S.isUltraMode) {
-      const totalTime = S.isBlitzMode ? 12e4 : 18e4;
+    } else if (S.isBlitzMode) {
+      const totalTime = 12e4;
       const elapsed = S._timeAttackStartTime > 0 ? performance.now() - S._timeAttackStartTime : 0;
       const remain = Math.max(0, totalTime - elapsed);
       const fmt = fmtTime(remain);
@@ -5903,7 +5885,6 @@ if ('serviceWorker' in navigator) {
     S.isDailyMode = false;
     S.isSprintMode = false;
     S.isBlitzMode = false;
-    S.isUltraMode = false;
     S.isFlowMode = false;
     if (_gateTimer) {
       clearInterval(_gateTimer);
@@ -6043,14 +6024,6 @@ if ('serviceWorker' in navigator) {
               <div class="mode-best">${dailySub}</div>
             </div>
             <div class="mode-arrow">\u203A</div>
-          </div>
-          <div class="mode-card ultra mode-coming-soon" tabindex="-1">
-            <div class="mode-icon">\u{1F30C}</div>
-            <div class="mode-info">
-              <div class="mode-name">ULTRA ${soon}</div>
-              <div class="mode-desc">Plan strategically for massive scores in 3 minutes.</div>
-            </div>
-          </div>
         </div>
 
       </div>
@@ -6452,7 +6425,7 @@ ${cta}`;
     const ctx = c.getContext("2d");
     const mode = getGameMode();
     const accent = MODE_COLORS[mode] || MODE_COLORS.classic;
-    const MODE_LABELS = { classic: "MARATHON", flow: "FLOW", blitz: "BLITZ", ultra: "ULTRA" };
+    const MODE_LABELS = { classic: "MARATHON", flow: "FLOW", blitz: "BLITZ" };
     ctx.fillStyle = "#04041e";
     ctx.fillRect(0, 0, 1200, 630);
     const bgi = document.getElementById("bg-canvas");
@@ -6764,7 +6737,6 @@ ${cta}`;
     startGame: () => startGame,
     startMarathonMode: () => startMarathonMode,
     startSprintMode: () => startSprintMode,
-    startUltraMode: () => startUltraMode,
     stopGameAndReset: () => stopGameAndReset
   });
   function refillBag() {
@@ -7554,7 +7526,7 @@ ${cta}`;
     gtag("game_start", { game_mode: getGameMode() });
     const psl = document.getElementById("panel-score-label");
     const lsl = document.getElementById("lines-sub-label");
-    const isTimeAttack = S.isBlitzMode || S.isUltraMode;
+    const isTimeAttack = S.isBlitzMode;
     if (S.isSprintMode) {
       S._sprintHiTime = parseInt(localStorage.getItem(LS.SPRINT_HI) || "0");
       S._sprintEndTime = 0;
@@ -7562,8 +7534,7 @@ ${cta}`;
       if (psl) psl.textContent = "TIME";
       if (lsl) lsl.textContent = "LEFT";
     } else if (isTimeAttack) {
-      if (S.isBlitzMode) S._blitzHiScore = parseInt(localStorage.getItem(LS.BLITZ_HI) || "0");
-      if (S.isUltraMode) S._ultraHiScore = parseInt(localStorage.getItem(LS.ULTRA_HI) || "0");
+      S._blitzHiScore = parseInt(localStorage.getItem(LS.BLITZ_HI) || "0");
       S._timeAttackStartTime = 0;
       if (psl) psl.textContent = "TIME";
       if (lsl) lsl.textContent = "SCORE";
@@ -7588,14 +7559,13 @@ ${cta}`;
     startCountdown(() => {
       S.gravityTimer = 0;
       if (S.isSprintMode) S._sprintStartTime = performance.now();
-      if (S.isBlitzMode || S.isUltraMode) S._timeAttackStartTime = performance.now();
+      if (S.isBlitzMode) S._timeAttackStartTime = performance.now();
     });
   }
   function launchDailyChallenge() {
     document.getElementById("overlay").style.display = "none";
     S.isSprintMode = false;
     S.isBlitzMode = false;
-    S.isUltraMode = false;
     S.isFlowMode = false;
     S.isDailyMode = true;
     const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
@@ -7787,17 +7757,11 @@ ${cta}`;
     gameOver = true;
     stopBGM();
     sfxSprintGoal();
-    const isBlitz = S.isBlitzMode;
-    const prevBest = isBlitz ? S._blitzHiScore : S._ultraHiScore;
+    const prevBest = S._blitzHiScore;
     const isNewBest = S.score > prevBest;
     if (isNewBest) {
-      if (isBlitz) {
-        S._blitzHiScore = S.score;
-        localStorage.setItem(LS.BLITZ_HI, S.score);
-      } else {
-        S._ultraHiScore = S.score;
-        localStorage.setItem(LS.ULTRA_HI, S.score);
-      }
+      S._blitzHiScore = S.score;
+      localStorage.setItem(LS.BLITZ_HI, S.score);
     }
     if (S.animIntensity !== "off") {
       if (isNewBest) {
@@ -7823,7 +7787,6 @@ ${cta}`;
   function startSprintMode() {
     S.isSprintMode = true;
     S.isBlitzMode = false;
-    S.isUltraMode = false;
     S.isDailyMode = false;
     S.isFlowMode = false;
     startGame();
@@ -7831,15 +7794,6 @@ ${cta}`;
   function startBlitzMode() {
     S.isSprintMode = false;
     S.isBlitzMode = true;
-    S.isUltraMode = false;
-    S.isDailyMode = false;
-    S.isFlowMode = false;
-    startGame();
-  }
-  function startUltraMode() {
-    S.isSprintMode = false;
-    S.isBlitzMode = false;
-    S.isUltraMode = true;
     S.isDailyMode = false;
     S.isFlowMode = false;
     startGame();
@@ -7847,7 +7801,6 @@ ${cta}`;
   function startMarathonMode() {
     S.isSprintMode = false;
     S.isBlitzMode = false;
-    S.isUltraMode = false;
     S.isDailyMode = false;
     S.isFlowMode = false;
     startGame();
@@ -7855,7 +7808,6 @@ ${cta}`;
   function startFlowMode() {
     S.isSprintMode = false;
     S.isBlitzMode = false;
-    S.isUltraMode = false;
     S.isDailyMode = false;
     S.isFlowMode = true;
     startGame();
@@ -8096,7 +8048,6 @@ ${cta}`;
     <li><strong>Marathon</strong> — Classic block-stacking endless mode. How long can you survive as the blocks fall faster?</li>
     <li><strong>Sprint</strong> — Clear 40 lines as fast as possible. Chase your personal best and compare with the all-time leaderboard.</li>
     <li><strong>Blitz</strong> — Score as many points as you can in 2 minutes.</li>
-    <li><strong>Ultra</strong> — Maximum score in 3 minutes.</li>
   </ul>
   <h2>Features</h2>
   <ul>

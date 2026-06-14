@@ -40,7 +40,6 @@ export const MODE_COLORS = {
   sprint:   '#00c8ff',
   blitz:    '#ffd000',
   daily:    '#ff7700',
-  ultra:    '#ff0080',
 };
 
 // #rrggbb → rgba() string for canvas fills/strokes that need an alpha
@@ -76,12 +75,10 @@ export const LS = {
   ACHIEVEMENTS: 'glowTrisAchievements',
   SPRINT_HI:    'glowTrisSprintHi',
   BLITZ_HI:     'glowTrisBlitzHi',
-  ULTRA_HI:     'glowTrisUltraHi',
   FLOW_HI:      'glowTrisFlowHi',
 };
 
 export const BLITZ_TIME = 120000; // 2 minutes
-export const ULTRA_TIME = 180000; // 3 minutes
 
 // ─── Achievement definitions ─────────────────────────────────────────────────
 export const ACHIEVEMENTS = [
@@ -167,7 +164,6 @@ export const S = {
   isDailyMode: false,
   isSprintMode: false,
   isBlitzMode: false,
-  isUltraMode: false,
   isFlowMode: false,
 
   // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
@@ -219,10 +215,9 @@ export const S = {
   _sprintEndTime:   0,   // only game.js uses, kept here for symmetry
   _sprintHiTime:    0,
 
-  // Time Attack timing (Blitz/Ultra)
+  // Time Attack timing (Blitz)
   _timeAttackStartTime: 0,
   _blitzHiScore: 0,
-  _ultraHiScore: 0,
 
   // Flow endless mode (game.js writes, ui.js reads): cumulative score survives
   // board top-outs; each top-out collapses the board and increments the round.
@@ -249,7 +244,6 @@ export function getGameMode() {
   if (S.isDailyMode)  return 'daily';
   if (S.isSprintMode) return 'sprint';
   if (S.isBlitzMode)  return 'blitz';
-  if (S.isUltraMode)  return 'ultra';
   if (S.isFlowMode)   return 'flow';
   return 'classic';
 }

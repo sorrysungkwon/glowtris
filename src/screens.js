@@ -10,7 +10,7 @@ import {
   renderLbTab, setLbMode, loadStartLeaderboard
 } from './leaderboard.js';
 import {
-  startGame, startSprintMode, startBlitzMode, startUltraMode, startFlowMode,
+  startGame, startSprintMode, startBlitzMode, startFlowMode,
   startMarathonMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
@@ -351,7 +351,6 @@ export function showStartScreen(){
   S.isDailyMode=false;
   S.isSprintMode=false;
   S.isBlitzMode=false;
-  S.isUltraMode=false;
   S.isFlowMode=false;
   if(_gateTimer) { clearInterval(_gateTimer); _gateTimer=null; }
   stopGameAndReset();
@@ -497,14 +496,6 @@ export function showModeSelector(){
               <div class="mode-best">${dailySub}</div>
             </div>
             <div class="mode-arrow">›</div>
-          </div>
-          <div class="mode-card ultra mode-coming-soon" tabindex="-1">
-            <div class="mode-icon">🌌</div>
-            <div class="mode-info">
-              <div class="mode-name">ULTRA ${soon}</div>
-              <div class="mode-desc">Plan strategically for massive scores in 3 minutes.</div>
-            </div>
-          </div>
         </div>
 
       </div>

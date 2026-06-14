@@ -67,7 +67,6 @@
     --mode-sprint:   #00c8ff; /* SPEED — cyan, fast focus */
     --mode-blitz:    #ffd000; /* SPEED — yellow, electric burst */
     --mode-daily:    #ff7700; /* CHALLENGE — orange, daily streak */
-    --mode-ultra:    #ff0080; /* CHALLENGE — magenta, cosmic high score */
 
     /* ───────────────────────────────────────────────────────────────────────
        DESIGN SYSTEM TOKENS — single source of truth. See DESIGN_SYSTEM.md.
@@ -1337,18 +1336,7 @@
   }
   .mode-card.daily:hover .mode-arrow { color: var(--mode-daily); }
 
-  /* CHALLENGE — Ultra Theme (Magenta) */
-  .mode-card.ultra {
-    border-color: rgba(255, 0, 128, 0.22);
-    background: rgba(255, 0, 128, 0.04);
-  }
-  .mode-card.ultra .mode-name { color: var(--mode-ultra); text-shadow: 0 0 8px rgba(255, 0, 128, 0.3); }
-  .mode-card.ultra:hover {
-    border-color: rgba(255, 0, 128, 0.55);
-    background: rgba(255, 0, 128, 0.12);
-    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.15), 0 0 10px rgba(255, 0, 128, 0.05);
-  }
-  .mode-card.ultra:hover .mode-arrow { color: var(--mode-ultra); }
+
 
   /* --- Coming Soon mode cards --- */
   .mode-card.mode-coming-soon {

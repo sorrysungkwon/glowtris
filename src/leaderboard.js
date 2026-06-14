@@ -325,7 +325,7 @@ export async function captureGameImage(sc, rank, isDaily=false) {
   // Mode-driven accent — single source of truth (MODE_COLORS), never hardcoded here
   const mode   = getGameMode();
   const accent = MODE_COLORS[mode] || MODE_COLORS.classic;
-  const MODE_LABELS = { classic: 'MARATHON', flow: 'FLOW', blitz: 'BLITZ', ultra: 'ULTRA' };
+  const MODE_LABELS = { classic: 'MARATHON', flow: 'FLOW', blitz: 'BLITZ' };
 
   ctx.fillStyle = '#04041e';
   ctx.fillRect(0, 0, 1200, 630);

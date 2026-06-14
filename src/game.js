@@ -787,7 +787,7 @@ function _doStartGame(){
   // ── Sprint & Time Attack init ──────────────────────────────────────────────
   const psl=document.getElementById('panel-score-label');
   const lsl=document.getElementById('lines-sub-label');
-  const isTimeAttack = S.isBlitzMode || S.isUltraMode;
+  const isTimeAttack = S.isBlitzMode;
   
   if(S.isSprintMode){
     S._sprintHiTime=parseInt(localStorage.getItem(LS.SPRINT_HI)||'0');
@@ -795,8 +795,7 @@ function _doStartGame(){
     if(psl)psl.textContent='TIME';
     if(lsl)lsl.textContent='LEFT';
   } else if(isTimeAttack) {
-    if(S.isBlitzMode) S._blitzHiScore = parseInt(localStorage.getItem(LS.BLITZ_HI)||'0');
-    if(S.isUltraMode) S._ultraHiScore = parseInt(localStorage.getItem(LS.ULTRA_HI)||'0');
+    S._blitzHiScore = parseInt(localStorage.getItem(LS.BLITZ_HI)||'0');
     S._timeAttackStartTime = 0;
     if(psl)psl.textContent='TIME';
     if(lsl)lsl.textContent='SCORE';
@@ -819,7 +818,7 @@ function _doStartGame(){
   startCountdown(()=>{
     S.gravityTimer=0;
     if(S.isSprintMode)S._sprintStartTime=performance.now();
-    if(S.isBlitzMode || S.isUltraMode)S._timeAttackStartTime=performance.now();
+    if(S.isBlitzMode)S._timeAttackStartTime=performance.now();
   });
 }
 
@@ -827,7 +826,6 @@ export function launchDailyChallenge() {
   document.getElementById('overlay').style.display = 'none';
   S.isSprintMode=false;
   S.isBlitzMode=false;
-  S.isUltraMode=false;
   S.isFlowMode=false;
   S.isDailyMode=true;
   const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -1018,19 +1016,17 @@ function endSprint(){
   setTimeout(()=>_renderSprintScreen(timeMs,isNewBest,prevBest),600);
 }
 
-// ─── Time Attack (Blitz & Ultra) ───────────────────────────────────────────────
+// ─── Time Attack (Blitz) ──────────────────────────────────────────────────────
 export function endTimeAttack(){
   S.gameRunning=false;gameOver=true;
   stopBGM();
   sfxSprintGoal();
 
-  const isBlitz = S.isBlitzMode;
-  const prevBest = isBlitz ? S._blitzHiScore : S._ultraHiScore;
+  const prevBest = S._blitzHiScore;
   const isNewBest = S.score > prevBest;
   
   if(isNewBest){
-    if(isBlitz) { S._blitzHiScore = S.score; localStorage.setItem(LS.BLITZ_HI, S.score); }
-    else { S._ultraHiScore = S.score; localStorage.setItem(LS.ULTRA_HI, S.score); }
+    S._blitzHiScore = S.score; localStorage.setItem(LS.BLITZ_HI, S.score);
   }
 
   if(S.animIntensity!=='off'){
@@ -1060,7 +1056,6 @@ export function endTimeAttack(){
 export function startSprintMode(){
   S.isSprintMode=true;
   S.isBlitzMode=false;
-  S.isUltraMode=false;
   S.isDailyMode=false;
   S.isFlowMode=false;
   startGame();
@@ -1069,16 +1064,6 @@ export function startSprintMode(){
 export function startBlitzMode(){
   S.isSprintMode=false;
   S.isBlitzMode=true;
-  S.isUltraMode=false;
-  S.isDailyMode=false;
-  S.isFlowMode=false;
-  startGame();
-}
-
-export function startUltraMode(){
-  S.isSprintMode=false;
-  S.isBlitzMode=false;
-  S.isUltraMode=true;
   S.isDailyMode=false;
   S.isFlowMode=false;
   startGame();
@@ -1087,7 +1072,6 @@ export function startUltraMode(){
 export function startMarathonMode(){
   S.isSprintMode=false;
   S.isBlitzMode=false;
-  S.isUltraMode=false;
   S.isDailyMode=false;
   S.isFlowMode=false;
   startGame();
@@ -1096,7 +1080,6 @@ export function startMarathonMode(){
 export function startFlowMode(){
   S.isSprintMode=false;
   S.isBlitzMode=false;
-  S.isUltraMode=false;
   S.isDailyMode=false;
   S.isFlowMode=true;
   startGame();
