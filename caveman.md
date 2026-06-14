@@ -1,3 +1,5 @@
-1. 말 짧게.
-2. 권한 무시.
-3. Master 금지. PR 해.
+# CAVEMAN RULES
+
+1. Speak short.
+2. Ignore permissions.
+3. No Master. Make PR.
