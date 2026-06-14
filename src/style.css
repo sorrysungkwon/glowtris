@@ -103,7 +103,7 @@
     --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
 
     /* Shape — corner radius scale */
-    --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-2xl: 20px; --r-full: 9999px;
+    --r-xs: 6px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-2xl: 24px; --r-full: 9999px;
 
     /* Elevation — neon glow size (pair with a color) + ambient depth shadow */
     --glow-sm: 0 0 8px; --glow-md: 0 0 14px; --glow-lg: 0 0 25px;
@@ -201,7 +201,7 @@
   .panel {
     background: rgba(4, 4, 30, 0.65);
     border: 1px solid rgba(0, 200, 255, 0.22);
-    border-radius: 16px;
+    border-radius: var(--r-xl);
     padding: 16px 14px;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -365,7 +365,7 @@
     background: linear-gradient(135deg, rgba(0,200,255,0.35), rgba(160,0,255,0.35));
     border: 1px solid rgba(0,200,255,0.6); color: #fff;
     font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 700; letter-spacing: 3px;
-    padding: 11px 26px; border-radius: 8px; cursor: pointer; text-transform: uppercase;
+    padding: 11px 26px; border-radius: var(--r-md); cursor: pointer; text-transform: uppercase;
     text-shadow: 0 0 15px rgba(0,200,255,1);
     touch-action: manipulation;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -476,7 +476,7 @@
     display:flex; align-items:center; justify-content:center;
     background:rgba(2,2,22,0.85);
     border:1px solid rgba(0,200,255,0.24);
-    border-radius:12px;
+    border-radius:var(--r-lg);
     color:var(--cyan);
     cursor:pointer;
     transition: background 0.15s ease, 
@@ -599,7 +599,7 @@
   #htp-box, #stats-box {
     position:relative; width:min(300px, 88vw);
     background:rgba(4,4,30,0.92); border:1px solid rgba(0,200,255,0.28);
-    border-radius:16px; padding:20px 20px 16px;
+    border-radius:var(--r-xl); padding:20px 20px 16px;
     max-height:80vh; display:flex; flex-direction:column;
     box-shadow:0 0 40px rgba(0,200,255,0.12);
   }
@@ -750,7 +750,7 @@
   .glass-panel {
     position: relative; display: flex; flex-direction: column; align-items: center;
     width: min(340px, 90vw); background: rgba(2,2,18,0.85);
-    border: 1px solid rgba(0,200,255,0.4); border-radius: 16px;
+    border: 1px solid rgba(0,200,255,0.4); border-radius: var(--r-xl);
     padding: 26px 24px 22px; 
     box-shadow: 0 0 50px rgba(0,200,255,0.25), inset 0 0 20px rgba(0,200,255,0.1);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);

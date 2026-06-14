@@ -108,16 +108,17 @@ Glowtris pairs **Orbitron** (a geometric, sci-fi brand typeface) with **Pretenda
 To establish a clear sense of Gestalt *similarity*, border radiuses are grouped systematically:
 
 ```
-[--r-xs] 4px     -->   In-line code chips, very small badges (e.g., KO/EN lang badges)
-[--r-sm] 6px     -->   Small button elements, select options, version badges
-[--r-md] 8px     -->   Input fields, primary buttons, small cards
-[--r-lg] 12px    -->   Post list cards, admin cards, editor pane containers
-[--r-xl] 18px    -->   Featured post cards, modal dialogs, main panels
+[--r-xs] 6px     -->   In-line code chips, very small badges (e.g., KO/EN lang badges)
+[--r-sm] 8px     -->   Small button elements, select options, version badges
+[--r-md] 12px    -->   Input fields, primary buttons, small cards
+[--r-lg] 16px    -->   Post list cards, admin cards, editor pane containers
+[--r-xl] 20px    -->   Featured post cards, modal dialogs, main panels
+[--r-2xl] 24px   -->   Large overlays, sheets, alert boxes
 [--r-full] 9999px -->   Pill CTAs, Category filter buttons, Search bar inputs
 ```
 
 > [!NOTE]
-> Implemented game radii (`--r-*`): `--r-xs 4` chips/inputs · `--r-sm 6` badges · `--r-md 8` small buttons · `--r-lg 12` cards · `--r-xl 16` mode groups · `--r-2xl 20` dialogs · `--r-full` pills/circles. Cards and panels favor the **Large/XL** end (12–20px) for a soft neon-glass look; tiny badges use **Small** (6px).
+> Implemented game radii (`--r-*`): `--r-xs 6` chips/inputs · `--r-sm 8` badges · `--r-md 12` small buttons · `--r-lg 16` cards · `--r-xl 20` mode groups/panels · `--r-2xl 24` dialogs · `--r-full` pills/circles. Cards and panels favor the **Large/XL** end (16–20px) for a soft neon-glass look; tiny badges use **Small** (8px).
 
 ---
 
