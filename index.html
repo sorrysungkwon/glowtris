@@ -111,6 +111,68 @@
     --border: rgba(0,200,255,0.28);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
+    /* Per-mode signature colors (grouped: ENDLESS / SPEED / CHALLENGE) */
+    --mode-marathon: #00ff88; /* ENDLESS — green, endurance */
+    --mode-flow:     #a000ff; /* ENDLESS — violet, meditative flow */
+    --mode-sprint:   #00c8ff; /* SPEED — cyan, fast focus */
+    --mode-blitz:    #ffd000; /* SPEED — yellow, electric burst */
+    --mode-daily:    #ff7700; /* CHALLENGE — orange, daily streak */
+    --mode-ultra:    #ff0080; /* CHALLENGE — magenta, cosmic high score */
+
+    /* ───────────────────────────────────────────────────────────────────────
+       DESIGN SYSTEM TOKENS — single source of truth. See DESIGN_SYSTEM.md.
+       Reference these vars; do NOT hardcode raw values in component CSS.
+       ─────────────────────────────────────────────────────────────────────── */
+
+    /* Semantic color roles (built on brand + neutrals) */
+    --surface:        rgba(4,4,30,0.75);     /* panels / dialogs */
+    --surface-2:      rgba(255,255,255,0.04);/* raised card on a panel */
+    --surface-glass:  rgba(0,0,20,0.72);     /* glassy HUD panel (= --panel-bg) */
+    --on-surface:       rgba(255,255,255,0.92); /* primary text */
+    --on-surface-muted: rgba(255,255,255,0.60); /* secondary text */
+    --on-surface-faint: rgba(255,255,255,0.30); /* disabled / hints */
+    --outline:        rgba(0,200,255,0.28);  /* default hairline (= --border) */
+    --outline-strong: rgba(0,200,255,0.55);
+    --success: #00ff88;
+    --warning: #ffb347;
+    --error:   #ff0080;
+
+    /* Typography — Orbitron is the single typeface (display + UI) */
+    --font-display: 'Orbitron', sans-serif;
+    --font-ui:      'Orbitron', monospace;   /* numerics / HUD — tabular feel */
+    --fw-regular: 400; --fw-bold: 700; --fw-black: 900;
+    /* Type scale (px) — Material-style roles, tuned to this game's density */
+    --type-display-l: 44px; --type-display-m: 36px; --type-display-s: 28px;
+    --type-headline:  22px; --type-title-l: 18px; --type-title-m: 15px; --type-title-s: 13px;
+    --type-body-l: 12px; --type-body-m: 11px; --type-body-s: 10px;
+    --type-label-l: 9px; --type-label-m: 8px; --type-label-s: 7px;
+    /* Letter-spacing (Orbitron caps read best with tracking) */
+    --tracking-normal: 1px; --tracking-wide: 2px; --tracking-wider: 4px; --tracking-widest: 6px;
+
+    /* Spacing — 4px baseline grid */
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+    /* Shape — corner radius scale */
+    --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-2xl: 20px; --r-full: 9999px;
+
+    /* Elevation — neon glow size (pair with a color) + ambient depth shadow */
+    --glow-sm: 0 0 8px; --glow-md: 0 0 14px; --glow-lg: 0 0 25px;
+    --shadow-sm: 0 4px 15px rgba(0,0,0,0.4);
+    --shadow-md: 0 8px 30px rgba(0,0,0,0.55);
+
+    /* Motion — durations */
+    --t-fast: 120ms; --t-mid: 200ms; --t-slow: 300ms; --t-slowest: 600ms;
+    /* Motion — easing */
+    --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);     /* legacy decelerate */
+    --ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);      /* general UI */
+    --ease-decelerate: cubic-bezier(0.22, 1, 0.36, 1);    /* entrances */
+    --ease-emphasized: cubic-bezier(0.34, 1.56, 0.64, 1); /* playful overshoot — house style */
+    --ease-spring:     cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* State */
+    --state-disabled-opacity: 0.45;
+    --focus-ring: 2px solid var(--cyan);
   }
 
   html, body {
@@ -1237,44 +1299,83 @@
     transform: translateY(1px);
   }
 
-  /* Marathon Mode Theme (Cyan) */
+  /* ENDLESS — Marathon Theme (Green) */
   .mode-card.marathon {
-    border-color: rgba(0, 200, 255, 0.22);
-    background: rgba(0, 200, 255, 0.04);
-  }
-  .mode-card.marathon .mode-name { color: var(--cyan); text-shadow: 0 0 8px rgba(0, 200, 255, 0.3); }
-  .mode-card.marathon:hover {
-    border-color: rgba(0, 200, 255, 0.55);
-    background: rgba(0, 200, 255, 0.12);
-    box-shadow: 0 4px 20px rgba(0, 200, 255, 0.15), 0 0 10px rgba(0, 200, 255, 0.05);
-  }
-  .mode-card.marathon:hover .mode-arrow { color: var(--cyan); }
-
-  /* Sprint Mode Theme (Green) */
-  .mode-card.sprint {
     border-color: rgba(0, 255, 136, 0.22);
     background: rgba(0, 255, 136, 0.04);
   }
-  .mode-card.sprint .mode-name { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
-  .mode-card.sprint:hover {
+  .mode-card.marathon .mode-name { color: var(--mode-marathon); text-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+  .mode-card.marathon:hover {
     border-color: rgba(0, 255, 136, 0.55);
     background: rgba(0, 255, 136, 0.12);
     box-shadow: 0 4px 20px rgba(0, 255, 136, 0.15), 0 0 10px rgba(0, 255, 136, 0.05);
   }
-  .mode-card.sprint:hover .mode-arrow { color: #00ff88; }
+  .mode-card.marathon:hover .mode-arrow { color: var(--mode-marathon); }
 
-  /* Daily Challenge Theme (Orange) */
+  /* ENDLESS — Flow Theme (Violet) */
+  .mode-card.flow {
+    border-color: rgba(160, 0, 255, 0.22);
+    background: rgba(160, 0, 255, 0.04);
+  }
+  .mode-card.flow .mode-name { color: var(--mode-flow); text-shadow: 0 0 8px rgba(160, 0, 255, 0.35); }
+  .mode-card.flow:hover {
+    border-color: rgba(160, 0, 255, 0.55);
+    background: rgba(160, 0, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(160, 0, 255, 0.15), 0 0 10px rgba(160, 0, 255, 0.05);
+  }
+  .mode-card.flow:hover .mode-arrow { color: var(--mode-flow); }
+
+  /* SPEED — Sprint Theme (Cyan) */
+  .mode-card.sprint {
+    border-color: rgba(0, 200, 255, 0.22);
+    background: rgba(0, 200, 255, 0.04);
+  }
+  .mode-card.sprint .mode-name { color: var(--mode-sprint); text-shadow: 0 0 8px rgba(0, 200, 255, 0.3); }
+  .mode-card.sprint:hover {
+    border-color: rgba(0, 200, 255, 0.55);
+    background: rgba(0, 200, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 200, 255, 0.15), 0 0 10px rgba(0, 200, 255, 0.05);
+  }
+  .mode-card.sprint:hover .mode-arrow { color: var(--mode-sprint); }
+
+  /* SPEED — Blitz Theme (Yellow) */
+  .mode-card.blitz {
+    border-color: rgba(255, 208, 0, 0.22);
+    background: rgba(255, 208, 0, 0.04);
+  }
+  .mode-card.blitz .mode-name { color: var(--mode-blitz); text-shadow: 0 0 8px rgba(255, 208, 0, 0.3); }
+  .mode-card.blitz:hover {
+    border-color: rgba(255, 208, 0, 0.55);
+    background: rgba(255, 208, 0, 0.12);
+    box-shadow: 0 4px 20px rgba(255, 208, 0, 0.15), 0 0 10px rgba(255, 208, 0, 0.05);
+  }
+  .mode-card.blitz:hover .mode-arrow { color: var(--mode-blitz); }
+
+  /* CHALLENGE — Daily Theme (Orange) */
   .mode-card.daily {
     border-color: rgba(255, 119, 0, 0.22);
     background: rgba(255, 119, 0, 0.03);
   }
-  .mode-card.daily .mode-name { color: #ff7700; text-shadow: 0 0 8px rgba(255, 119, 0, 0.3); }
+  .mode-card.daily .mode-name { color: var(--mode-daily); text-shadow: 0 0 8px rgba(255, 119, 0, 0.3); }
   .mode-card.daily:hover {
     border-color: rgba(255, 119, 0, 0.55);
     background: rgba(255, 119, 0, 0.1);
     box-shadow: 0 4px 20px rgba(255, 119, 0, 0.15), 0 0 10px rgba(255, 119, 0, 0.05);
   }
-  .mode-card.daily:hover .mode-arrow { color: #ff7700; }
+  .mode-card.daily:hover .mode-arrow { color: var(--mode-daily); }
+
+  /* CHALLENGE — Ultra Theme (Magenta) */
+  .mode-card.ultra {
+    border-color: rgba(255, 0, 128, 0.22);
+    background: rgba(255, 0, 128, 0.04);
+  }
+  .mode-card.ultra .mode-name { color: var(--mode-ultra); text-shadow: 0 0 8px rgba(255, 0, 128, 0.3); }
+  .mode-card.ultra:hover {
+    border-color: rgba(255, 0, 128, 0.55);
+    background: rgba(255, 0, 128, 0.12);
+    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.15), 0 0 10px rgba(255, 0, 128, 0.05);
+  }
+  .mode-card.ultra:hover .mode-arrow { color: var(--mode-ultra); }
 
   /* --- Coming Soon mode cards --- */
   .mode-card.mode-coming-soon {
@@ -2065,6 +2166,10 @@ if ('serviceWorker' in navigator) {
   };
 
   // src/shared.js
+  function hexToRgba(hex, a = 1) {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`;
+  }
   function _getAchievements() {
     if (!S._achievementsCache)
       S._achievementsCache = JSON.parse(localStorage.getItem(LS.ACHIEVEMENTS) || "[]");
@@ -2099,9 +2204,10 @@ if ('serviceWorker' in navigator) {
     if (S.isSprintMode) return "sprint";
     if (S.isBlitzMode) return "blitz";
     if (S.isUltraMode) return "ultra";
+    if (S.isFlowMode) return "flow";
     return "classic";
   }
-  var COLS, ROWS, PIECES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, LEVEL_LINES, SPRINT_LINES, MAX_PARTICLES, SUPPORT_URL, COLOR_TO_KEY, LS, ACHIEVEMENTS, S;
+  var COLS, ROWS, PIECES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, LEVEL_LINES, SPRINT_LINES, MAX_PARTICLES, SUPPORT_URL, COLOR_TO_KEY, MODE_COLORS, LS, ACHIEVEMENTS, S;
   var init_shared = __esm({
     "src/shared.js"() {
       COLS = 10;
@@ -2124,6 +2230,15 @@ if ('serviceWorker' in navigator) {
       SUPPORT_URL = "https://ko-fi.com/sorrysungkwon";
       COLOR_TO_KEY = {};
       for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
+      MODE_COLORS = {
+        marathon: "#00ff88",
+        classic: "#00ff88",
+        flow: "#a000ff",
+        sprint: "#00c8ff",
+        blitz: "#ffd000",
+        daily: "#ff7700",
+        ultra: "#ff0080"
+      };
       LS = {
         HI: "glowTrisHi",
         HISTORY: "glowTrisHistory",
@@ -2150,7 +2265,8 @@ if ('serviceWorker' in navigator) {
         ACHIEVEMENTS: "glowTrisAchievements",
         SPRINT_HI: "glowTrisSprintHi",
         BLITZ_HI: "glowTrisBlitzHi",
-        ULTRA_HI: "glowTrisUltraHi"
+        ULTRA_HI: "glowTrisUltraHi",
+        FLOW_HI: "glowTrisFlowHi"
       };
       ACHIEVEMENTS = [
         { id: "first_game", label: "First Stack", description: "Complete your first game", icon: "\u{1F9F1}" },
@@ -2204,6 +2320,7 @@ if ('serviceWorker' in navigator) {
         isSprintMode: false,
         isBlitzMode: false,
         isUltraMode: false,
+        isFlowMode: false,
         // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
         _countdownVal: 0,
         _countdownGo: 0,
@@ -2265,6 +2382,10 @@ if ('serviceWorker' in navigator) {
         _timeAttackStartTime: 0,
         _blitzHiScore: 0,
         _ultraHiScore: 0,
+        // Flow endless mode (game.js writes, ui.js reads): cumulative score survives
+        // board top-outs; each top-out collapses the board and increments the round.
+        _flowHiScore: 0,
+        _flowRounds: 0,
         // Perf lock (ui.js measureFPS writes, game.js _doStartGame reads)
         _perfLocked: false,
         // Particle array (game.js endGame/endSprint push directly; ui.js renders)
@@ -3891,11 +4012,12 @@ if ('serviceWorker' in navigator) {
     ];
   }
   function getBgTheme() {
-    if (S.isDailyMode) return { m: "daily", type: "nebula", bg: "rgba(15,5,0,0.18)", hueBase: 15, hueVar: 15, core: "rgba(255,100,0,0.015)", core2: "rgba(200,80,0,0.01)", edge: "rgba(200,80,0,0.4)", glow: true, speed: 1.7 };
-    if (S.isBlitzMode) return { m: "blitz", type: "nebula", bg: "rgba(15,0,0,0.18)", hueBase: 10, core: "rgba(255,50,0,0.04)", core2: "rgba(200,20,0,0.025)", edge: "rgba(255,50,0,1)", glow: true, speed: 2.2 };
-    if (S.isUltraMode) return { m: "ultra", type: "nebula", bg: "rgba(8,0,12,0.18)", hueBase: 280, core: "rgba(200,0,255,0.04)", core2: "rgba(150,0,200,0.025)", edge: "rgba(150,0,200,1)", glow: true, speed: 1.5 };
-    if (S.isSprintMode) return { m: "sprint", type: "matrix", bg: "rgba(0,5,10,0.18)", hueBase: 190, core: "rgba(0,180,255,0.04)", core2: "rgba(0,120,200,0.025)", edge: "rgba(0,160,255,1)", glow: true, speed: 2 };
-    return { m: "marathon", type: "nebula", bg: "rgba(0,0,12,0.18)", hueBase: 240, core: "rgba(80,0,160,0.01)", core2: "rgba(40,0,80,0.01)", edge: null, glow: false, speed: 0.8 };
+    if (S.isDailyMode) return { m: "daily", type: "nebula", bg: "rgba(15,7,0,0.18)", hueBase: 28, hueVar: 16, core: "rgba(255,120,0,0.035)", core2: "rgba(200,90,0,0.022)", edge: "rgba(255,120,0,0.85)", trail: [255, 150, 0], glow: true, speed: 1.7 };
+    if (S.isBlitzMode) return { m: "blitz", type: "nebula", bg: "rgba(14,11,0,0.18)", hueBase: 49, hueVar: 14, core: "rgba(255,210,0,0.04)", core2: "rgba(200,160,0,0.025)", edge: "rgba(255,210,0,1)", trail: [255, 225, 0], glow: true, speed: 2.2 };
+    if (S.isUltraMode) return { m: "ultra", type: "nebula", bg: "rgba(12,0,7,0.18)", hueBase: 330, hueVar: 16, core: "rgba(255,0,130,0.04)", core2: "rgba(190,0,100,0.025)", edge: "rgba(255,0,130,1)", trail: [255, 0, 130], glow: true, speed: 1.5 };
+    if (S.isSprintMode) return { m: "sprint", type: "matrix", bg: "rgba(0,6,12,0.18)", hueBase: 195, hueVar: 20, core: "rgba(0,200,255,0.04)", core2: "rgba(0,140,210,0.025)", edge: "rgba(0,200,255,1)", matrix: [0, 200, 255], glow: true, speed: 2 };
+    if (S.isFlowMode) return { m: "flow", type: "nebula", bg: "rgba(7,0,14,0.18)", hueBase: 275, hueVar: 30, core: "rgba(160,0,255,0.018)", core2: "rgba(110,0,180,0.012)", edge: null, glow: false, speed: 0.9 };
+    return { m: "marathon", type: "nebula", bg: "rgba(0,9,5,0.18)", hueBase: 150, hueVar: 40, core: "rgba(0,170,95,0.012)", core2: "rgba(0,110,65,0.01)", edge: null, glow: false, speed: 0.8 };
   }
   function drawBackground(dtFactor = 1) {
     if (S.lowPerfMode) {
@@ -3928,7 +4050,8 @@ if ('serviceWorker' in navigator) {
           d.y = -d.size * 3;
           d.x = Math.random() * bgc.width;
         }
-        bgx.fillStyle = `rgba(0,150,255,${d.op})`;
+        const mc = th.matrix || [0, 150, 255];
+        bgx.fillStyle = `rgba(${mc[0]},${mc[1]},${mc[2]},${d.op})`;
         bgx.fillRect(d.x, d.y, d.size, d.size * 2);
       }
     } else {
@@ -3966,9 +4089,10 @@ if ('serviceWorker' in navigator) {
         }
         if (th.glow) {
           const tLen = s.speed * 22;
+          const tc = th.trail || [255, 80 + (s.r * 40 | 0), 0];
           const tg = bgx.createLinearGradient(s.x - s.vx * 22, s.y - tLen, s.x, s.y);
           tg.addColorStop(0, "transparent");
-          tg.addColorStop(1, `rgba(255,${80 + s.r * 40 | 0},0,${s.r * 0.22})`);
+          tg.addColorStop(1, `rgba(${tc[0]},${tc[1]},${tc[2]},${s.r * 0.22})`);
           bgx.strokeStyle = tg;
           bgx.lineWidth = s.r * 0.9;
           bgx.beginPath();
@@ -5745,8 +5869,15 @@ if ('serviceWorker' in navigator) {
   }
   function showStartScreen() {
     offlineBarGameEnd();
+    if (S.isFlowMode && S.score > (S._flowHiScore || 0)) {
+      S._flowHiScore = S.score;
+      localStorage.setItem(LS.FLOW_HI, S.score);
+    }
     S.isDailyMode = false;
     S.isSprintMode = false;
+    S.isBlitzMode = false;
+    S.isUltraMode = false;
+    S.isFlowMode = false;
     if (_gateTimer) {
       clearInterval(_gateTimer);
       _gateTimer = null;
@@ -5814,68 +5945,82 @@ if ('serviceWorker' in navigator) {
   }
   function showModeSelector() {
     hidePWASheet();
-    const sprintBest = S._sprintHiTime > 0 ? `<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
+    const noRec = '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
     const hiS = parseInt(localStorage.getItem(LS.HI) || "0");
-    const marathonBest = hiS > 0 ? `<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
+    const marathonBest = hiS > 0 ? `<span style="color:rgba(0,255,136,0.8)">Best: ${hiS.toLocaleString()}</span>` : noRec;
+    const flowHi = parseInt(localStorage.getItem(LS.FLOW_HI) || "0");
+    const flowBest = flowHi > 0 ? `<span style="color:rgba(160,0,255,0.8)">Best: ${flowHi.toLocaleString()}</span>` : noRec;
+    const sprintBest = S._sprintHiTime > 0 ? `<span style="color:rgba(0,200,255,0.8)">Best: ${fmtTime(S._sprintHiTime)}</span>` : noRec;
     const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("sv").replace(/-/g, "");
     const dailyDone = localStorage.getItem(LS.DAILY_DATE) === todayStr;
     const dailySub = dailyDone ? '<span style="color:rgba(255,230,0,0.75)">\u2713 Completed today</span>' : '<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
+    const soon = '<span class="coming-soon-badge">SOON</span>';
     $overlay.innerHTML = `
     <div class="glass-panel">
       <h1 style="font-size:15px;margin-bottom:12px;letter-spacing:3px">SELECT MODE</h1>
 
-      <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
 
-        <!-- MARATHON -->
-        <div class="mode-card marathon" tabindex="0" onclick="startGame()">
-          <div class="mode-icon">\u{1F3AE}</div>
-          <div class="mode-info">
-            <div class="mode-name">MARATHON</div>
-            <div class="mode-desc">No time limit \u2014 how high can you go?</div>
-            <div class="mode-best">${marathonBest}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
-        <!-- SPRINT -->
-        <div class="mode-card sprint" tabindex="0" onclick="startSprintMode()">
-          <div class="mode-icon">\u26A1</div>
-          <div class="mode-info">
-            <div class="mode-name">SPRINT 40L</div>
-            <div class="mode-desc">Clear 40 lines. Fastest time wins.</div>
-            <div class="mode-best">${sprintBest}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
-        <!-- DAILY CHALLENGE -->
-        <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
-          <div class="mode-icon">\u{1F3C6}</div>
-          <div class="mode-info">
-            <div class="mode-name">DAILY CHALLENGE</div>
-            <div class="mode-desc">Same piece sequence for everyone \u2014 pure skill.</div>
-            <div class="mode-best">${dailySub}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
-        <!-- SPEED RUN GROUP \u2014 Coming Soon -->
-        <div class="mode-group-label">\u23F3 SPEED RUN <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <!-- ENDLESS -->
+        <div class="mode-group-label">\u267E\uFE0F ENDLESS</div>
         <div class="mode-group">
-          <!-- BLITZ -->
+          <div class="mode-card marathon" tabindex="0" onclick="startMarathonMode()">
+            <div class="mode-icon">\u{1F3AE}</div>
+            <div class="mode-info">
+              <div class="mode-name">MARATHON</div>
+              <div class="mode-desc">No time limit \u2014 how high can you go?</div>
+              <div class="mode-best">${marathonBest}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
+          <div class="mode-card flow" tabindex="0" onclick="startFlowMode()">
+            <div class="mode-icon">\u{1F30A}</div>
+            <div class="mode-info">
+              <div class="mode-name">FLOW</div>
+              <div class="mode-desc">Never lose \u2014 the board resets and you keep scoring.</div>
+              <div class="mode-best">${flowBest}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
+        </div>
+
+        <!-- SPEED -->
+        <div class="mode-group-label">\u26A1 SPEED</div>
+        <div class="mode-group">
+          <div class="mode-card sprint" tabindex="0" onclick="startSprintMode()">
+            <div class="mode-icon">\u26A1</div>
+            <div class="mode-info">
+              <div class="mode-name">SPRINT 40L</div>
+              <div class="mode-desc">Clear 40 lines. Fastest time wins.</div>
+              <div class="mode-best">${sprintBest}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
           <div class="mode-card blitz mode-coming-soon" tabindex="-1">
             <div class="mode-icon">\u23F1\uFE0F</div>
             <div class="mode-info">
-              <div class="mode-name">BLITZ</div>
+              <div class="mode-name">BLITZ ${soon}</div>
               <div class="mode-desc">Score as high as possible in 2 minutes.</div>
             </div>
           </div>
+        </div>
 
-          <!-- ULTRA -->
+        <!-- CHALLENGE -->
+        <div class="mode-group-label">\u{1F3C6} CHALLENGE</div>
+        <div class="mode-group">
+          <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
+            <div class="mode-icon">\u{1F3C6}</div>
+            <div class="mode-info">
+              <div class="mode-name">DAILY CHALLENGE</div>
+              <div class="mode-desc">Same piece sequence for everyone \u2014 pure skill.</div>
+              <div class="mode-best">${dailySub}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
           <div class="mode-card ultra mode-coming-soon" tabindex="-1">
             <div class="mode-icon">\u{1F30C}</div>
             <div class="mode-info">
-              <div class="mode-name">ULTRA</div>
+              <div class="mode-name">ULTRA ${soon}</div>
               <div class="mode-desc">Plan strategically for massive scores in 3 minutes.</div>
             </div>
           </div>
@@ -6071,6 +6216,7 @@ ${cta}`;
     c.width = 1200;
     c.height = 630;
     const ctx = c.getContext("2d");
+    const accent = MODE_COLORS.sprint;
     ctx.fillStyle = "#04041e";
     ctx.fillRect(0, 0, 1200, 630);
     const bgi = document.getElementById("bg-canvas");
@@ -6078,13 +6224,13 @@ ${cta}`;
     const gci = document.getElementById("game-canvas");
     if (gci) {
       const gw = 260, gh = 520, gx = 90, gy = 55;
-      ctx.shadowColor = "#00ff88";
+      ctx.shadowColor = accent;
       ctx.shadowBlur = 40;
       ctx.fillStyle = "rgba(0,0,20,0.8)";
       ctx.fillRect(gx, gy, gw, gh);
       ctx.shadowBlur = 0;
       ctx.drawImage(gci, gx, gy, gw, gh);
-      ctx.strokeStyle = "#00ff88";
+      ctx.strokeStyle = accent;
       ctx.lineWidth = 4;
       ctx.strokeRect(gx, gy, gw, gh);
       ctx.strokeStyle = "rgba(255,255,255,0.15)";
@@ -6097,13 +6243,13 @@ ${cta}`;
     ctx.shadowBlur = 30;
     ctx.fillRect(px, py, pw, ph);
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = "rgba(0,255,136,0.35)";
+    ctx.strokeStyle = hexToRgba(accent, 0.4);
     ctx.lineWidth = 2;
     ctx.strokeRect(px, py, pw, ph);
     ctx.textAlign = "center";
-    ctx.fillStyle = "#00ff88";
+    ctx.fillStyle = accent;
     ctx.font = "900 52px Orbitron, monospace";
-    ctx.shadowColor = "rgba(0,255,136,0.6)";
+    ctx.shadowColor = hexToRgba(accent, 0.6);
     ctx.shadowBlur = 20;
     ctx.fillText("SPRINT 40L", px + pw / 2, py + 95);
     ctx.shadowBlur = 0;
@@ -6118,20 +6264,20 @@ ${cta}`;
     ctx.letterSpacing = "2px";
     ctx.fillText(fmtTime(timeMs), px + pw / 2, py + 290);
     ctx.shadowBlur = 0;
-    ctx.fillStyle = "rgba(0,255,136,0.2)";
+    ctx.fillStyle = hexToRgba(accent, 0.22);
     ctx.fillRect(px + 80, py + 320, pw - 160, 2);
     ctx.letterSpacing = "2px";
     ctx.font = "700 26px Orbitron, monospace";
     let cy = py + 395;
     if (rank) {
-      ctx.fillStyle = "#00ff88";
-      ctx.shadowColor = "rgba(0,255,136,0.5)";
+      ctx.fillStyle = "#ffe600";
+      ctx.shadowColor = "rgba(255,230,0,0.5)";
       ctx.shadowBlur = 10;
       ctx.fillText("\u{1F3C6} ALL TIME RANK: #" + rank, px + pw / 2, cy);
       ctx.shadowBlur = 0;
       cy += 50;
     }
-    ctx.fillStyle = "#00c8ff";
+    ctx.fillStyle = hexToRgba(accent, 0.9);
     ctx.fillText(`${lpm} LPM   |   40 LINES`, px + pw / 2, cy);
     cy += 50;
     ctx.fillStyle = "rgba(255,255,255,0.35)";
@@ -6277,6 +6423,9 @@ ${cta}`;
     c.width = 1200;
     c.height = 630;
     const ctx = c.getContext("2d");
+    const mode = getGameMode();
+    const accent = MODE_COLORS[mode] || MODE_COLORS.classic;
+    const MODE_LABELS = { classic: "MARATHON", flow: "FLOW", blitz: "BLITZ", ultra: "ULTRA" };
     ctx.fillStyle = "#04041e";
     ctx.fillRect(0, 0, 1200, 630);
     const bgi = document.getElementById("bg-canvas");
@@ -6285,13 +6434,13 @@ ${cta}`;
     if (gci) {
       const gw = 260, gh = 520;
       const gx = 90, gy = 55;
-      ctx.shadowColor = "#00c8ff";
+      ctx.shadowColor = accent;
       ctx.shadowBlur = 40;
       ctx.fillStyle = "rgba(0,0,20,0.8)";
       ctx.fillRect(gx, gy, gw, gh);
       ctx.shadowBlur = 0;
       ctx.drawImage(gci, gx, gy, gw, gh);
-      ctx.strokeStyle = "#00c8ff";
+      ctx.strokeStyle = accent;
       ctx.lineWidth = 4;
       ctx.strokeRect(gx, gy, gw, gh);
       ctx.strokeStyle = "rgba(255,255,255,0.15)";
@@ -6304,14 +6453,14 @@ ${cta}`;
     ctx.shadowBlur = 30;
     ctx.fillRect(px, py, pw, ph);
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = "rgba(0,200,255,0.35)";
+    ctx.strokeStyle = hexToRgba(accent, 0.4);
     ctx.lineWidth = 2;
     ctx.strokeRect(px, py, pw, ph);
     ctx.textAlign = "center";
     if (isDaily) {
-      ctx.fillStyle = "#ff7700";
+      ctx.fillStyle = accent;
       ctx.font = "900 52px Orbitron, monospace";
-      ctx.shadowColor = "rgba(255,230,0,0.6)";
+      ctx.shadowColor = hexToRgba(accent, 0.6);
       ctx.shadowBlur = 20;
       ctx.letterSpacing = "2px";
       ctx.fillText("DAILY CHALLENGE", px + pw / 2, py + 95);
@@ -6327,44 +6476,45 @@ ${cta}`;
       gr.addColorStop(0.5, "#a000ff");
       gr.addColorStop(1, "#ff0080");
       ctx.fillStyle = gr;
-      ctx.font = "900 76px Orbitron, monospace";
+      ctx.font = "900 70px Orbitron, monospace";
       ctx.shadowColor = "rgba(160,0,255,0.6)";
       ctx.shadowBlur = 20;
-      ctx.fillText("GLOWTRIS", px + pw / 2, py + 110);
+      ctx.fillText("GLOWTRIS", px + pw / 2, py + 100);
       ctx.shadowBlur = 0;
+      ctx.font = "800 26px Orbitron, monospace";
+      ctx.fillStyle = accent;
+      ctx.shadowColor = hexToRgba(accent, 0.6);
+      ctx.shadowBlur = 14;
+      ctx.letterSpacing = "6px";
+      ctx.fillText(MODE_LABELS[mode] || "MARATHON", px + pw / 2, py + 142);
+      ctx.shadowBlur = 0;
+      ctx.letterSpacing = "0px";
     }
     ctx.font = "700 28px Orbitron, monospace";
     ctx.fillStyle = "rgba(255,255,255,0.6)";
     ctx.letterSpacing = "6px";
     ctx.fillText("FINAL SCORE", px + pw / 2, py + 210);
     ctx.font = "900 70px Orbitron, monospace";
-    ctx.fillStyle = isDaily ? "#ff7700" : "#ffe600";
-    ctx.shadowColor = isDaily ? "#ff7700" : "#ffe600";
+    ctx.fillStyle = accent;
+    ctx.shadowColor = accent;
     ctx.shadowBlur = 25;
     ctx.letterSpacing = "2px";
     ctx.fillText(sc.toLocaleString(), px + pw / 2, py + 290);
     ctx.shadowBlur = 0;
-    ctx.fillStyle = "rgba(0,200,255,0.2)";
+    ctx.fillStyle = hexToRgba(accent, 0.22);
     ctx.fillRect(px + 80, py + 340, pw - 160, 2);
     ctx.font = "700 26px Orbitron, monospace";
     ctx.letterSpacing = "2px";
     let currentY = py + 400;
-    if (isDaily && rank) {
-      ctx.fillStyle = "#00ff88";
-      ctx.shadowColor = "rgba(0,255,136,0.5)";
+    if (rank) {
+      ctx.fillStyle = "#ffe600";
+      ctx.shadowColor = "rgba(255,230,0,0.5)";
       ctx.shadowBlur = 10;
-      ctx.fillText("\u{1F3C6} TODAY CHALLENGE RANK: #" + rank, px + pw / 2, currentY);
-      ctx.shadowBlur = 0;
-      currentY += 50;
-    } else if (rank) {
-      ctx.fillStyle = "#00ff88";
-      ctx.shadowColor = "rgba(0,255,136,0.5)";
-      ctx.shadowBlur = 10;
-      ctx.fillText("\u{1F3C6} ALL TIME RANK: #" + rank, px + pw / 2, currentY);
+      ctx.fillText(`\u{1F3C6} ${isDaily ? "TODAY CHALLENGE" : "ALL TIME"} RANK: #` + rank, px + pw / 2, currentY);
       ctx.shadowBlur = 0;
       currentY += 50;
     }
-    ctx.fillStyle = "#00c8ff";
+    ctx.fillStyle = hexToRgba(accent, 0.9);
     ctx.fillText(`LEVEL: ${S.level}   |   LINES: ${S.lines}`, px + pw / 2, currentY);
     currentY += 50;
     const maxCombo = parseInt(localStorage.getItem(LS.MAX_COMBO) || "0");
@@ -6583,6 +6733,7 @@ ${cta}`;
     resumeWithCountdown: () => resumeWithCountdown,
     startBlitzMode: () => startBlitzMode,
     startCountdown: () => startCountdown,
+    startFlowMode: () => startFlowMode,
     startGame: () => startGame,
     startMarathonMode: () => startMarathonMode,
     startSprintMode: () => startSprintMode,
@@ -6685,7 +6836,7 @@ ${cta}`;
       if (!S.current.shape[r][c]) continue;
       const y = S.current.y + r;
       if (y < 0) {
-        endGame();
+        topOut();
         return;
       }
       S.board[y][S.current.x + c] = S.current.color;
@@ -6815,7 +6966,7 @@ ${cta}`;
   }
   function addScore(pts, n, tspin = false, b2b = false) {
     S.score += pts;
-    if (!S.isSprintMode) {
+    if (!S.isSprintMode && !S.isFlowMode) {
       if (S.score > S.hiScore) {
         S.hiScore = S.score;
         localStorage.setItem(LS.HI, S.hiScore);
@@ -6882,7 +7033,7 @@ ${cta}`;
     S.lockResets = 0;
     S.dcdTimer = S.dcd || 0;
     drawNext();
-    if (!validPos(S.current)) endGame();
+    if (!validPos(S.current)) topOut();
   }
   function holdPiece() {
     if (!canHold || !S.gameRunning || S.gamePaused || !S.current || S._countdownVal) return;
@@ -6893,7 +7044,10 @@ ${cta}`;
       const t = S.current.key;
       S.current = makePiece(S.held.key);
       S.held = makePiece(t);
-      if (!validPos(S.current)) endGame();
+      if (!validPos(S.current)) {
+        topOut();
+        return;
+      }
     }
     S.lowestY = S.current.y;
     S.lockResets = 0;
@@ -7390,6 +7544,11 @@ ${cta}`;
       if (psl) psl.textContent = "SCORE";
       if (lsl) lsl.textContent = "CLEARED";
     }
+    if (S.isFlowMode) {
+      S._flowHiScore = parseInt(localStorage.getItem(LS.FLOW_HI) || "0");
+      S._flowRounds = 0;
+      _flowCollapsing = false;
+    }
     spawnPiece();
     drawNext();
     drawHold();
@@ -7409,6 +7568,8 @@ ${cta}`;
     document.getElementById("overlay").style.display = "none";
     S.isSprintMode = false;
     S.isBlitzMode = false;
+    S.isUltraMode = false;
+    S.isFlowMode = false;
     S.isDailyMode = true;
     const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
     _prng = mulberry32(parseInt(todayStr, 10));
@@ -7521,6 +7682,47 @@ ${cta}`;
     }
     setTimeout(() => _renderGameOverScreen(stats), 600);
   }
+  function topOut() {
+    if (S.isFlowMode) flowCollapse();
+    else endGame();
+  }
+  function flowCollapse() {
+    if (_flowCollapsing) return;
+    _flowCollapsing = true;
+    S._flowRounds++;
+    if (S.score > S._flowHiScore) {
+      S._flowHiScore = S.score;
+      localStorage.setItem(LS.FLOW_HI, S.score);
+    }
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (!S.board[r][c]) continue;
+      const a = Math.random() * Math.PI * 2, sp = Math.random() * 6 + 2;
+      S.particles.push({ x: (c + 0.5) * S.CELL, y: (r + 0.5) * S.CELL, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2, life: 1, decay: Math.random() * 0.01 + 5e-3, color: S.board[r][c], size: Math.random() * 5 + 3, type: "spark" });
+    }
+    S.shakeFrames = 40;
+    S.shakeMag = 0.7;
+    if (S.animIntensity !== "off") triggerScreenFlash();
+    sfxGameOver();
+    S.current = null;
+    setTimeout(() => {
+      if (!S.gameRunning || !S.isFlowMode) {
+        _flowCollapsing = false;
+        return;
+      }
+      S.board = createBoard();
+      S.combo = 0;
+      S.b2b = false;
+      S.flashLines = /* @__PURE__ */ new Set();
+      S.flashTimer = 0;
+      S.lockActive = false;
+      S.lockTimer = 0;
+      S.gravityTimer = 0;
+      spawnFloatingText(`ROUND ${S._flowRounds + 1}`, COLS / 2 * S.CELL, ROWS / 2 * S.CELL, "#a000ff", 24);
+      spawnPiece();
+      updateUI();
+      _flowCollapsing = false;
+    }, 500);
+  }
   function endSprint() {
     const timeMs = Math.round(S._sprintEndTime - S._sprintStartTime);
     S.gameRunning = false;
@@ -7596,6 +7798,7 @@ ${cta}`;
     S.isBlitzMode = false;
     S.isUltraMode = false;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
   function startBlitzMode() {
@@ -7603,6 +7806,7 @@ ${cta}`;
     S.isBlitzMode = true;
     S.isUltraMode = false;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
   function startUltraMode() {
@@ -7610,6 +7814,7 @@ ${cta}`;
     S.isBlitzMode = false;
     S.isUltraMode = true;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
   function startMarathonMode() {
@@ -7617,9 +7822,18 @@ ${cta}`;
     S.isBlitzMode = false;
     S.isUltraMode = false;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
-  var canHold, gameOver, dropInterval, animFrame, bag, _countdownTimer, _prng, lastWasRotate, lastKickNonZero, _keyGuide, $overlay2, $combo2, KICKS_JLSTZ, KICKS_I, KICKS_180, KEYS, lastFrameTs, _sprintPauseTs, $hiScore2, $hiScoreM2, _VERSION;
+  function startFlowMode() {
+    S.isSprintMode = false;
+    S.isBlitzMode = false;
+    S.isUltraMode = false;
+    S.isDailyMode = false;
+    S.isFlowMode = true;
+    startGame();
+  }
+  var canHold, gameOver, dropInterval, animFrame, bag, _countdownTimer, _prng, lastWasRotate, lastKickNonZero, _keyGuide, $overlay2, $combo2, KICKS_JLSTZ, KICKS_I, KICKS_180, KEYS, lastFrameTs, _sprintPauseTs, _flowCollapsing, $hiScore2, $hiScoreM2, _VERSION;
   var init_game = __esm({
     "src/game.js"() {
       init_shared();
@@ -7733,6 +7947,7 @@ ${cta}`;
       makeTouchBtn("btn-pause", () => togglePause(), "any");
       lastFrameTs = 0;
       _sprintPauseTs = 0;
+      _flowCollapsing = false;
       S.flashLines = /* @__PURE__ */ new Set();
       initLayout();
       initStars();
@@ -7759,9 +7974,10 @@ ${cta}`;
         });
         showStartScreen();
         const mode = new URLSearchParams(window.location.search).get("mode");
-        if (mode === "marathon") setTimeout(startGame, 100);
+        if (mode === "marathon") setTimeout(startMarathonMode, 100);
         else if (mode === "sprint") setTimeout(startSprintMode, 100);
         else if (mode === "daily") setTimeout(startDailyChallenge, 100);
+        else if (mode === "flow") setTimeout(startFlowMode, 100);
       });
       (window.requestIdleCallback || function(cb) {
         setTimeout(cb, 200);
@@ -7804,6 +8020,8 @@ ${cta}`;
         startSprintMode,
         startDailyChallenge,
         launchDailyChallenge,
+        startFlowMode,
+        startMarathonMode,
         togglePause,
         showStartScreen,
         showModeSelector,

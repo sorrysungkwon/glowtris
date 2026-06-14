@@ -61,6 +61,68 @@
     --border: rgba(0,200,255,0.28);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
+    /* Per-mode signature colors (grouped: ENDLESS / SPEED / CHALLENGE) */
+    --mode-marathon: #00ff88; /* ENDLESS — green, endurance */
+    --mode-flow:     #a000ff; /* ENDLESS — violet, meditative flow */
+    --mode-sprint:   #00c8ff; /* SPEED — cyan, fast focus */
+    --mode-blitz:    #ffd000; /* SPEED — yellow, electric burst */
+    --mode-daily:    #ff7700; /* CHALLENGE — orange, daily streak */
+    --mode-ultra:    #ff0080; /* CHALLENGE — magenta, cosmic high score */
+
+    /* ───────────────────────────────────────────────────────────────────────
+       DESIGN SYSTEM TOKENS — single source of truth. See DESIGN_SYSTEM.md.
+       Reference these vars; do NOT hardcode raw values in component CSS.
+       ─────────────────────────────────────────────────────────────────────── */
+
+    /* Semantic color roles (built on brand + neutrals) */
+    --surface:        rgba(4,4,30,0.75);     /* panels / dialogs */
+    --surface-2:      rgba(255,255,255,0.04);/* raised card on a panel */
+    --surface-glass:  rgba(0,0,20,0.72);     /* glassy HUD panel (= --panel-bg) */
+    --on-surface:       rgba(255,255,255,0.92); /* primary text */
+    --on-surface-muted: rgba(255,255,255,0.60); /* secondary text */
+    --on-surface-faint: rgba(255,255,255,0.30); /* disabled / hints */
+    --outline:        rgba(0,200,255,0.28);  /* default hairline (= --border) */
+    --outline-strong: rgba(0,200,255,0.55);
+    --success: #00ff88;
+    --warning: #ffb347;
+    --error:   #ff0080;
+
+    /* Typography — Orbitron is the single typeface (display + UI) */
+    --font-display: 'Orbitron', sans-serif;
+    --font-ui:      'Orbitron', monospace;   /* numerics / HUD — tabular feel */
+    --fw-regular: 400; --fw-bold: 700; --fw-black: 900;
+    /* Type scale (px) — Material-style roles, tuned to this game's density */
+    --type-display-l: 44px; --type-display-m: 36px; --type-display-s: 28px;
+    --type-headline:  22px; --type-title-l: 18px; --type-title-m: 15px; --type-title-s: 13px;
+    --type-body-l: 12px; --type-body-m: 11px; --type-body-s: 10px;
+    --type-label-l: 9px; --type-label-m: 8px; --type-label-s: 7px;
+    /* Letter-spacing (Orbitron caps read best with tracking) */
+    --tracking-normal: 1px; --tracking-wide: 2px; --tracking-wider: 4px; --tracking-widest: 6px;
+
+    /* Spacing — 4px baseline grid */
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+    /* Shape — corner radius scale */
+    --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-2xl: 20px; --r-full: 9999px;
+
+    /* Elevation — neon glow size (pair with a color) + ambient depth shadow */
+    --glow-sm: 0 0 8px; --glow-md: 0 0 14px; --glow-lg: 0 0 25px;
+    --shadow-sm: 0 4px 15px rgba(0,0,0,0.4);
+    --shadow-md: 0 8px 30px rgba(0,0,0,0.55);
+
+    /* Motion — durations */
+    --t-fast: 120ms; --t-mid: 200ms; --t-slow: 300ms; --t-slowest: 600ms;
+    /* Motion — easing */
+    --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);     /* legacy decelerate */
+    --ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);      /* general UI */
+    --ease-decelerate: cubic-bezier(0.22, 1, 0.36, 1);    /* entrances */
+    --ease-emphasized: cubic-bezier(0.34, 1.56, 0.64, 1); /* playful overshoot — house style */
+    --ease-spring:     cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* State */
+    --state-disabled-opacity: 0.45;
+    --focus-ring: 2px solid var(--cyan);
   }
 
   html, body {
@@ -1187,44 +1249,83 @@
     transform: translateY(1px);
   }
 
-  /* Marathon Mode Theme (Cyan) */
+  /* ENDLESS — Marathon Theme (Green) */
   .mode-card.marathon {
-    border-color: rgba(0, 200, 255, 0.22);
-    background: rgba(0, 200, 255, 0.04);
-  }
-  .mode-card.marathon .mode-name { color: var(--cyan); text-shadow: 0 0 8px rgba(0, 200, 255, 0.3); }
-  .mode-card.marathon:hover {
-    border-color: rgba(0, 200, 255, 0.55);
-    background: rgba(0, 200, 255, 0.12);
-    box-shadow: 0 4px 20px rgba(0, 200, 255, 0.15), 0 0 10px rgba(0, 200, 255, 0.05);
-  }
-  .mode-card.marathon:hover .mode-arrow { color: var(--cyan); }
-
-  /* Sprint Mode Theme (Green) */
-  .mode-card.sprint {
     border-color: rgba(0, 255, 136, 0.22);
     background: rgba(0, 255, 136, 0.04);
   }
-  .mode-card.sprint .mode-name { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
-  .mode-card.sprint:hover {
+  .mode-card.marathon .mode-name { color: var(--mode-marathon); text-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+  .mode-card.marathon:hover {
     border-color: rgba(0, 255, 136, 0.55);
     background: rgba(0, 255, 136, 0.12);
     box-shadow: 0 4px 20px rgba(0, 255, 136, 0.15), 0 0 10px rgba(0, 255, 136, 0.05);
   }
-  .mode-card.sprint:hover .mode-arrow { color: #00ff88; }
+  .mode-card.marathon:hover .mode-arrow { color: var(--mode-marathon); }
 
-  /* Daily Challenge Theme (Orange) */
+  /* ENDLESS — Flow Theme (Violet) */
+  .mode-card.flow {
+    border-color: rgba(160, 0, 255, 0.22);
+    background: rgba(160, 0, 255, 0.04);
+  }
+  .mode-card.flow .mode-name { color: var(--mode-flow); text-shadow: 0 0 8px rgba(160, 0, 255, 0.35); }
+  .mode-card.flow:hover {
+    border-color: rgba(160, 0, 255, 0.55);
+    background: rgba(160, 0, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(160, 0, 255, 0.15), 0 0 10px rgba(160, 0, 255, 0.05);
+  }
+  .mode-card.flow:hover .mode-arrow { color: var(--mode-flow); }
+
+  /* SPEED — Sprint Theme (Cyan) */
+  .mode-card.sprint {
+    border-color: rgba(0, 200, 255, 0.22);
+    background: rgba(0, 200, 255, 0.04);
+  }
+  .mode-card.sprint .mode-name { color: var(--mode-sprint); text-shadow: 0 0 8px rgba(0, 200, 255, 0.3); }
+  .mode-card.sprint:hover {
+    border-color: rgba(0, 200, 255, 0.55);
+    background: rgba(0, 200, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 200, 255, 0.15), 0 0 10px rgba(0, 200, 255, 0.05);
+  }
+  .mode-card.sprint:hover .mode-arrow { color: var(--mode-sprint); }
+
+  /* SPEED — Blitz Theme (Yellow) */
+  .mode-card.blitz {
+    border-color: rgba(255, 208, 0, 0.22);
+    background: rgba(255, 208, 0, 0.04);
+  }
+  .mode-card.blitz .mode-name { color: var(--mode-blitz); text-shadow: 0 0 8px rgba(255, 208, 0, 0.3); }
+  .mode-card.blitz:hover {
+    border-color: rgba(255, 208, 0, 0.55);
+    background: rgba(255, 208, 0, 0.12);
+    box-shadow: 0 4px 20px rgba(255, 208, 0, 0.15), 0 0 10px rgba(255, 208, 0, 0.05);
+  }
+  .mode-card.blitz:hover .mode-arrow { color: var(--mode-blitz); }
+
+  /* CHALLENGE — Daily Theme (Orange) */
   .mode-card.daily {
     border-color: rgba(255, 119, 0, 0.22);
     background: rgba(255, 119, 0, 0.03);
   }
-  .mode-card.daily .mode-name { color: #ff7700; text-shadow: 0 0 8px rgba(255, 119, 0, 0.3); }
+  .mode-card.daily .mode-name { color: var(--mode-daily); text-shadow: 0 0 8px rgba(255, 119, 0, 0.3); }
   .mode-card.daily:hover {
     border-color: rgba(255, 119, 0, 0.55);
     background: rgba(255, 119, 0, 0.1);
     box-shadow: 0 4px 20px rgba(255, 119, 0, 0.15), 0 0 10px rgba(255, 119, 0, 0.05);
   }
-  .mode-card.daily:hover .mode-arrow { color: #ff7700; }
+  .mode-card.daily:hover .mode-arrow { color: var(--mode-daily); }
+
+  /* CHALLENGE — Ultra Theme (Magenta) */
+  .mode-card.ultra {
+    border-color: rgba(255, 0, 128, 0.22);
+    background: rgba(255, 0, 128, 0.04);
+  }
+  .mode-card.ultra .mode-name { color: var(--mode-ultra); text-shadow: 0 0 8px rgba(255, 0, 128, 0.3); }
+  .mode-card.ultra:hover {
+    border-color: rgba(255, 0, 128, 0.55);
+    background: rgba(255, 0, 128, 0.12);
+    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.15), 0 0 10px rgba(255, 0, 128, 0.05);
+  }
+  .mode-card.ultra:hover .mode-arrow { color: var(--mode-ultra); }
 
   /* --- Coming Soon mode cards --- */
   .mode-card.mode-coming-soon {

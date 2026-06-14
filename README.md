@@ -1,6 +1,6 @@
 # Glowtris
 
-A neon-styled block stacking game built with ES modules and canvas.
+A next-generation web puzzle platform featuring a 1000Hz independent tick engine and an asynchronous retention system. Built with ES modules and canvas.
 
 **Live:** https://glowtris.com
 
@@ -16,29 +16,18 @@ A neon-styled block stacking game built with ES modules and canvas.
 - Upstash Redis (online leaderboard)
 - No external frontend libraries
 
-## Features
+## Core Architecture & Features
 
-- Neon glow effect on pieces and UI; PixiJS WebGL2 renderer (v0.5, in progress)
-- Responsive layout — desktop 3-panel, mobile touch controls, iPad keyboard mode
-- Starfield + nebula background animation; challenge mode gets distinct crimson background
-- Screen shake + danger red overlay when stack is high
-- Multi-track chiptune BGM via Web Audio API; tempo auto-scales with level; challenge mode distinct BGM
-- Sound effects: move, rotate, hold, line clear, Glowtris fanfare, game over, UI interactions
-- T-spin Mini + Full detection with bonus scoring; Back-to-Back 1.5× bonus
-- All-spin detection (SRS+); 5-piece next queue; 180° rotation
-- DAS / ARR / SDF / lock-delay tuning (pause menu); instant ARR=0 support; IRS / IHS / DCD
-- Combo flash overlay + rainbow border on Glowtris; all-clear gold flash + fanfare
-- Ghost piece with alignment lasers; colorblind mode (7 symbol overlays); animation intensity (Full/Low/Off)
-- Automatic low-perf mode (FPS monitor); manual PERF toggle in settings
-- Game modes: Marathon, Sprint 40L, Daily Challenge (date-seeded, one attempt per day)
-- Online leaderboard — TODAY / WEEKLY / ALL TIME per mode; rank shown after submission
-- Score deduplication (personal best kept); IP-based rate limiting; score validation
-- 20 achievement milestones — unlock toast + particle burst; badge gallery in STATS overlay
-- Canvas share image (1200×630 PNG) via Web Share API; clipboard fallback
-- PWA: installable on iOS/Android/desktop; service worker offline cache; push notifications (iOS 16.4+ standalone)
-- Maintenance banner with local timezone display
-- Changelog page; Privacy Policy + Terms of Service pages
-- OG image (`/api/og` Edge Function, 1200×630 PNG) for Twitter/KakaoTalk/Discord/Line previews
+- **10x40 Vanish Zone Architecture**: Internal 10x40 logic array with a 10x20 visual viewport, ensuring flawless Wall Kicks and preventing immediate lock-out bugs.
+- **1000Hz Engine & 0ms ARR**: Independent 1000Hz fixed-tick physics engine bypassing 60Hz browser limits, featuring Discontinuous State Transition for zero-latency 0ms ARR.
+- **Parity Preservation & 0-Finesse**: Precise 3-Corner Rule collision algorithms for T-Spins and Lossless Input Buffering for mathematical keystroke minimums.
+- **Asynchronous Competition**: Serverless architecture (Vercel + Upstash Redis) with no real-time PvP, eliminating server maintenance costs while retaining competitive tension.
+- **Target Overtake UI**: Replaces visual noise-inducing 'Ghost Pieces' with a 'Next Target Ranker' score and dynamic swipe animations for intense micro-motivation.
+- **Duolingo-style Gamification**: Streak loops and a dynamic avatar system (Factory Pattern) to transition single-session arcade play into a daily habit.
+- **Gestalt Psychology UX**: Clickable buttons secure 48dp+ touch targets with neon pop and drop shadows; non-clickable info areas use dimmed treatments. Features IDEAL framework micro-interactions (red vignetting, Z-axis scale suppression).
+- **IP Mitigation & Branding**: Complete exclusion of trademarked terms. Uses a proprietary deep navy and neon color palette to prevent trade dress disputes.
+- **Cross-Platform Adaptability**: Responsive layouts tailored for Mobile (Portrait) and PC (Landscape). PWA support with service worker offline caching and push notifications.
+- **Rich Media & Audio**: Multi-track chiptune BGM via Web Audio API, dynamic color-shifting nebulae, low-latency SFX, and dynamic Edge OG images (`/api/og`).
 
 ## Version Revision (2026-06-01)
 
@@ -59,21 +48,22 @@ A neon-styled block stacking game built with ES modules and canvas.
 | ⏱ Modes & Metrics | v0.6 | Ultra/Blitz mode, in-game APM/PPS |
 | 👥 Social Ranking + Account | v0.7 | Anonymous UUID → Google OAuth backup, percentile, rival system, async challenges, weekly tournament |
 
-### Phase B — Public Launch & Growth (gated by Phase A)
+### Phase B — Go-to-Market & Growth (Gated by Phase A)
 
-> **Strategy:** No multiplayer. Growth through social comparison, retention loops, CRM nudges, and virality — all async, no WebSocket.
+> **Core Strategy:** Zero infrastructure cost through asynchronous competition. Growth driven by organic community launches (Reddit/Hacker News), targeted SEO, and virality hooks (Share Cards).
 
-| Milestone | Target DAU | Target Version | Key Driver |
-|---|---:|---|---|
-| 🚀 **Real Release** | 700 | **v1.0** | Standards-compliant engine, official public launch |
-| 🔔 Retention Core | 1,200 | v1.1 | Daily streak, PWA push notifications, "X away from top 10" nudge |
-| 🤝 Social Hooks | 1,800 | v1.2 | Percentile badge, challenge links, rival system, "friend beat you" trigger |
-| 📈 Progression + Account | 2,500 | v1.3 | Achievements depth, stats timeline, improvement graph (powered by v0.7 account) |
-| 🎨 Visual Identity | 3,500 | v1.4 | Custom board skins, block themes, neon palettes |
-| 🏆 Tournaments | 4,500 | v1.5 | Weekly seeded tournament, seasonal rankings, reward badges |
-| 📬 CRM & Re-engagement | 6,000 | v1.6 | "Haven't played in 3 days" push, personalized challenge nudges, lapsed user flow |
-| 🔥 Virality Engine | 8,000 | v1.7 | Referral system, ghost replay sharing, social media score card templates |
-| 🌐 Platform | 15,000+ | v2.0 | Creator tools, embeddable widget, API for communities |
+| Phase | DAU Goal | Key Actions & Go-to-Market Strategy |
+|---|---|---|
+| **Phase 1: Initial Viral Hook** | 0 → 500 | Launch on `r/webgames` and `r/Tetris`. Cross-post development story on `r/gamedev`. Focus on "100% Ad-Free, Neon Web App" positioning. Establish SEO foundations (JSON-LD, Search Console). |
+| **Phase 2: Retention Loop** | 500 → 1,500 | Release Ultra Mode & Streak Counter. Launch on Hacker News & Product Hunt. Scale backlinks via Web Game Directories (CrazyGames, Kongregate). Upgrade Vercel infrastructure. |
+| **Phase 3: Core Community** | 1,500 → 4,500 | Introduce Skins/Palettes & Weekly Event Challenges. Outreach to niche puzzle streamers. Target page-1 SEO for `neon tetris` and `daily tetris challenge`. |
+| **Phase 4: Platform Pivot** | 4,500 → 15k+ | Weekly Tournaments, CRM Automation (email/push nudges), and a Viral Engine (Ghost Replays, Referral loops). Pivot to a community API and embeddable widgets. |
+
+### SEO & Organic Acquisition
+- **Phase 1**: Technical SEO (Meta, hreflang, JSON-LD) and niche blog content targeting low-competition keywords.
+- **Phase 2**: Backlink building via free HTML5 game directories (itch.io, Newgrounds, etc).
+- **Phase 3**: Ranking for specific niches (`neon tetris`, `daily tetris challenge`).
+- **Phase 4**: Long-term domain authority building to target high-traffic generic keywords.
 
 ### Infrastructure Upgrade Triggers
 | DAU | Upgrade |

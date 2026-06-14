@@ -30,6 +30,25 @@ export const SUPPORT_URL     = 'https://ko-fi.com/sorrysungkwon';
 export const COLOR_TO_KEY = {};
 for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
 
+// Per-mode signature colors (mirror the --mode-* CSS vars in style.css).
+// Used by canvas code (background themes, share cards) where CSS vars aren't available.
+// 'classic' is the getGameMode() key for Marathon.
+export const MODE_COLORS = {
+  marathon: '#00ff88',
+  classic:  '#00ff88',
+  flow:     '#a000ff',
+  sprint:   '#00c8ff',
+  blitz:    '#ffd000',
+  daily:    '#ff7700',
+  ultra:    '#ff0080',
+};
+
+// #rrggbb → rgba() string for canvas fills/strokes that need an alpha
+export function hexToRgba(hex, a = 1) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
 // ─── localStorage keys ────────────────────────────────────────────────────────
 export const LS = {
   HI:           'glowTrisHi',
@@ -58,6 +77,7 @@ export const LS = {
   SPRINT_HI:    'glowTrisSprintHi',
   BLITZ_HI:     'glowTrisBlitzHi',
   ULTRA_HI:     'glowTrisUltraHi',
+  FLOW_HI:      'glowTrisFlowHi',
 };
 
 export const BLITZ_TIME = 120000; // 2 minutes
@@ -148,6 +168,7 @@ export const S = {
   isSprintMode: false,
   isBlitzMode: false,
   isUltraMode: false,
+  isFlowMode: false,
 
   // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
   _countdownVal: 0,
@@ -203,6 +224,11 @@ export const S = {
   _blitzHiScore: 0,
   _ultraHiScore: 0,
 
+  // Flow endless mode (game.js writes, ui.js reads): cumulative score survives
+  // board top-outs; each top-out collapses the board and increments the round.
+  _flowHiScore: 0,
+  _flowRounds:  0,
+
   // Perf lock (ui.js measureFPS writes, game.js _doStartGame reads)
   _perfLocked: false,
 
@@ -224,5 +250,6 @@ export function getGameMode() {
   if (S.isSprintMode) return 'sprint';
   if (S.isBlitzMode)  return 'blitz';
   if (S.isUltraMode)  return 'ultra';
+  if (S.isFlowMode)   return 'flow';
   return 'classic';
 }

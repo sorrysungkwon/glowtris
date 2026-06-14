@@ -7,6 +7,20 @@ By referencing structural categories of the **Google Material Design 3 (M3)** gu
 
 ---
 
+## 0. Golden Rule & Token Sources
+
+> **Never hardcode a design value (color, size, radius, duration, easing) in component code. Reference a token.** If the value you need has no token, add the token to the source first, then reference it. Then update this document.
+
+| Domain | Game source of truth | Notes |
+| :--- | :--- | :--- |
+| Mode colors | `:root { --mode-* }` in `src/style.css` + `MODE_COLORS` in `src/shared.js` | CSS for stylesheets; JS map for canvas (backgrounds, share cards). Keep in sync. Alpha → `hexToRgba(hex,a)`. |
+| Brand colors | `--cyan` `--purple` `--pink` (`src/style.css`) | Full gradient reserved for the GLOWTRIS wordmark. |
+| Type / spacing / shape / elevation / motion / state | `:root` tokens in `src/style.css` | See §11 for the exact implemented token list. |
+
+`getGameMode()` (`shared.js`) returns the mode key; `classic` === Marathon. The game uses **Orbitron only** (no Pretendard — that pairing applies to the Blog surface).
+
+---
+
 ## 1. Design Philosophy: Cyberpunk Gestalt
 
 Our visual language is guided by three core principles of Gestalt psychology:
@@ -29,7 +43,24 @@ Glowtris adapts Material 3's color roles into a high-contrast Cyber Neon color s
 | `--green` | `#059669` (Emerald) | `#34d399` (Mint Green) | Success states, Saved indicators, Completed challenges |
 | `--amber` | `#d97706` (Amber) | `#fbbf24` (Golden Yellow) | Warning states, Leaderboards, Draft badges |
 
-### Surface & Background Tokens
+### Mode Signature Colors (game)
+Every game mode owns exactly **one** signature color, grouped by intent on a cool→warm intensity ramp. The accent themes the mode's card, its in-game background (`getBgTheme` in `ui.js`), and its share card (`leaderboard.js`).
+
+| Group | Mode | Color | `--mode-*` (CSS) | `MODE_COLORS` (JS) |
+| :--- | :--- | :--- | :--- | :--- |
+| ♾️ **ENDLESS** | Marathon | 🟢 `#00ff88` green | `--mode-marathon` | `.marathon` / `.classic` |
+| | Flow | 🟣 `#a000ff` violet | `--mode-flow` | `.flow` |
+| ⚡ **SPEED** | Sprint | 🔵 `#00c8ff` cyan | `--mode-sprint` | `.sprint` |
+| | Blitz | 🟡 `#ffd000` yellow | `--mode-blitz` | `.blitz` |
+| 🏆 **CHALLENGE** | Daily | 🟠 `#ff7700` orange | `--mode-daily` | `.daily` |
+| | Ultra | 🔴 `#ff0080` magenta | `--mode-ultra` | `.ultra` |
+
+Rules: one icon + one color per mode, consistent across card / HUD / background / share. The brand cyan→violet→pink gradient is NOT a mode accent. Changing a mode color = edit BOTH `--mode-*` and `MODE_COLORS`.
+
+### Semantic Roles (game surfaces)
+The game runs dark-only with translucent glass panels: `--surface`, `--surface-2` (raised card), `--surface-glass` (HUD); text `--on-surface` / `--on-surface-muted` / `--on-surface-faint`; lines `--outline` / `--outline-strong`; status `--success` / `--warning` / `--error`.
+
+### Surface & Background Tokens (blog)
 | Variable | Value (Light) | Value (Dark) | Semantic Purpose |
 | :--- | :--- | :--- | :--- |
 | `--bg` | `#f8f8fc` | `#080814` | Body background |
@@ -86,7 +117,7 @@ To establish a clear sense of Gestalt *similarity*, border radiuses are grouped 
 ```
 
 > [!NOTE]
-> The game interface leans heavily towards **None (0px)** or **Small (6px)** corners to match the retro-wireframe grid, whereas the blog interface introduces **Large (12px)** and **Extra Large (18px)** corners to create a softer, modern reading aesthetic.
+> Implemented game radii (`--r-*`): `--r-xs 4` chips/inputs · `--r-sm 6` badges · `--r-md 8` small buttons · `--r-lg 12` cards · `--r-xl 16` mode groups · `--r-2xl 20` dialogs · `--r-full` pills/circles. Cards and panels favor the **Large/XL** end (12–20px) for a soft neon-glass look; tiny badges use **Small** (6px).
 
 ---
 
@@ -163,3 +194,25 @@ To maintain visual integrity across the application:
 1. **Never use generic pure colors**: (e.g., `#ff0000` or `#0000ff`). Instead, use color system variables like `var(--pink)` or `var(--cyan)`.
 2. **Combine light & dark themes seamlessly**: Toggling theme must only switch variable values, not swap CSS files.
 3. **Respect mobile constraints**: Touch targets (buttons, links) must stay above `44px` height and width for accessibility, and category filters must scroll horizontally (`flex-wrap: nowrap`) to avoid vertical clutter on small viewports.
+
+---
+
+## 11. Implemented Game Tokens (`:root` in `src/style.css`)
+
+The exact token names available in the game today. Reference these; do not paste raw values.
+
+**Color** — brand `--cyan` `--purple` `--pink`; modes `--mode-marathon|flow|sprint|blitz|daily|ultra`; surfaces `--surface` `--surface-2` `--surface-glass`; text `--on-surface` `--on-surface-muted` `--on-surface-faint`; lines `--outline` `--outline-strong`; status `--success` `--warning` `--error`. (`--panel-bg`, `--border` kept as legacy aliases.)
+
+**Typography** — `--font-display` (Orbitron sans), `--font-ui` (Orbitron mono); weights `--fw-regular|bold|black` (400/700/900). Type scale: `--type-display-l|m|s` (44/36/28), `--type-headline` (22), `--type-title-l|m|s` (18/15/13), `--type-body-l|m|s` (12/11/10), `--type-label-l|m|s` (9/8/7). Tracking: `--tracking-normal|wide|wider|widest` (1/2/4/6px).
+
+**Spacing (4px grid)** — `--space-1..12` = 4/8/12/16/20/24/32/40/48px (keys 1,2,3,4,5,6,8,10,12).
+
+**Shape** — `--r-xs|sm|md|lg|xl|2xl|full` = 4/6/8/12/16/20/9999px.
+
+**Elevation** — glow sizes `--glow-sm|md|lg` (8/14/25px, pair with a color, e.g. `box-shadow: var(--glow-md) var(--mode-sprint)`); depth `--shadow-sm` `--shadow-md`.
+
+**Motion** — durations `--t-fast` (120ms) `--t-mid` (200ms) `--t-slow` (300ms) `--t-slowest` (600ms). Easing: `--ease-standard` (general UI), `--ease-decelerate` (entrances), `--ease-emphasized` (playful overshoot — house style), `--ease-spring` (bouncy hero moments), `--ease-out` (legacy decelerate). Gate non-essential motion on `prefers-reduced-motion` and the in-game `animIntensity` setting.
+
+**State** — `--state-disabled-opacity` (0.45, + `pointer-events:none`), `--focus-ring` (`2px solid var(--cyan)`).
+
+> Adding/changing a token: edit `:root` (and `MODE_COLORS` if canvas needs the color), update this §11 + the relevant section above, then reference it. Migrate legacy hardcoded values opportunistically when touching a component.
