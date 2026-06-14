@@ -44,9 +44,11 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | 🧱 Loop & Input Core | v0.2 ✅ | Decoupled fixed-timestep loop, ordered sub-frame input |
 | 🎮 Movement Standard | v0.3 ✅ | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
 | 🏆 Scoring Standard | v0.4 ✅ | B2B 1.5×, 3-piece queue, all-spin (SRS+), BUG-012/013 |
-| 🖼 Renderer & Audio | v0.5 | PixiJS WebGL2 renderer (staged), low-latency audio |
-| ⏱ Modes & Metrics | v0.6 | Blitz mode, in-game APM/PPS |
-| 👥 Social Ranking + Account | v0.7 | Anonymous UUID → Google OAuth backup, percentile, rival system, async challenges, weekly tournament |
+| 🖼 Renderer & Audio | v0.5 🔄 | PixiJS WebGL2 renderer (staged), low-latency audio |
+| ⏱ Modes & Metrics | v0.6 | Vanish Zone (10x40 logic board), 3-Corner G-Spin Rule, Lossless Input Buffering, APM/PPS display |
+| 👥 Social Ranking | v0.7 | Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments |
+| 🎨 Gameplay Feel | v0.8 | Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake |
+| ✨ Micro-interactions | v0.9 | Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations |
 
 ### Phase B — Go-to-Market & Growth (Gated by Phase A)
 
@@ -116,21 +118,25 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.3 | **Movement Standard** — 180° rotation, custom keybinds, SDF/∞, lock-cap (15 moves), IRS/IHS/DCD, instant ARR=0 | ✅ Done |
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
 | v0.5 | **Renderer & Audio** — PixiJS WebGL2 renderer (staged), render interpolation, 1000+ particles, low-latency audio | 🔄 In Progress |
-| v0.6 | **Modes & Metrics** — Blitz 2-minute mode, in-game APM/PPS display | 🔲 Planned |
+| v0.6 | **Modes & Metrics** — Vanish Zone (10x40 board), 3-Corner G-Spin Rule, Lossless Input Buffering, APM/PPS display | 🔲 Planned |
+| v0.7 | **Social** — Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments | 🔲 Planned |
+| v0.8 | **Gameplay Feel** — Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake | 🔲 Planned |
+| v0.9 | **Micro-interactions** — Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations | 🔲 Planned |
 
 ### 🔮 Planned — Phase B (Public Launch & Growth, post-1.0)
 
 | Version | Theme | Features | DAU Goal |
 |---|---|---|---:|
-| **v1.0** | **Real Release — Standards Compliance** | Engine officially meets competitive-standard quality. Public launch. Daily streak badge bundled. | **700** |
-| v1.1 | **Training & Finesse** | Practice mode (no game over, no timer). Finesse counter — tracks wasted keypresses vs optimal. Per-piece heatmap overlay. | 1,200 |
-| v1.2 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. BGM track selection saved to localStorage. | 1,800 |
-| v1.3 | **Weekly Events** | Weekly special challenge (rotating rule modifiers: invisible pieces, 20-line board, etc.) with 7-day Redis TTL leaderboard. Monthly event leaderboard. | 2,500 |
-| v1.4 | **Ghost & Replay** | Best-run ghost stored in Redis (serialised input log). Ghost race mode — race against your own personal best. Shareable replay link via short code. | 3,500 |
-| v1.5 | **Advanced Stats** | Expanded STATS overlay: T-spin %, all-clear %, average combo. Session graph (score over last 10 games). Weekly personal report card. | 4,500 |
-| v1.6 | **Season & Rank** | Monthly season resets leaderboard. 7-tier rank system (Bronze → Radiant) based on season score. Season-exclusive title badges and board borders unlock at each tier. | 6,000 |
-| v1.7 | **Social Layer** | Friend code system (6-char code → follow mutual). Friend-only leaderboard tab. Async challenge — share a seeded run; recipient plays same sequence, results compared on a shared card. | 8,000 |
-| v2.0 | **Platform** | Embeddable widget, community API, rival system, percentile badge, brand/creator hooks. No real-time multiplayer — async social competition provides equivalent engagement at zero WebSocket cost. | **15,000+** |
+| **v1.0** | **Launch & Avatar** | Reacting Duolingo-style Avatar state machine. Official public launch. | **700** |
+| v1.2 | **Blitz Mode** | Play 2-minute mode, score big near end, play days counter. | 1,200 |
+| v1.3 | **Training & Finesse** | Practice mode (no game over, no timer). Finesse counter — tracks wasted keypresses vs optimal. Speed metrics. | 1,800 |
+| v1.4 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. Custom drum beats. | 2,500 |
+| v1.5 | **Weekly Events** | Weekly special challenge (rotating rule modifiers: invisible pieces, 20-line board, etc.) with 7-day Redis TTL leaderboard. Monthly event leaderboard. | 3,500 |
+| v1.6 | **Ghost & Replay** | Best-run ghost stored in Redis (serialised input log). Ghost race mode — race against your own personal best. Shareable replay link via short code. | 4,500 |
+| v1.7 | **Advanced Stats** | Expanded STATS overlay: G-spin %, all-clear %, average combo. Session graph (score over last 10 games). Weekly personal report card. | 6,000 |
+| v1.8 | **Season & Rank** | Monthly season resets leaderboard. 7-tier rank system (Bronze → Radiant) based on season score. Season-exclusive title badges and board borders unlock at each tier. | 8,000 |
+| v1.9 | **Friends Layer** | Friend code system (6-char code → follow mutual). Friend-only leaderboard tab. Async challenge — share a seeded run; recipient plays same sequence, results compared on a shared card. | 10,000 |
+| v2.0 | **Platform Pivot** | Embeddable widget, community API, rival system, percentile badge, brand/creator hooks. No real-time multiplayer — async social competition provides equivalent engagement at zero WebSocket cost. | **15,000+** |
 
 ## Infrastructure
 
