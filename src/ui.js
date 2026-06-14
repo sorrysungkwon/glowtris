@@ -1051,9 +1051,9 @@ export function updateSprintTimer() {
 
 export function showScorePopup(pts, n, tspin=false, b2b=false) {
   const popup = $scorePopup;
-  const tspinLabels  = ['T-SPIN!','T-SPIN SINGLE','T-SPIN DOUBLE!!','T-SPIN TRIPLE!!!'];
+  const tspinLabels  = ['G-SPIN!','G-SPIN SINGLE','G-SPIN DOUBLE!!','G-SPIN TRIPLE!!!'];
   const spinLabels   = ['SPIN!','SPIN SINGLE','SPIN DOUBLE!!','SPIN TRIPLE!!!'];
-  const miniLabels   = ['T-SPIN MINI','T-SPIN MINI+','T-SPIN MINI DBL'];
+  const miniLabels   = ['G-SPIN MINI','G-SPIN MINI+','G-SPIN MINI DBL'];
   const labels       = ['','','DOUBLE!','TRIPLE!','GLOWTRIS!!'];
   const b2bTag = b2b ? 'B2B ' : '';
   let txt, color, sz, glow;

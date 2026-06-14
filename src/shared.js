@@ -87,8 +87,8 @@ export const ULTRA_TIME = 180000; // 3 minutes
 export const ACHIEVEMENTS = [
   { id: 'first_game',        label: 'First Stack',         description: 'Complete your first game',                icon: '🧱' },
   { id: 'glowtris_1',        label: 'Glowtris!',           description: 'Clear 4 lines at once',                   icon: '⚡' },
-  { id: 'tspin_1',           label: 'T-Spin Initiate',     description: 'Perform a T-Spin',                        icon: '🔄' },
-  { id: 'tspin_triple',      label: 'Apex Spin',           description: 'Perform a T-Spin Triple',                 icon: '🌀' },
+  { id: 'tspin_1',           label: 'G-Spin Initiate',     description: 'Perform a G-Spin',                        icon: '🔄' },
+  { id: 'tspin_triple',      label: 'Apex Spin',           description: 'Perform a G-Spin Triple',                 icon: '🌀' },
   { id: 'all_clear',         label: 'Void Clear',          description: 'Achieve an All-Clear bonus',              icon: '🌟' },
   { id: 'combo_5',           label: 'Combo Cadet',         description: 'Reach a 5x combo',                        icon: '🔥' },
   { id: 'combo_10',          label: 'Combo Master',        description: 'Reach a 10x combo',                       icon: '👑' },

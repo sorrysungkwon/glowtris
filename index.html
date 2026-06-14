@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Free Neon Block Game — Glowtris | Play Online, No Download</title>
 <meta name="description" content="Free neon block-stacking game — daily challenges, global leaderboard, sprint mode. No download, no ads. Play in any browser.">
-<meta name="keywords" content="neon tetris, tetris-style game online, free block puzzle game, daily tetris challenge, tetris sprint mode, browser block game, tetris leaderboard, glowtris">
+<meta name="keywords" content="neon block game, block-stacking game online, free block puzzle game, daily block challenge, block sprint mode, browser block game, puzzle leaderboard, glowtris">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Glowtris">
 <meta property="og:title" content="Glowtris — Free Neon Block Game, No Download">
-<meta property="og:description" content="Tetris-inspired neon block game in your browser. Daily challenges, global leaderboard, sprint mode — free, no ads, no download.">
+<meta property="og:description" content="Neon block-stacking game in your browser. Daily challenges, global leaderboard, sprint mode — free, no ads, no download.">
 <meta property="og:url" content="https://glowtris.com">
 <meta property="og:image" content="https://glowtris.com/api/og">
 <meta property="og:image:type" content="image/png">
@@ -35,7 +35,7 @@
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Glowtris — Free Neon Block Game, No Download">
-<meta name="twitter:description" content="Tetris-inspired neon block game in your browser. Daily challenges, global leaderboard, sprint mode — free, no ads.">
+<meta name="twitter:description" content="Neon block-stacking game in your browser. Daily challenges, global leaderboard, sprint mode — free, no ads.">
 <meta name="twitter:image" content="https://glowtris.com/api/og">
 <meta name="twitter:image:alt" content="GLOWTRIS — Neon Block Stacking Game">
 <link rel="canonical" href="https://glowtris.com">
@@ -2271,8 +2271,8 @@ if ('serviceWorker' in navigator) {
       ACHIEVEMENTS = [
         { id: "first_game", label: "First Stack", description: "Complete your first game", icon: "\u{1F9F1}" },
         { id: "glowtris_1", label: "Glowtris!", description: "Clear 4 lines at once", icon: "\u26A1" },
-        { id: "tspin_1", label: "T-Spin Initiate", description: "Perform a T-Spin", icon: "\u{1F504}" },
-        { id: "tspin_triple", label: "Apex Spin", description: "Perform a T-Spin Triple", icon: "\u{1F300}" },
+        { id: "tspin_1", label: "G-Spin Initiate", description: "Perform a G-Spin", icon: "\u{1F504}" },
+        { id: "tspin_triple", label: "Apex Spin", description: "Perform a G-Spin Triple", icon: "\u{1F300}" },
         { id: "all_clear", label: "Void Clear", description: "Achieve an All-Clear bonus", icon: "\u{1F31F}" },
         { id: "combo_5", label: "Combo Cadet", description: "Reach a 5x combo", icon: "\u{1F525}" },
         { id: "combo_10", label: "Combo Master", description: "Reach a 10x combo", icon: "\u{1F451}" },
@@ -4879,9 +4879,9 @@ if ('serviceWorker' in navigator) {
   }
   function showScorePopup(pts, n, tspin = false, b2b = false) {
     const popup = $scorePopup;
-    const tspinLabels = ["T-SPIN!", "T-SPIN SINGLE", "T-SPIN DOUBLE!!", "T-SPIN TRIPLE!!!"];
+    const tspinLabels = ["G-SPIN!", "G-SPIN SINGLE", "G-SPIN DOUBLE!!", "G-SPIN TRIPLE!!!"];
     const spinLabels = ["SPIN!", "SPIN SINGLE", "SPIN DOUBLE!!", "SPIN TRIPLE!!!"];
-    const miniLabels = ["T-SPIN MINI", "T-SPIN MINI+", "T-SPIN MINI DBL"];
+    const miniLabels = ["G-SPIN MINI", "G-SPIN MINI+", "G-SPIN MINI DBL"];
     const labels = ["", "", "DOUBLE!", "TRIPLE!", "GLOWTRIS!!"];
     const b2bTag = b2b ? "B2B " : "";
     let txt, color, sz, glow;
@@ -8058,15 +8058,15 @@ ${cta}`;
 
 <!-- SEO text block — visible to crawlers, hidden from game UI -->
 <section id="seo-block" aria-label="About Glowtris">
-  <h1>Glowtris — Free Neon Tetris-Style Block Game</h1>
+  <h1>Glowtris — Free Neon Block-Stacking Puzzle Game</h1>
   <p>
-    Glowtris is a free, tetris-inspired block-stacking game that runs in any browser with no download required.
+    Glowtris is a free, neon block-stacking puzzle game that runs in any browser with no download required.
     Stack falling neon blocks, clear lines, and compete on a global leaderboard — all for free, with no ads.
   </p>
   <h2>Game Modes</h2>
   <ul>
     <li><strong>Daily Challenge</strong> — Every player gets the same block sequence each day. Compete on today's leaderboard and see where you rank globally.</li>
-    <li><strong>Marathon</strong> — Classic tetris-style endless mode. How long can you survive as the blocks fall faster?</li>
+    <li><strong>Marathon</strong> — Classic block-stacking endless mode. How long can you survive as the blocks fall faster?</li>
     <li><strong>Sprint</strong> — Clear 40 lines as fast as possible. Chase your personal best and compare with the all-time leaderboard.</li>
     <li><strong>Blitz</strong> — Score as many points as you can in 2 minutes.</li>
     <li><strong>Ultra</strong> — Maximum score in 3 minutes.</li>
@@ -8082,7 +8082,7 @@ ${cta}`;
     <li>Neon visual style with smooth 60fps gameplay</li>
   </ul>
   <p>
-    If you enjoy tetris-style games, block puzzle games, or competitive browser games,
+    If you enjoy block-stacking games, block puzzle games, or competitive browser games,
     Glowtris offers a fresh neon take with daily challenges and sprint mode.
     Play now at <a href="https://glowtris.com">glowtris.com</a> — no sign-up needed.
   </p>
