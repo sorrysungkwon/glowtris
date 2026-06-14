@@ -29,11 +29,15 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 - **Cross-Platform Adaptability**: Responsive layouts tailored for Mobile (Portrait) and PC (Landscape). PWA support with service worker offline caching and push notifications.
 - **Rich Media & Audio**: Multi-track chiptune BGM via Web Audio API, dynamic color-shifting nebulae, low-latency SFX, and dynamic Edge OG images (`/api/og`).
 
-## Version Revision (2026-06-01)
+## Version Revision (2026-06-14)
 
 > Previously-shipped v1.0.x ~ v1.1.1 are **retroactively classified as pre-1.0 beta**. The engine did not yet meet competitive-standard quality at those releases. The version pipeline now restarts at **v0.2**, and **v1.0 is the engine-complete real release**. Git tags from the beta era remain in history for reference; the displayed version will be bumped back to v0.2.0 with the next engine release.
 >
 > See [`BUGS.md`](./BUGS.md) for the engine architecture gap analysis (ARCH-001~005) and feature gaps (FEAT-001~012) that gate the real 1.0 release.
+>
+> **Roadmap Optimization Note**: To guarantee a bulletproof core engine before public exposure, the 6 critical engine and UX tasks have been distributed across milestones **v0.6 to v1.0**. The Reacting Avatar (Duolingo-style) is planned as the final gate in **v1.0** due to its state machine complexity.
+>
+> **PixiJS WebGL2 Renderer Deprecated**: The experimental PixiJS WebGL2 integration staged for **v0.5** has been officially **abandoned** to resolve critical blank screen rendering regressions on iOS/Safari. Glowtris will proceed with and optimize its highly performant, custom-blitted **2D Canvas engine** instead.
 
 ## Growth Milestones
 
@@ -44,7 +48,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | 🧱 Loop & Input Core | v0.2 ✅ | Decoupled fixed-timestep loop, ordered sub-frame input |
 | 🎮 Movement Standard | v0.3 ✅ | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
 | 🏆 Scoring Standard | v0.4 ✅ | B2B 1.5×, 3-piece queue, all-spin (SRS+), BUG-012/013 |
-| 🖼 Renderer & Audio | v0.5 🔄 | PixiJS WebGL2 renderer (staged), low-latency audio |
+| 🖼 Renderer & Audio | v0.5 ✅ | Web Audio API low-latency audio, PixiJS WebGL2 renderer (Abandoned — kept lightweight 2D Canvas due to iOS regressions) |
 | ⏱ Modes & Metrics | v0.6 | Vanish Zone (10x40 logic board), 3-Corner G-Spin Rule, Lossless Input Buffering, APM/PPS display |
 | 👥 Social Ranking | v0.7 | Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments |
 | 🎨 Gameplay Feel | v0.8 | Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake |
@@ -117,7 +121,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.2 | **Loop & Input Core** — Decoupled fixed-timestep logic loop, ordered sub-frame input handling | ✅ Done |
 | v0.3 | **Movement Standard** — 180° rotation, custom keybinds, SDF/∞, lock-cap (15 moves), IRS/IHS/DCD, instant ARR=0 | ✅ Done |
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
-| v0.5 | **Renderer & Audio** — PixiJS WebGL2 renderer (staged), render interpolation, 1000+ particles, low-latency audio | 🔄 In Progress |
+| v0.5 | **Renderer & Audio** — Web Audio API low-latency audio, render interpolation (PixiJS WebGL2 renderer Abandoned due to iOS regressions, keeping lightweight 2D Canvas engine) | ✅ Done |
 | v0.6 | **Modes & Metrics** — Vanish Zone (10x40 board), 3-Corner G-Spin Rule, Lossless Input Buffering, APM/PPS display | 🔲 Planned |
 | v0.7 | **Social** — Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments | 🔲 Planned |
 | v0.8 | **Gameplay Feel** — Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake | 🔲 Planned |
