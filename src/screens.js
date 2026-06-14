@@ -10,7 +10,8 @@ import {
   renderLbTab, setLbMode, loadStartLeaderboard
 } from './leaderboard.js';
 import {
-  startGame, startSprintMode, startBlitzMode, startUltraMode, launchDailyChallenge,
+  startGame, startSprintMode, startBlitzMode, startUltraMode, startFlowMode,
+  startMarathonMode, launchDailyChallenge,
   pauseGameTiming, resumeGameTiming, stopGameAndReset, resumeWithCountdown
 } from './game.js';
 import { pwaInstallBtnHTML, onPWAGameOver, offlineBarGameEnd, hidePWASheet } from './pwa.js';
@@ -342,8 +343,16 @@ export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
 
 export function showStartScreen(){
   offlineBarGameEnd();
+  // Flow has no game-over screen — capture best cumulative score when the player exits
+  if(S.isFlowMode && S.score>(S._flowHiScore||0)){
+    S._flowHiScore=S.score;
+    localStorage.setItem(LS.FLOW_HI, S.score);
+  }
   S.isDailyMode=false;
   S.isSprintMode=false;
+  S.isBlitzMode=false;
+  S.isUltraMode=false;
+  S.isFlowMode=false;
   if(_gateTimer) { clearInterval(_gateTimer); _gateTimer=null; }
   stopGameAndReset();
   
@@ -411,69 +420,88 @@ export function showStartScreen(){
 
 export function showModeSelector(){
   hidePWASheet();
-  const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
+  const noRec='<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
+
   const hiS=parseInt(localStorage.getItem(LS.HI)||'0');
-  const marathonBest=hiS>0?`<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>`:'<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
+  const marathonBest=hiS>0?`<span style="color:rgba(0,255,136,0.8)">Best: ${hiS.toLocaleString()}</span>`:noRec;
+
+  const flowHi=parseInt(localStorage.getItem(LS.FLOW_HI)||'0');
+  const flowBest=flowHi>0?`<span style="color:rgba(160,0,255,0.8)">Best: ${flowHi.toLocaleString()}</span>`:noRec;
+
+  const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,200,255,0.8)">Best: ${fmtTime(S._sprintHiTime)}</span>`:noRec;
+
   const todayStr=new Date().toLocaleDateString('sv').replace(/-/g,'');
   const dailyDone=localStorage.getItem(LS.DAILY_DATE)===todayStr;
   const dailySub=dailyDone?'<span style="color:rgba(255,230,0,0.75)">✓ Completed today</span>':'<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
+
+  const soon='<span class="coming-soon-badge">SOON</span>';
 
   $overlay.innerHTML=`
     <div class="glass-panel">
       <h1 style="font-size:15px;margin-bottom:12px;letter-spacing:3px">SELECT MODE</h1>
 
-      <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
 
-        <!-- MARATHON -->
-        <div class="mode-card marathon" tabindex="0" onclick="startGame()">
-          <div class="mode-icon">🎮</div>
-          <div class="mode-info">
-            <div class="mode-name">MARATHON</div>
-            <div class="mode-desc">No time limit — how high can you go?</div>
-            <div class="mode-best">${marathonBest}</div>
-          </div>
-          <div class="mode-arrow">›</div>
-        </div>
-
-        <!-- SPRINT -->
-        <div class="mode-card sprint" tabindex="0" onclick="startSprintMode()">
-          <div class="mode-icon">⚡</div>
-          <div class="mode-info">
-            <div class="mode-name">SPRINT 40L</div>
-            <div class="mode-desc">Clear 40 lines. Fastest time wins.</div>
-            <div class="mode-best">${sprintBest}</div>
-          </div>
-          <div class="mode-arrow">›</div>
-        </div>
-
-        <!-- DAILY CHALLENGE -->
-        <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
-          <div class="mode-icon">🏆</div>
-          <div class="mode-info">
-            <div class="mode-name">DAILY CHALLENGE</div>
-            <div class="mode-desc">Same piece sequence for everyone — pure skill.</div>
-            <div class="mode-best">${dailySub}</div>
-          </div>
-          <div class="mode-arrow">›</div>
-        </div>
-
-        <!-- SPEED RUN GROUP — Coming Soon -->
-        <div class="mode-group-label">⏳ SPEED RUN <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <!-- ENDLESS -->
+        <div class="mode-group-label">♾️ ENDLESS</div>
         <div class="mode-group">
-          <!-- BLITZ -->
+          <div class="mode-card marathon" tabindex="0" onclick="startMarathonMode()">
+            <div class="mode-icon">🎮</div>
+            <div class="mode-info">
+              <div class="mode-name">MARATHON</div>
+              <div class="mode-desc">No time limit — how high can you go?</div>
+              <div class="mode-best">${marathonBest}</div>
+            </div>
+            <div class="mode-arrow">›</div>
+          </div>
+          <div class="mode-card flow" tabindex="0" onclick="startFlowMode()">
+            <div class="mode-icon">🌊</div>
+            <div class="mode-info">
+              <div class="mode-name">FLOW</div>
+              <div class="mode-desc">Never lose — the board resets and you keep scoring.</div>
+              <div class="mode-best">${flowBest}</div>
+            </div>
+            <div class="mode-arrow">›</div>
+          </div>
+        </div>
+
+        <!-- SPEED -->
+        <div class="mode-group-label">⚡ SPEED</div>
+        <div class="mode-group">
+          <div class="mode-card sprint" tabindex="0" onclick="startSprintMode()">
+            <div class="mode-icon">⚡</div>
+            <div class="mode-info">
+              <div class="mode-name">SPRINT 40L</div>
+              <div class="mode-desc">Clear 40 lines. Fastest time wins.</div>
+              <div class="mode-best">${sprintBest}</div>
+            </div>
+            <div class="mode-arrow">›</div>
+          </div>
           <div class="mode-card blitz mode-coming-soon" tabindex="-1">
             <div class="mode-icon">⏱️</div>
             <div class="mode-info">
-              <div class="mode-name">BLITZ</div>
+              <div class="mode-name">BLITZ ${soon}</div>
               <div class="mode-desc">Score as high as possible in 2 minutes.</div>
             </div>
           </div>
+        </div>
 
-          <!-- ULTRA -->
+        <!-- CHALLENGE -->
+        <div class="mode-group-label">🏆 CHALLENGE</div>
+        <div class="mode-group">
+          <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
+            <div class="mode-icon">🏆</div>
+            <div class="mode-info">
+              <div class="mode-name">DAILY CHALLENGE</div>
+              <div class="mode-desc">Same piece sequence for everyone — pure skill.</div>
+              <div class="mode-best">${dailySub}</div>
+            </div>
+            <div class="mode-arrow">›</div>
+          </div>
           <div class="mode-card ultra mode-coming-soon" tabindex="-1">
             <div class="mode-icon">🌌</div>
             <div class="mode-info">
-              <div class="mode-name">ULTRA</div>
+              <div class="mode-name">ULTRA ${soon}</div>
               <div class="mode-desc">Plan strategically for massive scores in 3 minutes.</div>
             </div>
           </div>

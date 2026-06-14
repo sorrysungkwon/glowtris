@@ -58,6 +58,7 @@ export const LS = {
   SPRINT_HI:    'glowTrisSprintHi',
   BLITZ_HI:     'glowTrisBlitzHi',
   ULTRA_HI:     'glowTrisUltraHi',
+  FLOW_HI:      'glowTrisFlowHi',
 };
 
 export const BLITZ_TIME = 120000; // 2 minutes
@@ -148,6 +149,7 @@ export const S = {
   isSprintMode: false,
   isBlitzMode: false,
   isUltraMode: false,
+  isFlowMode: false,
 
   // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
   _countdownVal: 0,
@@ -203,6 +205,11 @@ export const S = {
   _blitzHiScore: 0,
   _ultraHiScore: 0,
 
+  // Flow endless mode (game.js writes, ui.js reads): cumulative score survives
+  // board top-outs; each top-out collapses the board and increments the round.
+  _flowHiScore: 0,
+  _flowRounds:  0,
+
   // Perf lock (ui.js measureFPS writes, game.js _doStartGame reads)
   _perfLocked: false,
 
@@ -224,5 +231,6 @@ export function getGameMode() {
   if (S.isSprintMode) return 'sprint';
   if (S.isBlitzMode)  return 'blitz';
   if (S.isUltraMode)  return 'ultra';
+  if (S.isFlowMode)   return 'flow';
   return 'classic';
 }

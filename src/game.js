@@ -175,7 +175,7 @@ function lockPiece(){
   for(let r=0;r<S.current.shape.length;r++) for(let c=0;c<S.current.shape[r].length;c++){
     if(!S.current.shape[r][c])continue;
     const y=S.current.y+r;
-    if(y<0){endGame();return;}
+    if(y<0){topOut();return;}
     S.board[y][S.current.x+c]=S.current.color;
   }
   const cleared=[];
@@ -275,8 +275,8 @@ function lockPiece(){
 
 function addScore(pts,n,tspin=false,b2b=false){
   S.score+=pts;
-  // In sprint mode score is cosmetic only — don't update marathon hi-score or achievements
-  if(!S.isSprintMode){
+  // In sprint/flow modes score is cosmetic only — don't update marathon hi-score or achievements
+  if(!S.isSprintMode&&!S.isFlowMode){
     if(S.score>S.hiScore){S.hiScore=S.score;localStorage.setItem(LS.HI,S.hiScore);}
     if(S.score>=50000)unlockAchievement('score_50k');
     if(S.score>=100000)unlockAchievement('score_100k');
@@ -332,13 +332,13 @@ function spawnPiece(fromHold = false){
   
   S.current.justSpawned = true;
   S.lowestY = S.current.y; S.lockResets = 0; S.dcdTimer = S.dcd || 0;
-  drawNext();if(!validPos(S.current))endGame();
+  drawNext();if(!validPos(S.current))topOut();
 }
 
 function holdPiece(){
   if(!canHold||!S.gameRunning||S.gamePaused||!S.current||S._countdownVal)return;
   if(!S.held){S.held=makePiece(S.current.key);spawnPiece(true);}
-  else{const t=S.current.key;S.current=makePiece(S.held.key);S.held=makePiece(t);if(!validPos(S.current))endGame();}
+  else{const t=S.current.key;S.current=makePiece(S.held.key);S.held=makePiece(t);if(!validPos(S.current)){topOut();return;}}
   S.lowestY = S.current.y; S.lockResets = 0;
   canHold=false;cancelLock();drawHold();
 }
@@ -805,6 +805,11 @@ function _doStartGame(){
     if(lsl)lsl.textContent='CLEARED';
   }
 
+  if(S.isFlowMode){
+    S._flowHiScore=parseInt(localStorage.getItem(LS.FLOW_HI)||'0');
+    S._flowRounds=0; _flowCollapsing=false;
+  }
+
   spawnPiece();drawNext();drawHold();updateUI();
   if(S.isSprintMode || isTimeAttack)updateSprintTimer();
   if(animFrame)cancelAnimationFrame(animFrame);
@@ -822,6 +827,8 @@ export function launchDailyChallenge() {
   document.getElementById('overlay').style.display = 'none';
   S.isSprintMode=false;
   S.isBlitzMode=false;
+  S.isUltraMode=false;
+  S.isFlowMode=false;
   S.isDailyMode=true;
   const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   _prng = mulberry32(parseInt(todayStr, 10));
@@ -935,6 +942,49 @@ function endGame(){
   setTimeout(() => _renderGameOverScreen(stats), 600);
 }
 
+// ─── Top-out router ─────────────────────────────────────────────────────────────
+// Flow is an endless mode: a top-out collapses the board and continues instead of
+// ending the run. Every other mode ends normally.
+function topOut(){
+  if(S.isFlowMode) flowCollapse();
+  else endGame();
+}
+
+// ─── Flow (endless) ─────────────────────────────────────────────────────────────
+let _flowCollapsing = false;
+function flowCollapse(){
+  if(_flowCollapsing) return;      // guard against re-entry during the wipe window
+  _flowCollapsing = true;
+  S._flowRounds++;
+
+  // Persist best cumulative score reached so far
+  if(S.score > S._flowHiScore){ S._flowHiScore = S.score; localStorage.setItem(LS.FLOW_HI, S.score); }
+
+  // Explode the stacked board into spark particles, then shake + flash
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(!S.board[r][c])continue;
+    const a=Math.random()*Math.PI*2,sp=Math.random()*6+2;
+    S.particles.push({x:(c+.5)*S.CELL,y:(r+.5)*S.CELL,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,life:1,decay:Math.random()*.01+.005,color:S.board[r][c],size:Math.random()*5+3,type:'spark'});
+  }
+  S.shakeFrames=40;S.shakeMag=0.7;
+  if(S.animIntensity!=='off') triggerScreenFlash();
+  sfxGameOver();
+  S.current=null;          // hide the active piece during the collapse window
+
+  // After the explosion plays, wipe the board and resume the same run
+  setTimeout(()=>{
+    // Bail if the run ended or the player switched modes during the wipe window
+    if(!S.gameRunning || !S.isFlowMode){ _flowCollapsing=false; return; }
+    S.board=createBoard();
+    S.combo=0;S.b2b=false;S.flashLines=new Set();S.flashTimer=0;
+    S.lockActive=false;S.lockTimer=0;S.gravityTimer=0;
+    spawnFloatingText(`ROUND ${S._flowRounds+1}`, COLS/2*S.CELL, ROWS/2*S.CELL, '#a000ff', 24);
+    spawnPiece();
+    updateUI();
+    _flowCollapsing=false;
+  },500);
+}
+
 // ─── Sprint ───────────────────────────────────────────────────────────────────
 function endSprint(){
   const timeMs=Math.round(S._sprintEndTime-S._sprintStartTime);
@@ -1012,6 +1062,7 @@ export function startSprintMode(){
   S.isBlitzMode=false;
   S.isUltraMode=false;
   S.isDailyMode=false;
+  S.isFlowMode=false;
   startGame();
 }
 
@@ -1020,6 +1071,7 @@ export function startBlitzMode(){
   S.isBlitzMode=true;
   S.isUltraMode=false;
   S.isDailyMode=false;
+  S.isFlowMode=false;
   startGame();
 }
 
@@ -1028,6 +1080,7 @@ export function startUltraMode(){
   S.isBlitzMode=false;
   S.isUltraMode=true;
   S.isDailyMode=false;
+  S.isFlowMode=false;
   startGame();
 }
 
@@ -1036,6 +1089,16 @@ export function startMarathonMode(){
   S.isBlitzMode=false;
   S.isUltraMode=false;
   S.isDailyMode=false;
+  S.isFlowMode=false;
+  startGame();
+}
+
+export function startFlowMode(){
+  S.isSprintMode=false;
+  S.isBlitzMode=false;
+  S.isUltraMode=false;
+  S.isDailyMode=false;
+  S.isFlowMode=true;
   startGame();
 }
 
@@ -1067,9 +1130,10 @@ document.fonts.ready.then(() => {
   animFrame=requestAnimationFrame(function bgOnly(ts){drawBackground();if(!S.gameRunning)animFrame=requestAnimationFrame(bgOnly);});
   showStartScreen();
   const mode = new URLSearchParams(window.location.search).get('mode');
-  if (mode === 'marathon') setTimeout(startGame, 100);
+  if (mode === 'marathon') setTimeout(startMarathonMode, 100);
   else if (mode === 'sprint') setTimeout(startSprintMode, 100);
   else if (mode === 'daily') setTimeout(startDailyChallenge, 100);
+  else if (mode === 'flow') setTimeout(startFlowMode, 100);
 });
 // Pre-warm cell sprites during idle so startGame() click doesn't block (INP fix)
 (window.requestIdleCallback||function(cb){setTimeout(cb,200);})(function(){
@@ -1106,6 +1170,7 @@ window.onunhandledrejection = function(e) {
 // HTML template uses onclick="fn()" style which requires window.fn.
 Object.assign(window, {
   startGame, startSprintMode, startDailyChallenge, launchDailyChallenge,
+  startFlowMode, startMarathonMode,
   togglePause, showStartScreen, showModeSelector, openSettings,
   submitScore, submitSprintScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
