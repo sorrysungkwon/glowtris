@@ -111,6 +111,13 @@
     --border: rgba(0,200,255,0.28);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
+    /* Per-mode signature colors (grouped: ENDLESS / SPEED / CHALLENGE) */
+    --mode-marathon: #00ff88; /* ENDLESS — green, endurance */
+    --mode-flow:     #a000ff; /* ENDLESS — violet, meditative flow */
+    --mode-sprint:   #00c8ff; /* SPEED — cyan, fast focus */
+    --mode-blitz:    #ffd000; /* SPEED — yellow, electric burst */
+    --mode-daily:    #ff7700; /* CHALLENGE — orange, daily streak */
+    --mode-ultra:    #ff0080; /* CHALLENGE — magenta, cosmic high score */
   }
 
   html, body {
@@ -1237,44 +1244,83 @@
     transform: translateY(1px);
   }
 
-  /* Marathon Mode Theme (Cyan) */
+  /* ENDLESS — Marathon Theme (Green) */
   .mode-card.marathon {
-    border-color: rgba(0, 200, 255, 0.22);
-    background: rgba(0, 200, 255, 0.04);
-  }
-  .mode-card.marathon .mode-name { color: var(--cyan); text-shadow: 0 0 8px rgba(0, 200, 255, 0.3); }
-  .mode-card.marathon:hover {
-    border-color: rgba(0, 200, 255, 0.55);
-    background: rgba(0, 200, 255, 0.12);
-    box-shadow: 0 4px 20px rgba(0, 200, 255, 0.15), 0 0 10px rgba(0, 200, 255, 0.05);
-  }
-  .mode-card.marathon:hover .mode-arrow { color: var(--cyan); }
-
-  /* Sprint Mode Theme (Green) */
-  .mode-card.sprint {
     border-color: rgba(0, 255, 136, 0.22);
     background: rgba(0, 255, 136, 0.04);
   }
-  .mode-card.sprint .mode-name { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
-  .mode-card.sprint:hover {
+  .mode-card.marathon .mode-name { color: var(--mode-marathon); text-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+  .mode-card.marathon:hover {
     border-color: rgba(0, 255, 136, 0.55);
     background: rgba(0, 255, 136, 0.12);
     box-shadow: 0 4px 20px rgba(0, 255, 136, 0.15), 0 0 10px rgba(0, 255, 136, 0.05);
   }
-  .mode-card.sprint:hover .mode-arrow { color: #00ff88; }
+  .mode-card.marathon:hover .mode-arrow { color: var(--mode-marathon); }
 
-  /* Daily Challenge Theme (Orange) */
+  /* ENDLESS — Flow Theme (Violet) */
+  .mode-card.flow {
+    border-color: rgba(160, 0, 255, 0.22);
+    background: rgba(160, 0, 255, 0.04);
+  }
+  .mode-card.flow .mode-name { color: var(--mode-flow); text-shadow: 0 0 8px rgba(160, 0, 255, 0.35); }
+  .mode-card.flow:hover {
+    border-color: rgba(160, 0, 255, 0.55);
+    background: rgba(160, 0, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(160, 0, 255, 0.15), 0 0 10px rgba(160, 0, 255, 0.05);
+  }
+  .mode-card.flow:hover .mode-arrow { color: var(--mode-flow); }
+
+  /* SPEED — Sprint Theme (Cyan) */
+  .mode-card.sprint {
+    border-color: rgba(0, 200, 255, 0.22);
+    background: rgba(0, 200, 255, 0.04);
+  }
+  .mode-card.sprint .mode-name { color: var(--mode-sprint); text-shadow: 0 0 8px rgba(0, 200, 255, 0.3); }
+  .mode-card.sprint:hover {
+    border-color: rgba(0, 200, 255, 0.55);
+    background: rgba(0, 200, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 200, 255, 0.15), 0 0 10px rgba(0, 200, 255, 0.05);
+  }
+  .mode-card.sprint:hover .mode-arrow { color: var(--mode-sprint); }
+
+  /* SPEED — Blitz Theme (Yellow) */
+  .mode-card.blitz {
+    border-color: rgba(255, 208, 0, 0.22);
+    background: rgba(255, 208, 0, 0.04);
+  }
+  .mode-card.blitz .mode-name { color: var(--mode-blitz); text-shadow: 0 0 8px rgba(255, 208, 0, 0.3); }
+  .mode-card.blitz:hover {
+    border-color: rgba(255, 208, 0, 0.55);
+    background: rgba(255, 208, 0, 0.12);
+    box-shadow: 0 4px 20px rgba(255, 208, 0, 0.15), 0 0 10px rgba(255, 208, 0, 0.05);
+  }
+  .mode-card.blitz:hover .mode-arrow { color: var(--mode-blitz); }
+
+  /* CHALLENGE — Daily Theme (Orange) */
   .mode-card.daily {
     border-color: rgba(255, 119, 0, 0.22);
     background: rgba(255, 119, 0, 0.03);
   }
-  .mode-card.daily .mode-name { color: #ff7700; text-shadow: 0 0 8px rgba(255, 119, 0, 0.3); }
+  .mode-card.daily .mode-name { color: var(--mode-daily); text-shadow: 0 0 8px rgba(255, 119, 0, 0.3); }
   .mode-card.daily:hover {
     border-color: rgba(255, 119, 0, 0.55);
     background: rgba(255, 119, 0, 0.1);
     box-shadow: 0 4px 20px rgba(255, 119, 0, 0.15), 0 0 10px rgba(255, 119, 0, 0.05);
   }
-  .mode-card.daily:hover .mode-arrow { color: #ff7700; }
+  .mode-card.daily:hover .mode-arrow { color: var(--mode-daily); }
+
+  /* CHALLENGE — Ultra Theme (Magenta) */
+  .mode-card.ultra {
+    border-color: rgba(255, 0, 128, 0.22);
+    background: rgba(255, 0, 128, 0.04);
+  }
+  .mode-card.ultra .mode-name { color: var(--mode-ultra); text-shadow: 0 0 8px rgba(255, 0, 128, 0.3); }
+  .mode-card.ultra:hover {
+    border-color: rgba(255, 0, 128, 0.55);
+    background: rgba(255, 0, 128, 0.12);
+    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.15), 0 0 10px rgba(255, 0, 128, 0.05);
+  }
+  .mode-card.ultra:hover .mode-arrow { color: var(--mode-ultra); }
 
   /* --- Coming Soon mode cards --- */
   .mode-card.mode-coming-soon {
@@ -2099,6 +2145,7 @@ if ('serviceWorker' in navigator) {
     if (S.isSprintMode) return "sprint";
     if (S.isBlitzMode) return "blitz";
     if (S.isUltraMode) return "ultra";
+    if (S.isFlowMode) return "flow";
     return "classic";
   }
   var COLS, ROWS, PIECES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, LEVEL_LINES, SPRINT_LINES, MAX_PARTICLES, SUPPORT_URL, COLOR_TO_KEY, LS, ACHIEVEMENTS, S;
@@ -2150,7 +2197,8 @@ if ('serviceWorker' in navigator) {
         ACHIEVEMENTS: "glowTrisAchievements",
         SPRINT_HI: "glowTrisSprintHi",
         BLITZ_HI: "glowTrisBlitzHi",
-        ULTRA_HI: "glowTrisUltraHi"
+        ULTRA_HI: "glowTrisUltraHi",
+        FLOW_HI: "glowTrisFlowHi"
       };
       ACHIEVEMENTS = [
         { id: "first_game", label: "First Stack", description: "Complete your first game", icon: "\u{1F9F1}" },
@@ -2204,6 +2252,7 @@ if ('serviceWorker' in navigator) {
         isSprintMode: false,
         isBlitzMode: false,
         isUltraMode: false,
+        isFlowMode: false,
         // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
         _countdownVal: 0,
         _countdownGo: 0,
@@ -2265,6 +2314,10 @@ if ('serviceWorker' in navigator) {
         _timeAttackStartTime: 0,
         _blitzHiScore: 0,
         _ultraHiScore: 0,
+        // Flow endless mode (game.js writes, ui.js reads): cumulative score survives
+        // board top-outs; each top-out collapses the board and increments the round.
+        _flowHiScore: 0,
+        _flowRounds: 0,
         // Perf lock (ui.js measureFPS writes, game.js _doStartGame reads)
         _perfLocked: false,
         // Particle array (game.js endGame/endSprint push directly; ui.js renders)
@@ -5745,8 +5798,15 @@ if ('serviceWorker' in navigator) {
   }
   function showStartScreen() {
     offlineBarGameEnd();
+    if (S.isFlowMode && S.score > (S._flowHiScore || 0)) {
+      S._flowHiScore = S.score;
+      localStorage.setItem(LS.FLOW_HI, S.score);
+    }
     S.isDailyMode = false;
     S.isSprintMode = false;
+    S.isBlitzMode = false;
+    S.isUltraMode = false;
+    S.isFlowMode = false;
     if (_gateTimer) {
       clearInterval(_gateTimer);
       _gateTimer = null;
@@ -5814,68 +5874,82 @@ if ('serviceWorker' in navigator) {
   }
   function showModeSelector() {
     hidePWASheet();
-    const sprintBest = S._sprintHiTime > 0 ? `<span style="color:rgba(0,255,136,0.75)">Best: ${fmtTime(S._sprintHiTime)}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
+    const noRec = '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
     const hiS = parseInt(localStorage.getItem(LS.HI) || "0");
-    const marathonBest = hiS > 0 ? `<span style="color:rgba(0,200,255,0.75)">Best: ${hiS.toLocaleString()}</span>` : '<span style="color:rgba(255,255,255,0.3)">No record yet</span>';
+    const marathonBest = hiS > 0 ? `<span style="color:rgba(0,255,136,0.8)">Best: ${hiS.toLocaleString()}</span>` : noRec;
+    const flowHi = parseInt(localStorage.getItem(LS.FLOW_HI) || "0");
+    const flowBest = flowHi > 0 ? `<span style="color:rgba(160,0,255,0.8)">Best: ${flowHi.toLocaleString()}</span>` : noRec;
+    const sprintBest = S._sprintHiTime > 0 ? `<span style="color:rgba(0,200,255,0.8)">Best: ${fmtTime(S._sprintHiTime)}</span>` : noRec;
     const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("sv").replace(/-/g, "");
     const dailyDone = localStorage.getItem(LS.DAILY_DATE) === todayStr;
     const dailySub = dailyDone ? '<span style="color:rgba(255,230,0,0.75)">\u2713 Completed today</span>' : '<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
+    const soon = '<span class="coming-soon-badge">SOON</span>';
     $overlay.innerHTML = `
     <div class="glass-panel">
       <h1 style="font-size:15px;margin-bottom:12px;letter-spacing:3px">SELECT MODE</h1>
 
-      <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
 
-        <!-- MARATHON -->
-        <div class="mode-card marathon" tabindex="0" onclick="startGame()">
-          <div class="mode-icon">\u{1F3AE}</div>
-          <div class="mode-info">
-            <div class="mode-name">MARATHON</div>
-            <div class="mode-desc">No time limit \u2014 how high can you go?</div>
-            <div class="mode-best">${marathonBest}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
-        <!-- SPRINT -->
-        <div class="mode-card sprint" tabindex="0" onclick="startSprintMode()">
-          <div class="mode-icon">\u26A1</div>
-          <div class="mode-info">
-            <div class="mode-name">SPRINT 40L</div>
-            <div class="mode-desc">Clear 40 lines. Fastest time wins.</div>
-            <div class="mode-best">${sprintBest}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
-        <!-- DAILY CHALLENGE -->
-        <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
-          <div class="mode-icon">\u{1F3C6}</div>
-          <div class="mode-info">
-            <div class="mode-name">DAILY CHALLENGE</div>
-            <div class="mode-desc">Same piece sequence for everyone \u2014 pure skill.</div>
-            <div class="mode-best">${dailySub}</div>
-          </div>
-          <div class="mode-arrow">\u203A</div>
-        </div>
-
-        <!-- SPEED RUN GROUP \u2014 Coming Soon -->
-        <div class="mode-group-label">\u23F3 SPEED RUN <span class="coming-soon-badge" style="margin-left:8px">COMING SOON</span></div>
+        <!-- ENDLESS -->
+        <div class="mode-group-label">\u267E\uFE0F ENDLESS</div>
         <div class="mode-group">
-          <!-- BLITZ -->
+          <div class="mode-card marathon" tabindex="0" onclick="startMarathonMode()">
+            <div class="mode-icon">\u{1F3AE}</div>
+            <div class="mode-info">
+              <div class="mode-name">MARATHON</div>
+              <div class="mode-desc">No time limit \u2014 how high can you go?</div>
+              <div class="mode-best">${marathonBest}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
+          <div class="mode-card flow" tabindex="0" onclick="startFlowMode()">
+            <div class="mode-icon">\u{1F30A}</div>
+            <div class="mode-info">
+              <div class="mode-name">FLOW</div>
+              <div class="mode-desc">Never lose \u2014 the board resets and you keep scoring.</div>
+              <div class="mode-best">${flowBest}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
+        </div>
+
+        <!-- SPEED -->
+        <div class="mode-group-label">\u26A1 SPEED</div>
+        <div class="mode-group">
+          <div class="mode-card sprint" tabindex="0" onclick="startSprintMode()">
+            <div class="mode-icon">\u26A1</div>
+            <div class="mode-info">
+              <div class="mode-name">SPRINT 40L</div>
+              <div class="mode-desc">Clear 40 lines. Fastest time wins.</div>
+              <div class="mode-best">${sprintBest}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
           <div class="mode-card blitz mode-coming-soon" tabindex="-1">
             <div class="mode-icon">\u23F1\uFE0F</div>
             <div class="mode-info">
-              <div class="mode-name">BLITZ</div>
+              <div class="mode-name">BLITZ ${soon}</div>
               <div class="mode-desc">Score as high as possible in 2 minutes.</div>
             </div>
           </div>
+        </div>
 
-          <!-- ULTRA -->
+        <!-- CHALLENGE -->
+        <div class="mode-group-label">\u{1F3C6} CHALLENGE</div>
+        <div class="mode-group">
+          <div class="mode-card daily" tabindex="0" onclick="startDailyChallenge()">
+            <div class="mode-icon">\u{1F3C6}</div>
+            <div class="mode-info">
+              <div class="mode-name">DAILY CHALLENGE</div>
+              <div class="mode-desc">Same piece sequence for everyone \u2014 pure skill.</div>
+              <div class="mode-best">${dailySub}</div>
+            </div>
+            <div class="mode-arrow">\u203A</div>
+          </div>
           <div class="mode-card ultra mode-coming-soon" tabindex="-1">
             <div class="mode-icon">\u{1F30C}</div>
             <div class="mode-info">
-              <div class="mode-name">ULTRA</div>
+              <div class="mode-name">ULTRA ${soon}</div>
               <div class="mode-desc">Plan strategically for massive scores in 3 minutes.</div>
             </div>
           </div>
@@ -6583,6 +6657,7 @@ ${cta}`;
     resumeWithCountdown: () => resumeWithCountdown,
     startBlitzMode: () => startBlitzMode,
     startCountdown: () => startCountdown,
+    startFlowMode: () => startFlowMode,
     startGame: () => startGame,
     startMarathonMode: () => startMarathonMode,
     startSprintMode: () => startSprintMode,
@@ -6685,7 +6760,7 @@ ${cta}`;
       if (!S.current.shape[r][c]) continue;
       const y = S.current.y + r;
       if (y < 0) {
-        endGame();
+        topOut();
         return;
       }
       S.board[y][S.current.x + c] = S.current.color;
@@ -6815,7 +6890,7 @@ ${cta}`;
   }
   function addScore(pts, n, tspin = false, b2b = false) {
     S.score += pts;
-    if (!S.isSprintMode) {
+    if (!S.isSprintMode && !S.isFlowMode) {
       if (S.score > S.hiScore) {
         S.hiScore = S.score;
         localStorage.setItem(LS.HI, S.hiScore);
@@ -6882,7 +6957,7 @@ ${cta}`;
     S.lockResets = 0;
     S.dcdTimer = S.dcd || 0;
     drawNext();
-    if (!validPos(S.current)) endGame();
+    if (!validPos(S.current)) topOut();
   }
   function holdPiece() {
     if (!canHold || !S.gameRunning || S.gamePaused || !S.current || S._countdownVal) return;
@@ -6893,7 +6968,10 @@ ${cta}`;
       const t = S.current.key;
       S.current = makePiece(S.held.key);
       S.held = makePiece(t);
-      if (!validPos(S.current)) endGame();
+      if (!validPos(S.current)) {
+        topOut();
+        return;
+      }
     }
     S.lowestY = S.current.y;
     S.lockResets = 0;
@@ -7390,6 +7468,11 @@ ${cta}`;
       if (psl) psl.textContent = "SCORE";
       if (lsl) lsl.textContent = "CLEARED";
     }
+    if (S.isFlowMode) {
+      S._flowHiScore = parseInt(localStorage.getItem(LS.FLOW_HI) || "0");
+      S._flowRounds = 0;
+      _flowCollapsing = false;
+    }
     spawnPiece();
     drawNext();
     drawHold();
@@ -7409,6 +7492,8 @@ ${cta}`;
     document.getElementById("overlay").style.display = "none";
     S.isSprintMode = false;
     S.isBlitzMode = false;
+    S.isUltraMode = false;
+    S.isFlowMode = false;
     S.isDailyMode = true;
     const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
     _prng = mulberry32(parseInt(todayStr, 10));
@@ -7521,6 +7606,47 @@ ${cta}`;
     }
     setTimeout(() => _renderGameOverScreen(stats), 600);
   }
+  function topOut() {
+    if (S.isFlowMode) flowCollapse();
+    else endGame();
+  }
+  function flowCollapse() {
+    if (_flowCollapsing) return;
+    _flowCollapsing = true;
+    S._flowRounds++;
+    if (S.score > S._flowHiScore) {
+      S._flowHiScore = S.score;
+      localStorage.setItem(LS.FLOW_HI, S.score);
+    }
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (!S.board[r][c]) continue;
+      const a = Math.random() * Math.PI * 2, sp = Math.random() * 6 + 2;
+      S.particles.push({ x: (c + 0.5) * S.CELL, y: (r + 0.5) * S.CELL, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2, life: 1, decay: Math.random() * 0.01 + 5e-3, color: S.board[r][c], size: Math.random() * 5 + 3, type: "spark" });
+    }
+    S.shakeFrames = 40;
+    S.shakeMag = 0.7;
+    if (S.animIntensity !== "off") triggerScreenFlash();
+    sfxGameOver();
+    S.current = null;
+    setTimeout(() => {
+      if (!S.gameRunning || !S.isFlowMode) {
+        _flowCollapsing = false;
+        return;
+      }
+      S.board = createBoard();
+      S.combo = 0;
+      S.b2b = false;
+      S.flashLines = /* @__PURE__ */ new Set();
+      S.flashTimer = 0;
+      S.lockActive = false;
+      S.lockTimer = 0;
+      S.gravityTimer = 0;
+      spawnFloatingText(`ROUND ${S._flowRounds + 1}`, COLS / 2 * S.CELL, ROWS / 2 * S.CELL, "#a000ff", 24);
+      spawnPiece();
+      updateUI();
+      _flowCollapsing = false;
+    }, 500);
+  }
   function endSprint() {
     const timeMs = Math.round(S._sprintEndTime - S._sprintStartTime);
     S.gameRunning = false;
@@ -7596,6 +7722,7 @@ ${cta}`;
     S.isBlitzMode = false;
     S.isUltraMode = false;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
   function startBlitzMode() {
@@ -7603,6 +7730,7 @@ ${cta}`;
     S.isBlitzMode = true;
     S.isUltraMode = false;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
   function startUltraMode() {
@@ -7610,6 +7738,7 @@ ${cta}`;
     S.isBlitzMode = false;
     S.isUltraMode = true;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
   function startMarathonMode() {
@@ -7617,9 +7746,18 @@ ${cta}`;
     S.isBlitzMode = false;
     S.isUltraMode = false;
     S.isDailyMode = false;
+    S.isFlowMode = false;
     startGame();
   }
-  var canHold, gameOver, dropInterval, animFrame, bag, _countdownTimer, _prng, lastWasRotate, lastKickNonZero, _keyGuide, $overlay2, $combo2, KICKS_JLSTZ, KICKS_I, KICKS_180, KEYS, lastFrameTs, _sprintPauseTs, $hiScore2, $hiScoreM2, _VERSION;
+  function startFlowMode() {
+    S.isSprintMode = false;
+    S.isBlitzMode = false;
+    S.isUltraMode = false;
+    S.isDailyMode = false;
+    S.isFlowMode = true;
+    startGame();
+  }
+  var canHold, gameOver, dropInterval, animFrame, bag, _countdownTimer, _prng, lastWasRotate, lastKickNonZero, _keyGuide, $overlay2, $combo2, KICKS_JLSTZ, KICKS_I, KICKS_180, KEYS, lastFrameTs, _sprintPauseTs, _flowCollapsing, $hiScore2, $hiScoreM2, _VERSION;
   var init_game = __esm({
     "src/game.js"() {
       init_shared();
@@ -7733,6 +7871,7 @@ ${cta}`;
       makeTouchBtn("btn-pause", () => togglePause(), "any");
       lastFrameTs = 0;
       _sprintPauseTs = 0;
+      _flowCollapsing = false;
       S.flashLines = /* @__PURE__ */ new Set();
       initLayout();
       initStars();
@@ -7759,9 +7898,10 @@ ${cta}`;
         });
         showStartScreen();
         const mode = new URLSearchParams(window.location.search).get("mode");
-        if (mode === "marathon") setTimeout(startGame, 100);
+        if (mode === "marathon") setTimeout(startMarathonMode, 100);
         else if (mode === "sprint") setTimeout(startSprintMode, 100);
         else if (mode === "daily") setTimeout(startDailyChallenge, 100);
+        else if (mode === "flow") setTimeout(startFlowMode, 100);
       });
       (window.requestIdleCallback || function(cb) {
         setTimeout(cb, 200);
@@ -7804,6 +7944,8 @@ ${cta}`;
         startSprintMode,
         startDailyChallenge,
         launchDailyChallenge,
+        startFlowMode,
+        startMarathonMode,
         togglePause,
         showStartScreen,
         showModeSelector,
