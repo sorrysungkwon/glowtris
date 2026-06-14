@@ -3,10 +3,27 @@
 
 const fs   = require('fs');
 const path = require('path');
+const { lint } = require('./lint-design');
 
 const root = path.resolve(__dirname, '..');
 
 async function build() {
+  console.log('Verifying Design System compliance...');
+  const designErrors = lint();
+  const bypass = process.env.BYPASS_DESIGN_LINT === 'true' || process.argv.includes('--bypass');
+  if (designErrors.length > 0) {
+    if (bypass) {
+      console.warn('\x1b[33m%s\x1b[0m', 'Design System Verification Failed (Bypassed):');
+      designErrors.forEach(e => console.warn('\x1b[33m%s\x1b[0m', `  - [BYPASS] ${e}`));
+    } else {
+      console.error('\x1b[31m%s\x1b[0m', 'Design System Verification Failed:');
+      designErrors.forEach(e => console.error('\x1b[31m%s\x1b[0m', `  - ${e}`));
+      process.exit(1);
+    }
+  } else {
+    console.log('\x1b[32m%s\x1b[0m', 'Design System compliant.');
+  }
+
   const template = fs.readFileSync(path.join(root, 'src/template.html'), 'utf8');
   const css      = fs.readFileSync(path.join(root, 'src/style.css'),     'utf8');
 

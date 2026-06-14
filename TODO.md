@@ -1,36 +1,11 @@
-# GLOWTRIS TODO (CAVEMAN SPEAK)
-
-## URGENT. DO NOW.
-- [ ] Build 10x40 board. Eye see only 10x20.
-- [ ] Fix 3-corner crash. Keep all button press.
-- [ ] 1000Hz tick. 0ms delay. Fast.
-- [ ] Smash ghost piece. Show who to beat next.
-- [ ] Buttons big. Squeeze when press. Screen bleed red.
-- [ ] Duolingo face react.
-
-## RULES FOR TRIBE (READ FIRST)
-- Keep code files split. Tool mash into one file.
-- Write English only. No other speak.
-- Read guide first. Then read this.
-- Do task. Mark X. Save commit.
-- Push code only when User grunt "push". Wait for User.
-
-## SAFE FIRE (SECURITY)
-- [x] Bad keys gone.
-- [x] Gitignore strong.
-- [x] History clean.
-- [ ] Delete local env file later.
-
-## GOOD IDEAS FOR LATER
-- Make controller shake hand.
-- Make screen shake.
-- Add hold piece. Add big T-spin score.
-- Stop bad cheaters.
-- Save stats in local cave.
-
 ## PLAN FOR TRIBE
-- Part A: Make engine strong. No show public. (v0.2 to v0.7)
+- Part A: Make engine strong. No show public. (v0.2 to v0.9)
 - Part B: Release to world. Get many tribesmen. (v1.0 to v2.0)
+
+## NEXT V0.6 (MODES & METRICS)
+- [ ] Count APM and PPS. Show on screen.
+- [ ] Build 10x40 board. Eye see only 10x20. (Vanish Zone)
+- [ ] Fix 3-corner crash. Keep all button press. (Input Buffer & 3-Corner G-Spin Rule)
 
 ## NEXT V0.7 (SOCIAL)
 - [ ] Show rank percent.
@@ -39,7 +14,20 @@
 - [ ] Give rival.
 - [ ] Fight every week.
 
-## NEXT V1.2 (ULTRA)
+## NEXT V0.8 (GAMEPLAY FEEL)
+- [ ] Smash ghost piece. Show who to beat next. (Target Overtake UI)
+- [ ] Make controller shake hand on drop.
+- [ ] Make screen shake on big clear.
+
+## NEXT V0.9 (MICRO-INTERACTIONS)
+- [ ] Screen bleed red when blocks are high. (Danger pulse)
+- [ ] Buttons bounce and glow when press. (0.95 scale)
+
+## NEXT V1.0 (LAUNCH & AVATAR)
+- [ ] Duolingo face react. (Avatar state machine)
+- [ ] Let world see. (Public launch v1.0)
+
+## NEXT V1.2 (BLITZ)
 - [ ] Play 2 minute. Fast end.
 - [ ] Score big near end.
 - [ ] Count play days.

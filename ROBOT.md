@@ -43,7 +43,6 @@
 - Sprint: cyan (`--mode-sprint`).
 - Blitz: yellow (`--mode-blitz`).
 - Daily: orange (`--mode-daily`).
-- Ultra: magenta (`--mode-ultra`).
 - Tokens in `:root` (`style.css`) and `MODE_COLORS` (`shared.js`). Keep sync.
 
 ## Branches & Deploy

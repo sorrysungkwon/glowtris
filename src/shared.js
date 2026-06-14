@@ -28,7 +28,6 @@ export const SUPPORT_URL     = 'https://ko-fi.com/sorrysungkwon';
 
 // Reverse map: color → piece key (used for colorblind pattern lookup)
 export const COLOR_TO_KEY = {};
-for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
 
 // Per-mode signature colors (mirror the --mode-* CSS vars in style.css).
 // Used by canvas code (background themes, share cards) where CSS vars aren't available.
@@ -40,13 +39,41 @@ export const MODE_COLORS = {
   sprint:   '#00c8ff',
   blitz:    '#ffd000',
   daily:    '#ff7700',
-  ultra:    '#ff0080',
 };
 
 // #rrggbb → rgba() string for canvas fills/strokes that need an alpha
 export function hexToRgba(hex, a = 1) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
+// JS-CSS Bridge helper to get CSS variable color
+export function getCssVarColor(varName, fallback) {
+  if (typeof window === 'undefined') return fallback;
+  const val = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  return val || fallback;
+}
+
+// Dynamic initialization from CSS design tokens
+export function initializeSystemTheme() {
+  PIECES.I.color = getCssVarColor('--piece-i', '#00d8ff');
+  PIECES.O.color = getCssVarColor('--piece-o', '#ffe000');
+  PIECES.T.color = getCssVarColor('--piece-t', '#cc00ff');
+  PIECES.S.color = getCssVarColor('--piece-s', '#00ffaa');
+  PIECES.Z.color = getCssVarColor('--piece-z', '#ff2040');
+  PIECES.J.color = getCssVarColor('--piece-j', '#2979ff');
+  PIECES.L.color = getCssVarColor('--piece-l', '#ff8c00');
+
+  // Re-sync COLOR_TO_KEY mapping
+  for (const k in COLOR_TO_KEY) delete COLOR_TO_KEY[k];
+  for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
+
+  MODE_COLORS.marathon = getCssVarColor('--mode-marathon', '#00ff88');
+  MODE_COLORS.classic  = getCssVarColor('--mode-marathon', '#00ff88');
+  MODE_COLORS.flow     = getCssVarColor('--mode-flow', '#a000ff');
+  MODE_COLORS.sprint   = getCssVarColor('--mode-sprint', '#00c8ff');
+  MODE_COLORS.blitz    = getCssVarColor('--mode-blitz', '#ffd000');
+  MODE_COLORS.daily    = getCssVarColor('--mode-daily', '#ff7700');
 }
 
 // ─── localStorage keys ────────────────────────────────────────────────────────
@@ -76,19 +103,17 @@ export const LS = {
   ACHIEVEMENTS: 'glowTrisAchievements',
   SPRINT_HI:    'glowTrisSprintHi',
   BLITZ_HI:     'glowTrisBlitzHi',
-  ULTRA_HI:     'glowTrisUltraHi',
   FLOW_HI:      'glowTrisFlowHi',
 };
 
 export const BLITZ_TIME = 120000; // 2 minutes
-export const ULTRA_TIME = 180000; // 3 minutes
 
 // ─── Achievement definitions ─────────────────────────────────────────────────
 export const ACHIEVEMENTS = [
   { id: 'first_game',        label: 'First Stack',         description: 'Complete your first game',                icon: '🧱' },
   { id: 'glowtris_1',        label: 'Glowtris!',           description: 'Clear 4 lines at once',                   icon: '⚡' },
-  { id: 'tspin_1',           label: 'T-Spin Initiate',     description: 'Perform a T-Spin',                        icon: '🔄' },
-  { id: 'tspin_triple',      label: 'Apex Spin',           description: 'Perform a T-Spin Triple',                 icon: '🌀' },
+  { id: 'tspin_1',           label: 'G-Spin Initiate',     description: 'Perform a G-Spin',                        icon: '🔄' },
+  { id: 'tspin_triple',      label: 'Apex Spin',           description: 'Perform a G-Spin Triple',                 icon: '🌀' },
   { id: 'all_clear',         label: 'Void Clear',          description: 'Achieve an All-Clear bonus',              icon: '🌟' },
   { id: 'combo_5',           label: 'Combo Cadet',         description: 'Reach a 5x combo',                        icon: '🔥' },
   { id: 'combo_10',          label: 'Combo Master',        description: 'Reach a 10x combo',                       icon: '👑' },
@@ -167,7 +192,6 @@ export const S = {
   isDailyMode: false,
   isSprintMode: false,
   isBlitzMode: false,
-  isUltraMode: false,
   isFlowMode: false,
 
   // Countdown 3-2-1 (game.js writes, ui.js drawBoard reads)
@@ -219,10 +243,9 @@ export const S = {
   _sprintEndTime:   0,   // only game.js uses, kept here for symmetry
   _sprintHiTime:    0,
 
-  // Time Attack timing (Blitz/Ultra)
+  // Time Attack timing (Blitz)
   _timeAttackStartTime: 0,
   _blitzHiScore: 0,
-  _ultraHiScore: 0,
 
   // Flow endless mode (game.js writes, ui.js reads): cumulative score survives
   // board top-outs; each top-out collapses the board and increments the round.
@@ -249,7 +272,6 @@ export function getGameMode() {
   if (S.isDailyMode)  return 'daily';
   if (S.isSprintMode) return 'sprint';
   if (S.isBlitzMode)  return 'blitz';
-  if (S.isUltraMode)  return 'ultra';
   if (S.isFlowMode)   return 'flow';
   return 'classic';
 }

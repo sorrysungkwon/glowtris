@@ -53,12 +53,35 @@ Every game mode owns exactly **one** signature color, grouped by intent on a coo
 | ⚡ **SPEED** | Sprint | 🔵 `#00c8ff` cyan | `--mode-sprint` | `.sprint` |
 | | Blitz | 🟡 `#ffd000` yellow | `--mode-blitz` | `.blitz` |
 | 🏆 **CHALLENGE** | Daily | 🟠 `#ff7700` orange | `--mode-daily` | `.daily` |
-| | Ultra | 🔴 `#ff0080` magenta | `--mode-ultra` | `.ultra` |
+| | [Reserved] | 🔴 `#ff0080` magenta | `[TBD]` | `[TBD]` |
 
 Rules: one icon + one color per mode, consistent across card / HUD / background / share. The brand cyan→violet→pink gradient is NOT a mode accent. Changing a mode color = edit BOTH `--mode-*` and `MODE_COLORS`.
 
 ### Semantic Roles (game surfaces)
-The game runs dark-only with translucent glass panels: `--surface`, `--surface-2` (raised card), `--surface-glass` (HUD); text `--on-surface` / `--on-surface-muted` / `--on-surface-faint`; lines `--outline` / `--outline-strong`; status `--success` / `--warning` / `--error`.
+Glowtris maps Material 3 inspired semantic color roles directly to CSS variables to support unified state transitions and layout consistency:
+
+| Variable | Reference | Purpose |
+| :--- | :--- | :--- |
+| `--primary` | `var(--cyan)` | Active focus indicators, primary brand action text, highlighted leaders |
+| `--primary-container` | `rgba(0, 200, 255, 0.08)` | Primary selection backing, inputs background, hover overlays |
+| `--on-primary` | `#000000` | Text/Icons rendered on top of solid primary elements |
+| `--secondary` | `var(--purple)` | Secondary accents, tags, secondary button states |
+| `--secondary-container` | `rgba(160, 0, 255, 0.08)` | Secondary backing container |
+| `--tertiary` | `var(--pink)` | Tertiary highlights, alerts, red/magenta vignettes |
+| `--tertiary-container` | `rgba(255, 0, 128, 0.08)` | Error backing, warning container |
+| `--background` | `#070514` | Body canvas background (dark cosmos) |
+| `--on-background` | `#ffffff` | Primary readable text on canvas background |
+| `--surface` | `rgba(4,4,30,0.75)` | Core panels, dialog containers, raised sheets |
+| `--surface-2` | `rgba(255,255,255,0.04)` | Sub-containers inside a panel, modal steps backing |
+| `--surface-glass` | `rgba(0,0,20,0.72)` | Glassmorphic overlay containers (HUD, touch overlays) |
+| `--on-surface` | `rgba(255,255,255,0.92)` | Standard readable text on panels |
+| `--on-surface-muted` | `rgba(255,255,255,0.60)` | Faint descriptions, subtitles, inactive leaders |
+| `--on-surface-faint` | `rgba(255,255,255,0.30)` | Disabled buttons, placeholders, shortcut legends |
+| `--outline` | `rgba(0,200,255,0.28)` | Default hairline border strokes |
+| `--outline-strong` | `rgba(0,200,255,0.55)` | Active border focus rings, highlighted frame boundaries |
+| `--success` | `#00ff88` | Success toast states, saved progress |
+| `--warning` | `#ffb347` | Leaderboard personal bests, amber alert borders |
+| `--error` | `#ff0080` | High-spec warnings, game-over alerts, critical error vignettes |
 
 ### Surface & Background Tokens (blog)
 | Variable | Value (Light) | Value (Dark) | Semantic Purpose |
@@ -108,16 +131,17 @@ Glowtris pairs **Orbitron** (a geometric, sci-fi brand typeface) with **Pretenda
 To establish a clear sense of Gestalt *similarity*, border radiuses are grouped systematically:
 
 ```
-[--r-xs] 4px     -->   In-line code chips, very small badges (e.g., KO/EN lang badges)
-[--r-sm] 6px     -->   Small button elements, select options, version badges
-[--r-md] 8px     -->   Input fields, primary buttons, small cards
-[--r-lg] 12px    -->   Post list cards, admin cards, editor pane containers
-[--r-xl] 18px    -->   Featured post cards, modal dialogs, main panels
+[--r-xs] 6px     -->   In-line code chips, very small badges (e.g., KO/EN lang badges)
+[--r-sm] 8px     -->   Small button elements, select options, version badges
+[--r-md] 12px    -->   Input fields, primary buttons, small cards
+[--r-lg] 16px    -->   Post list cards, admin cards, editor pane containers
+[--r-xl] 20px    -->   Featured post cards, modal dialogs, main panels
+[--r-2xl] 24px   -->   Large overlays, sheets, alert boxes
 [--r-full] 9999px -->   Pill CTAs, Category filter buttons, Search bar inputs
 ```
 
 > [!NOTE]
-> Implemented game radii (`--r-*`): `--r-xs 4` chips/inputs · `--r-sm 6` badges · `--r-md 8` small buttons · `--r-lg 12` cards · `--r-xl 16` mode groups · `--r-2xl 20` dialogs · `--r-full` pills/circles. Cards and panels favor the **Large/XL** end (12–20px) for a soft neon-glass look; tiny badges use **Small** (6px).
+> Implemented game radii (`--r-*`): `--r-xs 6` chips/inputs · `--r-sm 8` badges · `--r-md 12` small buttons · `--r-lg 16` cards · `--r-xl 20` mode groups/panels · `--r-2xl 24` dialogs · `--r-full` pills/circles. Cards and panels favor the **Large/XL** end (16–20px) for a soft neon-glass look; tiny badges use **Small** (8px).
 
 ---
 
@@ -197,11 +221,41 @@ To maintain visual integrity across the application:
 
 ---
 
+## 9. Accessibility & Inclusive Design
+
+To ensure Glowtris remains playable and enjoyable for all users, follow these mandatory accessibility guidelines:
+
+### 1. Colorblind Support (7-Symbol Overlay)
+- Never rely solely on color to distinguish active blocks or preview queues.
+- Every block has a unique geometric white symbol overlay (I=══, O=○, T=△, S=/, Z=\, J=║, L=✕) configured for high-contrast accessibility.
+- Symbol overlays must render on the board grid cells, active dropping pieces, and both Next and Hold preview containers.
+
+### 2. Motion Sensitivity & Intensity Cycle
+- Allow users to toggle visual intensity levels (Full / Low / Off).
+- At **Low / Off** intensity, disable high-frequency animations: particle bursts, screen shake, rainbow borders, and background nebula shifting.
+- Ensure all interactive elements remain fully operational without decorative motions.
+
+---
+
+## 10. Performance vs. Aesthetics Guidelines
+
+Glowtris balances premium neon visual effects with tight performance targets (60FPS gameplay on low-end devices).
+
+### 1. Automatic Performance Mode
+- Actively monitor frame rates. If FPS drops below 30 for 2 consecutive seconds, fallback to low-spec layout.
+- Disable GPU-heavy operations: CSS glows (`shadowBlur`), linear gradients per-frame, and background color-shifting parallax nebulae.
+
+### 2. Assets & Rendering Optimizations
+- **Cell Sprite Cache**: Pre-render block styles once into an offscreen canvas and blit via `drawImage` rather than computing gradients dynamically on every frame.
+- **Static Gradients**: Use static linear gradients for background elements when low-spec mode is active to reduce fill-rate cost.
+
+---
+
 ## 11. Implemented Game Tokens (`:root` in `src/style.css`)
 
 The exact token names available in the game today. Reference these; do not paste raw values.
 
-**Color** — brand `--cyan` `--purple` `--pink`; modes `--mode-marathon|flow|sprint|blitz|daily|ultra`; surfaces `--surface` `--surface-2` `--surface-glass`; text `--on-surface` `--on-surface-muted` `--on-surface-faint`; lines `--outline` `--outline-strong`; status `--success` `--warning` `--error`. (`--panel-bg`, `--border` kept as legacy aliases.)
+**Color** — brand `--cyan` `--purple` `--pink`; modes `--mode-marathon|flow|sprint|blitz|daily`; surfaces `--surface` `--surface-2` `--surface-glass`; text `--on-surface` `--on-surface-muted` `--on-surface-faint`; lines `--outline` `--outline-strong`; status `--success` `--warning` `--error`. (`--panel-bg`, `--border` kept as legacy aliases.)
 
 **Typography** — `--font-display` (Orbitron sans), `--font-ui` (Orbitron mono); weights `--fw-regular|bold|black` (400/700/900). Type scale: `--type-display-l|m|s` (44/36/28), `--type-headline` (22), `--type-title-l|m|s` (18/15/13), `--type-body-l|m|s` (12/11/10), `--type-label-l|m|s` (9/8/7). Tracking: `--tracking-normal|wide|wider|widest` (1/2/4/6px).
 

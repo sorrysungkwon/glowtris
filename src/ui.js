@@ -1,4 +1,4 @@
-import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime } from './shared.js';
+import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime, initializeSystemTheme } from './shared.js';
 import { sfxAchievementUnlock, sfxAllClear, sfxLevelUp, toggleMute, applyMuteToGain } from './audio.js';
 
 // ─── Canvas refs ──────────────────────────────────────────────────────────────
@@ -182,6 +182,7 @@ export function _applyTouchCELL() {
 }
 
 export function initLayout() {
+  initializeSystemTheme();
   const W = window.innerWidth, H = window.innerHeight;
   const isCoarse = window.matchMedia('(any-pointer:coarse)').matches;
   S.isMobile = (W < 600) || (isCoarse && !S._kbMode);
@@ -297,8 +298,7 @@ function getBgTheme() {
   if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,7,0,0.18)', hueBase: 28, hueVar: 16, core: 'rgba(255,120,0,0.035)', core2: 'rgba(200,90,0,0.022)', edge: 'rgba(255,120,0,0.85)', trail: [255,150,0], glow: true, speed: 1.7 };
   // Blitz — yellow (#ffd000)
   if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(14,11,0,0.18)', hueBase: 49, hueVar: 14, core: 'rgba(255,210,0,0.04)', core2: 'rgba(200,160,0,0.025)', edge: 'rgba(255,210,0,1)', trail: [255,225,0], glow: true, speed: 2.2 };
-  // Ultra — magenta (#ff0080)
-  if (S.isUltraMode) return { m: 'ultra', type: 'nebula', bg: 'rgba(12,0,7,0.18)', hueBase: 330, hueVar: 16, core: 'rgba(255,0,130,0.04)', core2: 'rgba(190,0,100,0.025)', edge: 'rgba(255,0,130,1)', trail: [255,0,130], glow: true, speed: 1.5 };
+
   // Sprint — cyan (#00c8ff)
   if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,6,12,0.18)', hueBase: 195, hueVar: 20, core: 'rgba(0,200,255,0.04)', core2: 'rgba(0,140,210,0.025)', edge: 'rgba(0,200,255,1)', matrix: [0,200,255], glow: true, speed: 2.0 };
   // Flow — violet (#a000ff): calm, meditative, no glow streaks
@@ -1034,8 +1034,8 @@ export function updateSprintTimer() {
     const fmt = fmtTime(elapsed);
     $score.textContent = fmt; if ($scoreM) $scoreM.textContent = fmt;
     $lines.textContent = Math.max(0, SPRINT_LINES - S.lines); if ($linesM) $linesM.textContent = Math.max(0, SPRINT_LINES - S.lines);
-  } else if (S.isBlitzMode || S.isUltraMode) {
-    const totalTime = S.isBlitzMode ? 120000 : 180000;
+  } else if (S.isBlitzMode) {
+    const totalTime = 120000;
     const elapsed = S._timeAttackStartTime > 0 ? performance.now() - S._timeAttackStartTime : 0;
     const remain = Math.max(0, totalTime - elapsed);
     const fmt = fmtTime(remain);
@@ -1051,9 +1051,9 @@ export function updateSprintTimer() {
 
 export function showScorePopup(pts, n, tspin=false, b2b=false) {
   const popup = $scorePopup;
-  const tspinLabels  = ['T-SPIN!','T-SPIN SINGLE','T-SPIN DOUBLE!!','T-SPIN TRIPLE!!!'];
+  const tspinLabels  = ['G-SPIN!','G-SPIN SINGLE','G-SPIN DOUBLE!!','G-SPIN TRIPLE!!!'];
   const spinLabels   = ['SPIN!','SPIN SINGLE','SPIN DOUBLE!!','SPIN TRIPLE!!!'];
-  const miniLabels   = ['T-SPIN MINI','T-SPIN MINI+','T-SPIN MINI DBL'];
+  const miniLabels   = ['G-SPIN MINI','G-SPIN MINI+','G-SPIN MINI DBL'];
   const labels       = ['','','DOUBLE!','TRIPLE!','GLOWTRIS!!'];
   const b2bTag = b2b ? 'B2B ' : '';
   let txt, color, sz, glow;
