@@ -26,4 +26,16 @@ nohup.out
 
 # caveman-compress human-readable backups (local only)
 *.original.md
+
+# Local-only internal docs
 caveman.md
+AGENTS.md
+BUGS.md
+CLAUDE.md
+DESIGN_SYSTEM.md
+ROBOT.md
+TODO.md
+WALKTHROUGH.md
+docs/reports/
+glowtris-itchio.zip
+images/reddit-cover.png
