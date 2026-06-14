@@ -53,6 +53,7 @@ Every game mode owns exactly **one** signature color, grouped by intent on a coo
 | ⚡ **SPEED** | Sprint | 🔵 `#00c8ff` cyan | `--mode-sprint` | `.sprint` |
 | | Blitz | 🟡 `#ffd000` yellow | `--mode-blitz` | `.blitz` |
 | 🏆 **CHALLENGE** | Daily | 🟠 `#ff7700` orange | `--mode-daily` | `.daily` |
+| | [Reserved] | 🔴 `#ff0080` magenta | `[TBD]` | `[TBD]` |
 
 Rules: one icon + one color per mode, consistent across card / HUD / background / share. The brand cyan→violet→pink gradient is NOT a mode accent. Changing a mode color = edit BOTH `--mode-*` and `MODE_COLORS`.
 
