@@ -58,6 +58,36 @@
 
 ---
 
+## 🎨 Design System — Single Source of Truth (NO hardcoded values)
+
+> **Full spec: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)** — Material-3-structured foundations (color, typography, spacing, shape, elevation, motion, state) + the implemented `:root` token list (§11). Read it before any visual change.
+
+**Rule: never hardcode a design value (color, size, radius, duration, easing) inline. Always reference the central token.** When a new color/style decision is made, add it to the token source first, then reference it everywhere. Token layer lives in `:root` (`src/style.css`) + `MODE_COLORS` (`src/shared.js`) for canvas.
+
+### Mode signature colors
+Each game mode has ONE signature color, grouped by intent. These are the canonical tokens — do not retype the hex anywhere else:
+
+| Group | Mode | Color | Token (CSS) | Token (JS) |
+|-------|------|-------|-------------|------------|
+| ♾️ ENDLESS | Marathon | green `#00ff88` | `--mode-marathon` | `MODE_COLORS.marathon` / `.classic` |
+| | Flow | violet `#a000ff` | `--mode-flow` | `MODE_COLORS.flow` |
+| ⚡ SPEED | Sprint | cyan `#00c8ff` | `--mode-sprint` | `MODE_COLORS.sprint` |
+| | Blitz | yellow `#ffd000` | `--mode-blitz` | `MODE_COLORS.blitz` |
+| 🏆 CHALLENGE | Daily | orange `#ff7700` | `--mode-daily` | `MODE_COLORS.daily` |
+| | Ultra | magenta `#ff0080` | `--mode-ultra` | `MODE_COLORS.ultra` |
+
+### Where the tokens live
+- **CSS**: `:root { --mode-* }` in `src/style.css` — use `var(--mode-x)` in stylesheets.
+- **JS/Canvas**: `MODE_COLORS` in `src/shared.js` — use it for canvas work (backgrounds, share cards) where CSS vars aren't reachable. Need an alpha? Use the `hexToRgba(hex, a)` helper from `shared.js` — do not write `rgba(0,200,255,0.4)` literals.
+- Mode → key mapping comes from `getGameMode()` (`shared.js`); `classic` === Marathon.
+
+### How to apply
+- Background themes (`getBgTheme` in `ui.js`), mode cards (`style.css`), share cards (`leaderboard.js`) all pull from these tokens.
+- Brand identity (the GLOWTRIS gradient wordmark) is a separate brand asset and intentionally stays cyan→violet→pink; mode identity is layered on top via the accent/label.
+- Adding/changing a mode color = edit BOTH `--mode-*` (style.css) and `MODE_COLORS` (shared.js), then reference. Keep them in sync.
+
+---
+
 ## Branch & Deployment Strategy
 
 - `master` — protected, requires PR. Auto-deploys to **https://glowtris.com** (production).

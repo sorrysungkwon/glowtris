@@ -290,12 +290,21 @@ export function initStars() {
   ];
 }
 
+// Per-mode background themes — hues/accents mirror each mode's signature card color.
+// trail = star-streak RGB (glow modes); matrix = matrix-drop RGB (matrix type).
 function getBgTheme() {
-  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,5,0,0.18)', hueBase: 15, hueVar: 15, core: 'rgba(255,100,0,0.015)', core2: 'rgba(200,80,0,0.01)', edge: 'rgba(200,80,0,0.4)', glow: true, speed: 1.7 };
-  if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(15,0,0,0.18)', hueBase: 10, core: 'rgba(255,50,0,0.04)', core2: 'rgba(200,20,0,0.025)', edge: 'rgba(255,50,0,1)', glow: true, speed: 2.2 };
-  if (S.isUltraMode) return { m: 'ultra', type: 'nebula', bg: 'rgba(8,0,12,0.18)', hueBase: 280, core: 'rgba(200,0,255,0.04)', core2: 'rgba(150,0,200,0.025)', edge: 'rgba(150,0,200,1)', glow: true, speed: 1.5 };
-  if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,5,10,0.18)', hueBase: 190, core: 'rgba(0,180,255,0.04)', core2: 'rgba(0,120,200,0.025)', edge: 'rgba(0,160,255,1)', glow: true, speed: 2.0 };
-  return { m: 'marathon', type: 'nebula', bg: 'rgba(0,0,12,0.18)', hueBase: 240, core: 'rgba(80,0,160,0.01)', core2: 'rgba(40,0,80,0.01)', edge: null, glow: false, speed: 0.8 };
+  // Daily — orange (#ff7700)
+  if (S.isDailyMode) return { m: 'daily', type: 'nebula', bg: 'rgba(15,7,0,0.18)', hueBase: 28, hueVar: 16, core: 'rgba(255,120,0,0.035)', core2: 'rgba(200,90,0,0.022)', edge: 'rgba(255,120,0,0.85)', trail: [255,150,0], glow: true, speed: 1.7 };
+  // Blitz — yellow (#ffd000)
+  if (S.isBlitzMode) return { m: 'blitz', type: 'nebula', bg: 'rgba(14,11,0,0.18)', hueBase: 49, hueVar: 14, core: 'rgba(255,210,0,0.04)', core2: 'rgba(200,160,0,0.025)', edge: 'rgba(255,210,0,1)', trail: [255,225,0], glow: true, speed: 2.2 };
+  // Ultra — magenta (#ff0080)
+  if (S.isUltraMode) return { m: 'ultra', type: 'nebula', bg: 'rgba(12,0,7,0.18)', hueBase: 330, hueVar: 16, core: 'rgba(255,0,130,0.04)', core2: 'rgba(190,0,100,0.025)', edge: 'rgba(255,0,130,1)', trail: [255,0,130], glow: true, speed: 1.5 };
+  // Sprint — cyan (#00c8ff)
+  if (S.isSprintMode)return { m: 'sprint', type: 'matrix', bg: 'rgba(0,6,12,0.18)', hueBase: 195, hueVar: 20, core: 'rgba(0,200,255,0.04)', core2: 'rgba(0,140,210,0.025)', edge: 'rgba(0,200,255,1)', matrix: [0,200,255], glow: true, speed: 2.0 };
+  // Flow — violet (#a000ff): calm, meditative, no glow streaks
+  if (S.isFlowMode)  return { m: 'flow', type: 'nebula', bg: 'rgba(7,0,14,0.18)', hueBase: 275, hueVar: 30, core: 'rgba(160,0,255,0.018)', core2: 'rgba(110,0,180,0.012)', edge: null, glow: false, speed: 0.9 };
+  // Marathon — green (#00ff88): calm endurance, no glow streaks
+  return { m: 'marathon', type: 'nebula', bg: 'rgba(0,9,5,0.18)', hueBase: 150, hueVar: 40, core: 'rgba(0,170,95,0.012)', core2: 'rgba(0,110,65,0.01)', edge: null, glow: false, speed: 0.8 };
 }
 
 let _matrixDrops = null;
@@ -329,7 +338,8 @@ export function drawBackground(dtFactor = 1) {
     for (const d of _matrixDrops) {
       d.y += d.speed * dtFactor;
       if (d.y > bgc.height) { d.y = -d.size*3; d.x = Math.random() * bgc.width; }
-      bgx.fillStyle = `rgba(0,150,255,${d.op})`;
+      const mc = th.matrix || [0,150,255];
+      bgx.fillStyle = `rgba(${mc[0]},${mc[1]},${mc[2]},${d.op})`;
       bgx.fillRect(d.x, d.y, d.size, d.size*2);
     }
   } else {
@@ -363,9 +373,10 @@ export function drawBackground(dtFactor = 1) {
       
       if (th.glow) {
         const tLen = s.speed * 22;
+        const tc = th.trail || [255, 80+(s.r*40|0), 0];
         const tg = bgx.createLinearGradient(s.x-s.vx*22, s.y-tLen, s.x, s.y);
         tg.addColorStop(0, 'transparent');
-        tg.addColorStop(1, `rgba(255,${80+s.r*40|0},0,${s.r*0.22})`);
+        tg.addColorStop(1, `rgba(${tc[0]},${tc[1]},${tc[2]},${s.r*0.22})`);
         bgx.strokeStyle = tg; bgx.lineWidth = s.r*0.9;
         bgx.beginPath(); bgx.moveTo(s.x-s.vx*22, s.y-tLen); bgx.lineTo(s.x, s.y); bgx.stroke();
       } else {

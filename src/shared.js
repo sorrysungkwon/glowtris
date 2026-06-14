@@ -30,6 +30,25 @@ export const SUPPORT_URL     = 'https://ko-fi.com/sorrysungkwon';
 export const COLOR_TO_KEY = {};
 for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
 
+// Per-mode signature colors (mirror the --mode-* CSS vars in style.css).
+// Used by canvas code (background themes, share cards) where CSS vars aren't available.
+// 'classic' is the getGameMode() key for Marathon.
+export const MODE_COLORS = {
+  marathon: '#00ff88',
+  classic:  '#00ff88',
+  flow:     '#a000ff',
+  sprint:   '#00c8ff',
+  blitz:    '#ffd000',
+  daily:    '#ff7700',
+  ultra:    '#ff0080',
+};
+
+// #rrggbb → rgba() string for canvas fills/strokes that need an alpha
+export function hexToRgba(hex, a = 1) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
 // ─── localStorage keys ────────────────────────────────────────────────────────
 export const LS = {
   HI:           'glowTrisHi',
