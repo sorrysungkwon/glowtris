@@ -1,4 +1,4 @@
-import { S, LS, SUPPORT_URL, SPRINT_LINES, fmtTime, gtag } from './shared.js';
+import { S, LS, SUPPORT_URL, SPRINT_LINES, fmtTime, gtag, getGameMode, MODE_COLORS, hexToRgba } from './shared.js';
 import { unlockAchievement } from './ui.js';
 import { showStartScreen } from './screens.js';
 import { showToast } from './pwa.js';
@@ -151,39 +151,41 @@ export async function captureSprintImage(timeMs,rank,lpm){
   const c=document.createElement('canvas');
   c.width=1200;c.height=630;
   const ctx=c.getContext('2d');
+  // Sprint accent from the single source of truth (cyan)
+  const accent=MODE_COLORS.sprint;
   ctx.fillStyle='#04041e';ctx.fillRect(0,0,1200,630);
   const bgi=document.getElementById('bg-canvas');
   if(bgi)ctx.drawImage(bgi,0,0,1200,630);
   const gci=document.getElementById('game-canvas');
   if(gci){
     const gw=260,gh=520,gx=90,gy=55;
-    ctx.shadowColor='#00ff88';ctx.shadowBlur=40;
+    ctx.shadowColor=accent;ctx.shadowBlur=40;
     ctx.fillStyle='rgba(0,0,20,0.8)';ctx.fillRect(gx,gy,gw,gh);
     ctx.shadowBlur=0;ctx.drawImage(gci,gx,gy,gw,gh);
-    ctx.strokeStyle='#00ff88';ctx.lineWidth=4;ctx.strokeRect(gx,gy,gw,gh);
+    ctx.strokeStyle=accent;ctx.lineWidth=4;ctx.strokeRect(gx,gy,gw,gh);
     ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=1;ctx.strokeRect(gx+2,gy+2,gw-4,gh-4);
   }
   const px=420,py=55,pw=700,ph=520;
   ctx.fillStyle='rgba(4,4,30,0.75)';ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=30;
   ctx.fillRect(px,py,pw,ph);ctx.shadowBlur=0;
-  ctx.strokeStyle='rgba(0,255,136,0.35)';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
+  ctx.strokeStyle=hexToRgba(accent,0.4);ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
   ctx.textAlign='center';
-  ctx.fillStyle='#00ff88';ctx.font='900 52px Orbitron, monospace';
-  ctx.shadowColor='rgba(0,255,136,0.6)';ctx.shadowBlur=20;
+  ctx.fillStyle=accent;ctx.font='900 52px Orbitron, monospace';
+  ctx.shadowColor=hexToRgba(accent,0.6);ctx.shadowBlur=20;
   ctx.fillText('SPRINT 40L',px+pw/2,py+95);ctx.shadowBlur=0;
   ctx.font='700 28px Orbitron, monospace';ctx.fillStyle='rgba(255,255,255,0.6)';
   ctx.letterSpacing='6px';ctx.fillText('FINISH TIME',px+pw/2,py+210);
   ctx.font='900 70px Orbitron, monospace';ctx.fillStyle='#ffe600';
   ctx.shadowColor='#ffe600';ctx.shadowBlur=25;ctx.letterSpacing='2px';
   ctx.fillText(fmtTime(timeMs),px+pw/2,py+290);ctx.shadowBlur=0;
-  ctx.fillStyle='rgba(0,255,136,0.2)';ctx.fillRect(px+80,py+320,pw-160,2);
+  ctx.fillStyle=hexToRgba(accent,0.22);ctx.fillRect(px+80,py+320,pw-160,2);
   ctx.letterSpacing='2px';ctx.font='700 26px Orbitron, monospace';
   let cy=py+395;
   if(rank){
-    ctx.fillStyle='#00ff88';ctx.shadowColor='rgba(0,255,136,0.5)';ctx.shadowBlur=10;
+    ctx.fillStyle='#ffe600';ctx.shadowColor='rgba(255,230,0,0.5)';ctx.shadowBlur=10;
     ctx.fillText('🏆 ALL TIME RANK: #'+rank,px+pw/2,cy);ctx.shadowBlur=0;cy+=50;
   }
-  ctx.fillStyle='#00c8ff';ctx.fillText(`${lpm} LPM   |   40 LINES`,px+pw/2,cy);cy+=50;
+  ctx.fillStyle=hexToRgba(accent,0.9);ctx.fillText(`${lpm} LPM   |   40 LINES`,px+pw/2,cy);cy+=50;
   ctx.fillStyle='rgba(255,255,255,0.35)';ctx.font='700 20px Orbitron, monospace';
   ctx.fillText('Can you beat it? glowtris.com',px+pw/2,cy+10);
   return new Promise(res=>c.toBlob(res,'image/png'));
@@ -320,6 +322,11 @@ export async function captureGameImage(sc, rank, isDaily=false) {
   c.width = 1200; c.height = 630;
   const ctx = c.getContext('2d');
 
+  // Mode-driven accent — single source of truth (MODE_COLORS), never hardcoded here
+  const mode   = getGameMode();
+  const accent = MODE_COLORS[mode] || MODE_COLORS.classic;
+  const MODE_LABELS = { classic: 'MARATHON', flow: 'FLOW', blitz: 'BLITZ', ultra: 'ULTRA' };
+
   ctx.fillStyle = '#04041e';
   ctx.fillRect(0, 0, 1200, 630);
 
@@ -330,13 +337,13 @@ export async function captureGameImage(sc, rank, isDaily=false) {
   if(gci) {
     const gw = 260, gh = 520;
     const gx = 90, gy = 55;
-    ctx.shadowColor = '#00c8ff';
+    ctx.shadowColor = accent;
     ctx.shadowBlur = 40;
     ctx.fillStyle = 'rgba(0,0,20,0.8)';
     ctx.fillRect(gx, gy, gw, gh);
     ctx.shadowBlur = 0;
     ctx.drawImage(gci, gx, gy, gw, gh);
-    ctx.strokeStyle = '#00c8ff';
+    ctx.strokeStyle = accent;
     ctx.lineWidth = 4;
     ctx.strokeRect(gx, gy, gw, gh);
     ctx.strokeStyle = 'rgba(255,255,255,0.15)';
@@ -351,16 +358,16 @@ export async function captureGameImage(sc, rank, isDaily=false) {
   ctx.fillRect(px, py, pw, ph);
   ctx.shadowBlur = 0;
 
-  ctx.strokeStyle = 'rgba(0,200,255,0.35)';
+  ctx.strokeStyle = hexToRgba(accent, 0.4);
   ctx.lineWidth = 2;
   ctx.strokeRect(px, py, pw, ph);
 
   ctx.textAlign = 'center';
 
   if (isDaily) {
-    ctx.fillStyle = '#ff7700';
+    ctx.fillStyle = accent;
     ctx.font = '900 52px Orbitron, monospace';
-    ctx.shadowColor = 'rgba(255,230,0,0.6)';
+    ctx.shadowColor = hexToRgba(accent, 0.6);
     ctx.shadowBlur = 20;
     ctx.letterSpacing = '2px';
     ctx.fillText('DAILY CHALLENGE', px + pw/2, py + 95);
@@ -371,16 +378,25 @@ export async function captureGameImage(sc, rank, isDaily=false) {
     ctx.fillText(todayLabel, px + pw/2, py + 140);
     ctx.shadowBlur = 0;
   } else {
+    // Brand wordmark stays the GLOWTRIS gradient; mode identity comes from the label + accent below
     const gr = ctx.createLinearGradient(px, py, px+pw, py);
     gr.addColorStop(0, '#00c8ff');
     gr.addColorStop(0.5, '#a000ff');
     gr.addColorStop(1, '#ff0080');
     ctx.fillStyle = gr;
-    ctx.font = '900 76px Orbitron, monospace';
+    ctx.font = '900 70px Orbitron, monospace';
     ctx.shadowColor = 'rgba(160,0,255,0.6)';
     ctx.shadowBlur = 20;
-    ctx.fillText('GLOWTRIS', px + pw/2, py + 110);
+    ctx.fillText('GLOWTRIS', px + pw/2, py + 100);
     ctx.shadowBlur = 0;
+    ctx.font = '800 26px Orbitron, monospace';
+    ctx.fillStyle = accent;
+    ctx.shadowColor = hexToRgba(accent, 0.6);
+    ctx.shadowBlur = 14;
+    ctx.letterSpacing = '6px';
+    ctx.fillText(MODE_LABELS[mode] || 'MARATHON', px + pw/2, py + 142);
+    ctx.shadowBlur = 0;
+    ctx.letterSpacing = '0px';
   }
 
   ctx.font = '700 28px Orbitron, monospace';
@@ -389,37 +405,30 @@ export async function captureGameImage(sc, rank, isDaily=false) {
   ctx.fillText('FINAL SCORE', px + pw/2, py + 210);
 
   ctx.font = '900 70px Orbitron, monospace';
-  ctx.fillStyle = isDaily ? '#ff7700' : '#ffe600';
-  ctx.shadowColor = isDaily ? '#ff7700' : '#ffe600';
+  ctx.fillStyle = accent;
+  ctx.shadowColor = accent;
   ctx.shadowBlur = 25;
   ctx.letterSpacing = '2px';
   ctx.fillText(sc.toLocaleString(), px + pw/2, py + 290);
   ctx.shadowBlur = 0;
 
-  ctx.fillStyle = 'rgba(0,200,255,0.2)';
+  ctx.fillStyle = hexToRgba(accent, 0.22);
   ctx.fillRect(px + 80, py + 340, pw - 160, 2);
 
   ctx.font = '700 26px Orbitron, monospace';
   ctx.letterSpacing = '2px';
 
   let currentY = py + 400;
-  if (isDaily && rank) {
-    ctx.fillStyle = '#00ff88';
-    ctx.shadowColor = 'rgba(0,255,136,0.5)';
+  if (rank) {
+    ctx.fillStyle = '#ffe600';
+    ctx.shadowColor = 'rgba(255,230,0,0.5)';
     ctx.shadowBlur = 10;
-    ctx.fillText('🏆 TODAY CHALLENGE RANK: #' + rank, px + pw/2, currentY);
-    ctx.shadowBlur = 0;
-    currentY += 50;
-  } else if (rank) {
-    ctx.fillStyle = '#00ff88';
-    ctx.shadowColor = 'rgba(0,255,136,0.5)';
-    ctx.shadowBlur = 10;
-    ctx.fillText('🏆 ALL TIME RANK: #' + rank, px + pw/2, currentY);
+    ctx.fillText(`🏆 ${isDaily ? 'TODAY CHALLENGE' : 'ALL TIME'} RANK: #` + rank, px + pw/2, currentY);
     ctx.shadowBlur = 0;
     currentY += 50;
   }
 
-  ctx.fillStyle = '#00c8ff';
+  ctx.fillStyle = hexToRgba(accent, 0.9);
   ctx.fillText(`LEVEL: ${S.level}   |   LINES: ${S.lines}`, px + pw/2, currentY);
   currentY += 50;
 
