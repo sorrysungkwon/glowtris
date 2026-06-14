@@ -22,6 +22,7 @@ GROWTHPLAN.md
 /index.html
 nohup.out
 *.log
+.next/
 
 # caveman-compress human-readable backups (local only)
 *.original.md
