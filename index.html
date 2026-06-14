@@ -104,19 +104,97 @@
   }
 
   :root {
-    --cyan: #00c8ff;
-    --purple: #a000ff;
-    --pink: #ff0080;
+    /* 10-step HSL Color Scales (Lightness 10% to 95%) */
+    --cyan-10:   hsl(192, 100%, 10%);
+    --cyan-20:   hsl(192, 100%, 20%);
+    --cyan-30:   hsl(192, 100%, 30%);
+    --cyan-40:   hsl(192, 100%, 40%);
+    --cyan-50:   hsl(192, 100%, 50%);
+    --cyan-60:   hsl(192, 100%, 60%);
+    --cyan-70:   hsl(192, 100%, 70%);
+    --cyan-80:   hsl(192, 100%, 80%);
+    --cyan-90:   hsl(192, 100%, 90%);
+    --cyan-100:  hsl(192, 100%, 95%);
+
+    --purple-10:  hsl(278, 100%, 10%);
+    --purple-20:  hsl(278, 100%, 20%);
+    --purple-30:  hsl(278, 100%, 30%);
+    --purple-40:  hsl(278, 100%, 40%);
+    --purple-50:  hsl(278, 100%, 50%);
+    --purple-60:  hsl(278, 100%, 60%);
+    --purple-70:  hsl(278, 100%, 70%);
+    --purple-80:  hsl(278, 100%, 80%);
+    --purple-90:  hsl(278, 100%, 90%);
+    --purple-100: hsl(278, 100%, 95%);
+
+    --pink-10:  hsl(330, 100%, 10%);
+    --pink-20:  hsl(330, 100%, 20%);
+    --pink-30:  hsl(330, 100%, 30%);
+    --pink-40:  hsl(330, 100%, 40%);
+    --pink-50:  hsl(330, 100%, 50%);
+    --pink-60:  hsl(330, 100%, 60%);
+    --pink-70:  hsl(330, 100%, 70%);
+    --pink-80:  hsl(330, 100%, 80%);
+    --pink-90:  hsl(330, 100%, 90%);
+    --pink-100: hsl(330, 100%, 95%);
+
+    --green-10:  hsl(152, 100%, 10%);
+    --green-20:  hsl(152, 100%, 20%);
+    --green-30:  hsl(152, 100%, 30%);
+    --green-40:  hsl(152, 100%, 40%);
+    --green-50:  hsl(152, 100%, 50%);
+    --green-60:  hsl(152, 100%, 60%);
+    --green-70:  hsl(152, 100%, 70%);
+    --green-80:  hsl(152, 100%, 80%);
+    --green-90:  hsl(152, 100%, 90%);
+    --green-100: hsl(152, 100%, 95%);
+
+    --orange-10:  hsl(28, 100%, 10%);
+    --orange-20:  hsl(28, 100%, 20%);
+    --orange-30:  hsl(28, 100%, 30%);
+    --orange-40:  hsl(28, 100%, 40%);
+    --orange-50:  hsl(28, 100%, 50%);
+    --orange-60:  hsl(28, 100%, 60%);
+    --orange-70:  hsl(28, 100%, 70%);
+    --orange-80:  hsl(28, 100%, 80%);
+    --orange-90:  hsl(28, 100%, 90%);
+    --orange-100: hsl(28, 100%, 95%);
+
+    --yellow-10:  hsl(54, 100%, 10%);
+    --yellow-20:  hsl(54, 100%, 20%);
+    --yellow-30:  hsl(54, 100%, 30%);
+    --yellow-40:  hsl(54, 100%, 40%);
+    --yellow-50:  hsl(54, 100%, 50%);
+    --yellow-60:  hsl(54, 100%, 60%);
+    --yellow-70:  hsl(54, 100%, 70%);
+    --yellow-80:  hsl(54, 100%, 80%);
+    --yellow-90:  hsl(54, 100%, 90%);
+    --yellow-100: hsl(54, 100%, 95%);
+
+    --blue-10:  hsl(220, 100%, 10%);
+    --blue-20:  hsl(220, 100%, 20%);
+    --blue-30:  hsl(220, 100%, 30%);
+    --blue-40:  hsl(220, 100%, 40%);
+    --blue-50:  hsl(220, 100%, 50%);
+    --blue-60:  hsl(220, 100%, 60%);
+    --blue-70:  hsl(220, 100%, 70%);
+    --blue-80:  hsl(220, 100%, 80%);
+    --blue-90:  hsl(220, 100%, 90%);
+    --blue-100: hsl(220, 100%, 95%);
+
+    --cyan: var(--cyan-50);
+    --purple: var(--purple-50);
+    --pink: var(--pink-50);
     --panel-bg: rgba(0,0,20,0.72);
     --border: rgba(0,200,255,0.28);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
     /* Per-mode signature colors (grouped: ENDLESS / SPEED / CHALLENGE) */
-    --mode-marathon: #00ff88; /* ENDLESS — green, endurance */
-    --mode-flow:     #a000ff; /* ENDLESS — violet, meditative flow */
-    --mode-sprint:   #00c8ff; /* SPEED — cyan, fast focus */
-    --mode-blitz:    #ffd000; /* SPEED — yellow, electric burst */
-    --mode-daily:    #ff7700; /* CHALLENGE — orange, daily streak */
+    --mode-marathon: var(--green-50); /* ENDLESS — green, endurance */
+    --mode-flow:     var(--purple-50); /* ENDLESS — violet, meditative flow */
+    --mode-sprint:   var(--cyan-50); /* SPEED — cyan, fast focus */
+    --mode-blitz:    var(--yellow-50); /* SPEED — yellow, electric burst */
+    --mode-daily:    var(--orange-50); /* CHALLENGE — orange, daily streak */
 
     /* ───────────────────────────────────────────────────────────────────────
        DESIGN SYSTEM TOKENS — single source of truth. See DESIGN_SYSTEM.md.
@@ -146,38 +224,38 @@
     --on-surface-faint: rgba(255,255,255,0.30); /* disabled / hints */
     --outline:        rgba(0,200,255,0.28);  /* default hairline (= --border) */
     --outline-strong: rgba(0,200,255,0.55);
-    --success: #00ff88;
-    --warning: #ffb347;
-    --error:   #ff0080;
+    --success: var(--green-50);
+    --warning: var(--orange-50);
+    --error:   var(--pink-50);
     --maintenance-bg:    linear-gradient(90deg, rgba(20,8,0,0.92) 0%, rgba(40,18,0,0.95) 50%, rgba(20,8,0,0.92) 100%);
-    --maintenance-color: #ffb347;
+    --maintenance-color: var(--warning);
     
     /* Tetromino Piece Colors */
-    --piece-i:             var(--primary);
-    --piece-o:             var(--mode-blitz);
-    --piece-t:             var(--secondary);
-    --piece-s:             var(--mode-marathon);
-    --piece-z:             var(--tertiary);
-    --piece-j:             #2979ff;
-    --piece-l:             var(--warning);
+    --piece-i:             var(--cyan-50);
+    --piece-o:             var(--yellow-50);
+    --piece-t:             var(--purple-50);
+    --piece-s:             var(--green-50);
+    --piece-z:             var(--pink-50);
+    --piece-j:             var(--blue-50);
+    --piece-l:             var(--orange-50);
     
     /* Badge & Personal Best Theme Colors */
-    --badge-gold:          #ffe600;
+    --badge-gold:          var(--yellow-50);
     --badge-gold-bg:       rgba(255, 230, 0, 0.08);
     --badge-gold-border:   rgba(255, 230, 0, 0.5);
-    --badge-gold-shadow:   #ffaa00;
-    --badge-orange:        #ff6400;
+    --badge-gold-shadow:   var(--orange-50);
+    --badge-orange:        var(--orange-50);
     --badge-orange-bg:     rgba(255, 100, 0, 0.1);
     --badge-orange-border: rgba(255, 100, 0, 0.5);
-    --badge-violet:        #c45bfb;
+    --badge-violet:        var(--purple-70);
     --badge-violet-bg:     rgba(160, 0, 255, 0.08);
     --badge-violet-border: rgba(160, 0, 255, 0.5);
-    --badge-green:         #00ff88;
+    --badge-green:         var(--green-50);
     --badge-green-bg:      rgba(0, 255, 136, 0.08);
     --badge-green-border:  rgba(0, 255, 136, 0.5);
-    --pwa-btn-bg:          linear-gradient(135deg, #00e5ff 0%, #0088ff 100%);
-    --pwa-accent:          #00e5ff;
-    --mode-daily-dark:     #ff3300;
+    --pwa-btn-bg:          linear-gradient(135deg, var(--cyan-50) 0%, var(--blue-50) 100%);
+    --pwa-accent:          var(--cyan-50);
+    --mode-daily-dark:     var(--orange-30);
 
     /* Typography — Orbitron is the single typeface (display + UI) */
     --font-display: 'Orbitron', sans-serif;
