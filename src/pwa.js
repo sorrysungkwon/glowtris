@@ -2,7 +2,9 @@ import { gtag } from './shared.js';
 const LS_INSTALLED    = 'pwa-installed';
 const LS_SNOOZE_UNTIL = 'pwa-snooze-until';
 const SNOOZE_DAYS     = 3;
-const VAPID_PUBLIC_KEY = '<VAPID_PUBLIC_KEY>';
+// VAPID public key — safe to ship in the client (sent to every browser anyway).
+// Pairs with VAPID_PRIVATE_KEY used server-side by scripts/notify.js.
+const VAPID_PUBLIC_KEY = 'BBu-74h8e7Eot6eulpSdgN6et__o8TR8XF6S-GSIa1SAP2GMnxZLjstr5unMOsCQncevBL6cKUYYa_qK7LrGZD0';
 
 function _urlBase64ToUint8Array(b64) {
   const pad = '='.repeat((4 - b64.length % 4) % 4);
