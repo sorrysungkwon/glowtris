@@ -73,21 +73,34 @@ if ('serviceWorker' in navigator) {
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "VideoGame",
-  "name": "Glowtris",
-  "description": "Free neon-styled block-stacking game playable in any browser. Features daily challenges, global leaderboard, sprint mode, and PWA support.",
-  "url": "https://glowtris.com",
-  "image": "https://glowtris.com/api/og",
-  "genre": ["Puzzle", "Arcade"],
-  "gamePlatform": "Web Browser",
-  "applicationCategory": "Game",
-  "operatingSystem": "Any",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "author": { "@type": "Person", "name": "sorrysungkwon" },
-  "inLanguage": ["en", "ko"]
-}
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Glowtris",
+    "url": "https://glowtris.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://glowtris.com/?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "Glowtris",
+    "description": "Free neon-styled block-stacking game playable in any browser. Features daily challenges, global leaderboard, sprint mode, and PWA support.",
+    "url": "https://glowtris.com",
+    "image": "https://glowtris.com/api/og",
+    "genre": ["Puzzle", "Arcade"],
+    "gamePlatform": "Web Browser",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "sorrysungkwon" },
+    "inLanguage": ["en", "ko"]
+  }
+]
 </script>
 </head>
 <body>
