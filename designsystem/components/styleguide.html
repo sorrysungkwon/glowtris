@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=device-width, initial-scale=1.0">
+  <title>Glowtris Component Library & Styleguide</title>
+  
+  <!-- Font and Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
+  <!-- Link to the main style.css containing Design System Tokens -->
+  <link rel="stylesheet" href="../../src/style.css">
+
+  <style>
+    body {
+      background: #070514; /* Match --background */
+      color: #ffffff;
+      font-family: 'Orbitron', monospace;
+      padding: 40px 24px;
+      overflow-y: auto;
+      height: auto;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .header {
+      border-bottom: 2px solid var(--outline);
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+    .header h1 {
+      font-size: var(--type-display-m);
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .header p {
+      font-size: var(--type-title-s);
+      color: var(--on-surface-muted);
+      letter-spacing: 1px;
+    }
+    .section {
+      margin-bottom: 48px;
+    }
+    .section-title {
+      font-size: var(--type-title-l);
+      color: var(--primary);
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary);
+      padding-left: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+    .demo-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: var(--r-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .demo-label {
+      font-size: var(--type-label-s);
+      color: var(--on-surface-faint);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>GLOWTRIS COMPONENT LIBRARY</h1>
+      <p>Material Design 3 (M3) Cyber-Neon UI Styleguide</p>
+    </div>
+
+    <!-- 1. Panels -->
+    <div class="section">
+      <div class="section-title">1. Cards & Panels</div>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <div class="demo-label">Outlined Card (.panel)</div>
+          <div class="panel" style="width: 100%; box-sizing: border-box;">
+            <div class="panel-title">SCORE WIDGET</div>
+            <div class="score-val" style="margin-top: var(--space-2);">048,200</div>
+            <div class="score-sub">PB 120,000</div>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <div class="demo-label">Elevated Card (.glass-panel)</div>
+          <div class="glass-panel" style="width: 100%; box-sizing: border-box; position: static; transform: none; animation: none;">
+            <div style="font-size: var(--type-title-s); color: var(--cyan); margin-bottom: var(--space-3); text-align: center;">MODAL PREVIEW</div>
+            <p style="font-size: var(--type-body-s); color: var(--on-surface-muted); line-height: 1.5; margin-bottom: var(--space-4); text-align: center;">Elevated card backing with glassy blur and deep glow shadow.</p>
+            <button class="action-btn sm" style="width: 100%;">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Buttons -->
+    <div class="section">
+      <div class="section-title">2. Buttons</div>
+      <div class="demo-grid">
+        <div class="demo-item" style="gap: 12px;">
+          <div class="demo-label">Common Buttons (.action-btn)</div>
+          <button class="action-btn">Primary Action</button>
+          <button class="action-btn sm">Small Action</button>
+          <button class="action-btn ghost">Outlined / Ghost</button>
+        </div>
+
+        <div class="demo-item">
+          <div class="demo-label">Icon Buttons (.tbtn & .hud-btn)</div>
+          <div style="display: flex; gap: var(--space-3); align-items: center;">
+            <button class="tbtn" style="width: 52px; height: 52px; font-size: 24px;">
+              <span class="material-icons-round">pause</span>
+            </button>
+            <button class="tbtn tbtn-drop" style="width: 52px; height: 52px; font-size: 24px;">
+              <span class="material-icons-round">arrow_downward</span>
+            </button>
+            <button class="hud-btn" style="width: 36px; height: 36px;">
+              <span class="material-icons-round">volume_up</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Badges & Inputs -->
+    <div class="section">
+      <div class="section-title">3. Badges & Form Fields</div>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <div class="demo-label">Status Badges / Chips</div>
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
+            <span class="streak-badge">3 STREAK</span>
+            <span class="combo-badge">COMBO x5</span>
+            <span class="coming-soon-badge">SOON</span>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <div class="demo-label">Text Input (.neon-input)</div>
+          <input type="text" class="neon-input" placeholder="ENTER NAME" value="CYBER_PLAYER" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Segmented Buttons -->
+    <div class="section">
+      <div class="section-title">4. Segmented Buttons (Tabs)</div>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <div class="demo-label">Mode Toggle (.lb-mode-toggle)</div>
+          <div class="lb-mode-toggle">
+            <button class="lb-tab active">MARATHON</button>
+            <button class="lb-tab">SPRINT</button>
+            <button class="lb-tab">BLITZ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Toasts -->
+    <div class="section">
+      <div class="section-title">5. Snackbars & Alerts</div>
+      <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+        <button class="action-btn sm" id="trigger-toast" style="max-width: 200px;">Trigger Toast Demo</button>
+        
+        <div class="achievement-toast" id="preview-toast" style="position: static; transform: none; opacity: 1; transition: none; pointer-events: auto;">
+          <span class="ach-icon">🏆</span>
+          <div class="ach-text">
+            <strong>Centurion</strong>
+            <p>Clear 100 cumulative lines</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const triggerBtn = document.getElementById('trigger-toast');
+    const toast = document.getElementById('preview-toast');
+    
+    triggerBtn.addEventListener('click', () => {
+      toast.style.position = 'fixed';
+      toast.style.bottom = '40px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      toast.style.opacity = '1';
+      toast.style.pointerEvents = 'none';
+      
+      setTimeout(() => {
+        toast.style.transform = 'translateX(-50%) translateY(120px)';
+        toast.style.opacity = '0';
+        setTimeout(() => {
+          toast.style.position = 'static';
+          toast.style.transform = 'none';
+          toast.style.opacity = '1';
+          toast.style.pointerEvents = 'auto';
+        }, 500);
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
