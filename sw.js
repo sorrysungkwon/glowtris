@@ -1,4 +1,8 @@
-const CACHE      = 'glowtris-c5d126';
+<<<<<<< HEAD
+const CACHE      = 'glowtris-369db2';
+=======
+const CACHE      = 'glowtris-6a2139';
+>>>>>>> 1b35828 (fix: open blog link in new tab; update itch.io zip)
 const FONT_CACHE = 'glowtris-fonts-v1';
 const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 const FONT_URLS  = [

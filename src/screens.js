@@ -400,7 +400,7 @@ export function showStartScreen(){
           <a href="/changelog.html" class="footer-link">CHANGELOG</a>
         </div>
         <div style="margin-top: 6px;">
-          <a href="https://blog.glowtris.com" class="footer-link" style="color:var(--cyan); font-weight:700;">BLOG</a>
+          <a href="https://blog.glowtris.com" class="footer-link" style="color:var(--cyan); font-weight:700;" target="_blank" rel="noopener">BLOG</a>
         </div>
       </div>
     </div>`;
