@@ -5,6 +5,12 @@
 
 ---
 
+## 🪨 CAVEMAN MODE — ALWAYS ON
+
+- **Caveman mode runs persistently.** The `caveman` Claude Code plugin (`JuliusBrussee/caveman`) is installed at user scope and auto-activates every session — token-compressed "caveman-speak" responses are the default working style for this project. No need to type `/caveman` each session.
+- Applies to chat/output style only. **NEVER** caveman-compress or alter: code, commands, file paths, URLs, version numbers, frontmatter, or `CREDENTIALS.md` (and any secret/`*.original.md` files). Technical substance stays verbatim.
+- Human-facing artifacts (`README.md`, deployed copy, commit messages, PR bodies) stay in normal English.
+
 ## 🚨 SAFETY HARNESS: STRICT CONSTRAINT RULES (Must follow!)
 
 - **NO Autonomous Merging/Tagging/Destructive Acts**: NEVER perform any git merges to `master`, `git tag` creations/pushes, `git reset --hard`, or `git push --force` autonomously. You MUST present your design/findings to the user first and obtain EXPLICIT verbal approval (e.g., "merge it" or "tag it") in the chat before running these commands.
