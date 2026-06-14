@@ -39,7 +39,7 @@
 - [ ] Give rival.
 - [ ] Fight every week.
 
-## NEXT V1.2 (ULTRA)
+## NEXT V1.2 (BLITZ)
 - [ ] Play 2 minute. Fast end.
 - [ ] Score big near end.
 - [ ] Count play days.

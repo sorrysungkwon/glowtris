@@ -53,7 +53,6 @@ Every game mode owns exactly **one** signature color, grouped by intent on a coo
 | ⚡ **SPEED** | Sprint | 🔵 `#00c8ff` cyan | `--mode-sprint` | `.sprint` |
 | | Blitz | 🟡 `#ffd000` yellow | `--mode-blitz` | `.blitz` |
 | 🏆 **CHALLENGE** | Daily | 🟠 `#ff7700` orange | `--mode-daily` | `.daily` |
-| | Ultra | 🔴 `#ff0080` magenta | `--mode-ultra` | `.ultra` |
 
 Rules: one icon + one color per mode, consistent across card / HUD / background / share. The brand cyan→violet→pink gradient is NOT a mode accent. Changing a mode color = edit BOTH `--mode-*` and `MODE_COLORS`.
 
@@ -201,7 +200,7 @@ To maintain visual integrity across the application:
 
 The exact token names available in the game today. Reference these; do not paste raw values.
 
-**Color** — brand `--cyan` `--purple` `--pink`; modes `--mode-marathon|flow|sprint|blitz|daily|ultra`; surfaces `--surface` `--surface-2` `--surface-glass`; text `--on-surface` `--on-surface-muted` `--on-surface-faint`; lines `--outline` `--outline-strong`; status `--success` `--warning` `--error`. (`--panel-bg`, `--border` kept as legacy aliases.)
+**Color** — brand `--cyan` `--purple` `--pink`; modes `--mode-marathon|flow|sprint|blitz|daily`; surfaces `--surface` `--surface-2` `--surface-glass`; text `--on-surface` `--on-surface-muted` `--on-surface-faint`; lines `--outline` `--outline-strong`; status `--success` `--warning` `--error`. (`--panel-bg`, `--border` kept as legacy aliases.)
 
 **Typography** — `--font-display` (Orbitron sans), `--font-ui` (Orbitron mono); weights `--fw-regular|bold|black` (400/700/900). Type scale: `--type-display-l|m|s` (44/36/28), `--type-headline` (22), `--type-title-l|m|s` (18/15/13), `--type-body-l|m|s` (12/11/10), `--type-label-l|m|s` (9/8/7). Tracking: `--tracking-normal|wide|wider|widest` (1/2/4/6px).
 

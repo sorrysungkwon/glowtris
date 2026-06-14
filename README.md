@@ -45,7 +45,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | 🎮 Movement Standard | v0.3 ✅ | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
 | 🏆 Scoring Standard | v0.4 ✅ | B2B 1.5×, 3-piece queue, all-spin (SRS+), BUG-012/013 |
 | 🖼 Renderer & Audio | v0.5 | PixiJS WebGL2 renderer (staged), low-latency audio |
-| ⏱ Modes & Metrics | v0.6 | Ultra/Blitz mode, in-game APM/PPS |
+| ⏱ Modes & Metrics | v0.6 | Blitz mode, in-game APM/PPS |
 | 👥 Social Ranking + Account | v0.7 | Anonymous UUID → Google OAuth backup, percentile, rival system, async challenges, weekly tournament |
 
 ### Phase B — Go-to-Market & Growth (Gated by Phase A)
@@ -55,7 +55,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | Phase | DAU Goal | Key Actions & Go-to-Market Strategy |
 |---|---|---|
 | **Phase 1: Initial Viral Hook** | 0 → 500 | Launch on `r/webgames` and `r/Tetris`. Cross-post development story on `r/gamedev`. Focus on "100% Ad-Free, Neon Web App" positioning. Establish SEO foundations (JSON-LD, Search Console). |
-| **Phase 2: Retention Loop** | 500 → 1,500 | Release Ultra Mode & Streak Counter. Launch on Hacker News & Product Hunt. Scale backlinks via Web Game Directories (CrazyGames, Kongregate). Upgrade Vercel infrastructure. |
+| **Phase 2: Retention Loop** | 500 → 1,500 | Release Blitz Mode & Streak Counter. Launch on Hacker News & Product Hunt. Scale backlinks via Web Game Directories (CrazyGames, Kongregate). Upgrade Vercel infrastructure. |
 | **Phase 3: Core Community** | 1,500 → 4,500 | Introduce Skins/Palettes & Weekly Event Challenges. Outreach to niche puzzle streamers. Target page-1 SEO for `neon tetris` and `daily tetris challenge`. |
 | **Phase 4: Platform Pivot** | 4,500 → 15k+ | Weekly Tournaments, CRM Automation (email/push nudges), and a Viral Engine (Ghost Replays, Referral loops). Pivot to a community API and embeddable widgets. |
 
@@ -116,7 +116,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.3 | **Movement Standard** — 180° rotation, custom keybinds, SDF/∞, lock-cap (15 moves), IRS/IHS/DCD, instant ARR=0 | ✅ Done |
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
 | v0.5 | **Renderer & Audio** — PixiJS WebGL2 renderer (staged), render interpolation, 1000+ particles, low-latency audio | 🔄 In Progress |
-| v0.6 | **Modes & Metrics** — Ultra/Blitz 2-minute mode, in-game APM/PPS display | 🔲 Planned |
+| v0.6 | **Modes & Metrics** — Blitz 2-minute mode, in-game APM/PPS display | 🔲 Planned |
 
 ### 🔮 Planned — Phase B (Public Launch & Growth, post-1.0)
 
