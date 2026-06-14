@@ -26,3 +26,4 @@ nohup.out
 
 # caveman-compress human-readable backups (local only)
 *.original.md
+caveman.md
