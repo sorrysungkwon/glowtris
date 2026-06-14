@@ -55,13 +55,13 @@ async function run() {
 
   const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
-  let sent = 0;
+  let sent = 0, skippedHour = 0;
   const toDelete = [];
 
   for (const sub of subs) {
     const tz = sub.tzOffset || 0;
 
-    if (!isTest && !NOTIFY_HOURS.has(localHour(utcMinutes, tz))) continue;
+    if (!isTest && !NOTIFY_HOURS.has(localHour(utcMinutes, tz))) { skippedHour++; continue; }
 
     if (!isTest) {
       const localDate = localDateStr(now, tz);
@@ -94,7 +94,7 @@ async function run() {
     await redis('', ['hdel', SUBS_KEY, ...toDelete]);
   }
 
-  console.log(`Sent: ${sent}, Total subs: ${subs.length}, Deleted: ${toDelete.length}`);
+  console.log(`Sent: ${sent}, SkippedHour: ${skippedHour}, Total subs: ${subs.length}, Deleted: ${toDelete.length}`);
 }
 
 run().catch(err => {
