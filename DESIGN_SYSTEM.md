@@ -198,6 +198,36 @@ To maintain visual integrity across the application:
 
 ---
 
+## 9. Accessibility & Inclusive Design
+
+To ensure Glowtris remains playable and enjoyable for all users, follow these mandatory accessibility guidelines:
+
+### 1. Colorblind Support (7-Symbol Overlay)
+- Never rely solely on color to distinguish active blocks or preview queues.
+- Every block has a unique geometric white symbol overlay (I=══, O=○, T=△, S=/, Z=\, J=║, L=✕) configured for high-contrast accessibility.
+- Symbol overlays must render on the board grid cells, active dropping pieces, and both Next and Hold preview containers.
+
+### 2. Motion Sensitivity & Intensity Cycle
+- Allow users to toggle visual intensity levels (Full / Low / Off).
+- At **Low / Off** intensity, disable high-frequency animations: particle bursts, screen shake, rainbow borders, and background nebula shifting.
+- Ensure all interactive elements remain fully operational without decorative motions.
+
+---
+
+## 10. Performance vs. Aesthetics Guidelines
+
+Glowtris balances premium neon visual effects with tight performance targets (60FPS gameplay on low-end devices).
+
+### 1. Automatic Performance Mode
+- Actively monitor frame rates. If FPS drops below 30 for 2 consecutive seconds, fallback to low-spec layout.
+- Disable GPU-heavy operations: CSS glows (`shadowBlur`), linear gradients per-frame, and background color-shifting parallax nebulae.
+
+### 2. Assets & Rendering Optimizations
+- **Cell Sprite Cache**: Pre-render block styles once into an offscreen canvas and blit via `drawImage` rather than computing gradients dynamically on every frame.
+- **Static Gradients**: Use static linear gradients for background elements when low-spec mode is active to reduce fill-rate cost.
+
+---
+
 ## 11. Implemented Game Tokens (`:root` in `src/style.css`)
 
 The exact token names available in the game today. Reference these; do not paste raw values.
