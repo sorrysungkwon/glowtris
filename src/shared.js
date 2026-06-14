@@ -56,13 +56,13 @@ export function getCssVarColor(varName, fallback) {
 
 // Dynamic initialization from CSS design tokens
 export function initializeSystemTheme() {
-  PIECES.I.color = getCssVarColor('--primary', '#00d8ff');
-  PIECES.O.color = getCssVarColor('--mode-blitz', '#ffe000');
-  PIECES.T.color = getCssVarColor('--secondary', '#cc00ff');
-  PIECES.S.color = getCssVarColor('--mode-marathon', '#00ffaa');
-  PIECES.Z.color = getCssVarColor('--tertiary', '#ff2040');
-  PIECES.J.color = getCssVarColor('--cyan', '#2979ff');
-  PIECES.L.color = getCssVarColor('--warning', '#ff8c00');
+  PIECES.I.color = getCssVarColor('--piece-i', '#00d8ff');
+  PIECES.O.color = getCssVarColor('--piece-o', '#ffe000');
+  PIECES.T.color = getCssVarColor('--piece-t', '#cc00ff');
+  PIECES.S.color = getCssVarColor('--piece-s', '#00ffaa');
+  PIECES.Z.color = getCssVarColor('--piece-z', '#ff2040');
+  PIECES.J.color = getCssVarColor('--piece-j', '#2979ff');
+  PIECES.L.color = getCssVarColor('--piece-l', '#ff8c00');
 
   // Re-sync COLOR_TO_KEY mapping
   for (const k in COLOR_TO_KEY) delete COLOR_TO_KEY[k];

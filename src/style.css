@@ -102,6 +102,15 @@
     --maintenance-bg:    linear-gradient(90deg, rgba(20,8,0,0.92) 0%, rgba(40,18,0,0.95) 50%, rgba(20,8,0,0.92) 100%);
     --maintenance-color: #ffb347;
     
+    /* Tetromino Piece Colors */
+    --piece-i:             var(--primary);
+    --piece-o:             var(--mode-blitz);
+    --piece-t:             var(--secondary);
+    --piece-s:             var(--mode-marathon);
+    --piece-z:             var(--tertiary);
+    --piece-j:             #2979ff;
+    --piece-l:             var(--warning);
+    
     /* Badge & Personal Best Theme Colors */
     --badge-gold:          #ffe600;
     --badge-gold-bg:       rgba(255, 230, 0, 0.08);

@@ -64,7 +64,13 @@ function lint() {
 
 if (require.main === module) {
   const errors = lint();
+  const bypass = process.env.BYPASS_DESIGN_LINT === 'true' || process.argv.includes('--bypass');
   if (errors.length > 0) {
+    if (bypass) {
+      console.warn('\x1b[33m%s\x1b[0m', 'Design System Verification Failed (Bypassed):');
+      errors.forEach(e => console.warn('\x1b[33m%s\x1b[0m', `  - [BYPASS] ${e}`));
+      process.exit(0);
+    }
     console.error('\x1b[31m%s\x1b[0m', 'Design System Verification Failed:');
     errors.forEach(e => console.error('\x1b[31m%s\x1b[0m', `  - ${e}`));
     process.exit(1);

@@ -152,6 +152,15 @@
     --maintenance-bg:    linear-gradient(90deg, rgba(20,8,0,0.92) 0%, rgba(40,18,0,0.95) 50%, rgba(20,8,0,0.92) 100%);
     --maintenance-color: #ffb347;
     
+    /* Tetromino Piece Colors */
+    --piece-i:             var(--primary);
+    --piece-o:             var(--mode-blitz);
+    --piece-t:             var(--secondary);
+    --piece-s:             var(--mode-marathon);
+    --piece-z:             var(--tertiary);
+    --piece-j:             #2979ff;
+    --piece-l:             var(--warning);
+    
     /* Badge & Personal Best Theme Colors */
     --badge-gold:          #ffe600;
     --badge-gold-bg:       rgba(255, 230, 0, 0.08);
@@ -2282,13 +2291,13 @@ if ('serviceWorker' in navigator) {
     return val || fallback;
   }
   function initializeSystemTheme() {
-    PIECES.I.color = getCssVarColor("--primary", "#00d8ff");
-    PIECES.O.color = getCssVarColor("--mode-blitz", "#ffe000");
-    PIECES.T.color = getCssVarColor("--secondary", "#cc00ff");
-    PIECES.S.color = getCssVarColor("--mode-marathon", "#00ffaa");
-    PIECES.Z.color = getCssVarColor("--tertiary", "#ff2040");
-    PIECES.J.color = getCssVarColor("--cyan", "#2979ff");
-    PIECES.L.color = getCssVarColor("--warning", "#ff8c00");
+    PIECES.I.color = getCssVarColor("--piece-i", "#00d8ff");
+    PIECES.O.color = getCssVarColor("--piece-o", "#ffe000");
+    PIECES.T.color = getCssVarColor("--piece-t", "#cc00ff");
+    PIECES.S.color = getCssVarColor("--piece-s", "#00ffaa");
+    PIECES.Z.color = getCssVarColor("--piece-z", "#ff2040");
+    PIECES.J.color = getCssVarColor("--piece-j", "#2979ff");
+    PIECES.L.color = getCssVarColor("--piece-l", "#ff8c00");
     for (const k in COLOR_TO_KEY) delete COLOR_TO_KEY[k];
     for (const [k, v] of Object.entries(PIECES)) COLOR_TO_KEY[v.color] = k;
     MODE_COLORS.marathon = getCssVarColor("--mode-marathon", "#00ff88");
