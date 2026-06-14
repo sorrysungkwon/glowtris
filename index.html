@@ -123,7 +123,21 @@
        Reference these vars; do NOT hardcode raw values in component CSS.
        ─────────────────────────────────────────────────────────────────────── */
 
+    /* Core M3 Brand Roles */
+    --primary:             var(--cyan);
+    --primary-container:   rgba(0, 200, 255, 0.08);
+    --on-primary:          #000000;
+    --on-primary-container: var(--cyan);
+    --secondary:           var(--purple);
+    --secondary-container: rgba(160, 0, 255, 0.08);
+    --on-secondary:        #ffffff;
+    --tertiary:            var(--pink);
+    --tertiary-container:  rgba(255, 0, 128, 0.08);
+    --on-tertiary:         #ffffff;
+
     /* Semantic color roles (built on brand + neutrals) */
+    --background:     #070514;
+    --on-background:  #ffffff;
     --surface:        rgba(4,4,30,0.75);     /* panels / dialogs */
     --surface-2:      rgba(255,255,255,0.04);/* raised card on a panel */
     --surface-glass:  rgba(0,0,20,0.72);     /* glassy HUD panel (= --panel-bg) */
@@ -178,13 +192,13 @@
 
   html, body {
     width:100%; height:100%;
-    background:#070514;
+    background: var(--background);
     overflow:hidden;
     overscroll-behavior:none;
     user-select:none; -webkit-user-select:none;
     touch-action:none;
     font-family:'Orbitron', monospace;
-    color:#fff;
+    color: var(--on-background);
   }
 
   /* Focus indicator for keyboard navigation (M3 Double outline style) */
@@ -252,8 +266,8 @@
 
   /* Side panels */
   .panel {
-    background: rgba(4, 4, 30, 0.65);
-    border: 1px solid rgba(0, 200, 255, 0.22);
+    background: var(--surface);
+    border: 1px solid var(--outline);
     border-radius: var(--r-xl);
     padding: 16px 14px;
     backdrop-filter: blur(20px);
@@ -539,8 +553,8 @@
   /* Base button */
   .tbtn {
     display:flex; align-items:center; justify-content:center;
-    background:rgba(2,2,22,0.85);
-    border:1px solid rgba(0,200,255,0.24);
+    background: var(--surface-glass);
+    border:1px solid var(--outline);
     border-radius:var(--r-lg);
     color:var(--cyan);
     cursor:pointer;
@@ -587,8 +601,8 @@
   }
   
   .tbtn.pressed {
-    background:rgba(0,200,255,0.16);
-    border-color: var(--cyan);
+    background: var(--primary-container);
+    border-color: var(--primary);
     box-shadow:0 0 30px rgba(0,200,255,0.6), inset 0 0 15px rgba(0,200,255,0.5);
     transform:scale(0.96);
   }
@@ -615,8 +629,8 @@
   .hud-btn {
     display: flex; align-items: center; justify-content: center;
     width: 28px; height: 28px; border-radius: var(--r-xs);
-    background: rgba(4, 4, 30, 0.75);
-    border: 1px solid rgba(0, 200, 255, 0.25);
+    background: var(--surface);
+    border: 1px solid var(--outline);
     color: var(--cyan);
     cursor: pointer;
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
@@ -649,7 +663,7 @@
   .achievement-toast {
     position:fixed; bottom:120px; left:50%;
     transform:translateX(-50%) translateY(120px);
-    background:rgba(4,4,30,0.85); border:1px solid #ffe600;
+    background: var(--surface); border: 1px solid var(--warning);
     box-shadow:0 0 20px rgba(255,230,0,0.4); border-radius:12px;
     padding:12px 20px; display:flex; align-items:center; gap:12px;
     z-index:10001; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
@@ -675,7 +689,7 @@
   }
   #htp-box, #stats-box {
     position:relative; width:min(300px, 88vw);
-    background:rgba(4,4,30,0.92); border:1px solid rgba(0,200,255,0.28);
+    background: var(--surface); border: 1px solid var(--outline);
     border-radius:var(--r-2xl); padding:20px 20px 16px;
     max-height:80vh; display:flex; flex-direction:column;
     box-shadow:0 0 40px rgba(0,200,255,0.12);
@@ -734,8 +748,8 @@
   /* Pill-style leaderboard mode toggler */
   .lb-mode-toggle {
     display: flex; gap: 4px; padding: 3px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(0, 200, 255, 0.12);
+    background: var(--surface-2);
+    border: 1px solid var(--outline);
     border-radius: var(--r-sm); margin-bottom: 8px; width: 100%;
   }
   .lb-mode-toggle .lb-tab {
@@ -754,15 +768,15 @@
   .lb-inner { width:100%; min-height:180px; max-height:180px; overflow-y:auto; margin:8px 0 14px; }
   @media (max-width:600px) { .lb-inner { min-height:130px; max-height:130px; } }
   .lb-table { width:100%; border-collapse:collapse; display:table; table-layout:fixed; }
-  .lb-table tr { border-bottom:1px solid rgba(0,200,255,0.08); }
+  .lb-table tr { border-bottom:1px solid var(--outline); }
   .lb-table td { padding:var(--type-label-m) 4px; font-size:var(--type-body-m); letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .lb-table td:first-child { color:rgba(0,200,255,0.45); width:32px; text-align:center; font-weight: 700; }
-  .lb-table td:nth-child(2) { color:#e0f7ff; text-align:left; }
-  .lb-table td:last-child { color:var(--cyan); text-align:right; font-weight:700; }
+  .lb-table td:first-child { color: var(--on-surface-muted); width:32px; text-align:center; font-weight: 700; }
+  .lb-table td:nth-child(2) { color: var(--on-surface); text-align:left; }
+  .lb-table td:last-child { color: var(--primary); text-align:right; font-weight:700; }
   .lb-table tr.lb-me td { color:#ffe600; text-shadow:0 0 8px #ffe600; }
   .lb-table tr.lb-me td:first-child { color:#ffe600; }
   .neon-input {
-    background:rgba(0,200,255,0.08); border:1px solid rgba(0,200,255,0.4);
+    background: var(--primary-container); border:1px solid var(--outline);
     color:#fff; font-family:'Orbitron',monospace; font-size:var(--type-body-l); letter-spacing:2px;
     padding:10px 14px; border-radius:var(--r-sm); outline:none; width:100%;
     text-align:center; margin-bottom:12px;
@@ -786,8 +800,8 @@
   }
 
   .action-btn.sm { font-size:var(--type-body-s); padding:var(--type-label-l) var(--type-title-l); letter-spacing:2px; border-radius:6px; }
-  .action-btn.ghost { background:transparent; border-color:rgba(255,255,255,0.22); color:rgba(255,255,255,0.55); }
-  .action-btn.ghost:hover { border-color:rgba(0,200,255,0.45); color:var(--cyan); background:rgba(0,200,255,0.08); }
+  .action-btn.ghost { background:transparent; border-color: var(--outline); color: var(--on-surface-muted); }
+  .action-btn.ghost:hover { border-color: var(--outline-strong); color: var(--primary); background: var(--primary-container); }
   
   .action-btn.play-btn {
     font-size: 16px;
@@ -1486,10 +1500,10 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 16px;
+    border: 1px solid var(--outline);
+    border-radius: var(--r-lg);
     padding: 8px;
-    background: rgba(255,255,255,0.02);
+    background: var(--surface-2);
   }
   .mode-group .mode-card {
     margin: 0;
@@ -1524,8 +1538,8 @@
   /* --- Game Over Score Stats Cohesive Card --- */
   .game-over-stats {
     width: 100%; text-align: center; margin-bottom: 16px;
-    background: rgba(0, 0, 0, 0.35); padding: 14px 12px;
-    border-radius: var(--r-md); border: 1px solid rgba(0, 200, 255, 0.12);
+    background: var(--surface-2); padding: 14px 12px;
+    border-radius: var(--r-md); border: 1px solid var(--outline);
     box-sizing: border-box;
   }
   .game-over-stats .stat-item {
@@ -1576,7 +1590,7 @@
   .briefing-card {
     font-size: var(--type-body-s); line-height: 1.65; color: rgba(255, 255, 255, 0.8);
     text-align: left; margin-bottom: 14px; padding: 14px;
-    background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(0, 200, 255, 0.15);
+    background: var(--surface-2); border: 1px solid var(--outline);
     border-radius: var(--r-md); width: 100%; box-sizing: border-box;
   }
   .briefing-card p {
@@ -1586,10 +1600,10 @@
     margin: 0;
   }
   .warning-card {
-    font-size: var(--type-label-l); line-height: 1.45; color: #ff5b5b;
+    font-size: var(--type-label-l); line-height: 1.45; color: var(--error);
     font-weight: 700; text-align: center; margin-bottom: 14px;
-    padding: 10px 12px; background: rgba(255, 91, 91, 0.08);
-    border: 1px solid rgba(255, 91, 91, 0.25); border-radius: var(--r-sm);
+    padding: 10px 12px; background: var(--tertiary-container);
+    border: 1px solid var(--error); border-radius: var(--r-sm);
     width: 100%; box-sizing: border-box;
   }
 
@@ -1600,7 +1614,7 @@
     z-index: 99999; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   }
   .donation-modal-box {
-    background: rgba(4,4,30,0.97); border: 1px solid rgba(255,215,0,0.35);
+    background: var(--surface); border: 1px solid var(--warning);
     border-radius: 14px; padding: 26px 22px; max-width: 290px; width: 88%;
     text-align: center; font-family: 'Orbitron', monospace;
     box-shadow: 0 0 40px rgba(255,215,0,0.12);
@@ -1831,10 +1845,10 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: rgba(0, 10, 20, 0.85);
+  background: var(--surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 200, 255, 0.2);
+  border: 1px solid var(--outline);
   border-radius: 20px;
   padding: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -1899,18 +1913,18 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 .pwa-sheet-add:active { transform: scale(0.97); }
 .pwa-sheet-snooze {
   font-size: var(--type-body-m);
-  color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--on-surface-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--outline);
   border-radius: 12px;
   padding: 11px 16px;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background 0.2s, color 0.2s;
+  transition: background var(--t-fast) var(--ease-standard), color var(--t-fast) var(--ease-standard);
 }
-.pwa-sheet-snooze:active { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.pwa-sheet-snooze:active { background: var(--surface-3); color: var(--on-surface); }
 
 /* ── PWA Modals ──────────────────────────────────────────────────────────── */
 #pwa-modal {
@@ -1927,10 +1941,10 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 }
 #pwa-modal.visible { opacity: 1; }
 .pwa-modal-box {
-  background: rgba(0, 10, 20, 0.85);
+  background: var(--surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 200, 255, 0.2);
+  border: 1px solid var(--outline);
   border-radius: 24px;
   padding: 32px 24px;
   width: 100%;
@@ -1960,8 +1974,8 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   text-align: left;
   margin: 0 0 24px 0;
   padding: 16px 16px 16px 36px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
+  border: 1px solid var(--outline);
   border-radius: 14px;
   color: rgba(255, 255, 255, 0.85);
   font-size: var(--type-title-s);

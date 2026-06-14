@@ -58,7 +58,30 @@ Every game mode owns exactly **one** signature color, grouped by intent on a coo
 Rules: one icon + one color per mode, consistent across card / HUD / background / share. The brand cyan→violet→pink gradient is NOT a mode accent. Changing a mode color = edit BOTH `--mode-*` and `MODE_COLORS`.
 
 ### Semantic Roles (game surfaces)
-The game runs dark-only with translucent glass panels: `--surface`, `--surface-2` (raised card), `--surface-glass` (HUD); text `--on-surface` / `--on-surface-muted` / `--on-surface-faint`; lines `--outline` / `--outline-strong`; status `--success` / `--warning` / `--error`.
+Glowtris maps Material 3 inspired semantic color roles directly to CSS variables to support unified state transitions and layout consistency:
+
+| Variable | Reference | Purpose |
+| :--- | :--- | :--- |
+| `--primary` | `var(--cyan)` | Active focus indicators, primary brand action text, highlighted leaders |
+| `--primary-container` | `rgba(0, 200, 255, 0.08)` | Primary selection backing, inputs background, hover overlays |
+| `--on-primary` | `#000000` | Text/Icons rendered on top of solid primary elements |
+| `--secondary` | `var(--purple)` | Secondary accents, tags, secondary button states |
+| `--secondary-container` | `rgba(160, 0, 255, 0.08)` | Secondary backing container |
+| `--tertiary` | `var(--pink)` | Tertiary highlights, alerts, red/magenta vignettes |
+| `--tertiary-container` | `rgba(255, 0, 128, 0.08)` | Error backing, warning container |
+| `--background` | `#070514` | Body canvas background (dark cosmos) |
+| `--on-background` | `#ffffff` | Primary readable text on canvas background |
+| `--surface` | `rgba(4,4,30,0.75)` | Core panels, dialog containers, raised sheets |
+| `--surface-2` | `rgba(255,255,255,0.04)` | Sub-containers inside a panel, modal steps backing |
+| `--surface-glass` | `rgba(0,0,20,0.72)` | Glassmorphic overlay containers (HUD, touch overlays) |
+| `--on-surface` | `rgba(255,255,255,0.92)` | Standard readable text on panels |
+| `--on-surface-muted` | `rgba(255,255,255,0.60)` | Faint descriptions, subtitles, inactive leaders |
+| `--on-surface-faint` | `rgba(255,255,255,0.30)` | Disabled buttons, placeholders, shortcut legends |
+| `--outline` | `rgba(0,200,255,0.28)` | Default hairline border strokes |
+| `--outline-strong` | `rgba(0,200,255,0.55)` | Active border focus rings, highlighted frame boundaries |
+| `--success` | `#00ff88` | Success toast states, saved progress |
+| `--warning` | `#ffb347` | Leaderboard personal bests, amber alert borders |
+| `--error` | `#ff0080` | High-spec warnings, game-over alerts, critical error vignettes |
 
 ### Surface & Background Tokens (blog)
 | Variable | Value (Light) | Value (Dark) | Semantic Purpose |
