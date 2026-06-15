@@ -261,6 +261,11 @@ export const S = {
   // Achievement & lifetime caches (written lazily, used by both modules)
   _achievementsCache: null,
   _lifetimeCache:     null,
+
+  // APM / PPS counters (game.js writes, ui.js reads)
+  _actionCount: 0,   // key actions since game start
+  _pieceCount:  0,   // pieces placed since game start
+  _gameStartTs: 0,   // performance.now() at first piece spawn
 };
 
 export function gtag(event, params = {}) {

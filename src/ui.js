@@ -31,6 +31,8 @@ const $hiScore    = document.getElementById('hi-score');
 const $hiScoreM   = document.getElementById('hi-score-m');
 const $levelBar   = document.getElementById('level-bar');
 const $bpmEl      = document.getElementById('bpm-display');
+const $apmEl      = document.getElementById('apm-display');
+const $ppsEl      = document.getElementById('pps-display');
 const $combo      = document.getElementById('combo-display');
 const $app        = document.getElementById('app');
 const $flash      = document.getElementById('screen-flash');
@@ -1007,6 +1009,7 @@ export function updateUI() {
     $levelBar.style.width      = (S.lines / SPRINT_LINES * 100) + '%';
     $levelBar.style.background = 'linear-gradient(90deg,#00ff88,#00c8ff)';
     $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
+    updateAPMPPS();
     return;
   }
   const s = S.score.toLocaleString();
@@ -1026,6 +1029,17 @@ export function updateUI() {
   $levelBar.style.width      = pct + '%';
   $levelBar.style.background = `linear-gradient(90deg,hsl(${190+hue},100%,50%),hsl(${270+hue},100%,50%))`;
   $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
+  updateAPMPPS();
+}
+
+export function updateAPMPPS() {
+  if (!$apmEl || !$ppsEl) return;
+  const elapsed = S._gameStartTs > 0 ? (performance.now() - S._gameStartTs) / 1000 : 0;
+  if (elapsed < 1) return;
+  const apm = Math.round(S._actionCount / elapsed * 60);
+  const pps = (S._pieceCount / elapsed).toFixed(2);
+  $apmEl.textContent = apm;
+  $ppsEl.textContent = pps;
 }
 
 export function updateSprintTimer() {

@@ -16,7 +16,7 @@ import {
   drawBoard, drawNext, drawHold, getCellSprite,
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
   applyShake, _enableKbMode, _disableKbMode,
-  updateUI, updateSprintTimer, showScorePopup,
+  updateUI, updateSprintTimer, showScorePopup, updateAPMPPS,
   updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel, togglePerfMode,
   triggerScreenFlash, triggerAllClearFlash, triggerLevelUpVisuals, spawnGoldBurst,
   showAchievementToast, unlockAchievement,
@@ -172,6 +172,7 @@ function cancelLock(){
 function lockPiece(){
   const tspin=checkAllSpin();
   S.lockActive=false;S.lockTimer=0;
+  S._pieceCount++;
   for(let r=0;r<S.current.shape.length;r++) for(let c=0;c<S.current.shape[r].length;c++){
     if(!S.current.shape[r][c])continue;
     const y=S.current.y+r;
@@ -332,6 +333,7 @@ function spawnPiece(fromHold = false){
   
   S.current.justSpawned = true;
   S.lowestY = S.current.y; S.lockResets = 0; S.dcdTimer = S.dcd || 0;
+  if (!S._gameStartTs) S._gameStartTs = performance.now();
   drawNext();if(!validPos(S.current))topOut();
 }
 
@@ -515,14 +517,14 @@ function processInput(input){
   }
 
   switch(input.code){
-    case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
-    case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
-    case'ArrowDown':  /* handled in gameTick */       break;
-    case'ArrowUp':case'KeyX': rotatePiece(1);      break;
-    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1); break;
-    case'KeyA': rotatePiece(2); break;
-    case'Space':      hardDrop();         break;
-    case'KeyC':case'ShiftLeft': holdPiece(); break;
+    case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  S._actionCount++; break;
+    case'ArrowRight': moveX(1);  S.dasCharge.right=0; S._actionCount++; break;
+    case'ArrowDown':  /* handled in gameTick */        S._actionCount++; break;
+    case'ArrowUp':case'KeyX': rotatePiece(1);         S._actionCount++; break;
+    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1);   S._actionCount++; break;
+    case'KeyA': rotatePiece(2);                        S._actionCount++; break;
+    case'Space':      hardDrop();                      S._actionCount++; break;
+    case'KeyC':case'ShiftLeft': holdPiece();           S._actionCount++; break;
   }
 }
 
@@ -721,6 +723,7 @@ makeTouchBtn('btn-pause', ()=>togglePause(),'any');
 // ─── Game loop ────────────────────────────────────────────────────────────────
 // RAF drives rendering; logic advances on a fixed 1ms tick inside tickLoop.
 let lastFrameTs = 0;
+let _apmPpsTimer = 0;
 function gameLoop(ts){
   if (!lastFrameTs) lastFrameTs = ts;
   const dt = ts - lastFrameTs;
@@ -731,6 +734,7 @@ function gameLoop(ts){
   tickLoop(ts, { onInput: processInput, onTick: gameTick });
   drawBackground(dtFactor);
   if(S.isSprintMode&&S.gameRunning&&!S.gamePaused&&!S._countdownVal)updateSprintTimer();
+  _apmPpsTimer+=dt; if(_apmPpsTimer>=1000){_apmPpsTimer=0;if(S.gameRunning&&!S.gamePaused)updateAPMPPS();}
   drawBoard(dtFactor);
   updateParticles(dtFactor);
   applyShake(dtFactor);
@@ -779,6 +783,7 @@ function _doStartGame(){
   S.particles=[];S.shakeFrames=0;S.shakeMag=0.4;S.shakeAllDir=false;S.flashLines=new Set();S.flashTimer=0;
   S.lockTimer=0;S.lockActive=false;lastWasRotate=false;lastKickNonZero=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
   S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};S.pendingRot=0;
+  S._actionCount=0;S._pieceCount=0;S._gameStartTs=0;
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
   bag=[];refillBag();S.next=[];for(let i=0;i<3;i++)S.next.push(makePiece(nextFromBag()));S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;
