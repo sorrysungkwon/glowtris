@@ -1,9 +1,11 @@
-import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime, initializeSystemTheme } from './shared.js';
+import { S, LS, ACHIEVEMENTS, COLS, ROWS, VANISH_ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime, initializeSystemTheme } from './shared.js';
 import { sfxAchievementUnlock, sfxAllClear, sfxLevelUp, toggleMute, applyMuteToGain } from './audio.js';
 
 // ─── Canvas refs ──────────────────────────────────────────────────────────────
 export const gc   = document.getElementById('game-canvas');
 export const gctx = gc.getContext('2d');
+export const vc   = document.getElementById('vanish-canvas');
+const vcx  = vc.getContext('2d');
 export const pc   = document.getElementById('particle-canvas');
 const pctx = pc.getContext('2d');
 // Desktop previews
@@ -176,6 +178,8 @@ export function _applyTouchCELL() {
   _cellSprites = {};
   gc.width  = gameW; gc.height = gameH;
   pc.width  = gameW; pc.height = gameH;
+  vc.width  = gameW; vc.height = VANISH_ROWS * newCELL;
+  vc.style.width = gameW + 'px'; vc.style.height = (VANISH_ROWS * newCELL) + 'px';
   ncD.width = 4 * newCELL; ncD.height = 9 * newCELL;
   ncD.style.width = (4 * newCELL) + 'px'; ncD.style.height = (9 * newCELL) + 'px';
   hcD.width = 4 * newCELL; hcD.height = 3 * newCELL;
@@ -199,6 +203,8 @@ export function initLayout() {
     gc.style.width  = (COLS * S.CELL) + 'px'; gc.style.height = (ROWS * S.CELL) + 'px';
     pc.width  = COLS * S.CELL; pc.height = ROWS * S.CELL;
     pc.style.width  = (COLS * S.CELL) + 'px'; pc.style.height = (ROWS * S.CELL) + 'px';
+    vc.width  = COLS * S.CELL; vc.height = VANISH_ROWS * S.CELL;
+    vc.style.width  = (COLS * S.CELL) + 'px'; vc.style.height = (VANISH_ROWS * S.CELL) + 'px';
     ncD.width = 4 * S.CELL; ncD.height = 9 * S.CELL;
     ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (9 * S.CELL) + 'px';
     hcD.width = 4 * S.CELL; hcD.height = 3 * S.CELL;
@@ -742,6 +748,35 @@ export function drawBoard(dtFactor = 1) {
     if (S._countdownGo > 0) S._countdownGo--;
   }
 
+  // ── Vanish zone canvas (above board) ────────────────────────────────────────
+  _drawVanishZone();
+}
+
+function _drawVanishZone() {
+  const VW = vc.width, VH = vc.height;
+  vcx.clearRect(0, 0, VW, VH);
+  if (!S.gameRunning || !S.current) return;
+
+  // Draw current piece cells that are above row 0 (y < 0)
+  for (let row = 0; row < S.current.shape.length; row++) {
+    const boardY = S.current.y + row;
+    if (boardY >= 0) continue; // already inside board
+    const vcRow = boardY + VANISH_ROWS; // map row -2→0, row -1→1
+    if (vcRow < 0 || vcRow >= VANISH_ROWS) continue;
+    for (let col = 0; col < S.current.shape[row].length; col++) {
+      if (!S.current.shape[row][col]) continue;
+      drawCell(vcx, S.current.x + col, vcRow, S.current.color, 1, 1,
+        S.colorblindMode ? COLOR_TO_KEY[S.current.color] : null);
+    }
+  }
+
+  // Gradient: top = opaque background, bottom = transparent (blend into board top)
+  const grad = vcx.createLinearGradient(0, 0, 0, VH);
+  grad.addColorStop(0,   'rgba(0,0,15,0.95)');
+  grad.addColorStop(0.6, 'rgba(0,0,15,0.4)');
+  grad.addColorStop(1,   'rgba(0,0,15,0)');
+  vcx.fillStyle = grad;
+  vcx.fillRect(0, 0, VW, VH);
 }
 
 // Ghost Y is needed by drawBoard but the board/current are in S.

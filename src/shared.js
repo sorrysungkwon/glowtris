@@ -1,5 +1,5 @@
 // ─── Constants ───────────────────────────────────────────────────────────────
-export const COLS = 10, ROWS = 20;
+export const COLS = 10, ROWS = 20, VANISH_ROWS = 2;
 
 // SRS-standard bounding boxes — 4x4 for I, 3x3 for JLSTZ, 2x2 for O.
 // Padding the JLSTZ pieces from 2x3/3x2 to 3x3 keeps the bounding box stable
