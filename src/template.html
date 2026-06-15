@@ -207,19 +207,15 @@ if ('serviceWorker' in navigator) {
       <div class="panel-title" style="margin-top:8px">BEST</div>
       <div class="score-val" id="hi-score" style="font-size:12px">0</div>
       <div id="combo-display"></div>
-      <div class="divider"></div>
-      <div class="panel-title">KEYS</div>
-      <div class="key-map">
-        <div class="key-row" id="key-move"><kbd>← →</kbd><span>move</span></div>
-        <div class="key-row" id="key-rotate"><kbd>↑</kbd><kbd>X</kbd><span>rotate CW</span></div>
-        <div class="key-row" id="key-rotate-ccw"><kbd>Z</kbd><kbd>Ctrl</kbd><span>rotate CCW</span></div>
-        <div class="key-row" id="key-rotate-180"><kbd>A</kbd><span>rotate 180°</span></div>
-        <div class="key-row" id="key-soft"><kbd>↓</kbd><span>soft drop</span></div>
-        <div class="key-row" id="key-hard"><kbd>SPC</kbd><span>hard drop</span></div>
-        <div class="key-row" id="key-hold"><kbd>C</kbd><kbd>Shift</kbd><span>hold</span></div>
-        <div class="key-row" id="key-pause"><kbd>P</kbd><kbd>Esc</kbd><span>pause</span></div>
-        <div class="key-row" id="key-mute"><kbd>M</kbd><span>mute</span></div>
-      </div>
+      <div id="key-move" style="display:none"></div>
+      <div id="key-rotate" style="display:none"></div>
+      <div id="key-rotate-ccw" style="display:none"></div>
+      <div id="key-rotate-180" style="display:none"></div>
+      <div id="key-soft" style="display:none"></div>
+      <div id="key-hard" style="display:none"></div>
+      <div id="key-hold" style="display:none"></div>
+      <div id="key-pause" style="display:none"></div>
+      <div id="key-mute" style="display:none"></div>
     </div>
 
     <!-- Game canvas -->
