@@ -764,26 +764,8 @@ export function drawBoard(dtFactor = 1) {
 }
 
 function _drawVanishZone() {
-  const VW = vc.width, VH = vc.height;
-  vcx.clearRect(0, 0, VW, VH);
-  if (!S.gameRunning || !S.current) return;
-
-  // Draw current piece cells that are above row 0 (y < 0)
-  for (let row = 0; row < S.current.shape.length; row++) {
-    const boardY = S.current.y + row;
-    if (boardY >= 0) continue; // already inside board
-    const vcRow = boardY + VANISH_ROWS; // map row -2→0, row -1→1
-    if (vcRow < 0 || vcRow >= VANISH_ROWS) continue;
-    for (let col = 0; col < S.current.shape[row].length; col++) {
-      if (!S.current.shape[row][col]) continue;
-      drawCell(vcx, S.current.x + col, vcRow, S.current.color, 1, 1,
-        S.colorblindMode ? COLOR_TO_KEY[S.current.color] : null);
-    }
-  }
-
-  // Fully cover the vanish zone — pieces hidden until they enter the board
-  vcx.fillStyle = 'rgba(0,0,15,1)';
-  vcx.fillRect(0, 0, VW, VH);
+  // Vanish zone is fully hidden — clear to transparent so canvas is invisible
+  vcx.clearRect(0, 0, vc.width, vc.height);
 }
 
 // Ghost Y is needed by drawBoard but the board/current are in S.
