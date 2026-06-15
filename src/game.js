@@ -1,4 +1,4 @@
-import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime, gtag, getGameMode } from './shared.js';
+import { S, LS, ACHIEVEMENTS, COLS, ROWS, VANISH_ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime, gtag, getGameMode } from './shared.js';
 import { toggleMute, startBGM, stopBGM, pauseBGM, resumeBGM, sfxMove, sfxRotate, sfxHardDrop, sfxHold, sfxLineClear, sfxGameOver, sfxTSpin, sfxAchievementUnlock, applyMuteToGain, onPageHide, onPageShow, closeAudio, sfxUIHover, sfxUIClick, sfxCountdownTick, sfxCountdownGo, sfxSprintGoal, sfxDailyComplete } from './audio.js';
 
 document.addEventListener('mouseover', (e) => {
@@ -16,7 +16,7 @@ import {
   drawBoard, drawNext, drawHold, getCellSprite,
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
   applyShake, _enableKbMode, _disableKbMode,
-  updateUI, updateSprintTimer, showScorePopup,
+  updateUI, updateSprintTimer, showScorePopup, updateAPMPPS,
   updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel, togglePerfMode,
   triggerScreenFlash, triggerAllClearFlash, triggerLevelUpVisuals, spawnGoldBurst,
   showAchievementToast, unlockAchievement,
@@ -71,7 +71,7 @@ const $combo    = document.getElementById('combo-display');
 // ─── Bag / Pieces ─────────────────────────────────────────────────────────────
 function refillBag(){bag=[...Object.keys(PIECES)];for(let i=bag.length-1;i>0;i--){const randVal=_prng?_prng():Math.random();const j=Math.floor(randVal*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}}
 function nextFromBag(){if(!bag.length)refillBag();return bag.pop();}
-function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor((COLS-d.shape[0].length)/2),y:-1,rot:0};}
+function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor((COLS-d.shape[0].length)/2),y:-VANISH_ROWS,rot:0};}
 
 // SRS kick tables — canvas y-down (wiki y-up values with y negated)
 const KICKS_JLSTZ = {
@@ -172,6 +172,7 @@ function cancelLock(){
 function lockPiece(){
   const tspin=checkAllSpin();
   S.lockActive=false;S.lockTimer=0;
+  S._pieceCount++;
   for(let r=0;r<S.current.shape.length;r++) for(let c=0;c<S.current.shape[r].length;c++){
     if(!S.current.shape[r][c])continue;
     const y=S.current.y+r;
@@ -322,6 +323,13 @@ function spawnPiece(fromHold = false){
   else if (KEYS['KeyA'])                    irsDir = 2;
   S.pendingRot = 0;
 
+  // IMS: fire buffered left/right from line-clear window
+  if (S.pendingMove !== 0) {
+    if (S.pendingMove === -1) { moveX(-1); S.dasCharge.left  = S.das; }
+    else                      { moveX(1);  S.dasCharge.right = S.das; }
+    S.pendingMove = 0;
+  }
+
   if (irsDir === 1)       { rotShape = rotateCW(S.current.shape);                   rotState = (rotState + 1) % 4; S.current.irsDir = 1; }
   else if (irsDir === -1) { rotShape = rotateCCW(S.current.shape);                  rotState = (rotState + 3) % 4; S.current.irsDir = -1; }
   else if (irsDir === 2)  { rotShape = rotateCW(rotateCW(S.current.shape));         rotState = (rotState + 2) % 4; S.current.irsDir = 2; }
@@ -332,6 +340,7 @@ function spawnPiece(fromHold = false){
   
   S.current.justSpawned = true;
   S.lowestY = S.current.y; S.lockResets = 0; S.dcdTimer = S.dcd || 0;
+  if (!S._gameStartTs) S._gameStartTs = performance.now();
   drawNext();if(!validPos(S.current))topOut();
 }
 
@@ -365,7 +374,8 @@ function checkTSpin(){
   const frontFilled=f[front[0]]+f[front[1]];
   if(frontFilled===2)return'full';
   if(frontFilled===1)return'mini';
-  return false;
+  // Both back corners filled, no front → 3-corner rule: counts as mini
+  return 'mini';
 }
 
 function checkAllSpin(){
@@ -505,6 +515,8 @@ function processInput(input){
     if (input.code === 'ArrowUp' || input.code === 'KeyX') S.pendingRot = 1;
     else if (input.code === 'KeyZ' || input.code === 'ControlLeft' || input.code === 'ControlRight') S.pendingRot = -1;
     else if (input.code === 'KeyA') S.pendingRot = 2;
+    else if (input.code === 'ArrowLeft')  S.pendingMove = -1;
+    else if (input.code === 'ArrowRight') S.pendingMove =  1;
     return;
   }
 
@@ -515,14 +527,14 @@ function processInput(input){
   }
 
   switch(input.code){
-    case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  break;
-    case'ArrowRight': moveX(1);  S.dasCharge.right=0; break;
-    case'ArrowDown':  /* handled in gameTick */       break;
-    case'ArrowUp':case'KeyX': rotatePiece(1);      break;
-    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1); break;
-    case'KeyA': rotatePiece(2); break;
-    case'Space':      hardDrop();         break;
-    case'KeyC':case'ShiftLeft': holdPiece(); break;
+    case'ArrowLeft':  moveX(-1); S.dasCharge.left=0;  S._actionCount++; break;
+    case'ArrowRight': moveX(1);  S.dasCharge.right=0; S._actionCount++; break;
+    case'ArrowDown':  /* handled in gameTick */        S._actionCount++; break;
+    case'ArrowUp':case'KeyX': rotatePiece(1);         S._actionCount++; break;
+    case'KeyZ':case'ControlLeft':case'ControlRight': rotatePiece(-1);   S._actionCount++; break;
+    case'KeyA': rotatePiece(2);                        S._actionCount++; break;
+    case'Space':      hardDrop();                      S._actionCount++; break;
+    case'KeyC':case'ShiftLeft': holdPiece();           S._actionCount++; break;
   }
 }
 
@@ -721,6 +733,7 @@ makeTouchBtn('btn-pause', ()=>togglePause(),'any');
 // ─── Game loop ────────────────────────────────────────────────────────────────
 // RAF drives rendering; logic advances on a fixed 1ms tick inside tickLoop.
 let lastFrameTs = 0;
+let _apmPpsTimer = 0;
 function gameLoop(ts){
   if (!lastFrameTs) lastFrameTs = ts;
   const dt = ts - lastFrameTs;
@@ -731,6 +744,7 @@ function gameLoop(ts){
   tickLoop(ts, { onInput: processInput, onTick: gameTick });
   drawBackground(dtFactor);
   if(S.isSprintMode&&S.gameRunning&&!S.gamePaused&&!S._countdownVal)updateSprintTimer();
+  _apmPpsTimer+=dt; if(_apmPpsTimer>=1000){_apmPpsTimer=0;if(S.gameRunning&&!S.gamePaused)updateAPMPPS();}
   drawBoard(dtFactor);
   updateParticles(dtFactor);
   applyShake(dtFactor);
@@ -778,7 +792,8 @@ function _doStartGame(){
   S.board=createBoard();S.score=0;S.lines=0;S.level=1;S.combo=0;S.maxCombo=0;dropInterval=800;S.b2b=false;
   S.particles=[];S.shakeFrames=0;S.shakeMag=0.4;S.shakeAllDir=false;S.flashLines=new Set();S.flashTimer=0;
   S.lockTimer=0;S.lockActive=false;lastWasRotate=false;lastKickNonZero=false;S.rainbowBorder=0;S.comboFlash=0;S.comboFlashColor='#00c8ff';S.dangerPulse=0;S.levelUpScanline=0;
-  S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};S.pendingRot=0;
+  S.gravityTimer=0;S.dasCharge={left:0,right:0,down:0};S.pendingRot=0;S.pendingMove=0;
+  S._actionCount=0;S._pieceCount=0;S._gameStartTs=0;
   S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
   bag=[];refillBag();S.next=[];for(let i=0;i<3;i++)S.next.push(makePiece(nextFromBag()));S.held=null;canHold=true;
   S.gameRunning=true;S.gamePaused=false;gameOver=false;

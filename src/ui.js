@@ -1,9 +1,11 @@
-import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime, initializeSystemTheme } from './shared.js';
+import { S, LS, ACHIEVEMENTS, COLS, ROWS, VANISH_ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, fmtTime, _getAchievements, _getLifetime, initializeSystemTheme } from './shared.js';
 import { sfxAchievementUnlock, sfxAllClear, sfxLevelUp, toggleMute, applyMuteToGain } from './audio.js';
 
 // ─── Canvas refs ──────────────────────────────────────────────────────────────
 export const gc   = document.getElementById('game-canvas');
 export const gctx = gc.getContext('2d');
+export const vc   = document.getElementById('vanish-canvas');
+const vcx  = vc.getContext('2d');
 export const pc   = document.getElementById('particle-canvas');
 const pctx = pc.getContext('2d');
 // Desktop previews
@@ -31,6 +33,8 @@ const $hiScore    = document.getElementById('hi-score');
 const $hiScoreM   = document.getElementById('hi-score-m');
 const $levelBar   = document.getElementById('level-bar');
 const $bpmEl      = document.getElementById('bpm-display');
+const $apmEl      = document.getElementById('apm-display');
+const $ppsEl      = document.getElementById('pps-display');
 const $combo      = document.getElementById('combo-display');
 const $app        = document.getElementById('app');
 const $flash      = document.getElementById('screen-flash');
@@ -174,6 +178,8 @@ export function _applyTouchCELL() {
   _cellSprites = {};
   gc.width  = gameW; gc.height = gameH;
   pc.width  = gameW; pc.height = gameH;
+  vc.width  = gameW; vc.height = VANISH_ROWS * newCELL;
+  vc.style.width = gameW + 'px'; vc.style.height = (VANISH_ROWS * newCELL) + 'px';
   ncD.width = 4 * newCELL; ncD.height = 9 * newCELL;
   ncD.style.width = (4 * newCELL) + 'px'; ncD.style.height = (9 * newCELL) + 'px';
   hcD.width = 4 * newCELL; hcD.height = 3 * newCELL;
@@ -197,6 +203,8 @@ export function initLayout() {
     gc.style.width  = (COLS * S.CELL) + 'px'; gc.style.height = (ROWS * S.CELL) + 'px';
     pc.width  = COLS * S.CELL; pc.height = ROWS * S.CELL;
     pc.style.width  = (COLS * S.CELL) + 'px'; pc.style.height = (ROWS * S.CELL) + 'px';
+    vc.width  = COLS * S.CELL; vc.height = VANISH_ROWS * S.CELL;
+    vc.style.width  = (COLS * S.CELL) + 'px'; vc.style.height = (VANISH_ROWS * S.CELL) + 'px';
     ncD.width = 4 * S.CELL; ncD.height = 9 * S.CELL;
     ncD.style.width = (4 * S.CELL) + 'px'; ncD.style.height = (9 * S.CELL) + 'px';
     hcD.width = 4 * S.CELL; hcD.height = 3 * S.CELL;
@@ -586,14 +594,25 @@ export function drawBoard(dtFactor = 1) {
           if (S.current.shape[row][col]) { if (col < minCol) minCol = col; if (col > maxCol) maxCol = col; }
         }
       }
-      gctx.save();
-      gctx.strokeStyle = `rgba(${r},${g},${b},0.09)`; gctx.lineWidth = 1;
-      gctx.setLineDash([4,4]);
+      // Gradient pillar from board top to ghost piece
       const lx = (visX + minCol) * S.CELL;
-      gctx.beginPath(); gctx.moveTo(lx, (visY+S.current.shape.length)*S.CELL); gctx.lineTo(lx, ghostY*S.CELL); gctx.stroke();
       const rx = (visX + maxCol + 1) * S.CELL;
-      gctx.beginPath(); gctx.moveTo(rx, (visY+S.current.shape.length)*S.CELL); gctx.lineTo(rx, ghostY*S.CELL); gctx.stroke();
-      gctx.restore();
+      const pillarBot = ghostY * S.CELL;
+      if (pillarBot > 0) {
+        gctx.save();
+        const pg = gctx.createLinearGradient(0, 0, 0, pillarBot);
+        pg.addColorStop(0,   `rgba(${r},${g},${b},0.18)`);
+        pg.addColorStop(0.4, `rgba(${r},${g},${b},0.06)`);
+        pg.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+        gctx.fillStyle = pg;
+        gctx.fillRect(lx, 0, rx - lx, pillarBot);
+        // Edge lines
+        gctx.strokeStyle = `rgba(${r},${g},${b},0.22)`; gctx.lineWidth = 1;
+        gctx.setLineDash([3, 5]);
+        gctx.beginPath(); gctx.moveTo(lx, 0); gctx.lineTo(lx, pillarBot); gctx.stroke();
+        gctx.beginPath(); gctx.moveTo(rx, 0); gctx.lineTo(rx, pillarBot); gctx.stroke();
+        gctx.restore();
+      }
     }
 
     if (S.lockActive && S.lockTimer > 0) {
@@ -739,6 +758,14 @@ export function drawBoard(dtFactor = 1) {
     gctx.shadowBlur = 0; gctx.restore();
     if (S._countdownGo > 0) S._countdownGo--;
   }
+
+  // ── Vanish zone canvas (above board) ────────────────────────────────────────
+  _drawVanishZone();
+}
+
+function _drawVanishZone() {
+  // Vanish zone is fully hidden — clear to transparent so canvas is invisible
+  vcx.clearRect(0, 0, vc.width, vc.height);
 }
 
 // Ghost Y is needed by drawBoard but the board/current are in S.
@@ -1007,6 +1034,7 @@ export function updateUI() {
     $levelBar.style.width      = (S.lines / SPRINT_LINES * 100) + '%';
     $levelBar.style.background = 'linear-gradient(90deg,#00ff88,#00c8ff)';
     $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
+    updateAPMPPS();
     return;
   }
   const s = S.score.toLocaleString();
@@ -1026,6 +1054,17 @@ export function updateUI() {
   $levelBar.style.width      = pct + '%';
   $levelBar.style.background = `linear-gradient(90deg,hsl(${190+hue},100%,50%),hsl(${270+hue},100%,50%))`;
   $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
+  updateAPMPPS();
+}
+
+export function updateAPMPPS() {
+  if (!$apmEl || !$ppsEl) return;
+  const elapsed = S._gameStartTs > 0 ? (performance.now() - S._gameStartTs) / 1000 : 0;
+  if (elapsed < 1) return;
+  const apm = Math.round(S._actionCount / elapsed * 60);
+  const pps = (S._pieceCount / elapsed).toFixed(2);
+  $apmEl.textContent = apm;
+  $ppsEl.textContent = pps;
 }
 
 export function updateSprintTimer() {
