@@ -49,9 +49,9 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | 🎮 Movement Standard | v0.3 ✅ | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
 | 🏆 Scoring Standard | v0.4 ✅ | B2B 1.5×, 3-piece queue, all-spin (SRS+), BUG-012/013 |
 | 🖼 Renderer & Audio | v0.5 ✅ | Web Audio API low-latency audio, PixiJS WebGL2 renderer (Abandoned — kept lightweight 2D Canvas due to iOS regressions) |
-| ⏱ Modes & Metrics | v0.6 ✅ | Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar |
-| 👥 Social Ranking | v0.7 | Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments |
-| 🎨 Gameplay Feel | v0.8 | Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake |
+| ⏱ Modes & Metrics | v0.6 ✅ | Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar, Blitz mode |
+| 👥 Social Ranking | v0.7 | Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag system |
+| 📳 Gameplay Feel | v0.8 | Mobile haptic feedback (hard drop + line clear), micro-vibration patterns |
 | ✨ Micro-interactions | v0.9 | Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations |
 
 ### Phase B — Go-to-Market & Growth (Gated by Phase A)
@@ -123,17 +123,18 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
 | v0.5 | **Renderer & Audio** — Web Audio API low-latency audio, render interpolation (PixiJS WebGL2 renderer Abandoned due to iOS regressions, keeping lightweight 2D Canvas engine) | ✅ Done |
 | v0.6 | **Modes & Metrics** — Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar gradient | ✅ Done |
-| v0.7 | **Social** — Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments | 🔲 Planned |
-| v0.8 | **Gameplay Feel** — Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake | 🔲 Planned |
+| v0.7 | **Social Ranking** — Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag identity system | 🔲 Planned |
+| v0.8 | **Haptic Feedback** — Mobile vibration on hard drop + line clear; micro-vibration patterns | 🔲 Planned |
 | v0.9 | **Micro-interactions** — Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations | 🔲 Planned |
 
 ### 🔮 Planned — Phase B (Public Launch & Growth, post-1.0)
 
 | Version | Theme | Features | DAU Goal |
 |---|---|---|---:|
-| **v1.0** | **Launch & Avatar** | Reacting Duolingo-style Avatar state machine. Official public launch. | **700** |
-| v1.2 | **Blitz Mode** | Play 2-minute mode, score big near end, play days counter. | 1,200 |
-| v1.3 | **Training & Finesse** | Practice mode (no game over, no timer). Finesse counter — tracks wasted keypresses vs optimal. Speed metrics. | 1,800 |
+| **v1.0** | **Design Overhaul** | Full visual redesign — layout, typography, mode select, result screen, leaderboard UI. COMING SOON badges on unfinished features. | **700** |
+| **v1.1** | **Launch & Avatar** | Reacting Duolingo-style Avatar state machine. Official public launch. | **700** |
+| v1.2 | **Retention & Training** | Streak UI strengthening (streak rank, danger push alert, longest streak badge). Flow mode rebranded as ZEN/TRAINING — finesse counter, fixed-speed practice, APM/PPS focus. | 1,200 |
+| v1.3 | **Identity & Accounts** | name#tag system (Discord-style), Google login (backup + score protection, verified badge ✓), existing score migration. | 1,800 |
 | v1.4 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. Custom drum beats. | 2,500 |
 | v1.5 | **Weekly Events** | Weekly special challenge (rotating rule modifiers: invisible pieces, 20-line board, etc.) with 7-day Redis TTL leaderboard. Monthly event leaderboard. | 3,500 |
 | v1.6 | **Ghost & Replay** | Best-run ghost stored in Redis (serialised input log). Ghost race mode — race against your own personal best. Shareable replay link via short code. | 4,500 |
