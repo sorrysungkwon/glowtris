@@ -770,11 +770,8 @@ function _drawVanishZone() {
     }
   }
 
-  // Gradient overlay: top = fully opaque (piece invisible), bottom = fully transparent (piece fully visible)
-  const grad = vcx.createLinearGradient(0, 0, 0, VH);
-  grad.addColorStop(0, 'rgba(0,0,15,1)');
-  grad.addColorStop(1, 'rgba(0,0,15,0)');
-  vcx.fillStyle = grad;
+  // Fully cover the vanish zone — pieces hidden until they enter the board
+  vcx.fillStyle = 'rgba(0,0,15,1)';
   vcx.fillRect(0, 0, VW, VH);
 }
 
