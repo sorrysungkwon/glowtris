@@ -256,12 +256,28 @@
     </div>
   </div>
 
-  <!-- v0.5 -->
+  <!-- v0.6 -->
   <div class="version-card latest">
+    <div class="version-header">
+      <span class="version-tag">v0.6</span>
+      <span class="version-date">Jun 2026</span>
+      <span class="version-badge">Latest</span>
+    </div>
+    <ul class="change-list">
+      <li class="feat"><span class="change-label">Vanish Zone</span> — Pieces now spawn 2 rows above the visible board (10×22 logic board); the vanish rows are hidden by a gradient overlay, matching competitive-standard behavior</li>
+      <li class="feat"><span class="change-label">Drop Pillar</span> — A gradient column in the active piece's color illuminates the drop path from the board top to the ghost piece, replacing the old dashed guide lines</li>
+      <li class="feat"><span class="change-label">APM / PPS</span> — Live Actions-Per-Minute and Pieces-Per-Second counters displayed in the left panel throughout each game</li>
+      <li class="feat"><span class="change-label">Input Buffer (IMS)</span> — Left/right inputs tapped during the 120 ms line-clear pause are buffered and fired on the next piece spawn with DAS pre-charged, eliminating dropped inputs</li>
+      <li class="feat"><span class="change-label">3-Corner G-Spin Rule</span> — T-spins where only the two back corners are occupied now correctly score as T-Spin Mini instead of a full T-Spin</li>
+      <li class="perf"><span class="change-label">UI Cleanup</span> — Removed the redundant desktop title header and KEYS reference panel from the left sidebar; hold button height reduced to align with the D-pad panel</li>
+    </ul>
+  </div>
+
+  <!-- v0.5 -->
+  <div class="version-card">
     <div class="version-header">
       <span class="version-tag">v0.5</span>
       <span class="version-date">Jun 2026</span>
-      <span class="version-badge">Latest</span>
     </div>
     <ul class="change-list">
       <li class="perf"><span class="change-label">Canvas2D Optimization</span> — Rolled back experimental WebGL renderer due to Safari bugs; bundle size heavily reduced</li>

@@ -49,7 +49,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | 🎮 Movement Standard | v0.3 ✅ | 180°, custom keybinds, SDF/∞, lock-cap, IRS/IHS/DCD, instant ARR=0 |
 | 🏆 Scoring Standard | v0.4 ✅ | B2B 1.5×, 3-piece queue, all-spin (SRS+), BUG-012/013 |
 | 🖼 Renderer & Audio | v0.5 ✅ | Web Audio API low-latency audio, PixiJS WebGL2 renderer (Abandoned — kept lightweight 2D Canvas due to iOS regressions) |
-| ⏱ Modes & Metrics | v0.6 | Vanish Zone (10x40 logic board), 3-Corner G-Spin Rule, Lossless Input Buffering, APM/PPS display |
+| ⏱ Modes & Metrics | v0.6 ✅ | Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar |
 | 👥 Social Ranking | v0.7 | Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments |
 | 🎨 Gameplay Feel | v0.8 | Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake |
 | ✨ Micro-interactions | v0.9 | Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations |
@@ -122,7 +122,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.3 | **Movement Standard** — 180° rotation, custom keybinds, SDF/∞, lock-cap (15 moves), IRS/IHS/DCD, instant ARR=0 | ✅ Done |
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
 | v0.5 | **Renderer & Audio** — Web Audio API low-latency audio, render interpolation (PixiJS WebGL2 renderer Abandoned due to iOS regressions, keeping lightweight 2D Canvas engine) | ✅ Done |
-| v0.6 | **Modes & Metrics** — Vanish Zone (10x40 board), 3-Corner G-Spin Rule, Lossless Input Buffering, APM/PPS display | 🔲 Planned |
+| v0.6 | **Modes & Metrics** — Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar gradient | ✅ Done |
 | v0.7 | **Social** — Anonymous UUID, percentile calculations, score gap, challenge links, weekly tournaments | 🔲 Planned |
 | v0.8 | **Gameplay Feel** — Target Overtake UI (no ghost pieces, next target ranker score display, swipe animation), haptic feedback, screen shake | 🔲 Planned |
 | v0.9 | **Micro-interactions** — Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations | 🔲 Planned |
