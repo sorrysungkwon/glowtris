@@ -601,9 +601,9 @@ export function drawBoard(dtFactor = 1) {
       if (pillarBot > 0) {
         gctx.save();
         const pg = gctx.createLinearGradient(0, 0, 0, pillarBot);
-        pg.addColorStop(0,   `rgba(${r},${g},${b},0)`);
-        pg.addColorStop(0.6, `rgba(${r},${g},${b},0.06)`);
-        pg.addColorStop(1,   `rgba(${r},${g},${b},0.18)`);
+        pg.addColorStop(0,   `rgba(${r},${g},${b},0.18)`);
+        pg.addColorStop(0.4, `rgba(${r},${g},${b},0.06)`);
+        pg.addColorStop(1,   `rgba(${r},${g},${b},0)`);
         gctx.fillStyle = pg;
         gctx.fillRect(lx, 0, rx - lx, pillarBot);
         // Edge lines
