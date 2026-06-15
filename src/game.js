@@ -743,7 +743,7 @@ function gameLoop(ts){
   measureFPS(ts);
   tickLoop(ts, { onInput: processInput, onTick: gameTick });
   drawBackground(dtFactor);
-  if(S.isSprintMode&&S.gameRunning&&!S.gamePaused&&!S._countdownVal)updateSprintTimer();
+  if((S.isSprintMode||S.isBlitzMode)&&S.gameRunning&&!S.gamePaused&&!S._countdownVal)updateSprintTimer();
   _apmPpsTimer+=dt; if(_apmPpsTimer>=1000){_apmPpsTimer=0;if(S.gameRunning&&!S.gamePaused)updateAPMPPS();}
   drawBoard(dtFactor);
   updateParticles(dtFactor);
@@ -1167,7 +1167,7 @@ window.onunhandledrejection = function(e) {
 // esbuild bundles to IIFE — functions are not global by default.
 // HTML template uses onclick="fn()" style which requires window.fn.
 Object.assign(window, {
-  startGame, startSprintMode, startDailyChallenge, launchDailyChallenge,
+  startGame, startSprintMode, startBlitzMode, startDailyChallenge, launchDailyChallenge,
   startFlowMode, startMarathonMode,
   togglePause, showStartScreen, showModeSelector, openSettings,
   submitScore, submitSprintScore, shareScore, shareSprintScore,

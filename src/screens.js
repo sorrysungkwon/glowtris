@@ -432,11 +432,12 @@ export function showModeSelector(){
 
   const sprintBest=S._sprintHiTime>0?`<span style="color:rgba(0,200,255,0.8)">Best: ${fmtTime(S._sprintHiTime)}</span>`:noRec;
 
+  const blitzHi=parseInt(localStorage.getItem(LS.BLITZ_HI)||'0');
+  const blitzBest=blitzHi>0?`<span style="color:rgba(255,208,0,0.8)">Best: ${blitzHi.toLocaleString()}</span>`:noRec;
+
   const todayStr=new Date().toISOString().slice(0,10).replace(/-/g,'');
   const dailyDone=localStorage.getItem(LS.DAILY_DATE)===todayStr;
   const dailySub=dailyDone?'<span style="color:rgba(255,230,0,0.75)">✓ Completed today</span>':'<span style="color:rgba(255,255,255,0.3)">Not played today</span>';
-
-  const soon='<span class="coming-soon-badge">SOON</span>';
 
   $overlay.innerHTML=`
     <div class="glass-panel">
@@ -479,12 +480,14 @@ export function showModeSelector(){
             </div>
             <div class="mode-arrow">›</div>
           </div>
-          <div class="mode-card blitz mode-coming-soon" tabindex="-1">
+          <div class="mode-card blitz" tabindex="0" onclick="startBlitzMode()">
             <div class="mode-icon">⏱️</div>
             <div class="mode-info">
-              <div class="mode-name">BLITZ ${soon}</div>
+              <div class="mode-name">BLITZ</div>
               <div class="mode-desc">Score as high as possible in 2 minutes.</div>
+              <div class="mode-best">${blitzBest}</div>
             </div>
+            <div class="mode-arrow">›</div>
           </div>
         </div>
 
