@@ -1,4 +1,4 @@
-import { S, LS, ACHIEVEMENTS, COLS, ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime, gtag, getGameMode } from './shared.js';
+import { S, LS, ACHIEVEMENTS, COLS, ROWS, VANISH_ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime, gtag, getGameMode } from './shared.js';
 import { toggleMute, startBGM, stopBGM, pauseBGM, resumeBGM, sfxMove, sfxRotate, sfxHardDrop, sfxHold, sfxLineClear, sfxGameOver, sfxTSpin, sfxAchievementUnlock, applyMuteToGain, onPageHide, onPageShow, closeAudio, sfxUIHover, sfxUIClick, sfxCountdownTick, sfxCountdownGo, sfxSprintGoal, sfxDailyComplete } from './audio.js';
 
 document.addEventListener('mouseover', (e) => {
@@ -71,7 +71,7 @@ const $combo    = document.getElementById('combo-display');
 // ─── Bag / Pieces ─────────────────────────────────────────────────────────────
 function refillBag(){bag=[...Object.keys(PIECES)];for(let i=bag.length-1;i>0;i--){const randVal=_prng?_prng():Math.random();const j=Math.floor(randVal*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}}
 function nextFromBag(){if(!bag.length)refillBag();return bag.pop();}
-function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor((COLS-d.shape[0].length)/2),y:-1,rot:0};}
+function makePiece(key){const d=PIECES[key];return{key,shape:d.shape.map(r=>[...r]),color:d.color,x:Math.floor((COLS-d.shape[0].length)/2),y:-VANISH_ROWS,rot:0};}
 
 // SRS kick tables — canvas y-down (wiki y-up values with y negated)
 const KICKS_JLSTZ = {
