@@ -594,14 +594,25 @@ export function drawBoard(dtFactor = 1) {
           if (S.current.shape[row][col]) { if (col < minCol) minCol = col; if (col > maxCol) maxCol = col; }
         }
       }
-      gctx.save();
-      gctx.strokeStyle = `rgba(${r},${g},${b},0.09)`; gctx.lineWidth = 1;
-      gctx.setLineDash([4,4]);
+      // Gradient pillar from board top to ghost piece
       const lx = (visX + minCol) * S.CELL;
-      gctx.beginPath(); gctx.moveTo(lx, (visY+S.current.shape.length)*S.CELL); gctx.lineTo(lx, ghostY*S.CELL); gctx.stroke();
       const rx = (visX + maxCol + 1) * S.CELL;
-      gctx.beginPath(); gctx.moveTo(rx, (visY+S.current.shape.length)*S.CELL); gctx.lineTo(rx, ghostY*S.CELL); gctx.stroke();
-      gctx.restore();
+      const pillarBot = ghostY * S.CELL;
+      if (pillarBot > 0) {
+        gctx.save();
+        const pg = gctx.createLinearGradient(0, 0, 0, pillarBot);
+        pg.addColorStop(0,   `rgba(${r},${g},${b},0)`);
+        pg.addColorStop(0.6, `rgba(${r},${g},${b},0.06)`);
+        pg.addColorStop(1,   `rgba(${r},${g},${b},0.18)`);
+        gctx.fillStyle = pg;
+        gctx.fillRect(lx, 0, rx - lx, pillarBot);
+        // Edge lines
+        gctx.strokeStyle = `rgba(${r},${g},${b},0.22)`; gctx.lineWidth = 1;
+        gctx.setLineDash([3, 5]);
+        gctx.beginPath(); gctx.moveTo(lx, 0); gctx.lineTo(lx, pillarBot); gctx.stroke();
+        gctx.beginPath(); gctx.moveTo(rx, 0); gctx.lineTo(rx, pillarBot); gctx.stroke();
+        gctx.restore();
+      }
     }
 
     if (S.lockActive && S.lockTimer > 0) {
