@@ -742,13 +742,6 @@ export function drawBoard(dtFactor = 1) {
     if (S._countdownGo > 0) S._countdownGo--;
   }
 
-  // Vanish zone: fade top 2 rows from background colour to transparent
-  const fadeH = S.CELL * 2;
-  const vg = gctx.createLinearGradient(0, 0, 0, fadeH);
-  vg.addColorStop(0,   'rgba(0,0,15,0.92)');
-  vg.addColorStop(1,   'rgba(0,0,15,0)');
-  gctx.fillStyle = vg;
-  gctx.fillRect(0, 0, COLS * S.CELL, fadeH);
 }
 
 // Ghost Y is needed by drawBoard but the board/current are in S.

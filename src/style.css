@@ -451,6 +451,16 @@
 
   /* Game wrap — sized by JS inline styles on the canvases (Safari safe) */
   .game-wrap { position:relative; flex:0 0 auto; }
+  .game-wrap::before {
+    content:'';
+    position:absolute;
+    left:2px; right:2px;
+    bottom:100%;
+    height:56px;
+    background:linear-gradient(to bottom, rgba(0,0,15,1) 0%, rgba(0,0,15,0) 100%);
+    pointer-events:none;
+    z-index:5;
+  }
   #game-canvas {
     display:block;
     border:2px solid rgba(0,200,255,0.35);
