@@ -1167,7 +1167,7 @@ window.onunhandledrejection = function(e) {
 // esbuild bundles to IIFE — functions are not global by default.
 // HTML template uses onclick="fn()" style which requires window.fn.
 Object.assign(window, {
-  startGame, startSprintMode, startDailyChallenge, launchDailyChallenge,
+  startGame, startSprintMode, startBlitzMode, startDailyChallenge, launchDailyChallenge,
   startFlowMode, startMarathonMode,
   togglePause, showStartScreen, showModeSelector, openSettings,
   submitScore, submitSprintScore, shareScore, shareSprintScore,
