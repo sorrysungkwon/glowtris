@@ -11,12 +11,18 @@ function _enqueueScore(payload) {
   localStorage.setItem(LS_SCORE_QUEUE, JSON.stringify(q));
 }
 
+function getLocalDate() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 async function _flushScoreQueue() {
   const q = JSON.parse(localStorage.getItem(LS_SCORE_QUEUE) || '[]');
   if (!q.length) return;
   const remaining = [];
   for (const payload of q) {
     try {
+      payload.date = getLocalDate();
       const r = await fetch('/api/leaderboard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!r.ok) remaining.push(payload);
       else showToast('Score submitted!', { icon: 'check_circle' });
@@ -75,7 +81,7 @@ export async function submitSprintScore(timeMs){
       <div class="lb-offline-txt" style="color:var(--cyan); animation: text-pulse 1.5s infinite;">SUBMITTING...</div>
     </div>`;
   try{
-    const r=await fetch('/api/leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,score:timeMs,mode:'sprint'})});
+    const r=await fetch('/api/leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,score:timeMs,mode:'sprint',date:getLocalDate()})});
     const data=await r.json();
     if(data.sprintBoard){
       S._lbCache={...S._lbCache,sprintBoard:data.sprintBoard||[],sprintDailyBoard:data.sprintDailyBoard||[],sprintWeeklyBoard:data.sprintWeeklyBoard||[],sprintRank:data.sprintRank,sprintDailyRank:data.sprintDailyRank,sprintWeeklyRank:data.sprintWeeklyRank,myName:name,mySprintTime:timeMs};
@@ -232,7 +238,7 @@ export async function submitScore(){
     </div>`;
 
   try{
-    const payload = { name, score:S.score };
+    const payload = { name, score:S.score, date: getLocalDate() };
     if (S.isDailyMode) payload.mode = 'daily';
 
     const r=await fetch('/api/leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
@@ -487,9 +493,11 @@ export async function loadStartLeaderboard(){
   if(!el)return;
   gtag('leaderboard_view', { lb_mode: S.lbMode || 'classic' });
   try{
-    const url=S.lbMode==='daily'?'/api/leaderboard?mode=daily'
+    const base = S.lbMode==='daily'?'/api/leaderboard?mode=daily'
              :S.lbMode==='sprint'?'/api/leaderboard?mode=sprint'
              :'/api/leaderboard';
+    const sep = base.includes('?') ? '&' : '?';
+    const url = `${base}${sep}date=${getLocalDate()}`;
     const r=await fetch(url);
     const data=await r.json();
     S._lbCache={...S._lbCache,...data};
