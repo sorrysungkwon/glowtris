@@ -2,8 +2,13 @@ const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const REDIS_AVAILABLE = !!(REDIS_URL && REDIS_TOKEN);
 const P = process.env.LEADERBOARD_PREFIX || '';
+function safeClientDate(raw) {
+  const utc = new Date().toISOString().slice(0, 10);
+  if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return utc;
+  return Math.abs(new Date(raw) - new Date(utc)) <= 86400000 ? raw : utc;
+}
 const KEY_ALL   = `${P}glowtris-lb`;
-const KEY_DAILY = () => `${P}glowtris-daily-${new Date().toISOString().slice(0,10)}`;
+const KEY_DAILY = (dateStr) => `${P}glowtris-daily-${dateStr}`;
 const KEY_WEEKLY = () => {
   const d = new Date();
   const day = d.getUTCDay() || 7;
@@ -18,7 +23,7 @@ const KEY_CHALLENGE_ALLTIME = `${P}challenge:alltime`;
 
 // Sprint keys — ascending leaderboard (lowest time = best)
 const KEY_SPRINT     = `${P}glowtris-sprint`;
-const KEY_SPRINT_DAILY  = () => `${P}glowtris-sprint-daily-${new Date().toISOString().slice(0,10)}`;
+const KEY_SPRINT_DAILY  = (dateStr) => `${P}glowtris-sprint-daily-${dateStr}`;
 const KEY_SPRINT_WEEKLY = () => {
   const d = new Date();
   const day = d.getUTCDay() || 7;
@@ -28,7 +33,7 @@ const KEY_SPRINT_WEEKLY = () => {
 
 const TOP = 10;
 const TOP_ALLTIME = 20;
-const DAILY_TTL  = 60 * 60 * 26;
+const DAILY_TTL  = 60 * 60 * 52;
 const WEEKLY_TTL = 60 * 60 * 24 * 8;
 
 // Score bounds: 0 < score ≤ 10M (roughly 4+ hours of perfect play).
@@ -150,7 +155,11 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const daily  = KEY_DAILY();
+  const url = req.url ? new URL(req.url, 'http://localhost') : null;
+  const rawDate = (req.query && req.query.date) || (url && url.searchParams.get('date')) || (req.body && req.body.date);
+  const clientDate = safeClientDate(rawDate);
+
+  const daily  = KEY_DAILY(clientDate);
   const weekly = KEY_WEEKLY();
 
   if (!REDIS_AVAILABLE) {
@@ -177,7 +186,7 @@ export default async function handler(req, res) {
     }
 
     if (mode === 'sprint') {
-      const sprintDaily = KEY_SPRINT_DAILY();
+      const sprintDaily = KEY_SPRINT_DAILY(clientDate);
       const sprintWeekly = KEY_SPRINT_WEEKLY();
       const [sprintBoard, sprintDailyBoard, sprintWeeklyBoard] = await Promise.all([
         getSprintBoard(KEY_SPRINT, TOP_ALLTIME),
@@ -222,7 +231,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'sprint time out of range' });
       }
       const sprintTime = score; // score field reused for time (ms)
-      const sprintDaily = KEY_SPRINT_DAILY();
+      const sprintDaily = KEY_SPRINT_DAILY(clientDate);
       const sprintWeekly = KEY_SPRINT_WEEKLY();
 
       await Promise.all([
