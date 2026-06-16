@@ -118,3 +118,8 @@
 - Glowing buttons. Touch support fixed.
 - Auto Perf mode less sensitive. Manual toggle works.
 - Next: v0.4 Back-to-Back, All-spin, 5-next queue.
+
+## Docs Sync Protocol
+- Run `/home/ubuntu/docs/sync-docs.sh`.
+- Push `/home/ubuntu/docs` to `glowtris-docs` private repo.
+- NO `CREDENTIALS.md` in docs.
