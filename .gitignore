@@ -1,41 +1,26 @@
-node_modules
-.vercel
+node_modules/
+.vercel/
+.next/
 
-# Sensitive credentials - NEVER commit
+# Secrets — never commit, rsync to new servers
 .env
 .env.local
 .env.*.local
 .env.production.local
 CREDENTIALS.md
-
-# Secrets and credentials
-**/secrets.*
-**/credentials.*
-**/token.*
-**/key.*
-
-# Local documentation (not versioned)
 MONETIZATION.md
 GROWTHPLAN.md
+**/secrets.*
+**/credentials.*
 
 # Build output
 /index.html
 nohup.out
 *.log
-.next/
 
-# caveman-compress human-readable backups (local only)
+# Local-only artifacts
 *.original.md
-
-# Local-only internal docs
 caveman.md
-AGENTS.md
-BUGS.md
-CLAUDE.md
-DESIGN_SYSTEM.md
-ROBOT.md
-TODO.md
-WALKTHROUGH.md
 docs/reports/
 glowtris-itchio.zip
 images/reddit-cover.png
