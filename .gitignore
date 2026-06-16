@@ -21,6 +21,7 @@ nohup.out
 # Local-only artifacts
 *.original.md
 caveman.md
+run_log.txt
 docs/reports/
 glowtris-itchio.zip
 images/reddit-cover.png
