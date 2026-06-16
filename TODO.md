@@ -2,10 +2,11 @@
 - Part A: Make engine strong. No show public. (v0.2 to v0.9)
 - Part B: Release to world. Get many tribesmen. (v1.0 to v2.0)
 
-## NEXT V0.6 (MODES & METRICS)
-- [ ] Count APM and PPS. Show on screen.
-- [ ] Build 10x40 board. Eye see only 10x20. (Vanish Zone)
-- [ ] Fix 3-corner crash. Keep all button press. (Input Buffer & 3-Corner G-Spin Rule)
+## V0.6 DONE (MODES & METRICS)
+- [x] Count APM and PPS. Show on screen.
+- [x] Build 10x40 board. Eye see only 10x20. (Vanish Zone)
+- [x] Fix 3-corner crash. Keep all button press. (Input Buffer & 3-Corner G-Spin Rule)
+- [x] Add Blitz mode. Fast fight.
 
 ## NEXT V0.7 (SOCIAL)
 - [ ] Show rank percent.
