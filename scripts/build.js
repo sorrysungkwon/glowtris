@@ -57,6 +57,67 @@ async function build() {
   fs.writeFileSync(path.join(root, 'index.html'), html);
   console.log(`Built index.html  ${(html.length / 1024).toFixed(1)} KB`);
 
+  // --- Programmatic SEO Generation ---
+  const seoPages = [
+    {
+      filename: 'sprint.html',
+      title: 'Glowtris Sprint Mode — Fast Neon Block Stacking Game',
+      desc: 'Play Glowtris Sprint Mode. Clear 40 lines as fast as you can in this neon block stacking game. No download required.',
+      url: 'https://glowtris.com/sprint.html'
+    },
+    {
+      filename: 'zen.html',
+      title: 'Glowtris Zen Mode — Relaxing Neon Block Game',
+      desc: 'Relax with Glowtris Zen Mode. No timer, no pressure, just endless neon block stacking. Free browser game.',
+      url: 'https://glowtris.com/zen.html'
+    },
+    {
+      filename: 'unblocked.html',
+      title: '학교에서 뚫리는 테트리스 무설치 — 글로우트리스 (Unblocked)',
+      desc: '학교나 회사에서 막히지 않고 뚫리는 무설치 네온 블록 퍼즐 게임. 웹 브라우저에서 바로 즐기는 글로우트리스입니다.',
+      url: 'https://glowtris.com/unblocked.html'
+    },
+    {
+      filename: 'multiplayer.html',
+      title: 'Glowtris Async Multiplayer — Compete in Neon Blocks',
+      desc: 'Challenge your friends in Glowtris async multiplayer. Compare scores and speed in this neon block stacking game.',
+      url: 'https://glowtris.com/multiplayer.html'
+    }
+  ];
+
+  seoPages.forEach(page => {
+    let pageHtml = html;
+    
+    pageHtml = pageHtml.replace(/<title>.*?<\/title>/g, `<title>${page.title}</title>`);
+    pageHtml = pageHtml.replace(/<meta property="og:title" content=".*?">/g, `<meta property="og:title" content="${page.title}">`);
+    pageHtml = pageHtml.replace(/<meta name="twitter:title" content=".*?">/g, `<meta name="twitter:title" content="${page.title}">`);
+    
+    pageHtml = pageHtml.replace(/<meta name="description" content=".*?">/g, `<meta name="description" content="${page.desc}">`);
+    pageHtml = pageHtml.replace(/<meta property="og:description" content=".*?">/g, `<meta property="og:description" content="${page.desc}">`);
+    pageHtml = pageHtml.replace(/<meta name="twitter:description" content=".*?">/g, `<meta name="twitter:description" content="${page.desc}">`);
+    
+    pageHtml = pageHtml.replace(/<meta property="og:url" content=".*?">/g, `<meta property="og:url" content="${page.url}">`);
+    pageHtml = pageHtml.replace(/<link rel="canonical" href=".*?">/g, `<link rel="canonical" href="${page.url}">`);
+    
+    fs.writeFileSync(path.join(root, page.filename), pageHtml);
+    console.log(`Built ${page.filename} ${(pageHtml.length / 1024).toFixed(1)} KB`);
+  });
+
+  const sitemapPath = path.join(root, 'sitemap.xml');
+  if (fs.existsSync(sitemapPath)) {
+    let sitemap = fs.readFileSync(sitemapPath, 'utf8');
+    const today = new Date().toISOString().split('T')[0];
+    
+    seoPages.forEach(page => {
+      if (!sitemap.includes(`<loc>${page.url}</loc>`)) {
+        const urlBlock = `  <url>\n    <loc>${page.url}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+        sitemap = sitemap.replace('</urlset>', `${urlBlock}</urlset>`);
+      }
+    });
+    fs.writeFileSync(sitemapPath, sitemap);
+    console.log('Updated sitemap.xml with SEO landing pages');
+  }
+
   // Auto-bump Service Worker cache version
   const swPath = path.join(root, 'sw.js');
   if (fs.existsSync(swPath)) {
