@@ -385,7 +385,7 @@
   }
   #level-bar-wrap { position:relative; width:100%; height:5px; margin:6px 0 4px; }
   #level-bar-wrap::before { content:""; position:absolute; top:50%; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); transform:translateY(-50%); z-index:0; }
-  #level-bar { position:relative; z-index:1; height:100%; background:linear-gradient(90deg,var(--cyan),var(--purple)); border-radius:var(--r-xs); transition:width var(--t-slow) var(--ease-standard); box-shadow:0 0 8px var(--cyan); }
+  #level-bar { position:relative; z-index:1; height:100%; width:100%; transform:scaleX(0); transform-origin:left; background:linear-gradient(90deg,var(--cyan),var(--purple)); border-radius:var(--r-xs); transition:transform var(--t-slow) var(--ease-standard); box-shadow:0 0 8px var(--cyan); }
   .divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:10px 0; }
   #combo-display { text-align:center; font-size:var(--type-label-l); color:var(--pink); letter-spacing:2px; min-height:14px; text-shadow:0 0 var(--type-label-m) var(--pink); }
 
@@ -2066,3 +2066,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 #seo-block ul { padding-left: 20px; }
 #seo-block li { margin-bottom: 4px; }
 #seo-block a { color: rgba(0,200,255,0.6); }
+
+/* Touch target fixes */
+.hud-btn { position: relative; }
+.hud-btn::after { content: ''; position: absolute; inset: -15px; }
+input, textarea, select { font-size: 16px; }
+button, a { touch-action: manipulation; }

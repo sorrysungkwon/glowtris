@@ -39,6 +39,7 @@ async function build() {
       bundle:      true,
       write:       false,
       format:      'iife',
+      minify:      true,
       platform:    'browser',
       target:      'es2018',
     });
