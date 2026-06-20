@@ -2066,3 +2066,9 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 #seo-block ul { padding-left: 20px; }
 #seo-block li { margin-bottom: 4px; }
 #seo-block a { color: rgba(0,200,255,0.6); }
+
+/* Touch target fixes */
+.hud-btn { position: relative; }
+.hud-btn::after { content: ''; position: absolute; inset: -15px; }
+input, textarea, select { font-size: 16px; }
+button, a { touch-action: manipulation; }
