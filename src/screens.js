@@ -324,9 +324,9 @@ export function _renderBlitzScreen(score, isNewBest, prevBest) {
       </div>
 
       <div style="width:100%">
-        <input id="lb-name" class="neon-input" maxlength="12" placeholder="ENTER NAME" value="${savedName}" autocomplete="off" spellcheck="false">
+        <input id="lb-name" class="neon-input" maxlength="12" placeholder="ENTER NAME" value="${savedName}" autocomplete="off" spellcheck="false" ${score<=0?'style="display:none"':''}>
         <div class="btn-row sub-actions">
-          <button id="lb-submit-btn" class="action-btn sm" onclick="submitBlitzScore(${score})">SUBMIT</button>
+          ${score>0?`<button id="lb-submit-btn" class="action-btn sm" onclick="submitBlitzScore(${score})">SUBMIT</button>`:''}
           <button class="action-btn sm ghost" onclick="startBlitzMode()">RETRY</button>
         </div>
       </div>
