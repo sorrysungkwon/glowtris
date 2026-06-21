@@ -2111,16 +2111,18 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
   max-width: 720px;
   margin: 0 auto;
   padding: 48px 24px 64px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.3);
   font-size: var(--type-title-s);
   line-height: 1.8;
 }
-#seo-block h1 { font-size: var(--type-body-xl); font-weight: 700; margin-bottom: var(--type-body-l); color: rgba(255,255,255,0.5); }
-#seo-block h2 { font-size: var(--type-title-s); font-weight: 700; margin: 20px 0 var(--type-label-m); color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
+#seo-block summary { color: rgba(255,255,255,0.2); cursor: pointer; font-size: var(--type-body-s); letter-spacing: 1px; }
+#seo-block summary::-webkit-details-marker { display: none; }
+#seo-block h1 { font-size: var(--type-body-xl); font-weight: 700; margin-bottom: var(--type-body-l); color: rgba(255,255,255,0.3); }
+#seo-block h2 { font-size: var(--type-title-s); font-weight: 700; margin: 20px 0 var(--type-label-m); color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
 #seo-block p, #seo-block ul { margin-bottom: 12px; }
 #seo-block ul { padding-left: 20px; }
 #seo-block li { margin-bottom: 4px; }
-#seo-block a { color: rgba(0,200,255,0.6); }
+#seo-block a { color: rgba(0,200,255,0.3); }
 
 /* Touch target fixes */
 .hud-btn { position: relative; }
