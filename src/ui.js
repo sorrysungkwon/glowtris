@@ -1031,7 +1031,7 @@ export function updateUI() {
     $level.textContent = S.level;  if ($levelM) $levelM.textContent = S.level;
     const ht = S._sprintHiTime > 0 ? fmtTime(S._sprintHiTime) : '--:--';
     $hiScore.textContent = ht; if ($hiScoreM) $hiScoreM.textContent = ht;
-    $levelBar.style.width      = (S.lines / SPRINT_LINES * 100) + '%';
+    $levelBar.style.transform  = 'scaleX(' + (S.lines / SPRINT_LINES) + ')';
     $levelBar.style.background = 'linear-gradient(90deg,#00ff88,#00c8ff)';
     $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
     updateAPMPPS();
@@ -1051,7 +1051,7 @@ export function updateUI() {
   $hiScore.textContent = hi; if ($hiScoreM) $hiScoreM.textContent = hi;
   const pct = ((S.lines % LEVEL_LINES) / LEVEL_LINES) * 100;
   const hue = (S.level-1)*30;
-  $levelBar.style.width      = pct + '%';
+  $levelBar.style.transform  = 'scaleX(' + (pct / 100) + ')';
   $levelBar.style.background = `linear-gradient(90deg,hsl(${190+hue},100%,50%),hsl(${270+hue},100%,50%))`;
   $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
   updateAPMPPS();
