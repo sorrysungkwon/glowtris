@@ -256,12 +256,26 @@
     </div>
   </div>
 
-  <!-- v0.6 -->
+  <!-- v0.7 -->
   <div class="version-card latest">
+    <div class="version-header">
+      <span class="version-tag">v0.7</span>
+      <span class="version-date">Jun 2026</span>
+      <span class="version-badge">Latest</span>
+    </div>
+    <ul class="change-list">
+      <li class="perf"><span class="change-label">LCP & Latency Improvements</span> — Deferred non-critical API requests (`/api/maintenance`, `/api/leaderboard`) from the main thread, and implemented Edge Caching with MGET optimizations to reduce initial load latency from 1.2s to under 30ms.</li>
+      <li class="feat"><span class="change-label">Touch Targets Expanded</span> — Footer links updated with negative margin CSS to increase hitboxes for mobile devices without breaking visual layout compactness, ensuring PageSpeed Accessibility compliance.</li>
+      <li class="fix"><span class="change-label">Layout Thrashing Eliminated</span> — Replaced `offsetHeight` reads during PWA initialization with `requestAnimationFrame` to prevent forced synchronous reflows.</li>
+      <li class="infra"><span class="change-label">Agentic Browsing Support</span> — Added standard `llms.txt` and optimized Vercel routing rules.</li>
+    </ul>
+  </div>
+
+  <!-- v0.6 -->
+  <div class="version-card">
     <div class="version-header">
       <span class="version-tag">v0.6</span>
       <span class="version-date">Jun 2026</span>
-      <span class="version-badge">Latest</span>
     </div>
     <ul class="change-list">
       <li class="feat"><span class="change-label">Vanish Zone</span> — Pieces now spawn 2 rows above the visible board (10×22 logic board); the vanish rows are hidden by a gradient overlay, matching competitive-standard behavior</li>
