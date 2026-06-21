@@ -280,8 +280,8 @@ function lockPiece(){
 
 function addScore(pts,n,tspin=false,b2b=false){
   S.score+=pts;
-  // In sprint/flow modes score is cosmetic only — don't update marathon hi-score or achievements
-  if(!S.isSprintMode&&!S.isFlowMode){
+  // In sprint/blitz/flow modes score is cosmetic only — don't update marathon hi-score or achievements
+  if(!S.isSprintMode&&!S.isBlitzMode&&!S.isFlowMode){
     if(S.score>S.hiScore){S.hiScore=S.score;localStorage.setItem(LS.HI,S.hiScore);}
     if(S.score>=50000)unlockAchievement('score_50k');
     if(S.score>=100000)unlockAchievement('score_100k');
@@ -965,6 +965,7 @@ function endGame(){
 // ending the run. Every other mode ends normally.
 function topOut(){
   if(S.isFlowMode) flowCollapse();
+  else if(S.isBlitzMode) endTimeAttack();
   else endGame();
 }
 
