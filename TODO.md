@@ -29,9 +29,9 @@
 - [ ] Let world see. (Public launch v1.0)
 
 ## NEXT V1.2 (BLITZ)
-- [ ] Play 2 minute. Fast end.
-- [ ] Score big near end.
-- [ ] Count play days.
+- [x] Play 2 minute. Fast end. (Done as Blitz)
+- [x] Score big near end.
+- [x] Count play days.
 
 ## NEXT V1.3 (TRAIN)
 - [ ] Practice. Never die.
