@@ -307,6 +307,41 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
   onPWAGameOver();
 }
 
+export function _renderBlitzScreen(score, isNewBest, prevBest) {
+  offlineBarGameEnd();
+  const savedName=localStorage.getItem(LS.NAME)||'';
+  const prevBestLine=prevBest>0&&!isNewBest
+    ?`<div style="font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,0.3);margin-bottom:10px">BEST: ${prevBest.toLocaleString()}</div>`:'';
+
+  $overlay.innerHTML=`
+    <div class="glass-panel">
+      <h1 class="game-over-header" style="margin-bottom:8px !important;color:var(--mode-blitz);text-shadow:0 0 20px var(--mode-blitz)">🔥 BLITZ OVER!</h1>
+      ${isNewBest?'<div class="new-best-badge">★ NEW BEST ★</div>':prevBestLine}
+
+      <div class="game-over-stats" style="padding:16px 12px">
+        <div style="font-size:9px;letter-spacing:3px;color:rgba(255,200,0,0.6);margin-bottom:6px">FINAL SCORE</div>
+        <div style="font-size:40px;font-weight:900;color:#ffe600;text-shadow:0 0 20px rgba(255,230,0,0.7);letter-spacing:2px;font-family:monospace;line-height:1.2">${score.toLocaleString()}</div>
+      </div>
+
+      <div style="width:100%">
+        <input id="lb-name" class="neon-input" maxlength="12" placeholder="ENTER NAME" value="${savedName}" autocomplete="off" spellcheck="false">
+        <div class="btn-row sub-actions">
+          <button id="lb-submit-btn" class="action-btn sm" onclick="submitBlitzScore(${score})">SUBMIT</button>
+          <button class="action-btn sm ghost" onclick="startBlitzMode()">RETRY</button>
+        </div>
+      </div>
+      <div id="lb-result" style="margin-top:14px;width:100%;display:flex;flex-direction:column;align-items:center"></div>
+      ${_donationHTML()}
+    </div>`;
+  $overlay.style.display='flex';
+  const inp=document.getElementById('lb-name');
+  if (!('ontouchstart' in window)) {
+    inp.focus(); inp.select();
+  }
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitBlitzScore(score);});
+  onPWAGameOver();
+}
+
 export function _renderSprintScreen(timeMs, isNewBest, prevBest) {
   offlineBarGameEnd();
   const savedName=localStorage.getItem(LS.NAME)||'';
@@ -372,6 +407,7 @@ export function showStartScreen(){
           <button id="lb-mode-marathon" class="lb-tab ${S.lbMode==='marathon'?'active':''}" onclick="setLbMode('marathon')">MARATHON</button>
           <button id="lb-mode-sprint" class="lb-tab ${S.lbMode==='sprint'?'active':''}" onclick="setLbMode('sprint')">⚡ SPRINT</button>
           <button id="lb-mode-daily" class="lb-tab ${S.lbMode==='daily'?'active':''}" onclick="setLbMode('daily')">🏆 DAILY</button>
+          <button id="lb-mode-blitz" class="lb-tab ${S.lbMode==='blitz'?'active':''}" onclick="setLbMode('blitz')">🔥 BLITZ</button>
         </div>
         <div class="lb-tabs-container lb-tabs">
           ${S.lbMode==='daily' ? `
