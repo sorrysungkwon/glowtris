@@ -8,17 +8,17 @@
 - [x] Fix 3-corner crash. Keep all button press. (Input Buffer & 3-Corner G-Spin Rule)
 - [x] Add Blitz mode. Fast fight.
 
-## NEXT V0.7 (SOCIAL)
+## NEXT V0.7 (GAMEPLAY FEEL)
+- [ ] Smash ghost piece. Show who to beat next. (Target Overtake UI)
+- [ ] Make controller shake hand on drop.
+- [ ] Make screen shake on big clear.
+
+## NEXT V0.8 (SOCIAL)
 - [ ] Show rank percent.
 - [ ] Show score gap.
 - [ ] Give link to fight.
 - [ ] Give rival.
 - [ ] Fight every week.
-
-## NEXT V0.8 (GAMEPLAY FEEL)
-- [ ] Smash ghost piece. Show who to beat next. (Target Overtake UI)
-- [ ] Make controller shake hand on drop.
-- [ ] Make screen shake on big clear.
 
 ## NEXT V0.9 (MICRO-INTERACTIONS)
 - [ ] Screen bleed red when blocks are high. (Danger pulse)
