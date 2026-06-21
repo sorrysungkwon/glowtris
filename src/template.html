@@ -82,16 +82,73 @@ if ('serviceWorker' in navigator) {
     "@context": "https://schema.org",
     "@type": "VideoGame",
     "name": "Glowtris",
-    "description": "Free neon-styled block-stacking game playable in any browser. Features daily challenges, global leaderboard, sprint mode, and PWA support.",
+    "description": "Glowtris is a free neon block-stacking puzzle game that runs in any browser with no download required. Stack falling neon blocks, clear lines, and compete on a global leaderboard. Features Daily Challenge (same seed for all players worldwide), Marathon mode (endless classic play), Sprint mode (clear 40 lines as fast as possible), and Blitz mode (score as many points as you can in 2 minutes). Free to play, no ads, no account needed. Installs as a PWA on iOS and Android home screens.",
     "url": "https://glowtris.com",
     "image": "https://glowtris.com/api/og",
-    "genre": ["Puzzle", "Arcade"],
-    "gamePlatform": "Web Browser",
+    "genre": ["Puzzle", "Arcade", "Block Puzzle", "Tetris-like"],
+    "gamePlatform": ["Web Browser", "iOS", "Android"],
     "applicationCategory": "Game",
     "operatingSystem": "Any",
+    "keywords": "block stacking game, neon puzzle game, tetris online, free browser game, daily challenge game, block puzzle, line clearing game",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Person", "name": "sorrysungkwon" },
-    "inLanguage": ["en", "ko"]
+    "inLanguage": ["en", "ko"],
+    "featureList": [
+      "Daily Challenge — same block sequence for every player worldwide",
+      "Global real-time leaderboard",
+      "Marathon mode — endless block-stacking",
+      "Sprint mode — clear 40 lines as fast as possible",
+      "Blitz mode — score as many points as possible in 2 minutes",
+      "PWA — installs on iOS and Android home screen",
+      "Push notifications for daily challenge reminders",
+      "No account required, no ads, completely free"
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Glowtris?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Glowtris is a free neon block-stacking puzzle game that runs in any browser with no download or account required. Stack falling neon blocks, clear lines, and compete on a global leaderboard — all for free, with no ads."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What game modes does Glowtris have?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Glowtris has four modes: Daily Challenge (every player gets the same block sequence each day), Marathon (endless classic block-stacking), Sprint (clear 40 lines as fast as possible), and Blitz (score as many points as you can in 2 minutes)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Glowtris free to play?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Glowtris is completely free to play with no ads, no account, and no download required. It runs in any modern browser on desktop or mobile."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I play Glowtris on mobile?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Glowtris works on mobile browsers and can be installed as a PWA (Progressive Web App) directly on your iOS or Android home screen for an app-like experience."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the Daily Challenge work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Every day at midnight UTC, Glowtris generates a new Daily Challenge using a fixed random seed. Every player worldwide gets the exact same sequence of blocks, making it a fair global competition. Your score is recorded on today's leaderboard."
+        }
+      }
+    ]
   }
 ]
 </script>
