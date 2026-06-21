@@ -52,8 +52,8 @@ async function build() {
   }
 
   const html = template
-    .replace('<!--BUILD_CSS-->', `<style>\n${css.trimEnd()}\n</style>`)
-    .replace('<!--BUILD_JS-->',  `<script>\n${js.trimEnd()}\n</script>`);
+    .replace('<!--BUILD_CSS-->', () => `<style>\n${css.trimEnd()}\n</style>`)
+    .replace('<!--BUILD_JS-->',  () => `<script>\n${js.trimEnd()}\n</script>`);
 
   fs.writeFileSync(path.join(root, 'index.html'), html);
   console.log(`Built index.html  ${(html.length / 1024).toFixed(1)} KB`);
