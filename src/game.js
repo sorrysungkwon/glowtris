@@ -195,6 +195,10 @@ function lockPiece(){
     if(isDifficult){S.b2b=true;}else{S.b2b=false;}
     sfxLineClear(cleared.length);
     if(tspin){sfxTSpin();if(S.animIntensity==='full'){S.shakeFrames=Math.max(S.shakeFrames,12+cleared.length*6);S.shakeMag=Math.max(S.shakeMag,0.55);}}
+    if(navigator.vibrate) {
+      if(cleared.length >= 4 || tspin) navigator.vibrate([30, 50, 40]);
+      else navigator.vibrate(20);
+    }
     if(S.combo>1&&S.animIntensity!=='off'){
       S.comboFlash=15 + (S.combo>=4 ? 15 : 0);
       S.comboFlashColor=S.combo>=5?'#ff0080':S.combo>=3?'#a000ff':'#00c8ff';
@@ -604,6 +608,7 @@ function hardDrop(){
   let d=0;while(validPos(S.current,0,1)){S.current.y++;d++;}
   S.score+=d*2;updateUI();
   if(S.animIntensity==='full'){S.shakeFrames=Math.min(12,5+Math.floor(d*0.45));S.shakeMag=2.8;S.shakeAllDir=true;}
+  if(navigator.vibrate) navigator.vibrate(15);
   spawnHardDropParticles(S.current);
   sfxHardDrop();
   lockPiece();

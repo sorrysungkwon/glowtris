@@ -50,8 +50,8 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | 🏆 Scoring Standard | v0.4 ✅ | B2B 1.5×, 3-piece queue, all-spin (SRS+), BUG-012/013 |
 | 🖼 Renderer & Audio | v0.5 ✅ | Web Audio API low-latency audio, PixiJS WebGL2 renderer (Abandoned — kept lightweight 2D Canvas due to iOS regressions) |
 | ⏱ Modes & Metrics | v0.6 ✅ | Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar, Blitz mode |
-| 👥 Social Ranking | v0.7 | Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag system |
-| 📳 Gameplay Feel | v0.8 | Mobile haptic feedback (hard drop + line clear), micro-vibration patterns |
+| 📳 Gameplay Feel | v0.7 | Mobile haptic feedback (hard drop + line clear), micro-vibration patterns |
+| 👥 Social Ranking | v0.8 | Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag system |
 | ✨ Micro-interactions | v0.9 | Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations |
 
 ### Phase B — Go-to-Market & Growth (Gated by Phase A)
@@ -123,8 +123,8 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
 | v0.5 | **Renderer & Audio** — Web Audio API low-latency audio, render interpolation (PixiJS WebGL2 renderer Abandoned due to iOS regressions, keeping lightweight 2D Canvas engine) | ✅ Done |
 | v0.6 | **Modes & Metrics** — Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar gradient | ✅ Done |
-| v0.7 | **Social Ranking** — Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag identity system | 🔲 Planned |
-| v0.8 | **Haptic Feedback** — Mobile vibration on hard drop + line clear; micro-vibration patterns | 🔲 Planned |
+| v0.7 | **Haptic Feedback** — Mobile vibration on hard drop + line clear; micro-vibration patterns | 🔲 Planned |
+| v0.8 | **Social Ranking** — Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag identity system | 🔲 Planned |
 | v0.9 | **Micro-interactions** — Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations | 🔲 Planned |
 
 ### 🔮 Planned — Phase B (Public Launch & Growth, post-1.0)
