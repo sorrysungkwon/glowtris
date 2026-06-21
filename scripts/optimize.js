@@ -35,7 +35,7 @@ async function run() {
 
   // Prepend to style.css
   let css = fs.readFileSync(cssPath, 'utf8');
-  if (!css.includes('font-family: \'Orbitron\'')) {
+  if (!css.includes('/* INLINED FONTS */')) {
     css = `/* INLINED FONTS */\n${combinedCss}\n/* END FONTS */\n` + css;
   }
 
