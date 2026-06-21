@@ -51,12 +51,42 @@ async function build() {
     console.log('Mode: direct concat (no imports in game.js)');
   }
 
-  const html = template
+  const baseHtml = template
     .replace('<!--BUILD_CSS-->', () => `<style>\n${css.trimEnd()}\n</style>`)
     .replace('<!--BUILD_JS-->',  () => `<script>\n${js.trimEnd()}\n</script>`);
 
-  fs.writeFileSync(path.join(root, 'index.html'), html);
-  console.log(`Built index.html  ${(html.length / 1024).toFixed(1)} KB`);
+  const pages = [
+    {
+      file: 'index.html',
+      title: 'GLOWTRIS',
+      desc: 'A free neon block-stacking game in your browser. No downloads, no ads. Just pure stacking action.',
+    },
+    {
+      file: 'sprint.html',
+      title: 'Play Tetris Sprint Online — 40 Lines Fast — GLOWTRIS',
+      desc: 'Test your speed in 40-line sprint mode. Free online block puzzle game with no ads and instant browser play.',
+    },
+    {
+      file: 'unblocked.html',
+      title: 'Tetris Unblocked — Play Free Online — GLOWTRIS',
+      desc: 'Play Glowtris unblocked at school or work. No downloads, 100% free neon puzzle game.',
+    },
+    {
+      file: 'tetris-online.html',
+      title: 'Free Tetris Online — Neon Puzzle Game — GLOWTRIS',
+      desc: 'The best free online Tetris alternative. Beautiful neon graphics, smooth controls, and no ads.',
+    }
+  ];
+
+  for (const p of pages) {
+    const pageHtml = baseHtml
+      .replace('<title>GLOWTRIS</title>', `<title>${p.title}</title>`)
+      .replace('<meta name="description" content="A free neon block-stacking game in your browser. No downloads, no ads. Just pure stacking action.">', `<meta name="description" content="${p.desc}">`)
+      .replace('<link rel="canonical" href="https://glowtris.com">', `<link rel="canonical" href="https://glowtris.com/${p.file === 'index.html' ? '' : p.file}">`);
+    
+    fs.writeFileSync(path.join(root, p.file), pageHtml);
+    console.log(`Built ${p.file.padEnd(20)} ${(pageHtml.length / 1024).toFixed(1)} KB`);
+  }
 
   // Auto-bump Service Worker cache version
   const swPath = path.join(root, 'sw.js');
