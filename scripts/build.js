@@ -58,32 +58,43 @@ async function build() {
   const pages = [
     {
       file: 'index.html',
-      title: 'GLOWTRIS',
-      desc: 'A free neon block-stacking game in your browser. No downloads, no ads. Just pure stacking action.',
+      title: 'Glowtris — Free Neon Block Puzzle Game Online',
+      desc: 'Free neon block-stacking puzzle game. Daily challenges, global leaderboard, sprint & blitz modes. No download, no ads. Play in any browser.',
+      ogTitle: 'Glowtris — Free Neon Block Puzzle Game',
+      ogDesc: 'Daily challenges, global leaderboard, sprint & blitz modes. Free, no ads, no download.',
     },
     {
       file: 'sprint.html',
-      title: 'Play Tetris Sprint Online — 40 Lines Fast — GLOWTRIS',
-      desc: 'Test your speed in 40-line sprint mode. Free online block puzzle game with no ads and instant browser play.',
+      title: 'Tetris Sprint Online — Clear 40 Lines Fast — Glowtris',
+      desc: 'Race to clear 40 lines as fast as possible. Free online sprint mode block puzzle game — no download, no ads.',
+      ogTitle: 'Tetris Sprint Online — Glowtris',
+      ogDesc: 'Clear 40 lines as fast as possible. Free sprint mode block puzzle, no download.',
     },
     {
       file: 'unblocked.html',
-      title: 'Tetris Unblocked — Play Free Online — GLOWTRIS',
-      desc: 'Play Glowtris unblocked at school or work. No downloads, 100% free neon puzzle game.',
+      title: 'Tetris Unblocked — Free Online Block Game — Glowtris',
+      desc: 'Play Glowtris unblocked at school or work. Free neon block puzzle game, no download, no ads, works anywhere.',
+      ogTitle: 'Tetris Unblocked — Glowtris',
+      ogDesc: 'Free neon block puzzle game, unblocked. No download, no ads, works anywhere.',
     },
     {
       file: 'tetris-online.html',
-      title: 'Free Tetris Online — Neon Puzzle Game — GLOWTRIS',
-      desc: 'The best free online Tetris alternative. Beautiful neon graphics, smooth controls, and no ads.',
-    }
+      title: 'Play Tetris Online Free — No Download — Glowtris',
+      desc: 'Play Tetris-style block puzzle game online for free. Daily challenges, global leaderboard, sprint mode. No ads, no download, works in any browser.',
+      ogTitle: 'Play Tetris Online Free — Glowtris',
+      ogDesc: 'Free Tetris-style game online. Daily challenges, global leaderboard. No download, no ads.',
+    },
   ];
 
   for (const p of pages) {
+    const canonical = `https://glowtris.com/${p.file === 'index.html' ? '' : p.file}`;
     const pageHtml = baseHtml
       .replace('<title>GLOWTRIS</title>', `<title>${p.title}</title>`)
-      .replace('<meta name="description" content="A free neon block-stacking game in your browser. No downloads, no ads. Just pure stacking action.">', `<meta name="description" content="${p.desc}">`)
-      .replace('<link rel="canonical" href="https://glowtris.com">', `<link rel="canonical" href="https://glowtris.com/${p.file === 'index.html' ? '' : p.file}">`);
-    
+      .replace('content="A free neon block-stacking game in your browser. No downloads, no ads. Just pure stacking action."', `content="${p.desc}"`)
+      .replace('content="BUILD_OG_TITLE"', `content="${p.ogTitle}"`)
+      .replaceAll('content="BUILD_OG_DESC"', `content="${p.ogDesc}"`)
+      .replace('<link rel="canonical" href="https://glowtris.com">', `<link rel="canonical" href="${canonical}">`);
+
     fs.writeFileSync(path.join(root, p.file), pageHtml);
     console.log(`Built ${p.file.padEnd(20)} ${(pageHtml.length / 1024).toFixed(1)} KB`);
   }
