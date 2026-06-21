@@ -1,4 +1,4 @@
-const CACHE      = 'glowtris-808015';
+const CACHE      = 'glowtris-bff4c6';
 const FONT_CACHE = 'glowtris-fonts-v1';
 const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 const FONT_URLS  = [
