@@ -1433,7 +1433,7 @@
   /* Overlays (pause/game-over) only show when game is paused — keep their blur */
 
   .footer-link {
-    color:rgba(0,200,255,0.3); text-decoration:none; margin:0 6px;
+    color:rgba(0,200,255,0.3); text-decoration:none; margin:0 2px; padding: 12px; display: inline-block;
     transition:color .2s;
   }
   .footer-link:hover { color:var(--cyan); }
@@ -1799,7 +1799,7 @@
     margin-top: 14px; text-align: center; font-size: var(--type-body-s); letter-spacing: 1.5px;
   }
   .footer-links-wrap .footer-link {
-    color: rgba(255, 255, 255, 0.45); text-decoration: none; margin: 0 8px;
+    color: rgba(255, 255, 255, 0.45); text-decoration: none; margin: 0 2px; padding: 12px; display: inline-block;
     font-size: var(--type-label-l); font-weight: 700; transition: color .2s;
   }
   .footer-links-wrap .footer-link:hover {
