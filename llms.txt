@@ -1,0 +1,8 @@
+# Glowtris
+
+Glowtris is a browser-based block-stacking game.
+
+- [Play Glowtris](https://glowtris.com)
+- [Read the Developer Blog](https://blog.glowtris.com)
+- [Privacy Policy](https://glowtris.com/privacy.html)
+- [Terms of Service](https://glowtris.com/terms.html)

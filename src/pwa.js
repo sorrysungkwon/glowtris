@@ -214,8 +214,11 @@ function _showSheet() {
     document.body.appendChild(el);
   }
 
-  el.offsetHeight; // force reflow for transition
-  if (!_gameActive) el.classList.add('visible');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (!_gameActive) el.classList.add('visible');
+    });
+  });
 }
 
 export function hidePWASheet() {

@@ -416,7 +416,7 @@ export function showStartScreen(){
       </div>
     </div>`;
   $overlay.style.display='flex';
-  loadStartLeaderboard();
+  setTimeout(loadStartLeaderboard, 100);
   onPWAGameOver();
 }
 
