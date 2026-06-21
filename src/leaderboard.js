@@ -130,6 +130,70 @@ export async function submitSprintScore(timeMs){
   }
 }
 
+export async function submitBlitzScore(score){
+  const inp=document.getElementById('lb-name');
+  const res=document.getElementById('lb-result');
+  const btn=document.getElementById('lb-submit-btn');
+  if(!inp||!res||!btn)return;
+  if(btn.disabled)return;
+  const name=inp.value.trim();
+  if(!name){inp.focus();return;}
+  localStorage.setItem(LS.NAME,name);
+  btn.disabled=true;inp.disabled=true;
+  res.innerHTML=`
+    <div class="lb-offline" style="margin-top:10px; gap:6px;">
+      <div class="lb-offline-icon" style="font-size:24px; animation: text-pulse 1.5s infinite;">🚀</div>
+      <div class="lb-offline-txt" style="color:var(--cyan); animation: text-pulse 1.5s infinite;">SUBMITTING...</div>
+    </div>`;
+  try{
+    const r=await fetch('/api/leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,score,mode:'blitz',date:getLocalDate()})});
+    const data=await r.json();
+    if(data.blitzBoard){
+      S._lbCache={...S._lbCache,blitzBoard:data.blitzBoard||[],blitzDailyBoard:data.blitzDailyBoard||[],blitzWeeklyBoard:data.blitzWeeklyBoard||[],blitzRank:data.blitzRank,blitzDailyRank:data.blitzDailyRank,blitzWeeklyRank:data.blitzWeeklyRank,myName:name,myBlitzScore:score};
+      const rankMsg=[
+        data.blitzDailyRank?`<div class="sub" style="color:#00ff88;margin-bottom:2px">TODAY: #${data.blitzDailyRank}</div>`:'',
+        data.blitzWeeklyRank?`<div class="sub" style="color:#00c8ff;margin-bottom:2px">WEEKLY: #${data.blitzWeeklyRank}</div>`:'',
+        data.blitzRank?`<div class="sub" style="color:#ffe600;margin-bottom:6px">ALL TIME: #${data.blitzRank}</div>`:'',
+      ].join('');
+      inp.style.display='none';btn.closest('.btn-row').style.display='none';
+      const tabs=`<div class="lb-tabs">
+        <button class="lb-tab active" data-tab="blitz-daily" onclick="renderLbTab('blitz-daily')">TODAY</button>
+        <button class="lb-tab" data-tab="blitz-weekly" onclick="renderLbTab('blitz-weekly')">WEEKLY</button>
+        <button class="lb-tab" data-tab="blitz-all" onclick="renderLbTab('blitz-all')">ALL TIME</button>
+      </div><div class="lb-inner">${lbHTML(data.blitzDailyBoard||[],name,data.blitzDailyRank,score)}</div>`;
+      res.innerHTML=rankMsg+tabs+`<div class="btn-row"><button class="action-btn sm" onclick="showStartScreen()">PLAY AGAIN</button></div>`;
+    }else{
+      btn.disabled=false;inp.disabled=false;
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">⚠️</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">SAVE FAILED</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
+    }
+  }catch(e){
+    btn.disabled=false;inp.disabled=false;
+    if(!navigator.onLine){
+      _enqueueScore({name,score,mode:'blitz'});
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:rgba(255,200,80,0.9)">💾</div>
+          <div class="lb-offline-txt" style="color:rgba(255,200,80,0.9);">SAVED OFFLINE</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px; letter-spacing:0.5px">Will submit when back online</div>
+        </div>`;
+      const onResume=()=>{window.removeEventListener('online',onResume);const r=document.getElementById('lb-result');if(r&&r.innerHTML.includes('SAVED OFFLINE')){const b=document.getElementById('lb-submit-btn');if(b&&!b.disabled)b.click();}};
+      window.addEventListener('online',onResume);
+    }else{
+      res.innerHTML=`
+        <div class="lb-offline" style="margin-top:10px; gap:6px;">
+          <div class="lb-offline-icon" style="font-size:24px; color:var(--pink)">📡</div>
+          <div class="lb-offline-txt" style="color:var(--pink);">NETWORK ERROR</div>
+          <div style="font-size:8px; color:rgba(255,255,255,0.4); margin-top:-2px">Please try again</div>
+        </div>`;
+    }
+  }
+}
+
 export async function shareSprintScore(timeMs,rank){
   gtag('share_score', { game_mode: 'sprint', time_ms: timeMs, rank });
   const btn=event&&event.target?event.target:null;
@@ -495,6 +559,7 @@ export async function loadStartLeaderboard(){
   try{
     const base = S.lbMode==='daily'?'/api/leaderboard?mode=daily'
              :S.lbMode==='sprint'?'/api/leaderboard?mode=sprint'
+             :S.lbMode==='blitz'?'/api/leaderboard?mode=blitz'
              :'/api/leaderboard';
     const sep = base.includes('?') ? '&' : '?';
     const url = `${base}${sep}date=${getLocalDate()}`;
@@ -503,7 +568,7 @@ export async function loadStartLeaderboard(){
     S._lbCache={...S._lbCache,...data};
     S._lbOffline = false;
     const activeTab=document.querySelector('.lb-tab[data-tab].active');
-    const defaultTab=S.lbMode==='daily'?'challenge':S.lbMode==='sprint'?'sprint-daily':'daily';
+    const defaultTab=S.lbMode==='daily'?'challenge':S.lbMode==='sprint'?'sprint-daily':S.lbMode==='blitz'?'blitz-daily':'daily';
     renderLbTab(activeTab?activeTab.dataset.tab:defaultTab);
   }catch(e){
     S._lbOffline = true;
@@ -523,6 +588,7 @@ export function renderLbTab(tab){
   if(!inner)return;
   let entries, myRank;
   const isSprintTab=tab.startsWith('sprint');
+  const isBlitzTab=tab.startsWith('blitz');
   if(tab==='daily')            { entries=S._lbCache.dailyBoard||[];            myRank=S._lbCache.dailyRank; }
   else if(tab==='weekly')      { entries=S._lbCache.weeklyBoard||[];           myRank=S._lbCache.weeklyRank; }
   else if(tab==='challenge')   { entries=S._lbCache.challengeBoard||[];        myRank=S._lbCache.challengeRank; }
@@ -530,6 +596,9 @@ export function renderLbTab(tab){
   else if(tab==='sprint-daily'){ entries=S._lbCache.sprintDailyBoard||[];     myRank=S._lbCache.sprintDailyRank; }
   else if(tab==='sprint-weekly'){entries=S._lbCache.sprintWeeklyBoard||[];    myRank=S._lbCache.sprintWeeklyRank; }
   else if(tab==='sprint-all')  { entries=S._lbCache.sprintBoard||[];          myRank=S._lbCache.sprintRank; }
+  else if(tab==='blitz-daily') { entries=S._lbCache.blitzDailyBoard||[];      myRank=S._lbCache.blitzDailyRank; }
+  else if(tab==='blitz-weekly'){ entries=S._lbCache.blitzWeeklyBoard||[];     myRank=S._lbCache.blitzWeeklyRank; }
+  else if(tab==='blitz-all')   { entries=S._lbCache.blitzBoard||[];           myRank=S._lbCache.blitzRank; }
   else                         { entries=S._lbCache.board||[];                myRank=S._lbCache.rank; }
 
   document.querySelectorAll('.lb-tab[data-tab]').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
@@ -543,7 +612,7 @@ export function renderLbTab(tab){
     return;
   }
 
-  const myVal=isSprintTab?S._lbCache.mySprintTime:S._lbCache.myScore;
+  const myVal=isSprintTab?S._lbCache.mySprintTime:isBlitzTab?S._lbCache.myBlitzScore:S._lbCache.myScore;
   // Clear inline flex/centering styles left over from the LOADING placeholder.
   // Without this, the table is rendered as a flex item with align-items:center,
   // clipping the top rows so the visible list starts mid-rank.
@@ -555,7 +624,7 @@ export function renderLbTab(tab){
 
 export function setLbMode(mode) {
   S.lbMode=mode;
-  ['marathon','sprint','daily'].forEach(m=>{
+  ['marathon','sprint','daily','blitz'].forEach(m=>{
     const el=document.getElementById('lb-mode-'+m);
     if(el)el.classList.toggle('active',m===mode);
   });
@@ -572,6 +641,12 @@ export function setLbMode(mode) {
         <button class="lb-tab active" data-tab="sprint-daily" onclick="renderLbTab('sprint-daily')">TODAY</button>
         <button class="lb-tab" data-tab="sprint-weekly" onclick="renderLbTab('sprint-weekly')">WEEKLY</button>
         <button class="lb-tab" data-tab="sprint-all" onclick="renderLbTab('sprint-all')">ALL TIME</button>
+      `;
+    }else if(mode==='blitz'){
+      tc.innerHTML=`
+        <button class="lb-tab active" data-tab="blitz-daily" onclick="renderLbTab('blitz-daily')">TODAY</button>
+        <button class="lb-tab" data-tab="blitz-weekly" onclick="renderLbTab('blitz-weekly')">WEEKLY</button>
+        <button class="lb-tab" data-tab="blitz-all" onclick="renderLbTab('blitz-all')">ALL TIME</button>
       `;
     }else{
       tc.innerHTML=`

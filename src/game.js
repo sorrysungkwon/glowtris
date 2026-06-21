@@ -24,13 +24,13 @@ import {
 } from './ui.js';
 import {
   _openDonation, _donationHTML,
-  submitSprintScore, shareSprintScore, captureSprintImage,
+  submitSprintScore, submitBlitzScore, shareSprintScore, captureSprintImage,
   lbHTML, submitScore, captureGameImage, shareScore,
   loadStartLeaderboard, renderLbTab, setLbMode
 } from './leaderboard.js';
 import {
   showDailyGateOverlay, startDailyChallenge, togglePause, _saveGameStats, _renderGameOverScreen,
-  _renderSprintScreen, showStartScreen, showModeSelector, openSettings
+  _renderSprintScreen, _renderBlitzScreen, showStartScreen, showModeSelector, openSettings
 } from './screens.js';
 import { TICK_RATE, enqueueInput, resetLoop, tickLoop } from './loop.js';
 import { initPWA, offlineBarGameStart, offlineBarGameEnd } from './pwa.js';
@@ -1060,12 +1060,7 @@ export function endTimeAttack(){
     }
   }
 
-  // Reuse the game over screen logic for now, but mark it as Time Attack
-  setTimeout(() => {
-    const stats = _saveGameStats();
-    stats.isNewBest = isNewBest; // Force 'NEW BEST' UI flag if true
-    _renderGameOverScreen(stats);
-  }, 600);
+  setTimeout(() => _renderBlitzScreen(S.score, isNewBest, prevBest), 600);
 }
 
 export function startSprintMode(){
@@ -1172,7 +1167,7 @@ Object.assign(window, {
   startGame, startSprintMode, startBlitzMode, startDailyChallenge, launchDailyChallenge,
   startFlowMode, startMarathonMode,
   togglePause, showStartScreen, showModeSelector, openSettings,
-  submitScore, submitSprintScore, shareScore, shareSprintScore,
+  submitScore, submitSprintScore, submitBlitzScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
   toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,
   updateGhost, updateColorblind, cycleAnimIntensity, togglePerfMode,

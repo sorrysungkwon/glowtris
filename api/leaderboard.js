@@ -31,6 +31,16 @@ const KEY_SPRINT_WEEKLY = () => {
   return `${P}glowtris-sprint-weekly-${d.toISOString().slice(0,10)}`;
 };
 
+// Blitz keys — descending leaderboard (highest score = best)
+const KEY_BLITZ      = `${P}glowtris-blitz`;
+const KEY_BLITZ_DAILY  = (dateStr) => `${P}glowtris-blitz-daily-${dateStr}`;
+const KEY_BLITZ_WEEKLY = () => {
+  const d = new Date();
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() - day + 1);
+  return `${P}glowtris-blitz-weekly-${d.toISOString().slice(0,10)}`;
+};
+
 const TOP = 10;
 const TOP_ALLTIME = 20;
 const DAILY_TTL  = 60 * 60 * 52;
@@ -196,6 +206,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ sprintBoard, sprintDailyBoard, sprintWeeklyBoard });
     }
 
+    if (mode === 'blitz') {
+      const blitzDaily = KEY_BLITZ_DAILY(clientDate);
+      const blitzWeekly = KEY_BLITZ_WEEKLY();
+      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard] = await Promise.all([
+        getBoard(KEY_BLITZ, TOP_ALLTIME),
+        getBoard(blitzDaily),
+        getBoard(blitzWeekly),
+      ]);
+      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard });
+    }
+
     const [board, dailyBoard, weeklyBoard] = await Promise.all([
       getBoard(KEY_ALL, TOP_ALLTIME),
       getBoard(daily),
@@ -224,6 +245,7 @@ export default async function handler(req, res) {
     const member = encodeURIComponent(`${clean}#${Date.now()}`);
     const isChallenge = mode === 'daily' || req.body.challenge === 1;
     const isSprint = mode === 'sprint';
+    const isBlitz = mode === 'blitz';
 
     // ── Sprint mode ────────────────────────────────────────────────────────────
     if (isSprint) {
@@ -262,6 +284,44 @@ export default async function handler(req, res) {
       const sprintWeeklyRank = (weeklyRankData.result || 0) + 1;
 
       return res.status(200).json({ sprintBoard, sprintDailyBoard, sprintWeeklyBoard, sprintRank, sprintDailyRank, sprintWeeklyRank });
+    }
+
+    // ── Blitz mode ─────────────────────────────────────────────────────────────
+    if (isBlitz) {
+      if (!Number.isInteger(score) || score <= 0 || score > MAX_SCORE) {
+        return res.status(400).json({ error: 'score out of range' });
+      }
+      const blitzDaily = KEY_BLITZ_DAILY(clientDate);
+      const blitzWeekly = KEY_BLITZ_WEEKLY();
+
+      await Promise.all([
+        deduplicateAndAdd(KEY_BLITZ, clean, score, member),
+        deduplicateAndAdd(blitzDaily, clean, score, member),
+        deduplicateAndAdd(blitzWeekly, clean, score, member),
+      ]);
+
+      await Promise.all([
+        redis(`zremrangebyrank/${KEY_BLITZ}/0/-${TOP_ALLTIME + 1}`),
+        redis(`expire/${blitzDaily}/${DAILY_TTL}`),
+        redis(`expire/${blitzWeekly}/${WEEKLY_TTL}`),
+      ]);
+
+      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard] = await Promise.all([
+        getBoard(KEY_BLITZ, TOP_ALLTIME),
+        getBoard(blitzDaily),
+        getBoard(blitzWeekly),
+      ]);
+
+      const [allRankData, dailyRankData, weeklyRankData] = await Promise.all([
+        redis(`zcount/${KEY_BLITZ}/${score + 1}/+inf`),
+        redis(`zcount/${blitzDaily}/${score + 1}/+inf`),
+        redis(`zcount/${blitzWeekly}/${score + 1}/+inf`),
+      ]);
+      const blitzRank       = (allRankData.result    || 0) + 1;
+      const blitzDailyRank  = (dailyRankData.result  || 0) + 1;
+      const blitzWeeklyRank = (weeklyRankData.result || 0) + 1;
+
+      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzRank, blitzDailyRank, blitzWeeklyRank });
     }
 
     // ── Daily Challenge mode ───────────────────────────────────────────────────
