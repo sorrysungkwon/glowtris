@@ -2179,13 +2179,10 @@ button, a { touch-action: manipulation; }
   gap: 8px;
 }
 
-/* user row + score side by side */
 .target-info {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
+  flex-direction: column;
+  gap: 3px;
   width: 100%;
 }
 
@@ -2197,7 +2194,6 @@ button, a { touch-action: manipulation; }
   font-weight: 600;
   color: rgba(255, 255, 255, 0.65);
   min-width: 0;
-  flex: 1;
 }
 
 .target-name-text {
@@ -2216,7 +2212,7 @@ button, a { touch-action: manipulation; }
   color: #fff;
   text-shadow: 0 0 10px rgba(255, 230, 0, 0.8);
   line-height: 1;
-  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .progress-track {

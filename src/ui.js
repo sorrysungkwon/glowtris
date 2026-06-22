@@ -1103,7 +1103,7 @@ function triggerTargetOvertake() {
     tBox.classList.remove('overtaken');
 
     setTimeout(() => {
-      tTitle.textContent = '🎯 NEXT TARGET';
+      tTitle.textContent = 'NEXT TARGET';
       tTitle.style.color = '#ffe600';
 
       S.targetIndex++;
