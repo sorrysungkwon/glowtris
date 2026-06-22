@@ -76,7 +76,8 @@ if ('serviceWorker' in navigator) {
       "@type": "SearchAction",
       "target": "https://glowtris.com/?search={search_term_string}",
       "query-input": "required name=search_term_string"
-    }
+    },
+    "inLanguage": "en"
   },
   {
     "@context": "https://schema.org",
@@ -85,14 +86,30 @@ if ('serviceWorker' in navigator) {
     "description": "Glowtris is a free neon block-stacking puzzle game that runs in any browser with no download required. Stack falling neon blocks, clear lines, and compete on a global leaderboard. Features Daily Challenge (same seed for all players worldwide), Marathon mode (endless classic play), Sprint mode (clear 40 lines as fast as possible), and Blitz mode (score as many points as you can in 2 minutes). Free to play, no ads, no account needed. Installs as a PWA on iOS and Android home screens.",
     "url": "https://glowtris.com",
     "image": "https://glowtris.com/api/og",
-    "genre": ["Puzzle", "Arcade", "Block Puzzle", "Tetris-like"],
-    "gamePlatform": ["Web Browser", "iOS", "Android"],
+    "genre": [
+      "Puzzle",
+      "Arcade",
+      "Block Puzzle",
+      "Tetris-like"
+    ],
+    "gamePlatform": [
+      "Web Browser",
+      "iOS",
+      "Android"
+    ],
     "applicationCategory": "Game",
     "operatingSystem": "Any",
     "keywords": "block stacking game, neon puzzle game, tetris online, free browser game, daily challenge game, block puzzle, line clearing game",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "author": { "@type": "Person", "name": "sorrysungkwon" },
-    "inLanguage": ["en", "ko"],
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "sorrysungkwon"
+    },
+    "inLanguage": "en",
     "featureList": [
       "Daily Challenge — same block sequence for every player worldwide",
       "Global real-time leaderboard",
@@ -146,6 +163,99 @@ if ('serviceWorker' in navigator) {
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Every day at midnight UTC, Glowtris generates a new Daily Challenge using a fixed random seed. Every player worldwide gets the exact same sequence of blocks, making it a fair global competition. Your score is recorded on today's leaderboard."
+        }
+      }
+    ],
+    "inLanguage": "en"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "글로우트리스 (Glowtris)",
+    "url": "https://glowtris.com/?lang=ko",
+    "inLanguage": "ko",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://glowtris.com/?lang=ko&search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "글로우트리스 (Glowtris)",
+    "description": "글로우트리스는 다운로드 없이 웹 브라우저에서 바로 즐길 수 있는 무료 네온 블록 퍼즐 게임입니다. 떨어지는 네온 블록을 쌓아 라인을 클리어하고 글로벌 리더보드에서 경쟁하세요. 데일리 챌린지, 마라톤, 스프린트, 블리츠 모드가 있습니다. 회원가입이나 광고 없이 완전 무료로 플레이하세요.",
+    "url": "https://glowtris.com/?lang=ko",
+    "inLanguage": "ko",
+    "image": "https://glowtris.com/api/og",
+    "genre": [
+      "Puzzle",
+      "Arcade",
+      "Block Puzzle",
+      "Tetris-like"
+    ],
+    "gamePlatform": [
+      "Web Browser",
+      "iOS",
+      "Android"
+    ],
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "keywords": "블록 퍼즐, 테트리스, 무료 웹게임, 데일리 챌린지, 네온 퍼즐, 글로우트리스",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "KRW"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "sorrysungkwon"
+    },
+    "featureList": [
+      "데일리 챌린지 — 매일 전 세계 유저와 동일한 블록으로 경쟁",
+      "글로벌 실시간 리더보드",
+      "마라톤 모드 — 끝없이 이어지는 클래식 블록 쌓기",
+      "스프린트 모드 — 40라인을 최대한 빨리 지우기",
+      "블리츠 모드 — 2분 안에 최고 점수 달성하기",
+      "PWA 지원 — iOS 및 안드로이드 홈 화면에 앱으로 설치 가능",
+      "광고나 회원가입 없이 완전 무료"
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "inLanguage": "ko",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "글로우트리스(Glowtris)가 무엇인가요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "글로우트리스는 웹 브라우저에서 다운로드 없이 바로 즐길 수 있는 무료 네온 블록 퍼즐 게임입니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "어떤 게임 모드가 있나요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "매일 똑같은 블록이 나오는 데일리 챌린지, 무한으로 즐기는 마라톤 모드, 40라인을 빨리 없애는 스프린트 모드, 2분 안에 높은 점수를 기록하는 블리츠 모드가 있습니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "정말 무료인가요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "네, 광고나 회원가입 없이 100% 완전 무료로 즐길 수 있습니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "모바일에서도 플레이 가능한가요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "네, 모바일 브라우저에 최적화되어 있으며, PWA(프로그레시브 웹 앱)로 iOS나 안드로이드 홈 화면에 설치하여 앱처럼 즐길 수 있습니다."
         }
       }
     ]
