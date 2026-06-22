@@ -1027,15 +1027,21 @@ export function applyShake(dtFactor = 1) {
 export function initTargetUI() {
   const tBox = document.getElementById('target-box');
   if (!tBox) return;
-  if (S.isSprintMode || S.isFlowMode) {
+  if (!S.gameRunning || S.isSprintMode || S.isFlowMode) {
     tBox.style.display = 'none';
     return;
   }
   
   let lbList = [];
-  if (S.isBlitzMode) lbList = S._lbCache.blitzDailyBoard || [];
-  else if (S.isDailyMode) lbList = S._lbCache.challengeBoard || [];
-  else lbList = S._lbCache.dailyBoard || [];
+  if (S.isBlitzMode) {
+    lbList = S._lbCache.blitzDailyBoard || [];
+    if (lbList.length === 0) lbList = S._lbCache.blitzBoard || [];
+  } else if (S.isDailyMode) {
+    lbList = S._lbCache.challengeBoard || [];
+  } else {
+    lbList = S._lbCache.dailyBoard || [];
+    if (lbList.length === 0) lbList = S._lbCache.board || [];
+  }
 
   const valid = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
   valid.sort((a,b) => a.score - b.score);
