@@ -149,6 +149,22 @@
   .overtaken {
     animation: shatter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
+
+  /* Target change animation */
+  @keyframes slideOutUp {
+    to { transform: translateY(-20px); opacity: 0; }
+  }
+  @keyframes slideInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .slide-out { animation: slideOutUp 0.3s forwards; }
+  .slide-in { animation: slideInUp 0.3s forwards; }
+  
+  .target-content {
+    display: flex;
+    flex-direction: column;
+  }
 </style>
 </head>
 <body>
@@ -165,13 +181,15 @@
   <!-- New Target Overtake UI -->
   <div class="target-box" id="target-box">
     <div class="target-header">
-      <span>🎯 NEXT TARGET</span>
+      <span id="target-title">🎯 NEXT TARGET</span>
     </div>
-    <div class="target-user">
-      <span>👤</span>
-      <span id="target-name">NeoBrain</span>
+    <div class="target-content" id="target-content">
+      <div class="target-user">
+        <span>👤</span>
+        <span id="target-name">NeoBrain</span>
+      </div>
+      <div class="target-score" id="target-score">124,500</div>
     </div>
-    <div class="target-score" id="target-score">124,500</div>
     
     <div class="progress-track">
       <div class="progress-fill" id="target-progress"></div>
@@ -181,17 +199,25 @@
 
 <script>
   let currentScore = 112050;
-  const targetScore = 124500;
+  let targetScore = 124500;
   
   const progressFill = document.getElementById('target-progress');
   const myScoreDisplay = document.getElementById('my-score');
   const targetBox = document.getElementById('target-box');
   const targetName = document.getElementById('target-name');
   const targetScoreDisplay = document.getElementById('target-score');
+  const targetContent = document.getElementById('target-content');
+  const targetTitle = document.getElementById('target-title');
 
-  // Simulation loop to show it filling up
+  let targets = [
+    { name: "TetrisGod99", score: 185000 },
+    { name: "BlockMaster", score: 250000 },
+    { name: "GlowKing", score: 400000 }
+  ];
+  let targetIndex = 0;
+
   setInterval(() => {
-    if (currentScore >= targetScore) return;
+    if (currentScore >= targetScore && targetIndex >= targets.length) return;
     
     // Simulate score increasing
     currentScore += Math.floor(Math.random() * 800) + 200;
@@ -200,30 +226,45 @@
     myScoreDisplay.innerText = currentScore.toLocaleString();
     
     // Update Progress
-    const percent = Math.min((currentScore / targetScore) * 100, 100);
+    const currentTargetScore = targetScore;
+    const percent = Math.min((currentScore / currentTargetScore) * 100, 100);
     progressFill.style.width = percent + '%';
     
     // Trigger Overtake Event
-    if (currentScore >= targetScore) {
+    if (currentScore >= currentTargetScore && targetIndex < targets.length) {
       targetBox.classList.add('overtaken');
+      targetTitle.innerText = "OVERTAKEN!";
+      targetTitle.style.color = "#fff";
       
-      // Setup next target after a brief delay
+      // Animate out the old target
       setTimeout(() => {
-        targetBox.classList.remove('overtaken');
-        targetName.innerText = "TetrisGod99";
-        const nextTarget = 185000;
-        targetScoreDisplay.innerText = nextTarget.toLocaleString();
+        targetContent.classList.add('slide-out');
         
-        // Reset progress bar visually instantly without transition
-        progressFill.style.transition = 'none';
-        progressFill.style.width = ((currentScore / nextTarget) * 100) + '%';
-        
-        // Restore transition
+        // Setup next target while hidden
         setTimeout(() => {
-          progressFill.style.transition = 'width 0.1s linear';
-        }, 50);
-        
-      }, 1500);
+          targetBox.classList.remove('overtaken');
+          targetTitle.innerText = "🎯 NEXT TARGET";
+          targetTitle.style.color = "#ffe600";
+          
+          targetContent.classList.remove('slide-out');
+          targetContent.classList.add('slide-in');
+          
+          const nextTarget = targets[targetIndex];
+          targetName.innerText = nextTarget.name;
+          targetScoreDisplay.innerText = nextTarget.score.toLocaleString();
+          targetScore = nextTarget.score;
+          targetIndex++;
+          
+          // Smoothly reset the progress bar back to its new proportion
+          progressFill.style.width = ((currentScore / nextTarget.score) * 100) + '%';
+          
+          // Remove slide-in class after animation finishes
+          setTimeout(() => {
+            targetContent.classList.remove('slide-in');
+          }, 300);
+          
+        }, 300);
+      }, 800);
     }
   }, 100);
 </script>
