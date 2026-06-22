@@ -2147,44 +2147,49 @@ button, a { touch-action: manipulation; }
 
 /* ─── Target Overtake UI ─── */
 .target-box {
-  width: 134px; /* Same width as right-panel (108 + 12 + 14 border) */
+  width: 100%;
   position: relative;
-  font-family: var(--font-ui);
+  font-family: 'Orbitron', monospace;
   transform: translateZ(0);
 }
 
 .target-header {
-  font-family: var(--font-ui);
-  font-size: var(--type-body-s);
-  color: var(--primary);
-  margin-bottom: 6px;
-  text-align: center;
-  letter-spacing: 0.5px;
-  text-shadow: var(--glow-sm) var(--primary-container);
+  color: var(--pink); opacity: 0.85;
+  font-size: 10px; letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(255,0,128,0.5);
+  text-transform: uppercase;
+  text-align: center; margin-bottom: 8px;
+  font-weight: 700;
 }
 
 .target-content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 12px;
+  transform: translateZ(0);
 }
 
 .target-info {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 4px;
   width: 100%;
+  background: radial-gradient(ellipse at center, rgba(255,0,128,0.1), transparent 70%);
+  padding: 8px 0;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255,0,128,0.15);
+  box-shadow: inset 0 0 10px rgba(255,0,128,0.05);
 }
 
 .target-user {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--type-title-s);
-  font-weight: var(--fw-bold);
-  color: var(--on-surface-muted);
   max-width: 100%;
-  align-self: flex-start;
+  letter-spacing: 1px;
 }
 
 .target-name-text {
@@ -2196,31 +2201,31 @@ button, a { touch-action: manipulation; }
 }
 
 .target-score {
-  font-family: var(--font-ui);
-  font-size: var(--type-headline-l);
-  font-weight: var(--fw-black);
-  color: var(--on-surface);
-  text-shadow: var(--glow-md) var(--yellow-50);
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(255,0,128,0.8), 0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing: 1px;
   line-height: 1;
-  align-self: flex-end;
 }
 
 .progress-track {
   width: 100%;
-  height: 4px;
-  background: var(--surface-2);
-  border-radius: var(--r-xs);
+  height: 6px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 3px;
   overflow: hidden;
   position: relative;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
 }
 
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--pink-50), var(--yellow-50));
-  box-shadow: var(--glow-sm) var(--orange-50);
-  border-radius: var(--r-xs);
-  transition: width 0.1s linear;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  box-shadow: 0 0 10px var(--pink);
+  border-radius: 3px;
+  transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes slide-out-right {
