@@ -2147,49 +2147,44 @@ button, a { touch-action: manipulation; }
 
 /* ─── Target Overtake UI ─── */
 .target-box {
-  width: 100%;
+  width: 154px;
   position: relative;
-  font-family: 'Orbitron', monospace;
+  font-family: var(--font-ui);
   transform: translateZ(0);
 }
 
 .target-header {
-  color: var(--pink); opacity: 0.85;
-  font-size: 10px; letter-spacing: 2px;
-  text-shadow: 0 0 8px rgba(255,0,128,0.5);
-  text-transform: uppercase;
-  text-align: center; margin-bottom: 8px;
-  font-weight: 700;
+  font-family: var(--font-ui);
+  font-size: var(--type-body-s);
+  color: var(--primary);
+  margin-bottom: 6px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: var(--glow-sm) var(--primary-container);
 }
 
 .target-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transform: translateZ(0);
+  gap: var(--space-2);
 }
 
 .target-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 4px;
   width: 100%;
-  background: radial-gradient(ellipse at center, rgba(255,0,128,0.1), transparent 70%);
-  padding: 8px 0;
-  border-radius: var(--r-md);
-  border: 1px solid rgba(255,0,128,0.15);
-  box-shadow: inset 0 0 10px rgba(255,0,128,0.05);
 }
 
 .target-user {
-  font-size: 11px;
-  color: rgba(255,255,255,0.7);
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: var(--type-title-s);
+  font-weight: var(--fw-bold);
+  color: var(--on-surface-muted);
   max-width: 100%;
-  letter-spacing: 1px;
+  align-self: flex-start;
 }
 
 .target-name-text {
@@ -2201,19 +2196,20 @@ button, a { touch-action: manipulation; }
 }
 
 .target-score {
-  font-size: 18px;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 15px rgba(255,0,128,0.8), 0 2px 4px rgba(0,0,0,0.8);
-  letter-spacing: 1px;
+  font-family: var(--font-ui);
+  font-size: var(--type-headline-l);
+  font-weight: var(--fw-black);
+  color: var(--on-surface);
+  text-shadow: var(--glow-md) var(--yellow-50);
   line-height: 1;
+  align-self: flex-end;
 }
 
 .progress-track {
   width: 100%;
   height: 6px;
-  background: rgba(0,0,0,0.5);
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
@@ -2222,10 +2218,10 @@ button, a { touch-action: manipulation; }
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--cyan), var(--pink));
-  box-shadow: 0 0 10px var(--pink);
-  border-radius: 3px;
-  transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: linear-gradient(90deg, var(--pink-50), var(--yellow-50));
+  box-shadow: var(--glow-md) var(--yellow-50);
+  border-radius: 4px;
+  transition: width 0.2s var(--ease-standard);
 }
 
 @keyframes slide-out-right {
@@ -2257,9 +2253,10 @@ button, a { touch-action: manipulation; }
 
 .shatter-piece {
   background: var(--yellow-50);
-  box-shadow: var(--glow-sm) var(--yellow-50);
+  box-shadow: var(--glow-md) var(--yellow-50);
   position: absolute;
-  animation: shatter-fly 0.6s var(--ease-out) forwards;
+  border-radius: 50%;
+  animation: shatter-fly 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes shatter-fly {

@@ -1093,10 +1093,6 @@ function triggerTargetOvertake() {
   for (let i = 0; i < 8; i++) {
     const piece = document.createElement('div');
     piece.className = 'shatter-piece';
-    piece.style.background = 'rgba(255, 0, 128, 0.4)';
-    piece.style.boxShadow = '0 0 10px rgba(255, 0, 128, 0.6)';
-    piece.style.border = '1px solid rgba(255, 0, 128, 0.8)';
-    piece.style.borderRadius = '2px';
     piece.style.width = (4 + Math.random() * 6) + 'px';
     piece.style.height = (4 + Math.random() * 6) + 'px';
     piece.style.left = (Math.random() * 100) + '%';
@@ -1114,9 +1110,9 @@ function triggerTargetOvertake() {
     setTimeout(() => piece.remove(), 600);
   }
   
-  tContent.classList.remove('anim-slide-in', 'anim-slide-out');
-  void tContent.offsetWidth; // Force reflow
-  tContent.classList.add('anim-slide-out');
+  tBox.classList.remove('anim-slide-in', 'anim-slide-out');
+  void tBox.offsetWidth; // Force reflow
+  tBox.classList.add('anim-slide-out');
   
   setTimeout(() => {
     S.targetIndex++;
@@ -1127,9 +1123,9 @@ function triggerTargetOvertake() {
     }
     
     renderCurrentTarget();
-    tContent.classList.remove('anim-slide-out');
-    void tContent.offsetWidth; // Force reflow
-    tContent.classList.add('anim-slide-in');
+    tBox.classList.remove('anim-slide-out');
+    void tBox.offsetWidth; // Force reflow
+    tBox.classList.add('anim-slide-in');
     
     setTimeout(() => {
       S.targetAnimating = false;
