@@ -245,83 +245,86 @@ if ('serviceWorker' in navigator) {
   <!-- Game row -->
   <div id="game-row">
 
-    <!-- Desktop left panel -->
-    <div class="panel" id="left-panel" style="margin-top:6px">
+    <!-- Desktop left column: 2-panel layout -->
+    <div id="left-panel" style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
 
-      <!-- TOP: Score + Target (preview.html style) -->
-      <div class="stat-box primary">
-        <div class="panel-title" id="panel-score-label">SCORE</div>
-        <div class="score-val" id="score-display" style="font-size: 28px;">0</div>
-      </div>
+      <!-- TOP panel: Score + Target -->
+      <div class="panel">
+        <div class="stat-box primary">
+          <div class="panel-title" id="panel-score-label">SCORE</div>
+          <div class="score-val" id="score-display" style="font-size: 28px;">0</div>
+        </div>
 
-      <div class="divider"></div>
+        <div class="divider"></div>
 
-      <div class="target-box" id="target-box" style="display:none;">
-        <div class="target-header" id="target-title">🎯 NEXT TARGET</div>
-        <div class="target-content" id="target-content">
-          <div class="target-info">
-            <div class="target-user" title="">
-              <span style="opacity:0.5; flex-shrink:0;">👤</span>
-              <span id="target-name" class="target-name-text">Loading...</span>
+        <div class="target-box" id="target-box" style="display:none;">
+          <div class="target-header" id="target-title">🎯 NEXT TARGET</div>
+          <div class="target-content" id="target-content">
+            <div class="target-info">
+              <div class="target-user" title="">
+                <span style="opacity:0.5; flex-shrink:0;">👤</span>
+                <span id="target-name" class="target-name-text">Loading...</span>
+              </div>
+              <div class="target-score" id="target-score">0</div>
             </div>
-            <div class="target-score" id="target-score">0</div>
+            <div class="progress-track">
+              <div class="progress-fill" id="target-progress"></div>
+            </div>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="target-progress"></div>
+        </div>
+      </div>
+
+      <!-- BOTTOM panel: Stats -->
+      <div class="panel">
+        <div class="stat-box" style="margin-bottom: 8px;">
+          <div class="panel-title">LEVEL</div>
+          <div class="score-val" id="level-display" style="font-size: 24px; color: var(--cyan);">1</div>
+          <div id="level-bar-wrap" style="margin-top: 8px; margin-bottom: 0;"><div id="level-bar"></div></div>
+        </div>
+
+        <div class="stat-box" style="margin-bottom: 12px;">
+          <div class="panel-title">LINES CLEARED</div>
+          <div class="score-val" id="lines-display" style="font-size: 20px;">0</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="panel-title">SPEED</div>
+            <div id="bpm-display" style="font-size:14px;">140 <span style="font-size:10px; opacity:0.6;">BPM</span></div>
+          </div>
+          <div class="stat-box">
+            <div class="panel-title">BEST</div>
+            <div class="score-val" id="hi-score" style="font-size:14px">0</div>
           </div>
         </div>
-      </div>
 
-      <div class="divider"></div>
-
-      <!-- BOTTOM: Stats (existing, no design change) -->
-      <div class="stat-box" style="margin-bottom: 8px;">
-        <div class="panel-title">LEVEL</div>
-        <div class="score-val" id="level-display" style="font-size: 24px; color: var(--cyan);">1</div>
-        <div id="level-bar-wrap" style="margin-top: 8px; margin-bottom: 0;"><div id="level-bar"></div></div>
-      </div>
-
-      <div class="stat-box" style="margin-bottom: 12px;">
-        <div class="panel-title">LINES CLEARED</div>
-        <div class="score-val" id="lines-display" style="font-size: 20px;">0</div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="panel-title">SPEED</div>
-          <div id="bpm-display" style="font-size:14px;">140 <span style="font-size:10px; opacity:0.6;">BPM</span></div>
+        <div class="stats-grid" style="margin-top: 12px;">
+          <div class="stat-box">
+            <div class="panel-title">APM</div>
+            <div id="apm-display" class="score-val" style="font-size:14px">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="panel-title">PPS</div>
+            <div id="pps-display" class="score-val" style="font-size:14px">—</div>
+          </div>
         </div>
-        <div class="stat-box">
-          <div class="panel-title">BEST</div>
-          <div class="score-val" id="hi-score" style="font-size:14px">0</div>
-        </div>
+
+        <div id="combo-display" style="margin-top: 8px;"></div>
+
+        <!-- Hidden keys -->
+        <div id="key-move" style="display:none"></div>
+        <div id="key-rotate" style="display:none"></div>
+        <div id="key-rotate-ccw" style="display:none"></div>
+        <div id="key-rotate-180" style="display:none"></div>
+        <div id="key-soft" style="display:none"></div>
+        <div id="key-hard" style="display:none"></div>
+        <div id="key-hold" style="display:none"></div>
+        <div id="key-pause" style="display:none"></div>
+        <div id="key-mute" style="display:none"></div>
       </div>
 
-      <div class="stats-grid" style="margin-top: 12px;">
-        <div class="stat-box">
-          <div class="panel-title">APM</div>
-          <div id="apm-display" class="score-val" style="font-size:14px">—</div>
-        </div>
-        <div class="stat-box">
-          <div class="panel-title">PPS</div>
-          <div id="pps-display" class="score-val" style="font-size:14px">—</div>
-        </div>
-      </div>
-
-      <div id="combo-display" style="margin-top: 8px;"></div>
-
-      <!-- Hidden keys -->
-      <div id="key-move" style="display:none"></div>
-      <div id="key-rotate" style="display:none"></div>
-      <div id="key-rotate-ccw" style="display:none"></div>
-      <div id="key-rotate-180" style="display:none"></div>
-      <div id="key-soft" style="display:none"></div>
-      <div id="key-hard" style="display:none"></div>
-      <div id="key-hold" style="display:none"></div>
-      <div id="key-pause" style="display:none"></div>
-      <div id="key-mute" style="display:none"></div>
     </div>
 
     <!-- Game canvas -->
