@@ -93,7 +93,10 @@ async function build() {
       .replace('content="A free neon block-stacking game in your browser. No downloads, no ads. Just pure stacking action."', `content="${p.desc}"`)
       .replaceAll('content="BUILD_OG_TITLE"', `content="${p.ogTitle}"`)
       .replaceAll('content="BUILD_OG_DESC"', `content="${p.ogDesc}"`)
-      .replace('<link rel="canonical" href="https://glowtris.com">', `<link rel="canonical" href="${canonical}">`);
+      .replace('<link rel="canonical" href="https://glowtris.com">', `<link rel="canonical" href="${canonical}">`)
+      .replace('<meta property="og:url" content="https://glowtris.com">', `<meta property="og:url" content="${canonical}">`)
+      .replace('<link rel="alternate" hreflang="en" href="https://glowtris.com">', `<link rel="alternate" hreflang="en" href="${canonical}">`)
+      .replace('<link rel="alternate" hreflang="x-default" href="https://glowtris.com">', `<link rel="alternate" hreflang="x-default" href="${canonical}">`);
 
     fs.writeFileSync(path.join(root, p.file), pageHtml);
     console.log(`Built ${p.file.padEnd(20)} ${(pageHtml.length / 1024).toFixed(1)} KB`);

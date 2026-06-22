@@ -1,26 +1,24 @@
-# Google Rich Results Test vs. Schema Markup Validator
+# Final SEO & Schema Configuration Synthesis
 
-Based on a multi-model cross-validation, the issue is **not** with your JSON-LD code. Your code is perfectly valid. The issue is that the **Google Rich Results Test is the wrong tool** for testing these specific schemas.
+After running a multi-model cross-validation over the current codebase to ensure all recommendations were applied perfectly, the panel discovered a few critical edge cases that remained unaddressed. These edge cases primarily involve Open Graph tags and URL trailing slashes that were causing "canonical mismatch" errors behind the scenes.
 
-## The Core Issue
-The Google Rich Results Test does **not** validate all Schema.org markup. It *only* detects structured data types that are eligible to trigger specific "Rich Results" visual features in Google Search (like Recipe cards, Review stars, or Product carousels). 
+## Core Discoveries & Fixes Required
 
-Here is the breakdown for your specific schemas:
+### 1. The `og:url` Canonical Mismatch
+While we previously fixed `BUILD_OG_TITLE` and the `hreflang` tags, the `<meta property="og:url">` tag was entirely hardcoded to `https://glowtris.com` inside the template. 
+* **The Problem:** When the build script generated alternative landing pages like `sprint.html` or `tetris-online.html`, their canonical URLs correctly pointed to themselves, but their `og:url` still pointed to the homepage. This inconsistency can confuse crawlers.
+* **The Fix:** The build script (`scripts/build.js`) must be updated to dynamically replace the `og:url` on every generated page so that it exactly matches the `canonical` URL.
 
-### 1. `VideoGame` Schema
-* **Why it says "No items detected":** Google does **not** support `VideoGame` for rich results in Search. While it is a 100% valid Schema.org type that helps build the Knowledge Graph, Google's Rich Results tool ignores it completely because it doesn't power a specific search feature.
-* **Verdict:** The tool will *always* say "No items detected" for this, no matter how perfect the code is.
+### 2. Lingering Korean Locale Metadata
+Even though we removed the conflicting Korean `FAQPage` and `WebSite` JSON-LD schemas, the `<head>` still contained `<meta property="og:locale:alternate" content="ko_KR">`.
+* **The Problem:** Because the site is now explicitly declared as English-only (`<html lang="en">` and English-only JSON-LD) to avoid duplicate schema conflicts, signaling to Facebook/Google that a Korean localization exists without providing actual `hreflang="ko"` links is an SEO anti-pattern.
+* **The Fix:** Delete this `og:locale:alternate` tag completely to solidify the English-only schema structure.
 
-### 2. `WebSite` Schema
-* **Why it says "No items detected":** A basic `WebSite` schema is not considered a rich result on its own. While it can trigger a "Sitelinks Searchbox", Google only processes Sitelinks Searchbox markup from a **live URL**, not from pasted code in the "Test Code" tab.
-* **Verdict:** The tool will ignore it when pasting code.
+### 3. Missing Landing Pages in `sitemap.xml`
+The site generates excellent keyword-targeted landing pages like `sprint.html`, `tetris-online.html`, and `unblocked.html`.
+* **The Problem:** These pages are entirely missing from `sitemap.xml`, meaning Google has to rely on internal links to discover them, drastically slowing down their indexing.
+* **The Fix:** Add these three URLs to the `sitemap.xml`.
 
-### 3. `FAQPage` Schema
-* **Why it says "No items detected":** `FAQPage` *is* a supported rich result type, but it has extremely strict nesting requirements (`mainEntity` > `Question` > `acceptedAnswer` > `Answer`). Your code follows this structure, but in August 2023, Google significantly downgraded the visibility of FAQ rich results, limiting them mostly to authoritative health and government websites. Because of this deprecation, the tool may no longer reliably highlight FAQ schema for standard sites, or it may silently reject it.
-
-## The Correct Solution
-You must switch to the **[Schema Markup Validator](https://validator.schema.org/)**.
-
-This is the official general-purpose validator maintained by Schema.org. It checks for syntax correctness across **all** Schema.org vocabularies, not just Google's rich result features. 
-
-**Action Item:** Paste your exact HTML code into [validator.schema.org](https://validator.schema.org/). It will correctly detect your `WebSite`, `VideoGame`, and `FAQPage` schemas and confirm there are no syntax errors. Search engines will still parse and understand this data for entity recognition and indexing, even if they don't grant a special "rich result" snippet.
+### 4. Public Test Files Leak
+* **The Problem:** During our earlier debugging sessions, we created temporary files like `test-snippet.html`. Because they are in the project root, Vercel will deploy them to production, and Google might index these incomplete/duplicate pages.
+* **The Fix:** Clean up and delete all temporary script and HTML test files from the workspace.
