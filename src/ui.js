@@ -1043,7 +1043,19 @@ export function initTargetUI() {
     if (lbList.length === 0) lbList = S._lbCache.board || [];
   }
 
-  const valid = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
+  let valid = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
+  
+  // ── BETA/EMPTY SERVER FALLBACK: Inject Dummy NPC Targets ──
+  if (valid.length === 0) {
+    valid = [
+      { name: 'CPU_Alpha', score: 1500 },
+      { name: 'Glow_Bot',  score: 4200 },
+      { name: 'Neon_Pro',  score: 11500 },
+      { name: 'T-Spina',   score: 28000 },
+      { name: 'Max_Core',  score: 65000 }
+    ];
+  }
+
   valid.sort((a,b) => a.score - b.score);
   
   S.targets = valid;
