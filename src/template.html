@@ -255,18 +255,17 @@ if ('serviceWorker' in navigator) {
       
       <div class="divider"></div>
       
-      <!-- Lines & Level Grid -->
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="panel-title">LINES</div>
-          <div class="score-val" id="lines-display">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="panel-title">LEVEL</div>
-          <div class="score-val" id="level-display">1</div>
-        </div>
+      <!-- Level & Lines Section -->
+      <div class="stat-box" style="margin-bottom: 8px;">
+        <div class="panel-title">LEVEL</div>
+        <div class="score-val" id="level-display" style="font-size: 24px; color: var(--cyan);">1</div>
+        <div id="level-bar-wrap" style="margin-top: 8px; margin-bottom: 0;"><div id="level-bar"></div></div>
       </div>
-      <div id="level-bar-wrap"><div id="level-bar"></div></div>
+      
+      <div class="stat-box" style="margin-bottom: 12px;">
+        <div class="panel-title">LINES CLEARED</div>
+        <div class="score-val" id="lines-display" style="font-size: 20px;">0</div>
+      </div>
       
       <div class="divider"></div>
       
