@@ -1048,11 +1048,13 @@ export function initTargetUI() {
   // ── BETA/EMPTY SERVER FALLBACK: Inject Dummy NPC Targets ──
   if (valid.length === 0) {
     valid = [
-      { name: 'CPU_Alpha', score: 1500 },
-      { name: 'Glow_Bot',  score: 4200 },
-      { name: 'Neon_Pro',  score: 11500 },
-      { name: 'T-Spina',   score: 28000 },
-      { name: 'Max_Core',  score: 65000 }
+      { name: 'CPU_Alpha', score: 100 },
+      { name: 'Glow_Bot',  score: 300 },
+      { name: 'Neon_Pro',  score: 700 },
+      { name: 'T-Spina',   score: 1200 },
+      { name: 'Max_Core',  score: 2000 },
+      { name: 'AI_Omega',  score: 3500 },
+      { name: 'Final_Boss', score: 5000 }
     ];
   }
 
