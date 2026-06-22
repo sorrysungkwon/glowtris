@@ -1108,7 +1108,8 @@ function triggerTargetOvertake() {
     setTimeout(() => piece.remove(), 600);
   }
   
-  tContent.classList.remove('anim-slide-in');
+  tContent.classList.remove('anim-slide-in', 'anim-slide-out');
+  void tContent.offsetWidth; // Force reflow
   tContent.classList.add('anim-slide-out');
   
   setTimeout(() => {
@@ -1121,13 +1122,14 @@ function triggerTargetOvertake() {
     
     renderCurrentTarget();
     tContent.classList.remove('anim-slide-out');
+    void tContent.offsetWidth; // Force reflow
     tContent.classList.add('anim-slide-in');
     
     setTimeout(() => {
       S.targetAnimating = false;
       updateTargetUI();
-    }, 400);
-  }, 400);
+    }, 400); // Slide in time
+  }, 300); // Slide out time
 }
 
 export function updateTargetUI() {
