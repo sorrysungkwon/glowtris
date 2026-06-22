@@ -737,7 +737,6 @@
     #desktop-header { display:none; }
     #left-panel, #right-column { display:none; }
     #canvas-score-overlay { display:none; }
-    #bottom-hud { display:none; }
 
     /* ── Keyboard mode on tablet: restore desktop side panels ── */
     /* When an external keyboard is detected on a coarse-pointer device,
@@ -773,14 +772,13 @@
      When html.kb-mode is set, treat this device like a desktop:
      show side panels, hide mobile header & touch controls.
   ───────────────────────────────────────────────────────────────────────── */
-  html.kb-mode #desktop-header      { display:flex !important; }
-  html.kb-mode #right-column        { display:flex !important; flex-direction:column !important; gap:8px !important; }
-  html.kb-mode #canvas-score-overlay { display:flex !important; }
-  html.kb-mode #bottom-hud          { display:flex !important; }
-  html.kb-mode #mobile-header       { display:none !important; }
-  html.kb-mode #touch-controls      { display:none !important; }
-  html.kb-mode #game-row            { gap:12px !important; }
-  html.kb-mode #game-canvas         { border-radius: var(--r-xs) !important; }
+  html.kb-mode #desktop-header  { display:flex !important; }
+  html.kb-mode #left-panel,
+  html.kb-mode #right-column    { display:flex !important; flex-direction:column !important; gap:8px !important; }
+  html.kb-mode #mobile-header   { display:none !important; }
+  html.kb-mode #touch-controls  { display:none !important; }
+  html.kb-mode #game-row        { gap:12px !important; }
+  html.kb-mode #game-canvas     { border-radius: var(--r-xs) !important; }
 
   /* ════════════════════════════════
      TOUCH CONTROLS  (all screens)
@@ -2642,17 +2640,59 @@ if ('serviceWorker' in navigator) {
   <!-- Game row -->
   <div id="game-row">
 
-    <!-- Hidden key refs (engine DOM refs, not displayed) -->
-    <div id="left-panel" style="display:none">
-      <div id="key-move"></div>
-      <div id="key-rotate"></div>
-      <div id="key-rotate-ccw"></div>
-      <div id="key-rotate-180"></div>
-      <div id="key-soft"></div>
-      <div id="key-hard"></div>
-      <div id="key-hold"></div>
-      <div id="key-pause"></div>
-      <div id="key-mute"></div>
+    <!-- Desktop left panel -->
+    <div class="panel" id="left-panel" style="margin-top:6px">
+      <div class="divider"></div>
+
+      <!-- Level & Lines Section -->
+      <div class="stat-box" style="margin-bottom: 8px;">
+        <div class="panel-title">LEVEL</div>
+        <div class="score-val" id="level-display" style="font-size: 24px; color: var(--cyan);">1</div>
+        <div id="level-bar-wrap" style="margin-top: 8px; margin-bottom: 0;"><div id="level-bar"></div></div>
+      </div>
+
+      <div class="stat-box" style="margin-bottom: 12px;">
+        <div class="panel-title">LINES CLEARED</div>
+        <div class="score-val" id="lines-display" style="font-size: 20px;">0</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Speed & Performance Grid -->
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="panel-title">SPEED</div>
+          <div id="bpm-display" style="font-size:14px;">140 <span style="font-size:10px; opacity:0.6;">BPM</span></div>
+        </div>
+        <div class="stat-box">
+          <div class="panel-title">BEST</div>
+          <div class="score-val" id="hi-score" style="font-size:14px">0</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin-top: 12px;">
+        <div class="stat-box">
+          <div class="panel-title">APM</div>
+          <div id="apm-display" class="score-val" style="font-size:14px">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="panel-title">PPS</div>
+          <div id="pps-display" class="score-val" style="font-size:14px">—</div>
+        </div>
+      </div>
+
+      <div id="combo-display" style="margin-top: 8px;"></div>
+
+      <!-- Hidden keys -->
+      <div id="key-move" style="display:none"></div>
+      <div id="key-rotate" style="display:none"></div>
+      <div id="key-rotate-ccw" style="display:none"></div>
+      <div id="key-rotate-180" style="display:none"></div>
+      <div id="key-soft" style="display:none"></div>
+      <div id="key-hard" style="display:none"></div>
+      <div id="key-hold" style="display:none"></div>
+      <div id="key-pause" style="display:none"></div>
+      <div id="key-mute" style="display:none"></div>
     </div>
 
     <!-- Game canvas -->
@@ -2666,13 +2706,16 @@ if ('serviceWorker' in navigator) {
         </button>
       </div>
 
-      <!-- Score + Target overlay (top-left of canvas) -->
+      <canvas id="vanish-canvas"></canvas>
+      <canvas id="game-canvas"></canvas>
+      <canvas id="particle-canvas"></canvas>
+      <!-- Score + Target overlay — placed AFTER canvases so it paints on top -->
       <div id="canvas-score-overlay">
         <div class="overlay-score-panel">
           <div class="panel-title" id="panel-score-label">SCORE</div>
           <div class="score-val" id="score-display" style="font-size:28px;">0</div>
         </div>
-        <div class="panel target-box" id="target-box" style="display:none;">
+        <div class="target-box" id="target-box" style="display:none;">
           <div class="target-header" id="target-title">🎯 NEXT TARGET</div>
           <div class="target-content" id="target-content">
             <div class="target-info">
@@ -2688,10 +2731,6 @@ if ('serviceWorker' in navigator) {
           </div>
         </div>
       </div>
-
-      <canvas id="vanish-canvas"></canvas>
-      <canvas id="game-canvas"></canvas>
-      <canvas id="particle-canvas"></canvas>
       <div id="score-popup"></div>
     </div>
 
@@ -2711,39 +2750,6 @@ if ('serviceWorker' in navigator) {
       </div>
       
     </div>
-  </div>
-
-  <!-- Bottom HUD: level · lines · apm · pps · best · bpm · combo -->
-  <div id="bottom-hud">
-    <div class="hud-stat">
-      <span class="hud-label">LV</span>
-      <div class="score-val" id="level-display" style="font-size:16px; color:var(--cyan);">1</div>
-    </div>
-    <div id="level-bar-wrap"><div id="level-bar"></div></div>
-    <div class="hud-sep"></div>
-    <div class="hud-stat">
-      <span class="hud-label">LINES</span>
-      <div class="score-val" id="lines-display" style="font-size:16px;">0</div>
-    </div>
-    <div class="hud-sep"></div>
-    <div class="hud-stat">
-      <span class="hud-label">APM</span>
-      <div id="apm-display" class="score-val" style="font-size:14px;">—</div>
-    </div>
-    <div class="hud-stat">
-      <span class="hud-label">PPS</span>
-      <div id="pps-display" class="score-val" style="font-size:14px;">—</div>
-    </div>
-    <div class="hud-sep"></div>
-    <div class="hud-stat">
-      <span class="hud-label">BEST</span>
-      <div class="score-val" id="hi-score" style="font-size:14px;">0</div>
-    </div>
-    <div class="hud-stat">
-      <span class="hud-label">BPM</span>
-      <div id="bpm-display" style="font-size:14px;">140 <span style="font-size:10px; opacity:0.6;">BPM</span></div>
-    </div>
-    <div id="combo-display"></div>
   </div>
 
   <!-- Touch controls (all screens) -->
