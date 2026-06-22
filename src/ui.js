@@ -1088,57 +1088,54 @@ function triggerTargetOvertake() {
   S.targetAnimating = true;
   const tBox = document.getElementById('target-box');
   const tContent = document.getElementById('target-content');
-  
-  const rect = tBox.getBoundingClientRect();
-  for (let i = 0; i < 8; i++) {
-    const piece = document.createElement('div');
-    piece.className = 'shatter-piece';
-    piece.style.width = (4 + Math.random() * 6) + 'px';
-    piece.style.height = (4 + Math.random() * 6) + 'px';
-    piece.style.left = (Math.random() * 100) + '%';
-    piece.style.top = (Math.random() * 100) + '%';
-    
-    const tx = (Math.random() - 0.5) * 100 + 'px';
-    const ty = (Math.random() - 0.5) * 100 + 'px';
-    const rot = (Math.random() * 720 - 360) + 'deg';
-    
-    piece.style.setProperty('--tx', tx);
-    piece.style.setProperty('--ty', ty);
-    piece.style.setProperty('--rot', rot);
-    
-    tBox.appendChild(piece);
-    setTimeout(() => piece.remove(), 600);
-  }
-  
-  // Show OVERTAKEN! pop-up text
-  const overtakeText = document.createElement('div');
-  overtakeText.className = 'overtaken-text';
-  overtakeText.textContent = 'OVERTAKEN!';
-  tBox.appendChild(overtakeText);
-  setTimeout(() => overtakeText.remove(), 1000);
-  
-  tBox.classList.remove('anim-slide-in', 'anim-slide-out');
-  void tBox.offsetWidth; // Force reflow
-  tBox.classList.add('anim-slide-out');
-  
+  const tTitle = document.getElementById('target-title');
+
+  // preview.html: flash + scale via .overtaken, change title text
+  tBox.classList.add('overtaken');
+  tTitle.textContent = 'OVERTAKEN!';
+  tTitle.style.color = '#fff';
+
+  // After shatter settles (0.4s), slide out content
   setTimeout(() => {
-    S.targetIndex++;
-    if (S.targetIndex >= S.targets.length) {
-      tBox.style.display = 'none';
-      S.targetAnimating = false;
-      return;
-    }
-    
-    renderCurrentTarget();
-    tBox.classList.remove('anim-slide-out');
-    void tBox.offsetWidth; // Force reflow
-    tBox.classList.add('anim-slide-in');
-    
+    tContent.classList.remove('anim-slide-in');
+    void tContent.offsetWidth;
+    tContent.classList.add('anim-slide-out');
+    tBox.classList.remove('overtaken');
+
     setTimeout(() => {
-      S.targetAnimating = false;
-      updateTargetUI();
-    }, 400); // Slide in time
-  }, 300); // Slide out time
+      tTitle.textContent = '🎯 NEXT TARGET';
+      tTitle.style.color = '#ffe600';
+
+      S.targetIndex++;
+      if (S.targetIndex >= S.targets.length) {
+        tBox.style.display = 'none';
+        S.targetAnimating = false;
+        return;
+      }
+
+      renderCurrentTarget();
+
+      // Reset progress bar without transition
+      const fill = document.getElementById('target-progress');
+      if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        setTimeout(() => {
+          fill.style.transition = 'width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        }, 50);
+      }
+
+      tContent.classList.remove('anim-slide-out');
+      void tContent.offsetWidth;
+      tContent.classList.add('anim-slide-in');
+
+      setTimeout(() => {
+        tContent.classList.remove('anim-slide-in');
+        S.targetAnimating = false;
+        updateTargetUI();
+      }, 300);
+    }, 300);
+  }, 400);
 }
 
 export function updateTargetUI() {

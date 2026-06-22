@@ -515,35 +515,6 @@
   /* Game wrap — sized by JS inline styles on the canvases (Safari safe) */
   .game-wrap { position:relative; flex:0 0 auto; }
 
-  /* Canvas score overlay */
-  #canvas-score-overlay {
-    position: absolute;
-    top: 44px;
-    left: 8px;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-    min-width: 130px;
-    max-width: 152px;
-  }
-  .overlay-score-panel {
-    background: linear-gradient(180deg, rgba(4,4,30,0.88), rgba(2,2,15,0.96));
-    border: 1px solid rgba(0, 200, 255, 0.15);
-    border-top: 1px solid rgba(0, 200, 255, 0.35);
-    border-radius: var(--r-md);
-    padding: 10px 14px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    pointer-events: auto;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
-  }
-  #canvas-score-overlay .target-box {
-    pointer-events: auto;
-    width: 100%;
-    box-sizing: border-box;
-  }
   #game-canvas {
     display:block;
     border:2px solid rgba(0,200,255,0.35);
@@ -2176,33 +2147,42 @@ input, textarea, select { font-size: 16px; }
 button, a { touch-action: manipulation; }
 
 /* ─── Target Overtake UI ─── */
+/* ── Target Overtake UI — preview.html exact match ── */
 .target-box {
-  width: 154px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 230, 0, 0.3);
+  border-radius: 12px;
+  padding: 14px 16px;
   position: relative;
-  font-family: var(--font-ui);
-  transform: translateZ(0);
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(255, 230, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .target-header {
-  font-family: var(--font-ui);
-  font-size: var(--type-body-s);
-  color: var(--primary);
-  margin-bottom: 6px;
-  text-align: center;
-  letter-spacing: 0.5px;
-  text-shadow: var(--glow-sm) var(--primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffe600;
+  text-shadow: 0 0 8px rgba(255, 230, 0, 0.5);
+  letter-spacing: 1px;
 }
 
 .target-content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
 }
 
 .target-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   width: 100%;
 }
 
@@ -2210,27 +2190,27 @@ button, a { touch-action: manipulation; }
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--type-title-s);
-  font-weight: var(--fw-bold);
-  color: var(--on-surface-muted);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
   max-width: 100%;
   align-self: flex-start;
 }
 
 .target-name-text {
-  flex: 1;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 110px;
+  display: inline-block;
 }
 
 .target-score {
-  font-family: var(--font-ui);
-  font-size: var(--type-headline-l);
-  font-weight: var(--fw-black);
-  color: var(--on-surface);
-  text-shadow: var(--glow-md) var(--yellow-50);
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 230, 0, 0.8);
   line-height: 1;
   align-self: flex-end;
 }
@@ -2238,38 +2218,49 @@ button, a { touch-action: manipulation; }
 .progress-track {
   width: 100%;
   height: 6px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--pink-50), var(--yellow-50));
-  box-shadow: var(--glow-md) var(--yellow-50);
-  border-radius: 4px;
-  transition: width 0.2s var(--ease-standard);
+  background: linear-gradient(90deg, var(--cyan), #ffe600);
+  border-radius: 3px;
+  box-shadow: 0 0 10px #ffe600;
+  transition: width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes slide-out-right {
-  0% { transform: translateX(0); opacity: 1; }
-  100% { transform: translateX(120%); opacity: 0; }
+/* Overtake flash — preview.html shatter */
+@keyframes target-shatter {
+  0%   { transform: scale(1);    filter: brightness(1); }
+  15%  { transform: scale(1.15); filter: brightness(3); box-shadow: 0 0 50px #ffe600, 0 0 20px #fff, inset 0 0 20px rgba(255,230,0,0.05); border-color: #fff; }
+  35%  { transform: scale(0.95); filter: brightness(1.5); box-shadow: 0 0 20px #ffe600, inset 0 0 20px rgba(255,230,0,0.05); }
+  100% { transform: scale(1);    filter: brightness(1); }
 }
 
-@keyframes slide-in-left {
-  0% { transform: translateX(-120%); opacity: 0; }
-  100% { transform: translateX(0); opacity: 1; }
+.overtaken {
+  animation: target-shatter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Slide animations — preview.html exact */
+@keyframes slideOutUp {
+  to { transform: translateY(-20px); opacity: 0; }
+}
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 
 .anim-slide-out {
-  animation: slide-out-right 0.3s var(--ease-accelerate) forwards;
+  animation: slideOutUp 0.3s forwards;
 }
 
 .anim-slide-in {
-  animation: slide-in-left 0.4s var(--ease-emphasized) forwards;
+  animation: slideInUp 0.3s forwards;
 }
 
 .target-shatter {
