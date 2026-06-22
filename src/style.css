@@ -2134,31 +2134,31 @@ button, a { touch-action: manipulation; }
 /* ─── Target Overtake UI ─── */
 .target-box {
   width: 108px;
-  background: rgba(4, 4, 30, 0.6);
-  border: 1px solid rgba(0, 200, 255, 0.2);
-  border-radius: 6px;
-  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--r-xs);
+  padding: var(--space-2);
   position: relative;
   overflow: hidden;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   transform: translateZ(0);
 }
 
 .target-header {
-  font-family: 'Orbitron', monospace;
-  font-size: 10px;
-  color: var(--cyan);
+  font-family: var(--font-ui);
+  font-size: var(--type-body-s);
+  color: var(--primary);
   margin-bottom: 6px;
   text-align: center;
   letter-spacing: 0.5px;
-  text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+  text-shadow: var(--glow-sm) var(--primary-container);
 }
 
 .target-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .target-info {
@@ -2172,9 +2172,9 @@ button, a { touch-action: manipulation; }
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--type-title-s);
+  font-weight: var(--fw-bold);
+  color: var(--on-surface-muted);
   max-width: 100%;
   align-self: flex-start;
 }
@@ -2188,11 +2188,11 @@ button, a { touch-action: manipulation; }
 }
 
 .target-score {
-  font-family: 'Orbitron', monospace;
-  font-size: 22px;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 12px rgba(255, 230, 0, 0.8);
+  font-family: var(--font-ui);
+  font-size: var(--type-headline-l);
+  font-weight: var(--fw-black);
+  color: var(--on-surface);
+  text-shadow: var(--glow-md) var(--yellow-50);
   line-height: 1;
   align-self: flex-end;
 }
@@ -2200,8 +2200,8 @@ button, a { touch-action: manipulation; }
 .progress-track {
   width: 100%;
   height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  background: var(--surface-2);
+  border-radius: var(--r-xs);
   overflow: hidden;
   position: relative;
 }
@@ -2209,9 +2209,9 @@ button, a { touch-action: manipulation; }
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #ff0055, #ffaa00);
-  box-shadow: 0 0 8px rgba(255, 170, 0, 0.8);
-  border-radius: 2px;
+  background: linear-gradient(90deg, var(--pink-50), var(--yellow-50));
+  box-shadow: var(--glow-sm) var(--orange-50);
+  border-radius: var(--r-xs);
   transition: width 0.1s linear;
 }
 
@@ -2226,11 +2226,11 @@ button, a { touch-action: manipulation; }
 }
 
 .anim-slide-out {
-  animation: slide-out-right 0.4s cubic-bezier(0.8, 0, 0.2, 1) forwards;
+  animation: slide-out-right 0.4s var(--ease-decelerate) forwards;
 }
 
 .anim-slide-in {
-  animation: slide-in-left 0.4s cubic-bezier(0.2, 1, 0.2, 1) forwards;
+  animation: slide-in-left 0.4s var(--ease-emphasized) forwards;
 }
 
 .target-shatter {
@@ -2243,10 +2243,10 @@ button, a { touch-action: manipulation; }
 }
 
 .shatter-piece {
-  background: rgba(255, 230, 0, 0.9);
-  box-shadow: 0 0 10px #ffe600;
+  background: var(--yellow-50);
+  box-shadow: var(--glow-sm) var(--yellow-50);
   position: absolute;
-  animation: shatter-fly 0.6s ease-out forwards;
+  animation: shatter-fly 0.6s var(--ease-out) forwards;
 }
 
 @keyframes shatter-fly {
