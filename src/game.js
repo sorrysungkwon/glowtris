@@ -16,7 +16,7 @@ import {
   drawBoard, drawNext, drawHold, getCellSprite,
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
   applyShake, _enableKbMode, _disableKbMode,
-  updateUI, updateSprintTimer, showScorePopup, updateAPMPPS,
+  updateUI, updateSprintTimer, showScorePopup, updateAPMPPS, initTargetUI,
   updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel, togglePerfMode,
   triggerScreenFlash, triggerAllClearFlash, triggerLevelUpVisuals, spawnGoldBurst,
   showAchievementToast, unlockAchievement,
@@ -829,6 +829,7 @@ function _doStartGame(){
     S._flowRounds=0; _flowCollapsing=false;
   }
 
+  initTargetUI();
   spawnPiece();drawNext();drawHold();updateUI();
   if(S.isSprintMode || isTimeAttack)updateSprintTimer();
   if(animFrame)cancelAnimationFrame(animFrame);

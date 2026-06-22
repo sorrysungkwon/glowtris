@@ -2130,3 +2130,126 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 .hud-btn::after { content: ''; position: absolute; inset: -15px; }
 input, textarea, select { font-size: 16px; }
 button, a { touch-action: manipulation; }
+
+/* ─── Target Overtake UI ─── */
+.target-box {
+  width: 108px;
+  background: rgba(4, 4, 30, 0.6);
+  border: 1px solid rgba(0, 200, 255, 0.2);
+  border-radius: 6px;
+  padding: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  font-family: 'Inter', sans-serif;
+  transform: translateZ(0);
+}
+
+.target-header {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  margin-bottom: 6px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+}
+
+.target-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.target-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.target-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 100%;
+  align-self: flex-start;
+}
+
+.target-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 140px; /* Safe width for panel */
+  display: inline-block;
+}
+
+.target-score {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 230, 0, 0.8);
+  line-height: 1;
+  align-self: flex-end;
+}
+
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff0055, #ffaa00);
+  box-shadow: 0 0 8px rgba(255, 170, 0, 0.8);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+@keyframes slide-out-right {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+@keyframes slide-in-left {
+  0% { transform: translateX(-120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.anim-slide-out {
+  animation: slide-out-right 0.4s cubic-bezier(0.8, 0, 0.2, 1) forwards;
+}
+
+.anim-slide-in {
+  animation: slide-in-left 0.4s cubic-bezier(0.2, 1, 0.2, 1) forwards;
+}
+
+.target-shatter {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.shatter-piece {
+  background: rgba(255, 230, 0, 0.9);
+  box-shadow: 0 0 10px #ffe600;
+  position: absolute;
+  animation: shatter-fly 0.6s ease-out forwards;
+}
+
+@keyframes shatter-fly {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0); opacity: 0; }
+}

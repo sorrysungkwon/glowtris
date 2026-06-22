@@ -209,6 +209,11 @@ export const S = {
     sprintRank:0, sprintDailyRank:0, sprintWeeklyRank:0, mySprintTime:0,
   },
 
+  // Target Overtake UI
+  targets: [],
+  targetIndex: 0,
+  targetAnimating: false,
+
   // Audio / visual settings (written by audio.js or ui.js, read by both)
   muteAudio:     false,
   animIntensity: 'full',   // 'full' | 'reduced' | 'off'

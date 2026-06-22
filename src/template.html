@@ -299,6 +299,25 @@ if ('serviceWorker' in navigator) {
       <canvas id="next-canvas" class="mini-cv" width="108" height="96"></canvas>
       <div class="panel-title" style="margin-top: 12px;">HOLD</div>
       <canvas id="hold-canvas" class="mini-cv" width="108" height="80"></canvas>
+      
+      <!-- Target Overtake UI -->
+      <div class="target-box" id="target-box" style="margin-top: 16px; display: none;">
+        <div class="target-header" id="target-title">🎯 NEXT TARGET</div>
+        
+        <div class="target-content" id="target-content">
+          <div class="target-info">
+            <div class="target-user" title="">
+              <span style="opacity:0.5; flex-shrink:0;">👤</span>
+              <span id="target-name" class="target-name-text">Loading...</span>
+            </div>
+            <div class="target-score" id="target-score">0</div>
+          </div>
+          
+          <div class="progress-track">
+            <div class="progress-fill" id="target-progress"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

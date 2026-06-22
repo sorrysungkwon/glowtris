@@ -1023,6 +1023,112 @@ export function applyShake(dtFactor = 1) {
   }
 }
 
+// ─── Target Overtake UI logic ──────────────────────────────────────────────────
+export function initTargetUI() {
+  const tBox = document.getElementById('target-box');
+  if (!tBox) return;
+  if (S.isSprintMode || S.isFlowMode) {
+    tBox.style.display = 'none';
+    return;
+  }
+  
+  let lbList = [];
+  if (S.isBlitzMode) lbList = S._lbCache.blitzDailyBoard || [];
+  else if (S.isDailyMode) lbList = S._lbCache.challengeBoard || [];
+  else lbList = S._lbCache.dailyBoard || [];
+
+  const valid = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
+  valid.sort((a,b) => a.score - b.score);
+  
+  S.targets = valid;
+  S.targetIndex = 0;
+  S.targetAnimating = false;
+  
+  while(S.targetIndex < S.targets.length && S.targets[S.targetIndex].score <= S.score) {
+    S.targetIndex++;
+  }
+  
+  if (S.targetIndex < S.targets.length) {
+    tBox.style.display = 'block';
+    renderCurrentTarget();
+  } else {
+    tBox.style.display = 'none';
+  }
+}
+
+function renderCurrentTarget() {
+  if (S.targetIndex >= S.targets.length) return;
+  const t = S.targets[S.targetIndex];
+  document.getElementById('target-name').textContent = t.name;
+  document.getElementById('target-box').querySelector('.target-user').setAttribute('title', t.name);
+  document.getElementById('target-score').textContent = t.score.toLocaleString();
+}
+
+function triggerTargetOvertake() {
+  S.targetAnimating = true;
+  const tBox = document.getElementById('target-box');
+  const tContent = document.getElementById('target-content');
+  
+  const rect = tBox.getBoundingClientRect();
+  for (let i = 0; i < 8; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'shatter-piece';
+    piece.style.width = (4 + Math.random() * 6) + 'px';
+    piece.style.height = (4 + Math.random() * 6) + 'px';
+    piece.style.left = (Math.random() * 100) + '%';
+    piece.style.top = (Math.random() * 100) + '%';
+    
+    const tx = (Math.random() - 0.5) * 100 + 'px';
+    const ty = (Math.random() - 0.5) * 100 + 'px';
+    const rot = (Math.random() * 720 - 360) + 'deg';
+    
+    piece.style.setProperty('--tx', tx);
+    piece.style.setProperty('--ty', ty);
+    piece.style.setProperty('--rot', rot);
+    
+    tBox.appendChild(piece);
+    setTimeout(() => piece.remove(), 600);
+  }
+  
+  tContent.classList.remove('anim-slide-in');
+  tContent.classList.add('anim-slide-out');
+  
+  setTimeout(() => {
+    S.targetIndex++;
+    if (S.targetIndex >= S.targets.length) {
+      tBox.style.display = 'none';
+      S.targetAnimating = false;
+      return;
+    }
+    
+    renderCurrentTarget();
+    tContent.classList.remove('anim-slide-out');
+    tContent.classList.add('anim-slide-in');
+    
+    setTimeout(() => {
+      S.targetAnimating = false;
+      updateTargetUI();
+    }, 400);
+  }, 400);
+}
+
+export function updateTargetUI() {
+  if (S.isSprintMode || S.isFlowMode || S.targetAnimating || S.targetIndex >= S.targets.length) return;
+  
+  const target = S.targets[S.targetIndex];
+  if (S.score >= target.score) {
+    triggerTargetOvertake();
+  } else {
+    let prevScore = 0;
+    if (S.targetIndex > 0) prevScore = S.targets[S.targetIndex - 1].score;
+    const progressFill = document.getElementById('target-progress');
+    if (progressFill) {
+      const pct = Math.max(0, Math.min(100, ((S.score - prevScore) / (target.score - prevScore)) * 100));
+      progressFill.style.width = pct + '%';
+    }
+  }
+}
+
 // ─── UI update ────────────────────────────────────────────────────────────────
 export function updateUI() {
   if (S.isSprintMode) {
@@ -1055,6 +1161,7 @@ export function updateUI() {
   $levelBar.style.background = `linear-gradient(90deg,hsl(${190+hue},100%,50%),hsl(${270+hue},100%,50%))`;
   $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
   updateAPMPPS();
+  updateTargetUI();
 }
 
 export function updateAPMPPS() {
