@@ -1110,6 +1110,13 @@ function triggerTargetOvertake() {
     setTimeout(() => piece.remove(), 600);
   }
   
+  // Show OVERTAKEN! pop-up text
+  const overtakeText = document.createElement('div');
+  overtakeText.className = 'overtaken-text';
+  overtakeText.textContent = 'OVERTAKEN!';
+  tBox.appendChild(overtakeText);
+  setTimeout(() => overtakeText.remove(), 1000);
+  
   tBox.classList.remove('anim-slide-in', 'anim-slide-out');
   void tBox.offsetWidth; // Force reflow
   tBox.classList.add('anim-slide-out');
