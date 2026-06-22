@@ -430,9 +430,9 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
       inset 0 0 25px rgba(0, 200, 255, 0.05);
     width: 154px;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                border-color 0.3s ease, 
-                box-shadow 0.3s ease;
+    transition: transform var(--t-slow) var(--ease-emphasized), 
+                border-color var(--t-slow) var(--ease-standard), 
+                box-shadow var(--t-slow) var(--ease-standard);
   }
   
   .stat-box { display: flex; flex-direction: column; align-items: center; width: 100%; position: relative; }
@@ -552,12 +552,15 @@
     animation: scale-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
+  /* Game wrap — sized by JS inline styles on the canvases (Safari safe) */
+  .game-wrap { position:relative; flex:0 0 auto; }
+
   /* Canvas score overlay */
   #canvas-score-overlay {
     position: absolute;
     top: 44px;
     left: 8px;
-    z-index: 10;
+    z-index: 20;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -578,57 +581,9 @@
   }
   #canvas-score-overlay .target-box {
     pointer-events: auto;
-    margin-top: 0;
     width: 100%;
     box-sizing: border-box;
   }
-
-  /* Bottom HUD */
-  #bottom-hud {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 8px 20px;
-    background: linear-gradient(180deg, rgba(4,4,30,0.7), rgba(2,2,15,0.85));
-    border: 1px solid rgba(0, 200, 255, 0.12);
-    border-radius: var(--r-xl);
-    margin-top: 8px;
-    flex-wrap: wrap;
-  }
-  .hud-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    min-width: 36px;
-  }
-  .hud-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: rgba(0, 200, 255, 0.6);
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .hud-sep {
-    width: 1px;
-    height: 24px;
-    background: rgba(255,255,255,0.08);
-    flex-shrink: 0;
-  }
-  #bottom-hud #level-bar-wrap {
-    width: 48px;
-    margin: 0;
-    align-self: center;
-  }
-  #bottom-hud #combo-display {
-    text-align: center;
-    min-height: auto;
-  }
-
-  /* Game wrap — sized by JS inline styles on the canvases (Safari safe) */
-  .game-wrap { position:relative; flex:0 0 auto; }
   #game-canvas {
     display:block;
     border:2px solid rgba(0,200,255,0.35);
@@ -736,7 +691,6 @@
   @media (max-width:600px) {
     #desktop-header { display:none; }
     #left-panel, #right-column { display:none; }
-    #canvas-score-overlay { display:none; }
 
     /* ── Keyboard mode on tablet: restore desktop side panels ── */
     /* When an external keyboard is detected on a coarse-pointer device,
@@ -2263,41 +2217,32 @@ button, a { touch-action: manipulation; }
 
 /* ─── Target Overtake UI ─── */
 .target-box {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 230, 0, 0.3);
-  border-radius: 12px;
-  padding: 14px 16px;
+  width: 154px;
   position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 0 20px rgba(255, 230, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 8px;
+  font-family: var(--font-ui);
+  transform: translateZ(0);
 }
 
 .target-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: #ffe600;
-  text-shadow: 0 0 8px rgba(255, 230, 0, 0.5);
-  letter-spacing: 1px;
+  font-family: var(--font-ui);
+  font-size: var(--type-body-s);
+  color: var(--primary);
+  margin-bottom: 6px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: var(--glow-sm) var(--primary-container);
 }
 
 .target-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .target-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   width: 100%;
 }
 
@@ -2305,27 +2250,27 @@ button, a { touch-action: manipulation; }
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--type-title-s);
+  font-weight: var(--fw-bold);
+  color: var(--on-surface-muted);
   max-width: 100%;
   align-self: flex-start;
 }
 
 .target-name-text {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 140px;
-  display: inline-block;
 }
 
 .target-score {
-  font-family: 'Orbitron', monospace;
-  font-size: 22px;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 12px rgba(255, 230, 0, 0.8);
+  font-family: var(--font-ui);
+  font-size: var(--type-headline-l);
+  font-weight: var(--fw-black);
+  color: var(--on-surface);
+  text-shadow: var(--glow-md) var(--yellow-50);
   line-height: 1;
   align-self: flex-end;
 }
@@ -2333,42 +2278,20 @@ button, a { touch-action: manipulation; }
 .progress-track {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
 }
 
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--cyan), #ffe600);
-  border-radius: 3px;
-  box-shadow: 0 0 10px #ffe600;
-  transition: width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.overtaken-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: 'Orbitron', monospace;
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 10px #ffe600, 0 0 20px #ff0000;
-  z-index: 20;
-  animation: overtaken-pop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  pointer-events: none;
-}
-
-@keyframes overtaken-pop {
-  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-  20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-  80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+  background: linear-gradient(90deg, var(--pink-50), var(--yellow-50));
+  box-shadow: var(--glow-md) var(--yellow-50);
+  border-radius: 4px;
+  transition: width 0.2s var(--ease-standard);
 }
 
 @keyframes slide-out-right {
@@ -2410,28 +2333,6 @@ button, a { touch-action: manipulation; }
   0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
   100% { transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0); opacity: 0; }
 }
-
-/* ─── preview.html 방식 Overtake 애니메이션 ─── */
-@keyframes shatter {
-  0% { transform: scale(1); filter: brightness(1); }
-  15% { transform: scale(1.15); filter: brightness(3); box-shadow: 0 0 50px #ffe600, 0 0 20px #fff; border-color: #fff; }
-  35% { transform: scale(0.95); filter: brightness(1.5); box-shadow: 0 0 20px #ffe600; }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-
-.overtaken {
-  animation: shatter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-@keyframes slideOutUp {
-  to { transform: translateY(-20px); opacity: 0; }
-}
-@keyframes slideInUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.slide-out { animation: slideOutUp 0.3s forwards; }
-.slide-in { animation: slideInUp 0.3s forwards; }
 </style>
 <!-- Service Worker -->
 <script>
@@ -2650,14 +2551,14 @@ if ('serviceWorker' in navigator) {
         <div class="score-val" id="level-display" style="font-size: 24px; color: var(--cyan);">1</div>
         <div id="level-bar-wrap" style="margin-top: 8px; margin-bottom: 0;"><div id="level-bar"></div></div>
       </div>
-
+      
       <div class="stat-box" style="margin-bottom: 12px;">
         <div class="panel-title">LINES CLEARED</div>
         <div class="score-val" id="lines-display" style="font-size: 20px;">0</div>
       </div>
-
+      
       <div class="divider"></div>
-
+      
       <!-- Speed & Performance Grid -->
       <div class="stats-grid">
         <div class="stat-box">
@@ -2680,9 +2581,9 @@ if ('serviceWorker' in navigator) {
           <div id="pps-display" class="score-val" style="font-size:14px">—</div>
         </div>
       </div>
-
+      
       <div id="combo-display" style="margin-top: 8px;"></div>
-
+      
       <!-- Hidden keys -->
       <div id="key-move" style="display:none"></div>
       <div id="key-rotate" style="display:none"></div>
@@ -2705,11 +2606,10 @@ if ('serviceWorker' in navigator) {
           <span class="material-icons-round" style="font-size:16px">pause</span>
         </button>
       </div>
-
       <canvas id="vanish-canvas"></canvas>
       <canvas id="game-canvas"></canvas>
       <canvas id="particle-canvas"></canvas>
-      <!-- Score + Target overlay — placed AFTER canvases so it paints on top -->
+      <!-- Score + Target overlay — after canvases so it paints on top -->
       <div id="canvas-score-overlay">
         <div class="overlay-score-panel">
           <div class="panel-title" id="panel-score-label">SCORE</div>
@@ -3351,138 +3251,6 @@ ${n?"Think you can beat me? \u2192 https://glowtris.com":"Can you top this? \u21
       </div>
     </div>
   </details>
-
 </section>
-
-<script>
-/* ── Target Overtake UI: preview.html 완전 동기화 오버라이드 ── */
-(function() {
-  // ── 1. Ea() 함수를 preview.html 방식으로 완전히 대체 ──
-  // minified 코드에서 Ea는 module scope이므로, Gl()이 Ea()를 호출하기 전에
-  // score 체크를 먼저 인터셉트하는 방식으로 처리.
-  // Gl() 호출 전 e.score >= target.score를 감지해 우리 로직으로 대체.
-
-  var _isAnimating = false;
-
-  function runOvertakeAnimation() {
-    var tbEl = document.getElementById('target-box');
-    var tcEl = document.getElementById('target-content');
-    var titleEl = document.getElementById('target-title');
-    var pfEl = document.getElementById('target-progress');
-    if (!tbEl || !tcEl || !titleEl) return;
-
-    _isAnimating = true;
-    e.targetAnimating = true; // 엔진 Ea() 중복 실행 방지
-
-    // Step 1: shatter (preview.html @keyframes shatter)
-    tbEl.classList.add('overtaken');
-    titleEl.textContent = 'OVERTAKEN!';
-    titleEl.style.color = '#fff';
-
-    // Step 2: 0.4s 후 slide-out
-    setTimeout(function() {
-      tbEl.classList.remove('overtaken');
-      tcEl.classList.add('slide-out');
-
-      // Step 3: 0.3s 후 콘텐츠 교체 + slide-in
-      setTimeout(function() {
-        // 엔진이 이미 targetIndex를 올렸으므로 현재 타겟으로 UI 갱신
-        var ti = e.targetIndex;
-        var target = e.targets && e.targets[ti];
-        titleEl.textContent = '🎯 NEXT TARGET';
-        titleEl.style.color = '#ffe600';
-        tcEl.classList.remove('slide-out');
-
-        if (!target) {
-          // 모든 타겟 초과
-          tbEl.style.display = 'none';
-          _isAnimating = false;
-          e.targetAnimating = false;
-          return;
-        }
-
-        // 이름/점수 업데이트
-        var nameEl = document.getElementById('target-name');
-        var scoreEl = document.getElementById('target-score');
-        var userEl = tbEl.querySelector('.target-user');
-        if (nameEl) nameEl.textContent = target.name;
-        if (scoreEl) scoreEl.textContent = target.score.toLocaleString();
-        if (userEl) userEl.setAttribute('title', target.name);
-
-        // progress bar 리셋 (transition 없이)
-        if (pfEl) {
-          pfEl.style.transition = 'none';
-          pfEl.style.width = Math.min((e.score / target.score) * 100, 100) + '%';
-          setTimeout(function() {
-            pfEl.style.transition = 'width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)';
-          }, 50);
-        }
-
-        tcEl.classList.add('slide-in');
-        setTimeout(function() {
-          tcEl.classList.remove('slide-in');
-          _isAnimating = false;
-          e.targetAnimating = false;
-        }, 300);
-
-      }, 300);
-    }, 400);
-  }
-
-  // ── 2. 점수 초과 감지 + target-box 표시 제어 ──
-  var _lastTargetIndex = null;
-  var _wasVisible = false;
-
-  function tick() {
-    if (typeof e === 'undefined') return;
-
-    var tbEl = document.getElementById('target-box');
-    if (!tbEl) return;
-
-    // 게임 중 아닐 때
-    if (!e.gameRunning || e.isSprintMode || e.isFlowMode) return;
-
-    var targets = e.targets;
-    var ti = e.targetIndex;
-    if (!targets || ti >= targets.length) return;
-
-    var target = targets[ti];
-    if (!target) return;
-
-    // target-box가 새로 표시될 때 slide-in 효과
-    var isVisible = tbEl.style.display !== 'none';
-    if (isVisible && !_wasVisible) {
-      var tcEl = document.getElementById('target-content');
-      if (tcEl) {
-        tcEl.classList.add('slide-in');
-        setTimeout(function() { tcEl.classList.remove('slide-in'); }, 300);
-      }
-    }
-    _wasVisible = isVisible;
-
-    // targetIndex 변경 감지 → overtake 애니메이션
-    if (_lastTargetIndex !== null && ti !== _lastTargetIndex && ti > _lastTargetIndex && !_isAnimating) {
-      runOvertakeAnimation();
-    }
-    _lastTargetIndex = ti;
-
-    // progress bar 실시간 업데이트
-    var pfEl = document.getElementById('target-progress');
-    if (pfEl && !_isAnimating) {
-      var prevScore = (ti > 0 && targets[ti - 1]) ? targets[ti - 1].score : 0;
-      var pct = Math.max(0, Math.min(100, (e.score - prevScore) / (target.score - prevScore) * 100));
-      pfEl.style.width = pct + '%';
-    }
-  }
-
-  // RAF 루프로 부드럽게 실행
-  function rafLoop() {
-    tick();
-    requestAnimationFrame(rafLoop);
-  }
-  requestAnimationFrame(rafLoop);
-
-})();
-</script>
 </body>
 </html>

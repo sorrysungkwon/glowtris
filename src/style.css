@@ -514,6 +514,36 @@
 
   /* Game wrap — sized by JS inline styles on the canvases (Safari safe) */
   .game-wrap { position:relative; flex:0 0 auto; }
+
+  /* Canvas score overlay */
+  #canvas-score-overlay {
+    position: absolute;
+    top: 44px;
+    left: 8px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    min-width: 130px;
+    max-width: 152px;
+  }
+  .overlay-score-panel {
+    background: linear-gradient(180deg, rgba(4,4,30,0.88), rgba(2,2,15,0.96));
+    border: 1px solid rgba(0, 200, 255, 0.15);
+    border-top: 1px solid rgba(0, 200, 255, 0.35);
+    border-radius: var(--r-md);
+    padding: 10px 14px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+  #canvas-score-overlay .target-box {
+    pointer-events: auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
   #game-canvas {
     display:block;
     border:2px solid rgba(0,200,255,0.35);

@@ -247,14 +247,8 @@ if ('serviceWorker' in navigator) {
 
     <!-- Desktop left panel -->
     <div class="panel" id="left-panel" style="margin-top:6px">
-      <!-- Main Score Section -->
-      <div class="stat-box primary">
-        <div class="panel-title" id="panel-score-label">SCORE</div>
-        <div class="score-val" id="score-display" style="font-size: 28px;">0</div>
-      </div>
-      
       <div class="divider"></div>
-      
+
       <!-- Level & Lines Section -->
       <div class="stat-box" style="margin-bottom: 8px;">
         <div class="panel-title">LEVEL</div>
@@ -319,6 +313,28 @@ if ('serviceWorker' in navigator) {
       <canvas id="vanish-canvas"></canvas>
       <canvas id="game-canvas"></canvas>
       <canvas id="particle-canvas"></canvas>
+      <!-- Score + Target overlay — after canvases so it paints on top -->
+      <div id="canvas-score-overlay">
+        <div class="overlay-score-panel">
+          <div class="panel-title" id="panel-score-label">SCORE</div>
+          <div class="score-val" id="score-display" style="font-size:28px;">0</div>
+        </div>
+        <div class="target-box" id="target-box" style="display:none;">
+          <div class="target-header" id="target-title">🎯 NEXT TARGET</div>
+          <div class="target-content" id="target-content">
+            <div class="target-info">
+              <div class="target-user" title="">
+                <span style="opacity:0.5; flex-shrink:0;">👤</span>
+                <span id="target-name" class="target-name-text">Loading...</span>
+              </div>
+              <div class="target-score" id="target-score">0</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="target-progress"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="score-popup"></div>
     </div>
 
@@ -337,24 +353,6 @@ if ('serviceWorker' in navigator) {
         </div>
       </div>
       
-      <!-- Target Overtake UI -->
-      <div class="panel target-box" id="target-box" style="display: none; margin-top:0;">
-        <div class="target-header" id="target-title">🎯 NEXT TARGET</div>
-        
-        <div class="target-content" id="target-content">
-          <div class="target-info">
-            <div class="target-user" title="">
-              <span style="opacity:0.5; flex-shrink:0;">👤</span>
-              <span id="target-name" class="target-name-text">Loading...</span>
-            </div>
-            <div class="target-score" id="target-score">0</div>
-          </div>
-          
-          <div class="progress-track">
-            <div class="progress-fill" id="target-progress"></div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
