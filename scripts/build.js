@@ -91,7 +91,7 @@ async function build() {
     const pageHtml = baseHtml
       .replace('<title>GLOWTRIS</title>', `<title>${p.title}</title>`)
       .replace('content="A free neon block-stacking game in your browser. No downloads, no ads. Just pure stacking action."', `content="${p.desc}"`)
-      .replace('content="BUILD_OG_TITLE"', `content="${p.ogTitle}"`)
+      .replaceAll('content="BUILD_OG_TITLE"', `content="${p.ogTitle}"`)
       .replaceAll('content="BUILD_OG_DESC"', `content="${p.ogDesc}"`)
       .replace('<link rel="canonical" href="https://glowtris.com">', `<link rel="canonical" href="${canonical}">`);
 
