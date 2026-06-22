@@ -135,18 +135,19 @@
     background: linear-gradient(90deg, var(--cyan), #ffe600);
     border-radius: 4px;
     box-shadow: 0 0 10px #ffe600;
-    transition: width 0.1s linear;
+    transition: width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); /* Snappy spring */
   }
 
   /* Overtake animation */
   @keyframes shatter {
     0% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.05); filter: brightness(2); box-shadow: 0 0 30px #ffe600; border-color: #ffe600; }
+    15% { transform: scale(1.15); filter: brightness(3); box-shadow: 0 0 50px #ffe600, 0 0 20px #fff; border-color: #fff; }
+    35% { transform: scale(0.95); filter: brightness(1.5); box-shadow: 0 0 20px #ffe600; }
     100% { transform: scale(1); filter: brightness(1); }
   }
 
   .overtaken {
-    animation: shatter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: shatter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 </style>
 </head>
