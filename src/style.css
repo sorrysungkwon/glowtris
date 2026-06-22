@@ -2119,6 +2119,7 @@ html.low-perf .action-btn.play-btn { animation: none !important; }
 #seo-block summary::-webkit-details-marker { display: none; }
 #seo-block h1 { font-size: var(--type-body-xl); font-weight: 700; margin-bottom: var(--type-body-l); color: rgba(255,255,255,0.3); }
 #seo-block h2 { font-size: var(--type-title-s); font-weight: 700; margin: 20px 0 var(--type-label-m); color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+#seo-block h3 { font-size: var(--type-body-m); font-weight: 600; margin-top: 16px; margin-bottom: 8px; color: rgba(255,255,255,0.25); }
 #seo-block p, #seo-block ul { margin-bottom: 12px; }
 #seo-block ul { padding-left: 20px; }
 #seo-block li { margin-bottom: 4px; }
