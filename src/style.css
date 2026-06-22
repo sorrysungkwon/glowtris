@@ -2152,24 +2152,25 @@ button, a { touch-action: manipulation; }
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 230, 0, 0.3);
   border-radius: 10px;
-  padding: 12px;
+  padding: 12px 14px;
   position: relative;
   overflow: hidden;
   box-shadow: inset 0 0 20px rgba(255, 230, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
 .target-header {
   display: block;
   text-align: center;
   font-family: 'Orbitron', sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  color: #ffe600;
-  text-shadow: 0 0 8px rgba(255, 230, 0, 0.5);
-  letter-spacing: 1.5px;
+  color: rgba(255, 230, 0, 0.7);
+  text-shadow: 0 0 6px rgba(255, 230, 0, 0.4);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
 }
 
 .target-content {
@@ -2181,7 +2182,7 @@ button, a { touch-action: manipulation; }
 .target-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 6px;
   width: 100%;
 }
 
@@ -2189,9 +2190,9 @@ button, a { touch-action: manipulation; }
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.65);
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
   min-width: 0;
 }
 
@@ -2206,22 +2207,17 @@ button, a { touch-action: manipulation; }
 
 .target-score {
   font-family: 'Orbitron', monospace;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255, 230, 0, 0.8);
+  color: #ffe600;
+  text-shadow: 0 0 14px rgba(255, 230, 0, 0.6);
   line-height: 1;
-  align-self: flex-start;
+  text-align: center;
+  width: 100%;
 }
 
 .progress-track {
-  width: 100%;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: none;
 }
 
 .progress-fill {
