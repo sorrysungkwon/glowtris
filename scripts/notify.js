@@ -79,7 +79,7 @@ async function run() {
         JSON.stringify({
           title: '🏆 Daily Challenge',
           body: `${displayDate} challenge is live — can you top the leaderboard?`,
-          url: '/?mode=daily',
+          url: '/',
         }),
         { TTL: 43200 } // 12 hours — queue if device is offline
       );
