@@ -1043,20 +1043,28 @@ export function initTargetUI() {
     if (lbList.length === 0) lbList = S._lbCache.board || [];
   }
 
-  let valid = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
-  
-  // ── BETA/EMPTY SERVER FALLBACK: Inject Dummy NPC Targets ──
-  if (valid.length === 0) {
-    valid = [
-      { name: 'CPU_Alpha', score: 100 },
-      { name: 'Glow_Bot',  score: 300 },
-      { name: 'Neon_Pro',  score: 700 },
-      { name: 'T-Spina',   score: 1200 },
-      { name: 'Max_Core',  score: 2000 },
-      { name: 'AI_Omega',  score: 3500 },
-      { name: 'Final_Boss', score: 5000 }
-    ];
-  }
+  let real = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
+
+  // ── Warmup NPC targets — always prepended before real leaderboard ──
+  const NPC = [
+    { name: 'Glow_Rookie',  score: 200 },
+    { name: 'CPU_Alpha',    score: 500 },
+    { name: 'Neon_Newbie',  score: 1000 },
+    { name: 'Glow_Bot',     score: 2000 },
+    { name: 'Stack_Pro',    score: 4000 },
+    { name: 'Neon_Pro',     score: 7000 },
+    { name: 'T-Spina',      score: 12000 },
+    { name: 'Max_Core',     score: 20000 },
+    { name: 'AI_Omega',     score: 35000 },
+    { name: 'Ultra_Apex',   score: 60000 },
+  ];
+
+  // Inject only NPCs below the lowest real score
+  const minReal = real.length > 0 ? Math.min(...real.map(t => t.score)) : Infinity;
+  const warmup = NPC.filter(n => n.score < minReal);
+
+  let valid = [...warmup, ...real];
+  if (valid.length === 0) valid = NPC; // full fallback if no server data
 
   valid.sort((a,b) => a.score - b.score);
   
