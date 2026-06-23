@@ -1044,27 +1044,47 @@ export function initTargetUI() {
   }
 
   let real = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
-
-  // ── Warmup: sample real users from targetBoard (ascending), below top-20 min ──
-  const targetBoard = (S._lbCache.targetBoard || []).filter(t => typeof t.score === 'number' && t.score > 0);
   const minReal = real.length > 0 ? Math.min(...real.map(t => t.score)) : Infinity;
 
+  // ── Warmup: real users from targetBoard, preprocessed ──
+  const rawTarget = (S._lbCache.targetBoard || []).filter(t => typeof t.score === 'number' && t.score > 0);
+
   let warmup = [];
-  if (targetBoard.length > 0) {
-    // Pick 10 evenly-spaced samples from below the real leaderboard cutoff
-    const below = targetBoard.filter(t => t.score < minReal);
-    const n = Math.min(10, below.length);
-    if (n > 0) {
-      const step = below.length / n;
-      for (let i = 0; i < n; i++) {
-        warmup.push(below[Math.floor(i * step)]);
+  if (rawTarget.length > 0) {
+    // 1. Deduplicate by name — keep highest score per person
+    const byName = new Map();
+    for (const t of rawTarget) {
+      if (!byName.has(t.name) || t.score > byName.get(t.name).score) byName.set(t.name, t);
+    }
+
+    // 2. Filter: below real leaderboard cutoff, score > 50
+    const pool = [...byName.values()].filter(t => t.score > 50 && t.score < minReal).sort((a,b) => a.score - b.score);
+
+    // 3. Log-scale band sampling — feels like natural progression
+    //    Bands: ~200, ~600, ~1500, ~4000, ~10k, ~25k, ~60k (log steps)
+    if (pool.length > 0) {
+      const minS = pool[0].score;
+      const maxS = pool[pool.length - 1].score;
+      const BANDS = 8;
+      const logMin = Math.log(Math.max(minS, 1));
+      const logMax = Math.log(Math.max(maxS, 2));
+      const logStep = (logMax - logMin) / BANDS;
+
+      for (let b = 0; b < BANDS; b++) {
+        const lo = Math.exp(logMin + b * logStep);
+        const hi = Math.exp(logMin + (b + 1) * logStep);
+        const band = pool.filter(t => t.score >= lo && t.score < hi);
+        if (band.length > 0) {
+          // Pick the median of the band
+          warmup.push(band[Math.floor(band.length / 2)]);
+        }
       }
     }
   }
 
-  // NPC fallback if no real warmup data
+  // NPC fallback
   if (warmup.length === 0) {
-    warmup = [
+    const NPC_FALLBACK = [
       { name: 'clumsyfinger',    score: 247 },
       { name: 'brian_lol',       score: 583 },
       { name: 'parkjy0314',      score: 1124 },
@@ -1075,7 +1095,8 @@ export function initTargetUI() {
       { name: 'hana_9191',       score: 23774 },
       { name: 'speedrunner_ish', score: 41038 },
       { name: 'ok_byeee',        score: 67291 },
-    ].filter(n => n.score < minReal);
+    ];
+    warmup = NPC_FALLBACK.filter(n => n.score < minReal);
   }
 
   let valid = [...warmup, ...real];

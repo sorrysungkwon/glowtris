@@ -375,7 +375,7 @@ export default async function handler(req, res) {
     ]);
 
     await Promise.all([
-      redis(`zremrangebyrank/${KEY_ALL}/0/-101`),
+      redis(`zremrangebyrank/${KEY_ALL}/0/-501`),
       redis(`expire/${daily}/${DAILY_TTL}`),
       redis(`expire/${weekly}/${WEEKLY_TTL}`),
     ]);
