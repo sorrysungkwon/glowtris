@@ -1045,26 +1045,41 @@ export function initTargetUI() {
 
   let real = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
 
-  // ── Warmup NPC targets — always prepended before real leaderboard ──
-  const NPC = [
-    { name: 'clumsyfinger',    score: 247 },
-    { name: 'brian_lol',       score: 583 },
-    { name: 'parkjy0314',      score: 1124 },
-    { name: 'yoloswag420',     score: 2387 },
-    { name: 'guest_9274',      score: 4812 },
-    { name: 'tetrisnoob2024',  score: 8931 },
-    { name: 'MountainDewGuy',  score: 14420 },
-    { name: 'hana_9191',       score: 23774 },
-    { name: 'speedrunner_ish', score: 41038 },
-    { name: 'ok_byeee',        score: 67291 },
-  ];
-
-  // Inject only NPCs below the lowest real score
+  // ── Warmup: sample real users from targetBoard (ascending), below top-20 min ──
+  const targetBoard = (S._lbCache.targetBoard || []).filter(t => typeof t.score === 'number' && t.score > 0);
   const minReal = real.length > 0 ? Math.min(...real.map(t => t.score)) : Infinity;
-  const warmup = NPC.filter(n => n.score < minReal);
+
+  let warmup = [];
+  if (targetBoard.length > 0) {
+    // Pick 10 evenly-spaced samples from below the real leaderboard cutoff
+    const below = targetBoard.filter(t => t.score < minReal);
+    const n = Math.min(10, below.length);
+    if (n > 0) {
+      const step = below.length / n;
+      for (let i = 0; i < n; i++) {
+        warmup.push(below[Math.floor(i * step)]);
+      }
+    }
+  }
+
+  // NPC fallback if no real warmup data
+  if (warmup.length === 0) {
+    warmup = [
+      { name: 'clumsyfinger',    score: 247 },
+      { name: 'brian_lol',       score: 583 },
+      { name: 'parkjy0314',      score: 1124 },
+      { name: 'yoloswag420',     score: 2387 },
+      { name: 'guest_9274',      score: 4812 },
+      { name: 'tetrisnoob2024',  score: 8931 },
+      { name: 'MountainDewGuy',  score: 14420 },
+      { name: 'hana_9191',       score: 23774 },
+      { name: 'speedrunner_ish', score: 41038 },
+      { name: 'ok_byeee',        score: 67291 },
+    ].filter(n => n.score < minReal);
+  }
 
   let valid = [...warmup, ...real];
-  if (valid.length === 0) valid = NPC; // full fallback if no server data
+  if (valid.length === 0) valid = warmup;
 
   valid.sort((a,b) => a.score - b.score);
   

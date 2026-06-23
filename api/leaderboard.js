@@ -84,6 +84,17 @@ async function getBoard(key, limit = TOP) {
   return board;
 }
 
+// Full board ascending (lowest score first) — for target warmup sampling
+async function getBoardAscending(key) {
+  const data = await redis(`zrange/${key}/0/-1/withscores`);
+  const raw = data.result || [];
+  const board = [];
+  for (let i = 0; i < raw.length; i += 2) {
+    board.push({ name: parseMember(raw[i]), score: parseInt(raw[i + 1], 10) });
+  }
+  return board;
+}
+
 // Sprint board: ascending (lowest time first = fastest wins)
 async function getSprintBoard(key, limit = TOP) {
   const data = await redis(`zrange/${key}/0/${limit - 1}/withscores`);
@@ -217,12 +228,13 @@ export default async function handler(req, res) {
       return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard });
     }
 
-    const [board, dailyBoard, weeklyBoard] = await Promise.all([
+    const [board, dailyBoard, weeklyBoard, targetBoard] = await Promise.all([
       getBoard(KEY_ALL, TOP_ALLTIME),
       getBoard(daily),
       getBoard(weekly),
+      getBoardAscending(KEY_ALL),
     ]);
-    return res.status(200).json({ board, dailyBoard, weeklyBoard });
+    return res.status(200).json({ board, dailyBoard, weeklyBoard, targetBoard });
   }
 
   if (req.method === 'POST') {
