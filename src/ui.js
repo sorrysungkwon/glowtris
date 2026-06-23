@@ -1068,14 +1068,11 @@ export function initTargetUI() {
     S.targetIndex++;
   }
   
-  const mBar = document.getElementById('mobile-target-bar');
   if (S.targetIndex < S.targets.length) {
     tBox.style.display = 'block';
-    if (mBar) mBar.style.opacity = '1';
     renderCurrentTarget();
   } else {
     tBox.style.display = 'none';
-    if (mBar) mBar.style.opacity = '0';
   }
 }
 
@@ -1101,9 +1098,7 @@ function triggerTargetOvertake() {
   tBox.classList.add('overtaken');
   tTitle.textContent = 'OVERTAKEN!';
   tTitle.style.color = '#fff';
-  const mBar = document.getElementById('mobile-target-bar');
   const mName = document.getElementById('mob-target-name');
-  if (mBar) mBar.classList.add('mtb-overtaken');
   if (mName) mName.textContent = 'OVERTAKEN!';
 
   // After shatter settles (0.4s), slide out content
@@ -1116,12 +1111,10 @@ function triggerTargetOvertake() {
     setTimeout(() => {
       tTitle.textContent = 'NEXT TARGET';
       tTitle.style.color = '#ffe600';
-      if (mBar) mBar.classList.remove('mtb-overtaken');
 
       S.targetIndex++;
       if (S.targetIndex >= S.targets.length) {
         tBox.style.display = 'none';
-        if (mBar) mBar.style.opacity = '0';
         S.targetAnimating = false;
         return;
       }

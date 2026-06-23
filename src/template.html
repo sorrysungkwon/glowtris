@@ -224,26 +224,33 @@ if ('serviceWorker' in navigator) {
 
   <!-- Mobile-only compact header -->
   <div id="mobile-header">
-    <div class="mh-preview">
-      <span>NEXT</span>
-      <canvas id="next-canvas-m" class="mini-cv" width="56" height="44"></canvas>
+    <!-- Left: Score -->
+    <div class="mh-score-block">
+      <span class="mh-label">SCORE</span>
+      <div id="score-display-m" class="mh-score-val">0</div>
     </div>
-    <div class="mh-info">
-      <div class="mh-score" id="score-display-m">0</div>
-      <div class="mh-meta">
-        <span>LV <b id="level-display-m">1</b></span>
-        <span>L <b id="lines-display-m">0</b></span>
-        <span>★ <b id="hi-score-m">0</b></span>
-      </div>
+    <!-- Center: Level / Lines / Best -->
+    <div class="mh-mid">
+      <span>LV <b id="level-display-m">1</b></span>
+      <span>L <b id="lines-display-m">0</b></span>
+      <span>★ <b id="hi-score-m">0</b></span>
     </div>
-    <div class="mh-preview">
-      <span>HOLD</span>
-      <canvas id="hold-canvas-m" class="mini-cv" width="56" height="44"></canvas>
+    <!-- Right: VS Target / Rank -->
+    <div class="mh-vs-block">
+      <span class="mh-label" id="mh-vs-label">RANK</span>
+      <div id="mob-target-name" class="mh-vs-name">—</div>
+      <div id="mob-target-score" class="mh-vs-score">—</div>
     </div>
   </div>
 
   <!-- Game row -->
   <div id="game-row">
+
+    <!-- Mobile NEXT side column -->
+    <div id="mob-next-col">
+      <span class="mob-col-label">NEXT</span>
+      <canvas id="next-canvas-m" class="mini-cv" width="52" height="52"></canvas>
+    </div>
 
     <!-- Desktop left column: 2-panel layout -->
     <div id="left-panel">
@@ -337,13 +344,6 @@ if ('serviceWorker' in navigator) {
           <span class="material-icons-round" style="font-size:16px">pause</span>
         </button>
       </div>
-      <div id="mobile-target-bar">
-        <div class="mtb-left">
-          <span class="mtb-vs">VS</span>
-          <span id="mob-target-name">—</span>
-        </div>
-        <span id="mob-target-score">0</span>
-      </div>
       <canvas id="vanish-canvas"></canvas>
       <canvas id="game-canvas"></canvas>
       <canvas id="particle-canvas"></canvas>
@@ -366,6 +366,13 @@ if ('serviceWorker' in navigator) {
       </div>
       
     </div>
+
+    <!-- Mobile HOLD side column -->
+    <div id="mob-hold-col">
+      <span class="mob-col-label">HOLD</span>
+      <canvas id="hold-canvas-m" class="mini-cv" width="52" height="52"></canvas>
+    </div>
+
   </div>
 
   <!-- Touch controls (all screens) -->
