@@ -84,6 +84,17 @@ async function getBoard(key, limit = TOP) {
   return board;
 }
 
+// Full board ascending (lowest score first) — for target warmup sampling
+async function getBoardAscending(key) {
+  const data = await redis(`zrange/${key}/0/-1/withscores`);
+  const raw = data.result || [];
+  const board = [];
+  for (let i = 0; i < raw.length; i += 2) {
+    board.push({ name: parseMember(raw[i]), score: parseInt(raw[i + 1], 10) });
+  }
+  return board;
+}
+
 // Sprint board: ascending (lowest time first = fastest wins)
 async function getSprintBoard(key, limit = TOP) {
   const data = await redis(`zrange/${key}/0/${limit - 1}/withscores`);
@@ -188,11 +199,12 @@ export default async function handler(req, res) {
     const mode = (req.query && req.query.mode) || (url && url.searchParams.get('mode')) || '';
 
     if (mode === 'daily') {
-      const [challengeBoard, challengeAlltimeBoard] = await Promise.all([
+      const [challengeBoard, challengeAlltimeBoard, dailyTargetBoard] = await Promise.all([
         getBoard(KEY_CHALLENGE()),
         getBoard(KEY_CHALLENGE_ALLTIME, TOP_ALLTIME),
+        getBoardAscending(KEY_CHALLENGE_ALLTIME),
       ]);
-      return res.status(200).json({ challengeBoard, challengeAlltimeBoard });
+      return res.status(200).json({ challengeBoard, challengeAlltimeBoard, dailyTargetBoard });
     }
 
     if (mode === 'sprint') {
@@ -209,20 +221,22 @@ export default async function handler(req, res) {
     if (mode === 'blitz') {
       const blitzDaily = KEY_BLITZ_DAILY(clientDate);
       const blitzWeekly = KEY_BLITZ_WEEKLY();
-      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard] = await Promise.all([
+      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard] = await Promise.all([
         getBoard(KEY_BLITZ, TOP_ALLTIME),
         getBoard(blitzDaily),
         getBoard(blitzWeekly),
+        getBoardAscending(KEY_BLITZ),
       ]);
-      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard });
+      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard });
     }
 
-    const [board, dailyBoard, weeklyBoard] = await Promise.all([
+    const [board, dailyBoard, weeklyBoard, targetBoard] = await Promise.all([
       getBoard(KEY_ALL, TOP_ALLTIME),
       getBoard(daily),
       getBoard(weekly),
+      getBoardAscending(KEY_ALL),
     ]);
-    return res.status(200).json({ board, dailyBoard, weeklyBoard });
+    return res.status(200).json({ board, dailyBoard, weeklyBoard, targetBoard });
   }
 
   if (req.method === 'POST') {
@@ -301,7 +315,7 @@ export default async function handler(req, res) {
       ]);
 
       await Promise.all([
-        redis(`zremrangebyrank/${KEY_BLITZ}/0/-${TOP_ALLTIME + 1}`),
+        redis(`zremrangebyrank/${KEY_BLITZ}/0/-501`),
         redis(`expire/${blitzDaily}/${DAILY_TTL}`),
         redis(`expire/${blitzWeekly}/${WEEKLY_TTL}`),
       ]);
@@ -336,7 +350,7 @@ export default async function handler(req, res) {
       ]);
       await Promise.all([
         redis(`expire/${key}/${DAILY_TTL}`),
-        redis(`zremrangebyrank/${KEY_CHALLENGE_ALLTIME}/0/-101`),
+        redis(`zremrangebyrank/${KEY_CHALLENGE_ALLTIME}/0/-501`),
       ]);
 
       const [challengeBoard, challengeAlltimeBoard] = await Promise.all([
@@ -363,7 +377,7 @@ export default async function handler(req, res) {
     ]);
 
     await Promise.all([
-      redis(`zremrangebyrank/${KEY_ALL}/0/-101`),
+      redis(`zremrangebyrank/${KEY_ALL}/0/-501`),
       redis(`expire/${daily}/${DAILY_TTL}`),
       redis(`expire/${weekly}/${WEEKLY_TTL}`),
     ]);

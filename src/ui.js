@@ -1033,30 +1033,77 @@ export function initTargetUI() {
   }
   
   let lbList = [];
+  let rawTargetKey = 'targetBoard';
   if (S.isBlitzMode) {
     lbList = S._lbCache.blitzDailyBoard || [];
     if (lbList.length === 0) lbList = S._lbCache.blitzBoard || [];
+    rawTargetKey = 'blitzTargetBoard';
   } else if (S.isDailyMode) {
     lbList = S._lbCache.challengeBoard || [];
+    rawTargetKey = 'dailyTargetBoard';
   } else {
     lbList = S._lbCache.dailyBoard || [];
     if (lbList.length === 0) lbList = S._lbCache.board || [];
   }
 
-  let valid = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
-  
-  // ── BETA/EMPTY SERVER FALLBACK: Inject Dummy NPC Targets ──
-  if (valid.length === 0) {
-    valid = [
-      { name: 'CPU_Alpha', score: 100 },
-      { name: 'Glow_Bot',  score: 300 },
-      { name: 'Neon_Pro',  score: 700 },
-      { name: 'T-Spina',   score: 1200 },
-      { name: 'Max_Core',  score: 2000 },
-      { name: 'AI_Omega',  score: 3500 },
-      { name: 'Final_Boss', score: 5000 }
-    ];
+  let real = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
+  const minReal = real.length > 0 ? Math.min(...real.map(t => t.score)) : Infinity;
+
+  // ── Warmup: real users from mode-specific targetBoard, preprocessed ──
+  const rawTarget = (S._lbCache[rawTargetKey] || []).filter(t => typeof t.score === 'number' && t.score > 0);
+
+  let warmup = [];
+  if (rawTarget.length > 0) {
+    // 1. Deduplicate by name — keep highest score per person
+    const byName = new Map();
+    for (const t of rawTarget) {
+      if (!byName.has(t.name) || t.score > byName.get(t.name).score) byName.set(t.name, t);
+    }
+
+    // 2. Filter: below real leaderboard cutoff, score > 50
+    const pool = [...byName.values()].filter(t => t.score > 50 && t.score < minReal).sort((a,b) => a.score - b.score);
+
+    // 3. Log-scale band sampling — feels like natural progression
+    //    Bands: ~200, ~600, ~1500, ~4000, ~10k, ~25k, ~60k (log steps)
+    if (pool.length > 0) {
+      const minS = pool[0].score;
+      const maxS = pool[pool.length - 1].score;
+      const BANDS = 8;
+      const logMin = Math.log(Math.max(minS, 1));
+      const logMax = Math.log(Math.max(maxS, 2));
+      const logStep = (logMax - logMin) / BANDS;
+
+      for (let b = 0; b < BANDS; b++) {
+        const lo = Math.exp(logMin + b * logStep);
+        const hi = Math.exp(logMin + (b + 1) * logStep);
+        const band = pool.filter(t => t.score >= lo && t.score < hi);
+        if (band.length > 0) {
+          // Pick the median of the band
+          warmup.push(band[Math.floor(band.length / 2)]);
+        }
+      }
+    }
   }
+
+  // NPC fallback
+  if (warmup.length === 0) {
+    const NPC_FALLBACK = [
+      { name: 'clumsyfinger',    score: 247 },
+      { name: 'brian_lol',       score: 583 },
+      { name: 'parkjy0314',      score: 1124 },
+      { name: 'yoloswag420',     score: 2387 },
+      { name: 'guest_9274',      score: 4812 },
+      { name: 'tetrisnoob2024',  score: 8931 },
+      { name: 'MountainDewGuy',  score: 14420 },
+      { name: 'hana_9191',       score: 23774 },
+      { name: 'speedrunner_ish', score: 41038 },
+      { name: 'ok_byeee',        score: 67291 },
+    ];
+    warmup = NPC_FALLBACK.filter(n => n.score < minReal);
+  }
+
+  let valid = [...warmup, ...real];
+  if (valid.length === 0) valid = warmup;
 
   valid.sort((a,b) => a.score - b.score);
   
