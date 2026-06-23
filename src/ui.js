@@ -1068,7 +1068,7 @@ export function initTargetUI() {
     if (pool.length > 0) {
       const minS = pool[0].score;
       const maxS = pool[pool.length - 1].score;
-      const BANDS = 8;
+      const BANDS = 10;
       const logMin = Math.log(Math.max(minS, 1));
       const logMax = Math.log(Math.max(maxS, 2));
       const logStep = (logMax - logMin) / BANDS;
