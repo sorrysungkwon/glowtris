@@ -1068,7 +1068,7 @@ export function initTargetUI() {
     if (pool.length > 0) {
       const minS = pool[0].score;
       const maxS = pool[pool.length - 1].score;
-      const BANDS = 8;
+      const BANDS = 10;
       const logMin = Math.log(Math.max(minS, 1));
       const logMax = Math.log(Math.max(maxS, 2));
       const logStep = (logMax - logMin) / BANDS;
@@ -1078,8 +1078,7 @@ export function initTargetUI() {
         const hi = Math.exp(logMin + (b + 1) * logStep);
         const band = pool.filter(t => t.score >= lo && t.score < hi);
         if (band.length > 0) {
-          // Pick the median of the band
-          warmup.push(band[Math.floor(band.length / 2)]);
+          warmup.push(band[Math.floor(Math.random() * band.length)]);
         }
       }
     }
