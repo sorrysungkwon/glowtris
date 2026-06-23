@@ -162,10 +162,10 @@ export function _applyTouchCELL() {
   gc.style.width  = gameW + 'px';  gc.style.height = gameH + 'px';
   pc.style.width  = gameW + 'px';  pc.style.height = gameH + 'px';
 
-  const MINI_W = 32, MINI_H = 26;
-  if (ncM.width !== MINI_W * 3 || ncM.height !== MINI_H) {
-    ncM.width = MINI_W * 3; ncM.height = MINI_H;
-    ncM.style.width = (MINI_W * 3) + 'px'; ncM.style.height = MINI_H + 'px';
+  const MINI_W = 44, MINI_H = 36;
+  if (ncM.width !== MINI_W || ncM.height !== MINI_H * 3) {
+    ncM.width = MINI_W; ncM.height = MINI_H * 3;
+    ncM.style.width = MINI_W + 'px'; ncM.style.height = (MINI_H * 3) + 'px';
   }
   if (hcM.width !== MINI_W || hcM.height !== MINI_H) {
     hcM.width = MINI_W; hcM.height = MINI_H;
