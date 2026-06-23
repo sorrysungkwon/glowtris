@@ -123,7 +123,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
 | v0.5 | **Renderer & Audio** — Web Audio API low-latency audio, render interpolation (PixiJS WebGL2 renderer Abandoned due to iOS regressions, keeping lightweight 2D Canvas engine) | ✅ Done |
 | v0.6 | **Modes & Metrics** — Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar gradient | ✅ Done |
-| v0.7 | **Haptic Feedback** — Mobile vibration on hard drop + line clear; micro-vibration patterns | 🔲 Planned |
+| v0.7 | **Social + Mobile** — Mobile UI redesign (new header, NEXT/HOLD side columns), overtake animation on mobile, haptic feedback (toggle), real-user warmup targets (10-band log-scale random, mode-specific), API cap 500 | ✅ Done |
 | v0.8 | **Social Ranking** — Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag identity system | 🔲 Planned |
 | v0.9 | **Micro-interactions** — Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations | 🔲 Planned |
 
@@ -131,10 +131,10 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 
 | Version | Theme | Features | DAU Goal |
 |---|---|---|---:|
-| **v1.0** | **Design Overhaul** | Full visual redesign — layout, typography, mode select, result screen, leaderboard UI. COMING SOON badges on unfinished features. | **700** |
-| **v1.1** | **Launch & Avatar** | Reacting Duolingo-style Avatar state machine. Official public launch. | **700** |
-| v1.2 | **Retention & Training** | Streak UI strengthening (streak rank, danger push alert, longest streak badge). Flow mode rebranded as ZEN/TRAINING — finesse counter, fixed-speed practice, APM/PPS focus. | 1,200 |
-| v1.3 | **Identity & Accounts** | name#tag system (Discord-style), Google login (backup + score protection, verified badge ✓), existing score migration. | 1,800 |
+| **v1.0** | **Launch — Auth + Streak + Shield** | Firebase Auth (Google + Email login, optional Duolingo-style). Server-side streak (24h UTC reset). Streak shield (1 free/week + paid TBD). Push nudge on streak risk. Streak in header + result screen. Avatar (Duolingo-style state machine). Official public launch. Positioning: "Start on mobile, get serious on PC." | **700** |
+| v1.1 | **Social Ranking** | Percentile ("Top X%"), score gap, name#tag system, Daily challenge share link. | 1,200 |
+| v1.2 | **Retention & Training** | Streak rank, finesse counter, Flow→ZEN rebranding, fixed-speed practice. | 1,800 |
+| v1.3 | **Identity & Accounts** | Google login score migration, verified badge ✓, cross-device sync. | 2,000 |
 | v1.4 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. Custom drum beats. | 2,500 |
 | v1.5 | **Weekly Events** | Weekly special challenge (rotating rule modifiers: invisible pieces, 20-line board, etc.) with 7-day Redis TTL leaderboard. Monthly event leaderboard. | 3,500 |
 | v1.6 | **Ghost & Replay** | Best-run ghost stored in Redis (serialised input log). Ghost race mode — race against your own personal best. Shareable replay link via short code. | 4,500 |
