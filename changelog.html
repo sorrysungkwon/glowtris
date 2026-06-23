@@ -264,9 +264,14 @@
       <span class="version-badge">Latest</span>
     </div>
     <ul class="change-list">
-      <li class="perf"><span class="change-label">LCP & Latency Improvements</span> — Deferred non-critical API requests (`/api/maintenance`, `/api/leaderboard`) from the main thread, and implemented Edge Caching with MGET optimizations to reduce initial load latency from 1.2s to under 30ms.</li>
-      <li class="feat"><span class="change-label">Touch Targets Expanded</span> — Footer links updated with negative margin CSS to increase hitboxes for mobile devices without breaking visual layout compactness, ensuring PageSpeed Accessibility compliance.</li>
-      <li class="fix"><span class="change-label">Layout Thrashing Eliminated</span> — Replaced `offsetHeight` reads during PWA initialization with `requestAnimationFrame` to prevent forced synchronous reflows.</li>
+      <li class="feat"><span class="change-label">Mobile UI Redesign</span> — Completely rebuilt mobile layout: new top bar (SCORE · LV/LINES/★ · VS target), NEXT and HOLD piece previews as vertical side columns flanking the board. PC design no longer bleeds onto mobile.</li>
+      <li class="feat"><span class="change-label">Mobile Overtake Animation</span> — Defeating a target on mobile now triggers the same shatter flash + slide-out/slide-in effect as desktop, giving real feedback when you climb past a rival.</li>
+      <li class="feat"><span class="change-label">Haptic Feedback</span> — Vibration on hard drop, line clear, Glowtris (4-line), and G-Spin. Toggle on/off in Settings. Only shown on devices that support it.</li>
+      <li class="feat"><span class="change-label">Real-User Warmup Targets</span> — Before you reach the top-20 leaderboard, you now climb through real players pulled live from the server. Scores are grouped into 10 log-scale bands and a random opponent is picked from each band every game — so it feels different every run.</li>
+      <li class="feat"><span class="change-label">Mode-Specific Rivals</span> — Blitz and Daily Challenge now draw warmup opponents from their own leaderboard pools, not the marathon board.</li>
+      <li class="perf"><span class="change-label">LCP & Latency Improvements</span> — Deferred non-critical API requests from the main thread; Edge Caching with MGET optimizations cut initial load latency from 1.2s to under 30ms.</li>
+      <li class="feat"><span class="change-label">Touch Targets Expanded</span> — Footer link hitboxes enlarged for mobile without changing visual layout.</li>
+      <li class="fix"><span class="change-label">Layout Thrashing Eliminated</span> — Replaced `offsetHeight` reads during PWA init with `requestAnimationFrame` to prevent forced synchronous reflows.</li>
       <li class="infra"><span class="change-label">Agentic Browsing Support</span> — Added standard `llms.txt` and optimized Vercel routing rules.</li>
     </ul>
   </div>
