@@ -37,7 +37,7 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 |---|---|---|
 | v0.9.0 | Danger vignette (red border glow when board is high), HUD spring animation on score update | Canvas + CSS |
 | v0.9.1 | Result screen redesign (launch quality), mode select UI cleanup | Visual overhaul |
-| **v0.9.5** | **Pre-launch checklist** — Privacy Policy update, security audit, marketing copy written. **Audits:** SEO (Schema/OpenGraph), PWA (sw.js offline cache), Analytics (streak telemetry). | Critical gate |
+| **v0.9.5** | **Pre-launch checklist** — Privacy Policy update, security audit, marketing copy written. **Audits:** SEO (Schema/OpenGraph), PWA (sw.js offline cache), Analytics (streak telemetry). **Security:** HTTP Headers (CSP), Anti-Cheat MVP (session HMAC), XSS sanitization. | Critical gate |
 
 **Gate to v1.0:** v0.9.5 checklist 100% complete.
 
@@ -104,12 +104,15 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 
 ## Security Principles (v1.0+)
 
-- **Least privilege**: Only UID stored in Redis. Email stays in Firebase.
-- **Token verification**: Every auth-required endpoint calls `verifyIdToken` server-side.
-- **Payment isolation**: Lemon Squeezy handles all card data. We only store shield count delta.
+- **Anti-Cheat Validation**: Clients cannot dictate scores. Server issues a signed HMAC session token. Score API validates minimum elapsed time and plausibility.
+- **Client State Encapsulation**: Game logic and state (e.g. score) must be enclosed in module closures, never exposed globally (`window.score`) to deter DevTools tampering.
+- **XSS Prevention & CSP**: Strict input sanitization on all user-generated content (like `displayName`). Enforce Content-Security-Policy and X-Frame-Options in `vercel.json`.
+- **Rate Limiting**: All edge functions (auth, score submission) are protected by Redis-backed IP/UID rate limiting to prevent DDoS and billing abuse.
+- **Least privilege & Data Masking**: Only UID stored in Redis. Email stays in Firebase. Leaderboard API payloads must strip UIDs and only expose public names.
+- **Token verification**: Every auth-required endpoint calls `verifyIdToken` server-side. Firebase Auth domains strictly restricted to `glowtris.com` and `prevglow.vercel.app`.
+- **Payment isolation & Idempotency**: Lemon Squeezy handles card data. Webhooks verified with HMAC signature and use Redis `SETNX` on `event_id` to prevent double-crediting.
 - **No PII in logs**: Vercel logs must not contain emails, tokens, or card details.
-- **Webhook verification**: All Lemon Squeezy webhooks verified with HMAC signature.
-- **CORS**: Already restricted to glowtris.com + prevglow.vercel.app.
+- **Strict CORS**: No wildcard `Access-Control-Allow-Origin: *` endpoints (including maintenance routes). Restricted to official domains.
 
 ---
 
