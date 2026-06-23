@@ -1,24 +1,22 @@
-# Final SEO & Schema Configuration Synthesis
+# Fusion Synthesis: Glowtris ROADMAP.md (v0.8 → v1.0)
 
-After running a multi-model cross-validation over the current codebase to ensure all recommendations were applied perfectly, the panel discovered a few critical edge cases that remained unaddressed. These edge cases primarily involve Open Graph tags and URL trailing slashes that were causing "canonical mismatch" errors behind the scenes.
+## 1. Consensus & Core Issues
+All panelists (Draft, Gemini Flash, Gemini Pro, Claude Sonnet) agree on the following critical flaws in the current ROADMAP.md:
+- **Monetization Risk (v1.0.3):** Launching Lemon Squeezy (paid shields) concurrently with the v1.0 marketing push is highly risky. Technical failures with webhooks on day one or community backlash (Reddit/HN hate Day-1 microtransactions) could ruin the launch. **Resolution:** Move Lemon Squeezy to v1.1.
+- **Scope Creep / Pacing:** v1.0 is overloaded (Auth, Streaks, Shields, Avatar, Payments). **Resolution:** Move the Avatar state machine (v1.0.4) to v1.1/v1.2. Pro suggests treating v0.9 as a "Soft Launch" for Auth/Streaks to battle-test the backend before the v1.0 marketing spike.
+- **Missing SEO & Analytics:** SEO (Schema.org, OpenGraph, Canonical) and Telemetry (tracking streak_starts, drop-offs) are completely absent from the v0.9.5 pre-launch gate.
+- **Missing PWA Polish:** PWA install prompts and offline caching are critical for the "Mobile first" habit loop but aren't audited in the pre-launch checklist.
 
-## Core Discoveries & Fixes Required
+## 2. Unique Insights & Deep Dives
+- **Technical Bugs Found (Gemini Flash):** `sw.js` currently only caches `/index.html`, ignoring sub-pages (`sprint.html`, `unblocked.html`). It also unnecessarily fetches Google Fonts when Orbitron is already base64-inlined. There is also a direct conflict between `ROADMAP.md` (Paid shields) and `MONETIZATION.md` ("No ads. Ask for coffee money").
+- **Launch Sequencing (Claude Sonnet & Draft):** The roadmap lists all launch channels (Reddit, HN, PH) simultaneously. These must be staggered (e.g., Reddit Day 1, HN Day 2, PH Day 7). The Draft highlighted that short-form video (TikTok, YouTube Shorts, IG Reels) is missing from the marketing strategy.
+- **Auth Resilience (Claude Sonnet):** Ensure there is a documented fallback (degraded experience) if Firebase goes down during the launch traffic spike.
+- **Cross-Platform Sync (Draft):** Firebase Auth must explicitly state that it syncs scores, stats, and keybind settings to fulfill the "Start on mobile, get serious on PC" promise.
 
-### 1. The `og:url` Canonical Mismatch
-While we previously fixed `BUILD_OG_TITLE` and the `hreflang` tags, the `<meta property="og:url">` tag was entirely hardcoded to `https://glowtris.com` inside the template. 
-* **The Problem:** When the build script generated alternative landing pages like `sprint.html` or `tetris-online.html`, their canonical URLs correctly pointed to themselves, but their `og:url` still pointed to the homepage. This inconsistency can confuse crawlers.
-* **The Fix:** The build script (`scripts/build.js`) must be updated to dynamically replace the `og:url` on every generated page so that it exactly matches the `canonical` URL.
-
-### 2. Lingering Korean Locale Metadata
-Even though we removed the conflicting Korean `FAQPage` and `WebSite` JSON-LD schemas, the `<head>` still contained `<meta property="og:locale:alternate" content="ko_KR">`.
-* **The Problem:** Because the site is now explicitly declared as English-only (`<html lang="en">` and English-only JSON-LD) to avoid duplicate schema conflicts, signaling to Facebook/Google that a Korean localization exists without providing actual `hreflang="ko"` links is an SEO anti-pattern.
-* **The Fix:** Delete this `og:locale:alternate` tag completely to solidify the English-only schema structure.
-
-### 3. Missing Landing Pages in `sitemap.xml`
-The site generates excellent keyword-targeted landing pages like `sprint.html`, `tetris-online.html`, and `unblocked.html`.
-* **The Problem:** These pages are entirely missing from `sitemap.xml`, meaning Google has to rely on internal links to discover them, drastically slowing down their indexing.
-* **The Fix:** Add these three URLs to the `sitemap.xml`.
-
-### 4. Public Test Files Leak
-* **The Problem:** During our earlier debugging sessions, we created temporary files like `test-snippet.html`. Because they are in the project root, Vercel will deploy them to production, and Google might index these incomplete/duplicate pages.
-* **The Fix:** Clean up and delete all temporary script and HTML test files from the workspace.
+## 3. Final Recommendations for ROADMAP.md
+1. **Restructure Milestones:** 
+   - Move Auth & Streaks to v0.9 (Soft Launch) or tightly scope v1.0 to just Auth + Free Shields.
+   - Move Lemon Squeezy (v1.0.3) and Avatar (v1.0.4) to v1.1.
+2. **Expand v0.9.5 Gate:** Add SEO Audit, PWA/Offline UX Audit (fixing the `sw.js` bugs), and an Analytics plan.
+3. **Refine v1.0 Launch Plan:** Sequence the launch channels, add short-form video, and assign an owner/deadline to the blog post.
+4. **Update Security/Tech Principles:** Add cross-platform sync and Auth fallback resilience.
