@@ -19,26 +19,53 @@
 - [x] Keep 500 people not 100. (API cap expanded)
 - [ ] Make screen shake on big clear. (skipped)
 
-## NEXT V0.8 (SOCIAL RANKING)
-- [ ] Show rank percent. (Top X%)
-- [ ] Show score gap. (N pts to #1)
-- [ ] Give link to fight. (Daily challenge share)
-- [ ] Give name tag. (name#tag system)
+## NEXT V0.8 (SOCIAL SIGNALS)
+### v0.8.0
+- [ ] Show rank percent. (Top X% — client-side math)
+- [ ] Show score gap to #1. (N pts away)
+### v0.8.1
+- [ ] Share daily challenge result link. (seeded URL)
+- [ ] Leaderboard UI polish.
 
-## NEXT V0.9 (MICRO-INTERACTIONS)
-- [ ] Screen bleed red when blocks are high. (Danger pulse)
-- [ ] Buttons bounce and glow when press. (0.95 scale)
+## NEXT V0.9 (FEEL POLISH)
+### v0.9.0
+- [ ] Screen bleed red when blocks are high. (Danger vignette)
+- [ ] Score number spring bounce on update. (HUD spring anim)
+### v0.9.1
+- [ ] Result screen redesign. (launch quality)
+- [ ] Mode select UI cleanup.
+### v0.9.5 — PRE-LAUNCH GATE
+- [ ] Update Privacy Policy. (Firebase + Lemon Squeezy)
+- [ ] Security audit all API endpoints.
+- [ ] Write Reddit/HN/Product Hunt post drafts.
+- [ ] Marketing copy done.
 
-## NEXT V1.0 (LAUNCH — AUTH + STREAK + SHIELD)
-- [ ] Let person login. Google or email. (Firebase Auth — optional, Duolingo-style)
-- [ ] Count play days. 24h no play = zero. (Server-side streak per user)
-- [ ] Protect streak with shield. Buy or earn. (Shield: 1 free/week, paid TBD)
-- [ ] Poke user when streak about to die. (Push notification on streak risk)
-- [ ] Show fire number on head bar. (Streak in header when logged in)
-- [ ] Show fire on end screen too. (Streak block on result screen)
-- [ ] If no login, say "save streak". (Login nudge after game)
-- [ ] Duolingo face react. (Avatar state machine — linked to streak/account)
-- [ ] Let world see. (Public launch v1.0)
+## NEXT V1.0 (OFFICIAL LAUNCH)
+### v1.0.0 — Auth
+- [ ] Firebase Auth setup. Google + email login.
+- [ ] Server verify Firebase token on protected routes.
+- [ ] Login modal in game. Non-blocking.
+- [ ] "Save streak" nudge after game if not logged in.
+- [ ] Link localStorage name to UID on first login.
+### v1.0.1 — Streak
+- [ ] Redis: user:{uid}:streak + last_play. 24h UTC reset.
+- [ ] Header flame 🔥 N when logged in.
+- [ ] Streak block on result screen.
+### v1.0.2 — Shield Free
+- [ ] Redis: user:{uid}:shields. Cap 5.
+- [ ] Weekly cron: grant 1 free shield Sunday UTC.
+- [ ] Auto-consume on streak break. Show in UI.
+### v1.0.3 — Lemon Squeezy
+- [ ] Lemon Squeezy product: shield pack (pricing TBD).
+- [ ] Webhook: verify HMAC sig → shields += N.
+- [ ] Update Privacy Policy with payment processor.
+### v1.0.4 — Avatar + Push
+- [ ] Avatar state machine. (idle/happy/sad/dead by streak)
+- [ ] Push nudge when streak at risk. (VAPID reuse)
+### 🚀 LAUNCH
+- [ ] Reddit: r/webgames + r/Tetris + r/gamedev
+- [ ] Hacker News: Show HN
+- [ ] Product Hunt: scheduled launch
 
 ## NEXT V1.2 (BLITZ)
 - [x] Play 2 minute. Fast end. (Done as Blitz)
