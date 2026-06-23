@@ -1068,11 +1068,14 @@ export function initTargetUI() {
     S.targetIndex++;
   }
   
+  const mBar = document.getElementById('mobile-target-bar');
   if (S.targetIndex < S.targets.length) {
     tBox.style.display = 'block';
+    if (mBar) mBar.style.opacity = '1';
     renderCurrentTarget();
   } else {
     tBox.style.display = 'none';
+    if (mBar) mBar.style.opacity = '0';
   }
 }
 
@@ -1082,6 +1085,10 @@ function renderCurrentTarget() {
   document.getElementById('target-name').textContent = t.name;
   document.getElementById('target-box').querySelector('.target-user').setAttribute('title', t.name);
   document.getElementById('target-score').textContent = t.score.toLocaleString();
+  const mn = document.getElementById('mob-target-name');
+  const ms = document.getElementById('mob-target-score');
+  if (mn) mn.textContent = t.name;
+  if (ms) ms.textContent = t.score.toLocaleString();
 }
 
 function triggerTargetOvertake() {
@@ -1094,6 +1101,10 @@ function triggerTargetOvertake() {
   tBox.classList.add('overtaken');
   tTitle.textContent = 'OVERTAKEN!';
   tTitle.style.color = '#fff';
+  const mBar = document.getElementById('mobile-target-bar');
+  const mName = document.getElementById('mob-target-name');
+  if (mBar) mBar.classList.add('mtb-overtaken');
+  if (mName) mName.textContent = 'OVERTAKEN!';
 
   // After shatter settles (0.4s), slide out content
   setTimeout(() => {
@@ -1105,10 +1116,12 @@ function triggerTargetOvertake() {
     setTimeout(() => {
       tTitle.textContent = 'NEXT TARGET';
       tTitle.style.color = '#ffe600';
+      if (mBar) mBar.classList.remove('mtb-overtaken');
 
       S.targetIndex++;
       if (S.targetIndex >= S.targets.length) {
         tBox.style.display = 'none';
+        if (mBar) mBar.style.opacity = '0';
         S.targetAnimating = false;
         return;
       }

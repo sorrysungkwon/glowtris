@@ -528,6 +528,61 @@
   /* Game wrap — sized by JS inline styles on the canvases (Safari safe) */
   .game-wrap { position:relative; flex:0 0 auto; }
 
+  /* Mobile target overlay bar — hidden on desktop */
+  #mobile-target-bar {
+    display: none;
+    position: absolute;
+    top: 38px;
+    left: 0; right: 0;
+    z-index: 9;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 230, 0, 0.2);
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .mtb-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .mtb-vs {
+    font-size: 8px;
+    font-weight: 700;
+    color: rgba(255, 230, 0, 0.5);
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+  #mob-target-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #mob-target-score {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffe600;
+    text-shadow: 0 0 8px rgba(255, 230, 0, 0.6);
+    flex-shrink: 0;
+  }
+  #mobile-target-bar.mtb-overtaken {
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 230, 0, 0.15);
+  }
+
+  @media (max-width: 600px) {
+    #mobile-target-bar { display: flex; }
+  }
+
   #game-canvas {
     display:block;
     border:2px solid rgba(0,200,255,0.35);
