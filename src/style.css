@@ -722,7 +722,12 @@
       font-weight: 700;
       color: #ffe600;
       text-shadow: 0 0 8px rgba(255,230,0,0.6);
+      transition: filter 0.3s;
     }
+    .mh-vs-block.overtaken {
+      animation: target-shatter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .mh-vs-name { overflow: hidden; }
 
     /* Mobile NEXT (left) + HOLD (right) side columns */
     #mob-next-col, #mob-hold-col {

@@ -1094,12 +1094,20 @@ function triggerTargetOvertake() {
   const tContent = document.getElementById('target-content');
   const tTitle = document.getElementById('target-title');
 
-  // preview.html: flash + scale via .overtaken, change title text
+  // Desktop: flash + scale
   tBox.classList.add('overtaken');
   tTitle.textContent = 'OVERTAKEN!';
   tTitle.style.color = '#fff';
+
+  // Mobile: flash VS block + show OVERTAKEN text
+  const mVsBlock = document.querySelector('.mh-vs-block');
+  const mVsLabel = document.getElementById('mh-vs-label');
   const mName = document.getElementById('mob-target-name');
-  if (mName) mName.textContent = 'OVERTAKEN!';
+  const mScore = document.getElementById('mob-target-score');
+  if (mVsBlock) mVsBlock.classList.add('overtaken');
+  if (mVsLabel) { mVsLabel.textContent = 'OVERTAKEN!'; mVsLabel.style.color = '#fff'; }
+  if (mName) mName.textContent = '★ CLEARED ★';
+  if (mScore) mScore.style.filter = 'brightness(3)';
 
   // After shatter settles (0.4s), slide out content
   setTimeout(() => {
@@ -1108,13 +1116,22 @@ function triggerTargetOvertake() {
     tContent.classList.add('anim-slide-out');
     tBox.classList.remove('overtaken');
 
+    // Mobile slide out
+    if (mName) { mName.classList.remove('anim-slide-in'); void mName.offsetWidth; mName.classList.add('anim-slide-out'); }
+    if (mScore) { mScore.classList.remove('anim-slide-in'); void mScore.offsetWidth; mScore.classList.add('anim-slide-out'); }
+    if (mVsBlock) mVsBlock.classList.remove('overtaken');
+
     setTimeout(() => {
       tTitle.textContent = 'NEXT TARGET';
       tTitle.style.color = '#ffe600';
+      if (mVsLabel) { mVsLabel.textContent = 'VS'; mVsLabel.style.color = ''; }
+      if (mScore) mScore.style.filter = '';
 
       S.targetIndex++;
       if (S.targetIndex >= S.targets.length) {
         tBox.style.display = 'none';
+        if (mName) mName.textContent = '—';
+        if (mScore) mScore.textContent = '—';
         S.targetAnimating = false;
         return;
       }
@@ -1135,8 +1152,14 @@ function triggerTargetOvertake() {
       void tContent.offsetWidth;
       tContent.classList.add('anim-slide-in');
 
+      // Mobile slide in
+      if (mName) { mName.classList.remove('anim-slide-out'); void mName.offsetWidth; mName.classList.add('anim-slide-in'); }
+      if (mScore) { mScore.classList.remove('anim-slide-out'); void mScore.offsetWidth; mScore.classList.add('anim-slide-in'); }
+
       setTimeout(() => {
         tContent.classList.remove('anim-slide-in');
+        if (mName) mName.classList.remove('anim-slide-in');
+        if (mScore) mScore.classList.remove('anim-slide-in');
         S.targetAnimating = false;
         updateTargetUI();
       }, 300);
