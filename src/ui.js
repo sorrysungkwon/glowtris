@@ -1047,16 +1047,16 @@ export function initTargetUI() {
 
   // ── Warmup NPC targets — always prepended before real leaderboard ──
   const NPC = [
-    { name: 'jake_m',       score: 200 },
-    { name: 'tetris_fan99', score: 500 },
-    { name: 'bloxxy',       score: 1000 },
-    { name: 'neon.stacker', score: 2000 },
-    { name: 'dr0p_it',      score: 4000 },
-    { name: 'lineclear7',   score: 7000 },
-    { name: 'tspindreams',  score: 12000 },
-    { name: 'kwon_plays',   score: 20000 },
-    { name: 'ultrawide99',  score: 35000 },
-    { name: 'perf3ct_clr',  score: 60000 },
+    { name: 'Booger',          score: 200 },
+    { name: 'xXshadow99Xx',   score: 500 },
+    { name: '2272772772',      score: 1000 },
+    { name: 'shmosephm',       score: 2000 },
+    { name: 'PogChampion',     score: 4000 },
+    { name: 'notarobot_beep',  score: 7000 },
+    { name: 'GamerDad1987',    score: 12000 },
+    { name: 'qqqqqqqqqqq',     score: 20000 },
+    { name: 'ieatblocks',      score: 35000 },
+    { name: 'TouchGrassPlz',   score: 60000 },
   ];
 
   // Inject only NPCs below the lowest real score
