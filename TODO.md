@@ -8,24 +8,36 @@
 - [x] Fix 3-corner crash. Keep all button press. (Input Buffer & 3-Corner G-Spin Rule)
 - [x] Add Blitz mode. Fast fight.
 
-## V0.7 DONE (GAMEPLAY FEEL)
+## V0.7 DONE (SOCIAL + MOBILE)
 - [x] Smash ghost piece. Show who to beat next. (Target Overtake UI — desktop + mobile)
 - [x] Make controller shake hand on drop. (Haptic vibration, settings toggle)
+- [x] Mobile new head bar. Score left. VS right. (Mobile header redesign)
+- [x] Next block and hold block on side. (NEXT/HOLD vertical side columns)
+- [x] Mobile fight anim same as PC. (Overtake shatter + slide)
+- [x] Real people from server. Not fake name. (Real-user warmup targets, 10-band log-scale random)
+- [x] Each mode fight own people. (Mode-specific boards: blitz/daily)
+- [x] Keep 500 people not 100. (API cap expanded)
 - [ ] Make screen shake on big clear. (skipped)
 
-## NEXT V0.8 (SOCIAL)
-- [ ] Show rank percent.
-- [ ] Show score gap.
-- [ ] Give link to fight.
-- [ ] Give rival.
-- [ ] Fight every week.
+## NEXT V0.8 (SOCIAL RANKING)
+- [ ] Show rank percent. (Top X%)
+- [ ] Show score gap. (N pts to #1)
+- [ ] Give link to fight. (Daily challenge share)
+- [ ] Give name tag. (name#tag system)
 
 ## NEXT V0.9 (MICRO-INTERACTIONS)
 - [ ] Screen bleed red when blocks are high. (Danger pulse)
 - [ ] Buttons bounce and glow when press. (0.95 scale)
 
-## NEXT V1.0 (LAUNCH & AVATAR)
-- [ ] Duolingo face react. (Avatar state machine)
+## NEXT V1.0 (LAUNCH — AUTH + STREAK + SHIELD)
+- [ ] Let person login. Google or email. (Firebase Auth — optional, Duolingo-style)
+- [ ] Count play days. 24h no play = zero. (Server-side streak per user)
+- [ ] Protect streak with shield. Buy or earn. (Shield: 1 free/week, paid TBD)
+- [ ] Poke user when streak about to die. (Push notification on streak risk)
+- [ ] Show fire number on head bar. (Streak in header when logged in)
+- [ ] Show fire on end screen too. (Streak block on result screen)
+- [ ] If no login, say "save streak". (Login nudge after game)
+- [ ] Duolingo face react. (Avatar state machine — linked to streak/account)
 - [ ] Let world see. (Public launch v1.0)
 
 ## NEXT V1.2 (BLITZ)
