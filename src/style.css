@@ -346,6 +346,19 @@
   ════════════════════════════════ */
   #mobile-header { display:none; }
 
+  #left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  #right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   /* Desktop title header */
   #desktop-header {
     display:flex; align-items:center; justify-content:center; gap:14px;
