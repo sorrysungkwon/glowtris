@@ -199,11 +199,12 @@ export default async function handler(req, res) {
     const mode = (req.query && req.query.mode) || (url && url.searchParams.get('mode')) || '';
 
     if (mode === 'daily') {
-      const [challengeBoard, challengeAlltimeBoard] = await Promise.all([
+      const [challengeBoard, challengeAlltimeBoard, dailyTargetBoard] = await Promise.all([
         getBoard(KEY_CHALLENGE()),
         getBoard(KEY_CHALLENGE_ALLTIME, TOP_ALLTIME),
+        getBoardAscending(KEY_CHALLENGE_ALLTIME),
       ]);
-      return res.status(200).json({ challengeBoard, challengeAlltimeBoard });
+      return res.status(200).json({ challengeBoard, challengeAlltimeBoard, dailyTargetBoard });
     }
 
     if (mode === 'sprint') {
@@ -220,12 +221,13 @@ export default async function handler(req, res) {
     if (mode === 'blitz') {
       const blitzDaily = KEY_BLITZ_DAILY(clientDate);
       const blitzWeekly = KEY_BLITZ_WEEKLY();
-      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard] = await Promise.all([
+      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard] = await Promise.all([
         getBoard(KEY_BLITZ, TOP_ALLTIME),
         getBoard(blitzDaily),
         getBoard(blitzWeekly),
+        getBoardAscending(KEY_BLITZ),
       ]);
-      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard });
+      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard });
     }
 
     const [board, dailyBoard, weeklyBoard, targetBoard] = await Promise.all([
@@ -313,7 +315,7 @@ export default async function handler(req, res) {
       ]);
 
       await Promise.all([
-        redis(`zremrangebyrank/${KEY_BLITZ}/0/-${TOP_ALLTIME + 1}`),
+        redis(`zremrangebyrank/${KEY_BLITZ}/0/-501`),
         redis(`expire/${blitzDaily}/${DAILY_TTL}`),
         redis(`expire/${blitzWeekly}/${WEEKLY_TTL}`),
       ]);
@@ -348,7 +350,7 @@ export default async function handler(req, res) {
       ]);
       await Promise.all([
         redis(`expire/${key}/${DAILY_TTL}`),
-        redis(`zremrangebyrank/${KEY_CHALLENGE_ALLTIME}/0/-101`),
+        redis(`zremrangebyrank/${KEY_CHALLENGE_ALLTIME}/0/-501`),
       ]);
 
       const [challengeBoard, challengeAlltimeBoard] = await Promise.all([

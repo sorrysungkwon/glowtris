@@ -1033,11 +1033,14 @@ export function initTargetUI() {
   }
   
   let lbList = [];
+  let rawTargetKey = 'targetBoard';
   if (S.isBlitzMode) {
     lbList = S._lbCache.blitzDailyBoard || [];
     if (lbList.length === 0) lbList = S._lbCache.blitzBoard || [];
+    rawTargetKey = 'blitzTargetBoard';
   } else if (S.isDailyMode) {
     lbList = S._lbCache.challengeBoard || [];
+    rawTargetKey = 'dailyTargetBoard';
   } else {
     lbList = S._lbCache.dailyBoard || [];
     if (lbList.length === 0) lbList = S._lbCache.board || [];
@@ -1046,8 +1049,8 @@ export function initTargetUI() {
   let real = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
   const minReal = real.length > 0 ? Math.min(...real.map(t => t.score)) : Infinity;
 
-  // ── Warmup: real users from targetBoard, preprocessed ──
-  const rawTarget = (S._lbCache.targetBoard || []).filter(t => typeof t.score === 'number' && t.score > 0);
+  // ── Warmup: real users from mode-specific targetBoard, preprocessed ──
+  const rawTarget = (S._lbCache[rawTargetKey] || []).filter(t => typeof t.score === 'number' && t.score > 0);
 
   let warmup = [];
   if (rawTarget.length > 0) {
