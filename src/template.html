@@ -246,12 +246,6 @@ if ('serviceWorker' in navigator) {
   <!-- Game row -->
   <div id="game-row">
 
-    <!-- Mobile NEXT side column -->
-    <div id="mob-next-col">
-      <span class="mob-col-label">NEXT</span>
-      <canvas id="next-canvas-m" class="mini-cv" width="52" height="52"></canvas>
-    </div>
-
     <!-- Desktop left column: 2-panel layout -->
     <div id="left-panel">
 
@@ -367,10 +361,16 @@ if ('serviceWorker' in navigator) {
       
     </div>
 
-    <!-- Mobile HOLD side column -->
-    <div id="mob-hold-col">
-      <span class="mob-col-label">HOLD</span>
-      <canvas id="hold-canvas-m" class="mini-cv" width="52" height="52"></canvas>
+    <!-- Mobile side column: NEXT + HOLD stacked -->
+    <div id="mob-side-col">
+      <div class="mob-piece-block">
+        <span class="mob-col-label">NEXT</span>
+        <canvas id="next-canvas-m" class="mini-cv" width="52" height="52"></canvas>
+      </div>
+      <div class="mob-piece-block">
+        <span class="mob-col-label">HOLD</span>
+        <canvas id="hold-canvas-m" class="mini-cv" width="52" height="52"></canvas>
+      </div>
     </div>
 
   </div>
