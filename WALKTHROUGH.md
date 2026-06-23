@@ -28,12 +28,19 @@
 - **Real-User Warmup Targets:** `targetBoard` API field (ascending all users). Frontend preprocessing: dedup by name (keep highest score), filter score>50, 10 log-scale bands, random pick per band each game session. Result: ~6-10 real opponents before top-20 leaderboard. Mode-specific: Blitz uses `blitzTargetBoard`, Daily uses `dailyTargetBoard`.
 - **API Cap Expanded:** Marathon + Blitz + Daily Challenge alltime all raised to 500 entries (was 100/20/100). Deeper warmup pool; fills naturally as playerbase grows.
 
-## 7. v1.0 Plan — Auth + Streak + Shield (scheduled)
-- **Firebase Auth:** Optional login (Google + Email). Non-logged-in play allowed; "save your streak" nudge after game end. On first login, existing localStorage name linked to account.
-- **Streak System:** Server-side per user (Redis `user:{uid}:streak`, `user:{uid}:last_play`). 24h UTC reset — no play today = streak 0. Shown in header (🔥 N) when logged in, and on result screen.
-- **Streak Shield:** `user:{uid}:shields` in Redis. 1 free shield granted per week. Paid purchase TBD. Shield consumed automatically when streak would break.
-- **Push Nudge:** Push notification fires when user hasn't played and streak is at risk (existing VAPID infrastructure reused).
-- **Product Positioning:** "Start on mobile, get serious on PC." Mobile = low-barrier entry + habit formation (daily check-in, streak). PC = skill depth + retention (keyboard speed, ranked progression).
+## 7. v1.0 Plan — Auth + Streak + Free Shield (scheduled for official launch)
+
+**Product Positioning:** "Start on mobile, get serious on PC." Mobile = low-barrier entry + habit formation. PC = skill depth + retention. Duolingo cross-platform model.
+
+- **v1.0.0 Firebase Auth:** Optional login (Google + Email). Non-logged-in play always allowed. "Save your streak" nudge after game end. On first login, existing localStorage name linked to Firebase UID. Cross-device sync (scores, stats, keybinds). Redis stores only UID — email never leaves Firebase.
+- **v1.0.1 Streak System:** Server-side per user (`user:{uid}:streak`, `user:{uid}:last_play` in Redis). 24h UTC reset. Shown in header (🔥 N) + result screen. Server-authoritative (no client manipulation).
+- **v1.0.2 Shield (Free):** `user:{uid}:shields` in Redis, cap 5. 1 free shield auto-granted every Sunday UTC via cron. Auto-consumed when streak would break.
+- **Launch sequence:** Reddit Day 1 (`r/webgames`, `r/Tetris`, `r/gamedev`) → HN Show HN Day 2 → Product Hunt Day 7 (scheduled, testimonials collected). Short-form video (TikTok/YT Shorts/IG Reels). Blog post draft completed before v0.9.5 gate.
+
+## 8. v1.1 Plan — Monetization & Expansion (post-launch)
+
+- **v1.1.0 Lemon Squeezy:** Paid shield packs (no business registration required — Merchant of Record model). Webhook `order_created` → HMAC verification → `user:{uid}:shields += N`. Zero card data touches our servers. Pricing TBD (e.g. 5 shields / $2.99).
+- **v1.1.1 Avatar + Push Nudge:** Avatar state machine (idle/happy/sad/dead by streak length). Push notification fires when streak at risk — reuses existing VAPID infrastructure.
 
 ## 5. UI & Social Features
 - **Design:** Exclusive challenge background (dark crimson, rapid nebulae, diagonal meteors, amber pulse).

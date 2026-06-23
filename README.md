@@ -131,11 +131,12 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 
 | Version | Theme | Features | DAU Goal |
 |---|---|---|---:|
-| **v1.0** | **Launch — Auth + Streak + Shield** | Firebase Auth (Google + Email login, optional Duolingo-style). Server-side streak (24h UTC reset). Streak shield (1 free/week + paid TBD). Push nudge on streak risk. Streak in header + result screen. Avatar (Duolingo-style state machine). Official public launch. Positioning: "Start on mobile, get serious on PC." | **700** |
-| v1.1 | **Social Ranking** | Percentile ("Top X%"), score gap, name#tag system, Daily challenge share link. | 1,200 |
-| v1.2 | **Retention & Training** | Streak rank, finesse counter, Flow→ZEN rebranding, fixed-speed practice. | 1,800 |
-| v1.3 | **Identity & Accounts** | Google login score migration, verified badge ✓, cross-device sync. | 2,000 |
-| v1.4 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. Custom drum beats. | 2,500 |
+| **v1.0** | **Launch — Auth + Streak + Shield** | Firebase Auth (Google + Email, optional Duolingo-style nudge). Server-side streak (24h UTC reset). Free shield (1/week). Cross-device sync. Official public launch. Positioning: "Start on mobile, get serious on PC." Launch sequence: Reddit Day 1 → HN Day 2 → Product Hunt Day 7. | **700** |
+| v1.1 | **Monetization & Expansion** | Lemon Squeezy paid shields (no business registration needed). Avatar state machine (Duolingo-style: idle/happy/sad/dead by streak). Push nudge when streak at risk (VAPID). | 1,000 |
+| v1.2 | **Social Ranking** | Percentile ("Top X%"), score gap to #1, name#tag system, Daily challenge share link. | 1,200 |
+| v1.3 | **Retention & Training** | Streak rank, finesse counter, Flow→ZEN rebranding, fixed-speed practice. | 1,800 |
+| v1.4 | **Identity & Accounts** | Google login score migration, verified badge ✓. | 2,000 |
+| v1.5 | **Visual Customization** | Board skin selector (Neon / Midnight / Pastel / Classic). Piece colour palette presets. Custom drum beats. | 2,500 |
 | v1.5 | **Weekly Events** | Weekly special challenge (rotating rule modifiers: invisible pieces, 20-line board, etc.) with 7-day Redis TTL leaderboard. Monthly event leaderboard. | 3,500 |
 | v1.6 | **Ghost & Replay** | Best-run ghost stored in Redis (serialised input log). Ghost race mode — race against your own personal best. Shareable replay link via short code. | 4,500 |
 | v1.7 | **Advanced Stats** | Expanded STATS overlay: G-spin %, all-clear %, average combo. Session graph (score over last 10 games). Weekly personal report card. | 6,000 |

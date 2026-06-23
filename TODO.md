@@ -37,7 +37,10 @@
 ### v0.9.5 — PRE-LAUNCH GATE
 - [ ] Update Privacy Policy. (Firebase + Lemon Squeezy)
 - [ ] Security audit all API endpoints.
+- [ ] SEO audit. (Schema/OpenGraph check)
+- [ ] PWA audit. (sw.js offline cache check)
 - [ ] Write Reddit/HN/Product Hunt post drafts.
+- [ ] Blog post draft done.
 - [ ] Marketing copy done.
 
 ## NEXT V1.0 (OFFICIAL LAUNCH)
@@ -47,6 +50,7 @@
 - [ ] Login modal in game. Non-blocking.
 - [ ] "Save streak" nudge after game if not logged in.
 - [ ] Link localStorage name to UID on first login.
+- [ ] Cross-device sync: scores, stats, keybind preferences.
 ### v1.0.1 — Streak
 - [ ] Redis: user:{uid}:streak + last_play. 24h UTC reset.
 - [ ] Header flame 🔥 N when logged in.
@@ -55,17 +59,21 @@
 - [ ] Redis: user:{uid}:shields. Cap 5.
 - [ ] Weekly cron: grant 1 free shield Sunday UTC.
 - [ ] Auto-consume on streak break. Show in UI.
-### v1.0.3 — Lemon Squeezy
-- [ ] Lemon Squeezy product: shield pack (pricing TBD).
-- [ ] Webhook: verify HMAC sig → shields += N.
-- [ ] Update Privacy Policy with payment processor.
-### v1.0.4 — Avatar + Push
+### 🚀 LAUNCH
+- [ ] Day 1: Reddit (r/webgames + r/Tetris + r/gamedev story angle)
+- [ ] Day 2: Hacker News Show HN
+- [ ] Day 7: Product Hunt (scheduled, testimonials collected)
+- [ ] Short-form video (TikTok / YouTube Shorts / IG Reels)
+- [ ] Blog post: "How I built a competitive Tetris clone" (draft before v0.9.5 gate)
+
+## NEXT V1.1 (MONETIZATION & EXPANSION)
+### v1.1.0 — Lemon Squeezy
+- [ ] Lemon Squeezy product: shield pack (pricing TBD, e.g. 5 shields / $2.99).
+- [ ] Webhook: verify HMAC sig → user:{uid}:shields += N.
+- [ ] Update Privacy Policy with Lemon Squeezy as payment processor.
+### v1.1.1 — Avatar + Push
 - [ ] Avatar state machine. (idle/happy/sad/dead by streak)
 - [ ] Push nudge when streak at risk. (VAPID reuse)
-### 🚀 LAUNCH
-- [ ] Reddit: r/webgames + r/Tetris + r/gamedev
-- [ ] Hacker News: Show HN
-- [ ] Product Hunt: scheduled launch
 
 ## NEXT V1.2 (BLITZ)
 - [x] Play 2 minute. Fast end. (Done as Blitz)
