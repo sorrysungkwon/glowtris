@@ -17,7 +17,7 @@ import {
   spawnLineClearParticles, spawnLockParticles, spawnFloatingText, spawnDropTrail, spawnHardDropParticles, updateParticles,
   applyShake, _enableKbMode, _disableKbMode,
   updateUI, updateSprintTimer, showScorePopup, updateAPMPPS, initTargetUI,
-  updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel, togglePerfMode,
+  updateDAS, updateARR, updateSDF, updateLockDelay, updateGhost, updateColorblind, cycleAnimIntensity, _animLabel, togglePerfMode, toggleHaptic,
   triggerScreenFlash, triggerAllClearFlash, triggerLevelUpVisuals, spawnGoldBurst,
   showAchievementToast, unlockAchievement,
   openHowToPlay, closeHowToPlay, openStats, closeStats, showAchTooltip, hideAchTooltip,
@@ -195,7 +195,7 @@ function lockPiece(){
     if(isDifficult){S.b2b=true;}else{S.b2b=false;}
     sfxLineClear(cleared.length);
     if(tspin){sfxTSpin();if(S.animIntensity==='full'){S.shakeFrames=Math.max(S.shakeFrames,12+cleared.length*6);S.shakeMag=Math.max(S.shakeMag,0.55);}}
-    if(navigator.vibrate) {
+    if(S.hapticEnabled && navigator.vibrate) {
       if(cleared.length >= 4 || tspin) navigator.vibrate([30, 50, 40]);
       else navigator.vibrate(20);
     }
@@ -608,7 +608,7 @@ function hardDrop(){
   let d=0;while(validPos(S.current,0,1)){S.current.y++;d++;}
   S.score+=d*2;updateUI();
   if(S.animIntensity==='full'){S.shakeFrames=Math.min(12,5+Math.floor(d*0.45));S.shakeMag=2.8;S.shakeAllDir=true;}
-  if(navigator.vibrate) navigator.vibrate(15);
+  if(S.hapticEnabled && navigator.vibrate) navigator.vibrate(15);
   spawnHardDropParticles(S.current);
   sfxHardDrop();
   lockPiece();
@@ -767,6 +767,7 @@ function loadSettings(){
   S.ghostVisible=localStorage.getItem(LS.GHOST)!=='0';
   S.colorblindMode=localStorage.getItem(LS.COLORBLIND)==='1';
   S.animIntensity=localStorage.getItem(LS.ANIM)||'full';
+  S.hapticEnabled=localStorage.getItem(LS.HAPTIC)!=='0';
   const icon=document.getElementById('mute-icon');
   const btn=document.getElementById('btn-mute');
   if(icon)icon.textContent=S.muteAudio?'volume_off':'volume_up';
@@ -1177,7 +1178,7 @@ Object.assign(window, {
   submitScore, submitSprintScore, submitBlitzScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
   toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,
-  updateGhost, updateColorblind, cycleAnimIntensity, togglePerfMode,
+  updateGhost, updateColorblind, cycleAnimIntensity, togglePerfMode, toggleHaptic,
   openHowToPlay, closeHowToPlay, openStats, closeStats,
   showAchTooltip, hideAchTooltip,
   _openDonation,

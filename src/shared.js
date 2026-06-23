@@ -104,6 +104,7 @@ export const LS = {
   SPRINT_HI:    'glowTrisSprintHi',
   BLITZ_HI:     'glowTrisBlitzHi',
   FLOW_HI:      'glowTrisFlowHi',
+  HAPTIC:       'glowTrisHaptic',
 };
 
 export const BLITZ_TIME = 120000; // 2 minutes
@@ -220,6 +221,7 @@ export const S = {
   lowPerfMode:   false,
   colorblindMode:false,
   ghostVisible:  true,
+  hapticEnabled: true,
 
   // Per-frame visual effects (game.js lockPiece writes, ui.js drawBoard reads)
   flashLines:      null,   // initialized to new Set() in game.js startup

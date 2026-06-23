@@ -1296,6 +1296,12 @@ export function updateLockDelay(v) {
   S.lockMs = parseInt(v); localStorage.setItem(LS.LOCK, v);
   const el = _sEl('lock-val'); if (el) el.textContent = v + 'ms';
 }
+export function toggleHaptic() {
+  S.hapticEnabled = !S.hapticEnabled;
+  localStorage.setItem(LS.HAPTIC, S.hapticEnabled ? '1' : '0');
+  const btn = _sEl('haptic-btn');
+  if (btn) { btn.textContent = S.hapticEnabled ? '📳 HAPTIC ON' : '📳 HAPTIC OFF'; btn.classList.toggle('muted', !S.hapticEnabled); }
+}
 export function updateGhost() {
   S.ghostVisible = !S.ghostVisible;
   localStorage.setItem(LS.GHOST, S.ghostVisible ? '1' : '0');
