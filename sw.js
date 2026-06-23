@@ -1,9 +1,12 @@
-const CACHE      = 'glowtris-be8583';
-const FONT_CACHE = 'glowtris-fonts-v1';
-const APP_SHELL  = ['/index.html', '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
+const CACHE      = 'glowtris-pwa-v2';
+const FONT_CACHE = 'glowtris-fonts-v2';
+const APP_SHELL  = [
+  '/index.html', '/sprint.html', '/unblocked.html', '/tetris-online.html',
+  '/manifest.json', '/favicon.svg', '/icon-192.svg', '/icon-512.svg', 
+  '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'
+];
 const FONT_URLS  = [
-  'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap',
-  'https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap',
+  'https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap'
 ];
 
 self.addEventListener('install', e => {
@@ -53,16 +56,20 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // index.html: network-first so updates are picked up, cache as fallback
-  if (url.pathname === '/' || url.pathname === '/index.html') {
+  // HTML pages: network-first so updates are picked up, cache as fallback
+  if (url.pathname === '/' || url.pathname.endsWith('.html')) {
     e.respondWith(
       fetch(request)
         .then(res => {
           const clone = res.clone();
-          caches.open(CACHE).then(c => c.put('/index.html', clone));
+          caches.open(CACHE).then(c => c.put(request, clone));
           return res;
         })
-        .catch(() => caches.match('/index.html'))
+        .catch(() => {
+          return caches.match(request, { ignoreSearch: true }).then(cached => {
+            return cached || caches.match('/index.html', { ignoreSearch: true });
+          });
+        })
     );
     return;
   }

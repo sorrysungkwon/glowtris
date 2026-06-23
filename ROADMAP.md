@@ -37,7 +37,7 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 |---|---|---|
 | v0.9.0 | Danger vignette (red border glow when board is high), HUD spring animation on score update | Canvas + CSS |
 | v0.9.1 | Result screen redesign (launch quality), mode select UI cleanup | Visual overhaul |
-| **v0.9.5** | **Pre-launch checklist** — Privacy Policy update (Firebase + Lemon Squeezy), security audit of all API endpoints, marketing copy written, Reddit/HN post drafts finalized | Non-code work, critical gate |
+| **v0.9.5** | **Pre-launch checklist** — Privacy Policy update, security audit, marketing copy written. **Audits:** SEO (Schema/OpenGraph), PWA (sw.js offline cache), Analytics (streak telemetry). | Critical gate |
 
 **Gate to v1.0:** v0.9.5 checklist 100% complete.
 
@@ -52,8 +52,9 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 - Firebase Auth setup (Google OAuth + email/password)
 - Server-side ID token verification on all protected endpoints
 - Login UI inside game (modal, non-blocking)
-- Non-logged-in play allowed — "Save your streak" nudge after game end
+- Non-logged-in play allowed — "Save your streak" nudge after game end (with explicitly documented fallback/resilience if Auth fails)
 - On first login: link existing localStorage name to Firebase UID
+- **Cross-platform sync**: Sync scores, stats, and keybind preferences across devices
 - Redis stores only UID — email/displayName never leaves Firebase
 
 ### v1.0.1 — Streak System
@@ -72,27 +73,32 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 - Shield count shown in UI (header or result screen)
 - Shield inventory cap: 5 (prevents hoarding)
 
-### v1.0.3 — Lemon Squeezy (Paid Shields)
-
-- Lemon Squeezy integration (no business registration required)
-- Product: Shield Pack — pricing TBD (e.g. 5 shields / $2.99)
-- Webhook: `order_created` → verify signature → `user:{uid}:shields += N`
-- No card data touches our servers (Lemon Squeezy is Merchant of Record)
-- Privacy Policy updated with payment processor details
-
-### v1.0.4 — Avatar + Push Nudge
-
-- Avatar state machine (Duolingo-style): idle / happy / sad / dead states
-- State driven by: streak length, recent play, shield count
-- Push notification fires when: user hasn't played and streak is at risk (uses existing VAPID infrastructure)
-- Avatar shown on: home screen, result screen, leaderboard entry
+*(Note: Paid monetization and advanced avatar features have been moved to v1.1 to de-risk the v1.0 launch window.)*
 
 ### 🚀 v1.0 Launch
 
-- [ ] Reddit: `r/webgames`, `r/Tetris`, `r/gamedev` (story angle)
-- [ ] Hacker News: Show HN post
-- [ ] Product Hunt: scheduled launch (story/ drafts ready)
-- [ ] Blog post: "How I built a competitive Tetris clone in the browser"
+- [ ] **Launch Sequencing**:
+  - **Day 1**: Reddit (`r/webgames`, `r/Tetris`, `r/gamedev` — story angle)
+  - **Day 2**: Hacker News (Show HN post)
+  - **Day 7**: Product Hunt (Scheduled launch with collected testimonials)
+- [ ] Short-form video marketing (TikTok, YouTube Shorts, IG Reels)
+- [ ] Blog post: "How I built a competitive Tetris clone in the browser" (Draft assigned and completed before v0.9.5 gate)
+
+---
+
+## v1.1 — Monetization & Expansion
+
+**Goal:** Once the core loop is stable, introduce monetization and deeper engagement features.
+
+### v1.1.0 — Lemon Squeezy (Paid Shields)
+- Lemon Squeezy integration
+- Product: Shield Pack — pricing TBD (e.g. 5 shields / $2.99)
+- Webhook: `order_created` → verify signature → `user:{uid}:shields += N`
+- No card data touches our servers
+
+### v1.1.1 — Avatar + Push Nudge
+- Avatar state machine (Duolingo-style): idle / happy / sad / dead states
+- Push notification fires when streak is at risk (uses existing VAPID infrastructure)
 
 ---
 
@@ -122,7 +128,8 @@ v1.0  🔲  Official Launch
   └─ v1.0.0  Firebase Auth
   └─ v1.0.1  Streak system
   └─ v1.0.2  Shield (free weekly)
-  └─ v1.0.3  Lemon Squeezy (paid shields)
-  └─ v1.0.4  Avatar + push nudge
   └─ 🚀 LAUNCH
+v1.1  🔲  Monetization & Expansion
+  └─ v1.1.0  Lemon Squeezy (paid shields)
+  └─ v1.1.1  Avatar + push nudge
 ```
