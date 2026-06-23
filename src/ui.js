@@ -1078,8 +1078,7 @@ export function initTargetUI() {
         const hi = Math.exp(logMin + (b + 1) * logStep);
         const band = pool.filter(t => t.score >= lo && t.score < hi);
         if (band.length > 0) {
-          // Pick the median of the band
-          warmup.push(band[Math.floor(band.length / 2)]);
+          warmup.push(band[Math.floor(Math.random() * band.length)]);
         }
       }
     }
