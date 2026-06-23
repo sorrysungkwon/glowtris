@@ -139,6 +139,7 @@ function _settingsHTML(p, showPWA=true) {
 
     <div class="sg-sep"></div>
     <div class="sg-label">PERFORMANCE & SYSTEM</div>
+    ${'vibrate' in navigator ? `<button class="toggle-btn${S.hapticEnabled?'':' muted'}" id="${p}-haptic-btn" onclick="toggleHaptic()">${S.hapticEnabled?'📳 HAPTIC ON':'📳 HAPTIC OFF'}</button>` : ''}
     <button class="toggle-btn${S.lowPerfMode?' lowspec-on':' muted'}" id="${p}-perf-btn" onclick="togglePerfMode()">${S.lowPerfMode?'⚡ LOW-SPEC MODE: ON':'⚡ LOW-SPEC MODE: OFF'}</button>
     ${showPWA?`<button class="toggle-btn${_notifBtnClass()}" id="${p}-notif-btn" onclick="window._pwaNotifToggle()">${_notifBtnLabel()}</button>
     ${pwaInstallBtnHTML(p)}`:''}

@@ -8,10 +8,10 @@
 - [x] Fix 3-corner crash. Keep all button press. (Input Buffer & 3-Corner G-Spin Rule)
 - [x] Add Blitz mode. Fast fight.
 
-## NEXT V0.7 (GAMEPLAY FEEL)
-- [ ] Smash ghost piece. Show who to beat next. (Target Overtake UI)
-- [ ] Make controller shake hand on drop.
-- [ ] Make screen shake on big clear.
+## V0.7 DONE (GAMEPLAY FEEL)
+- [x] Smash ghost piece. Show who to beat next. (Target Overtake UI — desktop + mobile)
+- [x] Make controller shake hand on drop. (Haptic vibration, settings toggle)
+- [ ] Make screen shake on big clear. (skipped)
 
 ## NEXT V0.8 (SOCIAL)
 - [ ] Show rank percent.

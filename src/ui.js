@@ -162,10 +162,10 @@ export function _applyTouchCELL() {
   gc.style.width  = gameW + 'px';  gc.style.height = gameH + 'px';
   pc.style.width  = gameW + 'px';  pc.style.height = gameH + 'px';
 
-  const MINI_W = 32, MINI_H = 26;
-  if (ncM.width !== MINI_W * 3 || ncM.height !== MINI_H) {
-    ncM.width = MINI_W * 3; ncM.height = MINI_H;
-    ncM.style.width = (MINI_W * 3) + 'px'; ncM.style.height = MINI_H + 'px';
+  const MINI_W = 44, MINI_H = 36;
+  if (ncM.width !== MINI_W || ncM.height !== MINI_H * 3) {
+    ncM.width = MINI_W; ncM.height = MINI_H * 3;
+    ncM.style.width = MINI_W + 'px'; ncM.style.height = (MINI_H * 3) + 'px';
   }
   if (hcM.width !== MINI_W || hcM.height !== MINI_H) {
     hcM.width = MINI_W; hcM.height = MINI_H;
@@ -1023,6 +1023,167 @@ export function applyShake(dtFactor = 1) {
   }
 }
 
+// ─── Target Overtake UI logic ──────────────────────────────────────────────────
+export function initTargetUI() {
+  const tBox = document.getElementById('target-box');
+  if (!tBox) return;
+  if (!S.gameRunning || S.isSprintMode || S.isFlowMode) {
+    tBox.style.display = 'none';
+    return;
+  }
+  
+  let lbList = [];
+  if (S.isBlitzMode) {
+    lbList = S._lbCache.blitzDailyBoard || [];
+    if (lbList.length === 0) lbList = S._lbCache.blitzBoard || [];
+  } else if (S.isDailyMode) {
+    lbList = S._lbCache.challengeBoard || [];
+  } else {
+    lbList = S._lbCache.dailyBoard || [];
+    if (lbList.length === 0) lbList = S._lbCache.board || [];
+  }
+
+  let valid = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
+  
+  // ── BETA/EMPTY SERVER FALLBACK: Inject Dummy NPC Targets ──
+  if (valid.length === 0) {
+    valid = [
+      { name: 'CPU_Alpha', score: 100 },
+      { name: 'Glow_Bot',  score: 300 },
+      { name: 'Neon_Pro',  score: 700 },
+      { name: 'T-Spina',   score: 1200 },
+      { name: 'Max_Core',  score: 2000 },
+      { name: 'AI_Omega',  score: 3500 },
+      { name: 'Final_Boss', score: 5000 }
+    ];
+  }
+
+  valid.sort((a,b) => a.score - b.score);
+  
+  S.targets = valid;
+  S.targetIndex = 0;
+  S.targetAnimating = false;
+  
+  while(S.targetIndex < S.targets.length && S.targets[S.targetIndex].score <= S.score) {
+    S.targetIndex++;
+  }
+  
+  if (S.targetIndex < S.targets.length) {
+    tBox.style.display = 'block';
+    renderCurrentTarget();
+  } else {
+    tBox.style.display = 'none';
+  }
+}
+
+function renderCurrentTarget() {
+  if (S.targetIndex >= S.targets.length) return;
+  const t = S.targets[S.targetIndex];
+  document.getElementById('target-name').textContent = t.name;
+  document.getElementById('target-box').querySelector('.target-user').setAttribute('title', t.name);
+  document.getElementById('target-score').textContent = t.score.toLocaleString();
+  const mn = document.getElementById('mob-target-name');
+  const ms = document.getElementById('mob-target-score');
+  if (mn) mn.textContent = t.name;
+  if (ms) ms.textContent = t.score.toLocaleString();
+}
+
+function triggerTargetOvertake() {
+  S.targetAnimating = true;
+  const tBox = document.getElementById('target-box');
+  const tContent = document.getElementById('target-content');
+  const tTitle = document.getElementById('target-title');
+
+  // Desktop: flash + scale
+  tBox.classList.add('overtaken');
+  tTitle.textContent = 'OVERTAKEN!';
+  tTitle.style.color = '#fff';
+
+  // Mobile: flash VS block + show OVERTAKEN text
+  const mVsBlock = document.querySelector('.mh-vs-block');
+  const mVsLabel = document.getElementById('mh-vs-label');
+  const mName = document.getElementById('mob-target-name');
+  const mScore = document.getElementById('mob-target-score');
+  if (mVsBlock) mVsBlock.classList.add('overtaken');
+  if (mVsLabel) { mVsLabel.textContent = 'OVERTAKEN!'; mVsLabel.style.color = '#fff'; }
+  if (mName) mName.textContent = '★ CLEARED ★';
+  if (mScore) mScore.style.filter = 'brightness(3)';
+
+  // After shatter settles (0.4s), slide out content
+  setTimeout(() => {
+    tContent.classList.remove('anim-slide-in');
+    void tContent.offsetWidth;
+    tContent.classList.add('anim-slide-out');
+    tBox.classList.remove('overtaken');
+
+    // Mobile slide out
+    if (mName) { mName.classList.remove('anim-slide-in'); void mName.offsetWidth; mName.classList.add('anim-slide-out'); }
+    if (mScore) { mScore.classList.remove('anim-slide-in'); void mScore.offsetWidth; mScore.classList.add('anim-slide-out'); }
+    if (mVsBlock) mVsBlock.classList.remove('overtaken');
+
+    setTimeout(() => {
+      tTitle.textContent = 'NEXT TARGET';
+      tTitle.style.color = '#ffe600';
+      if (mVsLabel) { mVsLabel.textContent = 'VS'; mVsLabel.style.color = ''; }
+      if (mScore) mScore.style.filter = '';
+
+      S.targetIndex++;
+      if (S.targetIndex >= S.targets.length) {
+        tBox.style.display = 'none';
+        if (mName) mName.textContent = '—';
+        if (mScore) mScore.textContent = '—';
+        S.targetAnimating = false;
+        return;
+      }
+
+      renderCurrentTarget();
+
+      // Reset progress bar without transition
+      const fill = document.getElementById('target-progress');
+      if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        setTimeout(() => {
+          fill.style.transition = 'width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        }, 50);
+      }
+
+      tContent.classList.remove('anim-slide-out');
+      void tContent.offsetWidth;
+      tContent.classList.add('anim-slide-in');
+
+      // Mobile slide in
+      if (mName) { mName.classList.remove('anim-slide-out'); void mName.offsetWidth; mName.classList.add('anim-slide-in'); }
+      if (mScore) { mScore.classList.remove('anim-slide-out'); void mScore.offsetWidth; mScore.classList.add('anim-slide-in'); }
+
+      setTimeout(() => {
+        tContent.classList.remove('anim-slide-in');
+        if (mName) mName.classList.remove('anim-slide-in');
+        if (mScore) mScore.classList.remove('anim-slide-in');
+        S.targetAnimating = false;
+        updateTargetUI();
+      }, 300);
+    }, 300);
+  }, 400);
+}
+
+export function updateTargetUI() {
+  if (S.isSprintMode || S.isFlowMode || S.targetAnimating || S.targetIndex >= S.targets.length) return;
+  
+  const target = S.targets[S.targetIndex];
+  if (S.score >= target.score) {
+    triggerTargetOvertake();
+  } else {
+    let prevScore = 0;
+    if (S.targetIndex > 0) prevScore = S.targets[S.targetIndex - 1].score;
+    const progressFill = document.getElementById('target-progress');
+    if (progressFill) {
+      const pct = Math.max(0, Math.min(100, ((S.score - prevScore) / (target.score - prevScore)) * 100));
+      progressFill.style.width = pct + '%';
+    }
+  }
+}
+
 // ─── UI update ────────────────────────────────────────────────────────────────
 export function updateUI() {
   if (S.isSprintMode) {
@@ -1055,6 +1216,7 @@ export function updateUI() {
   $levelBar.style.background = `linear-gradient(90deg,hsl(${190+hue},100%,50%),hsl(${270+hue},100%,50%))`;
   $bpmEl.textContent = Math.min(200, 135+S.level*5) + ' BPM';
   updateAPMPPS();
+  updateTargetUI();
 }
 
 export function updateAPMPPS() {
@@ -1133,6 +1295,12 @@ export function updateARR(v) {
 export function updateLockDelay(v) {
   S.lockMs = parseInt(v); localStorage.setItem(LS.LOCK, v);
   const el = _sEl('lock-val'); if (el) el.textContent = v + 'ms';
+}
+export function toggleHaptic() {
+  S.hapticEnabled = !S.hapticEnabled;
+  localStorage.setItem(LS.HAPTIC, S.hapticEnabled ? '1' : '0');
+  const btn = _sEl('haptic-btn');
+  if (btn) { btn.textContent = S.hapticEnabled ? '📳 HAPTIC ON' : '📳 HAPTIC OFF'; btn.classList.toggle('muted', !S.hapticEnabled); }
 }
 export function updateGhost() {
   S.ghostVisible = !S.ghostVisible;

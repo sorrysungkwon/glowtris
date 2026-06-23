@@ -1,5 +1,5 @@
 import { S, LS, SUPPORT_URL, SPRINT_LINES, fmtTime, gtag, getGameMode, MODE_COLORS, hexToRgba } from './shared.js';
-import { unlockAchievement } from './ui.js';
+import { unlockAchievement, initTargetUI } from './ui.js';
 import { showStartScreen } from './screens.js';
 import { showToast } from './pwa.js';
 
@@ -570,6 +570,7 @@ export async function loadStartLeaderboard(){
     const activeTab=document.querySelector('.lb-tab[data-tab].active');
     const defaultTab=S.lbMode==='daily'?'challenge':S.lbMode==='sprint'?'sprint-daily':S.lbMode==='blitz'?'blitz-daily':'daily';
     renderLbTab(activeTab?activeTab.dataset.tab:defaultTab);
+    initTargetUI();
   }catch(e){
     S._lbOffline = true;
     const inner=document.querySelector('.lb-inner');

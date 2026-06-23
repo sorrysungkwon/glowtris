@@ -104,6 +104,7 @@ export const LS = {
   SPRINT_HI:    'glowTrisSprintHi',
   BLITZ_HI:     'glowTrisBlitzHi',
   FLOW_HI:      'glowTrisFlowHi',
+  HAPTIC:       'glowTrisHaptic',
 };
 
 export const BLITZ_TIME = 120000; // 2 minutes
@@ -209,12 +210,18 @@ export const S = {
     sprintRank:0, sprintDailyRank:0, sprintWeeklyRank:0, mySprintTime:0,
   },
 
+  // Target Overtake UI
+  targets: [],
+  targetIndex: 0,
+  targetAnimating: false,
+
   // Audio / visual settings (written by audio.js or ui.js, read by both)
   muteAudio:     false,
   animIntensity: 'full',   // 'full' | 'reduced' | 'off'
   lowPerfMode:   false,
   colorblindMode:false,
   ghostVisible:  true,
+  hapticEnabled: true,
 
   // Per-frame visual effects (game.js lockPiece writes, ui.js drawBoard reads)
   flashLines:      null,   // initialized to new Set() in game.js startup
