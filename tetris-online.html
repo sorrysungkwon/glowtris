@@ -672,8 +672,8 @@
   /* ════════════════════════════════
      MOBILE  (< 600 px)
   ════════════════════════════════ */
-  /* Mobile side col — hidden on desktop */
-  #mob-side-col { display:none; }
+  /* Mobile side cols — hidden on desktop */
+  #mob-next-col, #mob-hold-col { display:none; }
 
   @media (max-width:600px) {
     #desktop-header { display:none; }
@@ -764,21 +764,15 @@
       text-shadow: 0 0 8px rgba(255,230,0,0.6);
     }
 
-    /* Mobile NEXT+HOLD single side column */
-    #mob-side-col {
+    /* Mobile NEXT (left) + HOLD (right) side columns */
+    #mob-next-col, #mob-hold-col {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      width: 58px;
-      flex-shrink: 0;
-    }
-    .mob-piece-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       gap: 4px;
+      width: 50px;
+      flex-shrink: 0;
     }
     .mob-col-label {
       font-size: 8px;
@@ -2626,6 +2620,12 @@ if ('serviceWorker' in navigator) {
   <!-- Game row -->
   <div id="game-row">
 
+    <!-- Mobile NEXT side column (left) -->
+    <div id="mob-next-col">
+      <span class="mob-col-label">NEXT</span>
+      <canvas id="next-canvas-m" class="mini-cv" width="44" height="132"></canvas>
+    </div>
+
     <!-- Desktop left column: 2-panel layout -->
     <div id="left-panel">
 
@@ -2741,16 +2741,10 @@ if ('serviceWorker' in navigator) {
       
     </div>
 
-    <!-- Mobile side column: NEXT + HOLD stacked -->
-    <div id="mob-side-col">
-      <div class="mob-piece-block">
-        <span class="mob-col-label">NEXT</span>
-        <canvas id="next-canvas-m" class="mini-cv" width="52" height="52"></canvas>
-      </div>
-      <div class="mob-piece-block">
-        <span class="mob-col-label">HOLD</span>
-        <canvas id="hold-canvas-m" class="mini-cv" width="52" height="52"></canvas>
-      </div>
+    <!-- Mobile HOLD side column (right) -->
+    <div id="mob-hold-col">
+      <span class="mob-col-label">HOLD</span>
+      <canvas id="hold-canvas-m" class="mini-cv" width="44" height="44"></canvas>
     </div>
 
   </div>
