@@ -1034,22 +1034,22 @@ export function initTargetUI() {
   
   let lbList = [];
   let rawTargetKey = 'targetBoard';
+  const mergeBoards = (...lists) => {
+    const m = new Map();
+    for (const e of lists.flat()) {
+      if (typeof e?.score === 'number' && (!m.has(e.name) || e.score > m.get(e.name).score)) m.set(e.name, e);
+    }
+    return [...m.values()].sort((a, b) => b.score - a.score);
+  };
+
   if (S.isBlitzMode) {
-    lbList = S._lbCache.blitzDailyBoard || [];
-    if (lbList.length === 0) lbList = S._lbCache.blitzBoard || [];
+    lbList = mergeBoards(S._lbCache.blitzDailyBoard || [], S._lbCache.blitzBoard || []);
     rawTargetKey = 'blitzTargetBoard';
   } else if (S.isDailyMode) {
-    lbList = S._lbCache.challengeBoard || [];
+    lbList = mergeBoards(S._lbCache.challengeBoard || [], S._lbCache.challengeAlltimeBoard || []);
     rawTargetKey = 'dailyTargetBoard';
   } else {
-    // Merge all-time + daily so targets reach the true #1 (e.g. 6M), not just today's top
-    const allTime = S._lbCache.board || [];
-    const daily = S._lbCache.dailyBoard || [];
-    const merged = new Map();
-    for (const e of [...daily, ...allTime]) {
-      if (!merged.has(e.name) || e.score > merged.get(e.name).score) merged.set(e.name, e);
-    }
-    lbList = [...merged.values()].sort((a, b) => b.score - a.score);
+    lbList = mergeBoards(S._lbCache.dailyBoard || [], S._lbCache.board || []);
   }
 
   S.targetCrown = false;
