@@ -1117,6 +1117,15 @@ initLayout();
 initStars();
 loadSettings();
 
+// iOS PWA cold-start: innerHeight not settled before first paint — recalc after browser commits frame
+if (navigator.standalone) {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    initLayout();
+    initStars();
+    if (S.gameRunning) { drawBoard(); drawNext(); drawHold(); }
+  }));
+}
+
 
 S.hiScore=parseInt(localStorage.getItem(LS.HI)||'0');
 const $hiScore  = document.getElementById('hi-score');
