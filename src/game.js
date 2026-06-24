@@ -241,7 +241,9 @@ function lockPiece(){
       if(S.level>=10) unlockAchievement('level_10');
       if(S.level>=15) unlockAchievement('level_15');
     }
-    dropInterval=Math.max(80,800-(S.level-1)*70);
+    dropInterval=S.level<=10
+      ?Math.max(50,800-(S.level-1)*70)
+      :Math.max(50,170-(S.level-10)*12);
     updateUI();
     const snap=[...cleared];
     setTimeout(()=>{
