@@ -388,14 +388,18 @@ export default async function handler(req, res) {
       getBoard(weekly),
     ]);
 
-    const rankData = await redis(`zcount/${KEY_ALL}/${score + 1}/+inf`);
+    const [rankData, dailyRankData, weeklyRankData, totalCountData] = await Promise.all([
+      redis(`zcount/${KEY_ALL}/${score + 1}/+inf`),
+      redis(`zcount/${daily}/${score + 1}/+inf`),
+      redis(`zcount/${weekly}/${score + 1}/+inf`),
+      redis(`zcard/${KEY_ALL}`),
+    ]);
     const rank = (rankData.result || 0) + 1;
-    const dailyRankData = await redis(`zcount/${daily}/${score + 1}/+inf`);
     const dailyRank = (dailyRankData.result || 0) + 1;
-    const weeklyRankData = await redis(`zcount/${weekly}/${score + 1}/+inf`);
     const weeklyRank = (weeklyRankData.result || 0) + 1;
+    const totalCount = totalCountData.result || 0;
 
-    return res.status(200).json({ board, dailyBoard, weeklyBoard, rank, dailyRank, weeklyRank });
+    return res.status(200).json({ board, dailyBoard, weeklyBoard, rank, dailyRank, weeklyRank, totalCount });
   }
 
   return res.status(405).json({ error: 'method not allowed' });

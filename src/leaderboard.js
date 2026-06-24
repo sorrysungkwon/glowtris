@@ -336,13 +336,20 @@ export async function submitScore(){
         ...S._lbCache,
         board: data.board, dailyBoard: data.dailyBoard || [], weeklyBoard: data.weeklyBoard || [],
         rank: data.rank, dailyRank: data.dailyRank, weeklyRank: data.weeklyRank,
+        totalCount: data.totalCount || 0,
         myName: name, myScore: S.score
       };
+
+      const topPct = (data.rank && data.totalCount > 0)
+        ? Math.max(1, Math.ceil(data.rank / data.totalCount * 100)) : null;
+      const top1Score = data.board && data.board[0] ? data.board[0].score : null;
+      const gap = (top1Score && data.rank > 1) ? top1Score - S.score : null;
 
       const rankMsg=[
         data.dailyRank?`<div class="sub" style="color:#00ff88;margin-bottom:2px">TODAY: #${data.dailyRank}</div>`:'',
         data.weeklyRank?`<div class="sub" style="color:#00c8ff;margin-bottom:2px">WEEKLY: #${data.weeklyRank}</div>`:'',
-        data.rank?`<div class="sub" style="color:#ffe600;margin-bottom:6px">ALL TIME: #${data.rank}</div>`:'',
+        data.rank?`<div class="sub" style="color:#ffe600;margin-bottom:2px">ALL TIME: #${data.rank}${topPct ? ` · Top ${topPct}%` : ''}</div>`:'',
+        gap?`<div class="sub" style="color:rgba(255,255,255,0.35);font-size:9px;margin-bottom:4px">${gap.toLocaleString()} pts from #1</div>`:'',
       ].join('');
       inp.style.display='none';
       btn.closest('.btn-row').style.display='none';
