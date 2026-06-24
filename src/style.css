@@ -636,6 +636,7 @@
   #mob-next-col, #mob-hold-col { display:none; }
 
   @media (max-width:600px) {
+    #app { gap:12px; }
     #desktop-header { display:none; }
     #left-panel, #right-column { display:none; }
 
