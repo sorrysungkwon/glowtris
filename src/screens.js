@@ -294,27 +294,35 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
           <span class="stat-val highlight" id="gov-hi-val">0</span>
         </div>
         ${(() => {
-          // Alltime boards only — no daily mix (daily skews rank vs all-time players)
           const c = S._lbCache || {};
-          let ref = S.isBlitzMode ? (c.blitzBoard || [])
-                  : S.isDailyMode ? (c.challengeAlltimeBoard || [])
-                  : (c.board || []);
-          if (!ref.length && S.targets && S.targets.length) ref = S.targets;
-          if (!ref.length) return '';
-          const sorted = [...ref].sort((a, b) => b.score - a.score);
-          const above = sorted.filter(e => e.score > S.score).length;
-          const estRank = above + 1;
-          const estPct = Math.max(1, Math.ceil(estRank / sorted.length * 100));
-          const top1 = sorted[0] ? sorted[0].score : null;
+          const dailyRef  = S.isBlitzMode ? (c.blitzDailyBoard || [])
+                          : S.isDailyMode ? (c.challengeBoard || [])
+                          : (c.dailyBoard || []);
+          const alltimeRef = S.isBlitzMode ? (c.blitzBoard || [])
+                           : S.isDailyMode ? (c.challengeAlltimeBoard || [])
+                           : (c.board || []);
+          const fallback = (S.targets && S.targets.length) ? S.targets : [];
+          const daily   = dailyRef.length   ? dailyRef   : fallback;
+          const alltime = alltimeRef.length  ? alltimeRef : fallback;
+          if (!daily.length && !alltime.length) return '';
+          const sortDesc = arr => [...arr].sort((a,b) => b.score - a.score);
+          const estRank = (board) => {
+            const s = sortDesc(board);
+            return { rank: s.filter(e => e.score > S.score).length + 1, top1: s[0]?.score ?? null, len: s.length };
+          };
+          const d = daily.length   ? estRank(daily)   : null;
+          const a = alltime.length ? estRank(alltime) : null;
+          const top1 = a?.top1 ?? d?.top1 ?? null;
           const gap = top1 && S.score < top1 ? top1 - S.score : null;
+          const alltimePct = a ? Math.max(1, Math.ceil(a.rank / a.len * 100)) : null;
           return `<div class="stat-item gov-rank-row">
             <div class="gov-rank-main">
               <span class="stat-label">RANK</span>
-              <span class="gov-rank-val">~#${estRank}<span class="gov-rank-pct"> · TOP ${estPct}%</span></span>
+              <span class="gov-rank-val">${d ? `~#${d.rank} TODAY` : ''}${alltimePct ? `<span class="gov-rank-pct">${d ? '  ·  ' : ''}TOP ${alltimePct}% ALL TIME</span>` : ''}</span>
             </div>
             ${gap
               ? `<span class="gov-rank-gap">${gap.toLocaleString()} PTS FROM #1</span>`
-              : `<span class="gov-rank-gap is-top1">👑 #1 POSITION</span>`}
+              : `<span class="gov-rank-gap is-top1">👑 #1 ALL TIME</span>`}
           </div>`;
         })()}
       </div>
