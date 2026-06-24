@@ -607,8 +607,12 @@ function gameTick(dt){
 }
 
 function moveX(d){if(!S.current)return;if(validPos(S.current,d)){S.current.x+=d;cancelLock();lastWasRotate=false;lastKickNonZero=false;sfxMove();}}
+let _lastHardDropTs = 0;
 function hardDrop(){
   if(!S.current)return;
+  const now = Date.now();
+  if (now - _lastHardDropTs < 100) return; // vibration phantom-touch guard
+  _lastHardDropTs = now;
   let d=0;while(validPos(S.current,0,1)){S.current.y++;d++;}
   S.score+=d*2;updateUI();
   if(S.animIntensity==='full'){S.shakeFrames=Math.min(12,5+Math.floor(d*0.45));S.shakeMag=2.8;S.shakeAllDir=true;}
@@ -619,6 +623,12 @@ function hardDrop(){
 }
 
 // ─── Touch buttons ────────────────────────────────────────────────────────────
+// Ghost click guard: Android Chrome fires synthetic mousedown ~300ms after
+// touchend even when preventDefault() was called on touchstart. Track last
+// touch time globally and suppress mouse events that arrive within 500ms.
+let _lastTouchTs = 0;
+document.addEventListener('touchstart', () => { _lastTouchTs = Date.now(); }, { passive: true, capture: true });
+
 function makeTouchBtn(id,onPress,mode='repeat',keyTarget=null){
   const el=document.getElementById(id);if(!el)return;
   let iv=null,to=null,on=false;
@@ -637,9 +647,9 @@ function makeTouchBtn(id,onPress,mode='repeat',keyTarget=null){
   el.addEventListener('touchstart',press,{passive:false});
   el.addEventListener('touchend',rel,{passive:false});
   el.addEventListener('touchcancel',rel,{passive:false});
-  el.addEventListener('mousedown',press);
-  el.addEventListener('mouseup',rel);
-  el.addEventListener('mouseleave',rel);
+  el.addEventListener('mousedown',(e)=>{ if(Date.now()-_lastTouchTs<500)return; press(e); });
+  el.addEventListener('mouseup',(e)=>{ if(Date.now()-_lastTouchTs<500)return; rel(e); });
+  el.addEventListener('mouseleave',(e)=>{ if(Date.now()-_lastTouchTs<500)return; rel(e); });
 }
 
 // D-pad: container-level handler so the finger can slide between buttons
@@ -713,8 +723,9 @@ function makeDpadSlide(containerSelector, buttons){
   container.addEventListener('touchend',    endTouch, { passive: false });
   container.addEventListener('touchcancel', endTouch, { passive: false });
 
-  // Mouse fallback (desktop testing only).
+  // Mouse fallback (desktop testing only — skip if recent touch to avoid ghost click).
   container.addEventListener('mousedown', (e) => {
+    if (Date.now() - _lastTouchTs < 500) return;
     const id = btnAt(e.clientX, e.clientY);
     if (!id) return;
     e.preventDefault();
