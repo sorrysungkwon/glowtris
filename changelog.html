@@ -269,10 +269,13 @@
       <li class="feat"><span class="change-label">Haptic Feedback</span> — Vibration on hard drop, line clear, Glowtris (4-line), and G-Spin. Toggle on/off in Settings. Only shown on devices that support it.</li>
       <li class="feat"><span class="change-label">Real-User Warmup Targets</span> — Before you reach the top-20 leaderboard, you now climb through real players pulled live from the server. Scores are grouped into 10 log-scale bands and a random opponent is picked from each band every game — so it feels different every run.</li>
       <li class="feat"><span class="change-label">Mode-Specific Rivals</span> — Blitz and Daily Challenge now draw warmup opponents from their own leaderboard pools, not the marathon board.</li>
+      <li class="feat"><span class="change-label">True #1 Target Tracking</span> — Rival targets now merge daily + all-time boards per mode, so you chase the real all-time record holder (not just today's top score) right through to the end. Once you beat everyone, the VS box crowns you 👑 #1 and live-updates your score.</li>
+      <li class="feat"><span class="change-label">BGM / SFX Volume Sliders</span> — Independent volume controls for game music and sound effects in Settings. Drag BGM to 0% to play your own music without killing game sounds.</li>
+      <li class="feat"><span class="change-label">Speed Curve Extended</span> — Difficulty now scales through level 32 instead of capping at level 12. Three phases: fast ramp (Lv 1→10), gradual tighten (Lv 10→20, 170ms→50ms), expert pressure (Lv 20→32, 50ms→16ms). Top speed raised from 80ms to 16ms (~60fps gravity).</li>
+      <li class="fix"><span class="change-label">External Music No Longer Interrupted</span> — Removed legacy iOS speaker-routing hack that caused Spotify / YouTube to pause whenever the game page loaded.</li>
       <li class="perf"><span class="change-label">LCP & Latency Improvements</span> — Deferred non-critical API requests from the main thread; Edge Caching with MGET optimizations cut initial load latency from 1.2s to under 30ms.</li>
-      <li class="feat"><span class="change-label">Touch Targets Expanded</span> — Footer link hitboxes enlarged for mobile without changing visual layout.</li>
-      <li class="fix"><span class="change-label">Layout Thrashing Eliminated</span> — Replaced `offsetHeight` reads during PWA init with `requestAnimationFrame` to prevent forced synchronous reflows.</li>
-      <li class="infra"><span class="change-label">Agentic Browsing Support</span> — Added standard `llms.txt` and optimized Vercel routing rules.</li>
+      <li class="fix"><span class="change-label">iOS Safe-Area Clipping</span> — Header was clipped on some iPhones (Display Zoom mode). Padding now uses <code>env(safe-area-inset-top)</code> directly, bypassing a Safari CSS-variable resolution bug.</li>
+      <li class="infra"><span class="change-label">Score Cap Raised</span> — Maximum submittable score raised from 10,000,000 to 99,999,999 across all leaderboards.</li>
     </ul>
   </div>
 

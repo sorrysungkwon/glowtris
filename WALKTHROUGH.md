@@ -27,6 +27,12 @@
 - **Haptic Feedback:** `navigator.vibrate()` on hard drop (15ms), line clear (20ms), Tetris/T-spin ([30,50,40]ms). Toggle in Settings → `📳 HAPTIC ON/OFF`, persisted to localStorage.
 - **Real-User Warmup Targets:** `targetBoard` API field (ascending all users). Frontend preprocessing: dedup by name (keep highest score), filter score>50, 10 log-scale bands, random pick per band each game session. Result: ~6-10 real opponents before top-20 leaderboard. Mode-specific: Blitz uses `blitzTargetBoard`, Daily uses `dailyTargetBoard`.
 - **API Cap Expanded:** Marathon + Blitz + Daily Challenge alltime all raised to 500 entries (was 100/20/100). Deeper warmup pool; fills naturally as playerbase grows.
+- **True #1 Target Tracking:** Target board now merges alltime + daily boards per mode (dedup by name, keep highest score). Targets reach the real all-time #1 (not just today's top). After beating everyone: crown state — `👑 #1` title, player's own name, live score tick. `updateTargetUI()` handles crown state each frame.
+- **BGM/SFX Volume Sliders:** Split `masterGain` into `bgmGain` + `sfxGain`. Settings panel shows two 0–100% sliders. Mute-all button (HUD) still controls `masterGain`. Values persisted to localStorage (`glowTrisBgmVol`, `glowTrisSfxVol`). Default BGM 80%, SFX 100%.
+- **Speed Curve Extended:** 3-phase gravity: Lv 1→10 (800→170ms, step 70ms), Lv 10→20 (170→50ms, step 12ms), Lv 20→32 (50→16ms, step 3ms). Cap at 16ms (~60fps). Previously capped at 80ms at Lv 12 (~200k score); now extends to ~Lv 32 (multi-million score range).
+- **iOS Safe-Area Fix:** `padding-top: max(8px, var(--safe-top))` → `max(12px, env(safe-area-inset-top, 0px))` — CSS variable intermediary caused `env()` to resolve as 0 on some Safari versions, clipping the mobile header under the status bar.
+- **Score Cap Raised:** MAX_SCORE 10,000,000 → 99,999,999 across all modes.
+- **External Music Preserved:** Removed `unlockSpeaker()` — the silent `<audio>` trick that routed iOS Web Audio to speaker also took over the media session on all platforms, pausing Spotify/YouTube on page load.
 
 ## 7. v1.0 Plan — Auth + Streak + Free Shield (scheduled for official launch)
 

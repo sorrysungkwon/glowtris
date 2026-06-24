@@ -123,7 +123,7 @@ A next-generation web puzzle platform featuring a 1000Hz independent tick engine
 | v0.4 | **Scoring Standard** — B2B 1.5×, 5-piece next queue, all-spin detection (SRS+) | ✅ Done |
 | v0.5 | **Renderer & Audio** — Web Audio API low-latency audio, render interpolation (PixiJS WebGL2 renderer Abandoned due to iOS regressions, keeping lightweight 2D Canvas engine) | ✅ Done |
 | v0.6 | **Modes & Metrics** — Vanish Zone (10×22 logic board), 3-Corner G-Spin Rule, Input Buffer (IMS), APM/PPS display, Drop Pillar gradient | ✅ Done |
-| v0.7 | **Social + Mobile** — Mobile UI redesign (new header, NEXT/HOLD side columns), overtake animation on mobile, haptic feedback (toggle), real-user warmup targets (10-band log-scale random, mode-specific), API cap 500 | ✅ Done |
+| v0.7 | **Social + Mobile** — Mobile UI redesign (new header, NEXT/HOLD side columns), overtake animation on mobile, haptic feedback (toggle), real-user warmup targets (10-band log-scale, alltime+daily merged, crown state), BGM/SFX independent volume sliders, speed curve extended to Lv32 (16ms cap), score cap 99,999,999, iOS safe-area fix, external music no longer interrupted | ✅ Done |
 | v0.8 | **Social Ranking** — Percentile ("Top X%"), score gap ("N pts to #1"), Daily challenge link sharing, name#tag identity system | 🔲 Planned |
 | v0.9 | **Micro-interactions** — Red danger vignette, active scale (0.95 scale) + spring-scale HUD animations | 🔲 Planned |
 
