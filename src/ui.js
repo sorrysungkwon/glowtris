@@ -1245,7 +1245,7 @@ export function updateTargetUI() {
   }
 
   if (S.targetIndex >= S.targets.length) return;
-  
+
   const target = S.targets[S.targetIndex];
   if (S.score >= target.score) {
     triggerTargetOvertake();

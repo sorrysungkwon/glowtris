@@ -279,25 +279,74 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
     </div>`;
   }
 
+  // Rank estimate rows (inside stats card, two rows: TODAY / ALL TIME)
+  const rankEstHTML = (() => {
+    const c = S._lbCache || {};
+    const dailyRef   = S.isBlitzMode ? (c.blitzDailyBoard || [])
+                     : S.isDailyMode ? (c.challengeBoard || [])
+                     : (c.dailyBoard || []);
+    const alltimeRef = S.isBlitzMode ? (c.blitzBoard || [])
+                     : S.isDailyMode ? (c.challengeAlltimeBoard || [])
+                     : (c.board || []);
+    const fallback = (S.targets && S.targets.length) ? S.targets : [];
+    const daily   = dailyRef.length   ? dailyRef   : fallback;
+    const alltime = alltimeRef.length ? alltimeRef : fallback;
+    if (!daily.length && !alltime.length) return '';
+    const sortDesc = arr => [...arr].sort((a, b) => b.score - a.score);
+    const estRank  = board => {
+      const s = sortDesc(board);
+      return { rank: s.filter(e => e.score > S.score).length + 1, top1: s[0]?.score ?? null, len: s.length };
+    };
+    const d = daily.length   ? estRank(daily)   : null;
+    const a = alltime.length ? estRank(alltime) : null;
+    const top1 = a?.top1 ?? d?.top1 ?? null;
+    const gap  = top1 && S.score < top1 ? top1 - S.score : null;
+    // Use server-provided total counts for accurate %; fall back to board.length
+    const dTotal  = S.isBlitzMode ? (c.blitzTotalCount || 0)
+                  : S.isDailyMode ? (c.challengeTodayCount || 0)
+                  : (c.dailyTotalCount || 0);
+    const aTotal  = S.isBlitzMode ? (c.blitzTotalCount || 0)
+                  : S.isDailyMode ? (c.challengeAlltimeCount || 0)
+                  : (c.totalCount || 0);
+    const dPct = d ? Math.max(1, Math.min(100, Math.ceil(d.rank / (dTotal || d.len) * 100))) : null;
+    const aPct = a ? Math.max(1, Math.min(100, Math.ceil(a.rank / (aTotal || a.len) * 100))) : null;
+    return `<div class="gov-rank-rows">
+      ${d ? `<div class="gov-rank-row-item">
+        <span class="gov-rank-label">TODAY</span>
+        <span class="gov-rank-num">#${d.rank}</span>
+        ${dPct ? `<span class="gov-rank-pct">TOP ${dPct}%</span>` : ''}
+      </div>` : ''}
+      ${a ? `<div class="gov-rank-row-item">
+        <span class="gov-rank-label">ALL TIME</span>
+        <span class="gov-rank-num">#${a.rank}</span>
+        ${aPct ? `<span class="gov-rank-pct">TOP ${aPct}%</span>` : ''}
+      </div>` : ''}
+      ${gap ? `<div class="gov-rank-gap">${gap.toLocaleString()} PTS FROM #1</div>`
+            : `<div class="gov-rank-gap is-top1">👑 #1 ALL TIME</div>`}
+    </div>`;
+  })();
+
   $overlay.innerHTML = `
     <div class="glass-panel">
       <h1 class="game-over-header">${S.isDailyMode ? 'DAILY CHALLENGE' : 'GAME OVER'}</h1>
       ${!S.isDailyMode && isNewBest ? '<div class="new-best-badge">★ NEW BEST ★</div>' : ''}
-      
-      <div class="game-over-stats">
-        <div class="stat-item">
-          <span class="stat-label">SCORE</span>
-          <span class="stat-val" id="gov-score-val">0</span>
+
+      <div class="gov-perf-group">
+        <div class="game-over-stats">
+          <div class="stat-item">
+            <span class="stat-label">SCORE</span>
+            <span class="stat-val" id="gov-score-val">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">BEST</span>
+            <span class="stat-val highlight" id="gov-hi-val">0</span>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">BEST</span>
-          <span class="stat-val highlight" id="gov-hi-val">0</span>
-        </div>
+        ${rankEstHTML}
+        ${badgesHTML}
       </div>
 
-      ${badgesHTML ? `<div style="width:100%;margin-bottom:18px">${badgesHTML}</div>` : ''}
-      
-      <div style="width:100%">
+      <div class="gov-action-group">
         <input id="lb-name" class="neon-input" maxlength="12" placeholder="ENTER NAME" value="${savedName}" autocomplete="off" spellcheck="false">
         <div class="btn-row sub-actions">
           <button id="lb-submit-btn" class="action-btn sm" onclick="submitScore()">SUBMIT</button>

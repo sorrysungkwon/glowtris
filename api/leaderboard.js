@@ -207,44 +207,54 @@ export default async function handler(req, res) {
     const mode = (req.query && req.query.mode) || (url && url.searchParams.get('mode')) || '';
 
     if (mode === 'daily') {
-      const [challengeBoard, challengeAlltimeBoard, dailyTargetBoard] = await Promise.all([
+      const [challengeBoard, challengeAlltimeBoard, dailyTargetBoard, challengeTodayCount, challengeAlltimeCount] = await Promise.all([
         getBoard(KEY_CHALLENGE()),
         getBoard(KEY_CHALLENGE_ALLTIME, TOP_ALLTIME),
         getBoardAscending(KEY_CHALLENGE_ALLTIME),
+        redis(`zcard/${KEY_CHALLENGE()}`),
+        redis(`zcard/${KEY_CHALLENGE_ALLTIME}`),
       ]);
-      return res.status(200).json({ challengeBoard, challengeAlltimeBoard, dailyTargetBoard });
+      return res.status(200).json({
+        challengeBoard, challengeAlltimeBoard, dailyTargetBoard,
+        challengeTodayCount: challengeTodayCount.result || 0,
+        challengeAlltimeCount: challengeAlltimeCount.result || 0,
+      });
     }
 
     if (mode === 'sprint') {
       const sprintDaily = KEY_SPRINT_DAILY(clientDate);
       const sprintWeekly = KEY_SPRINT_WEEKLY();
-      const [sprintBoard, sprintDailyBoard, sprintWeeklyBoard] = await Promise.all([
+      const [sprintBoard, sprintDailyBoard, sprintWeeklyBoard, sprintTotalCount] = await Promise.all([
         getSprintBoard(KEY_SPRINT, TOP_ALLTIME),
         getSprintBoard(sprintDaily),
         getSprintBoard(sprintWeekly),
+        redis(`zcard/${KEY_SPRINT}`),
       ]);
-      return res.status(200).json({ sprintBoard, sprintDailyBoard, sprintWeeklyBoard });
+      return res.status(200).json({ sprintBoard, sprintDailyBoard, sprintWeeklyBoard, sprintTotalCount: sprintTotalCount.result || 0 });
     }
 
     if (mode === 'blitz') {
       const blitzDaily = KEY_BLITZ_DAILY(clientDate);
       const blitzWeekly = KEY_BLITZ_WEEKLY();
-      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard] = await Promise.all([
+      const [blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard, blitzTotalCount] = await Promise.all([
         getBoard(KEY_BLITZ, TOP_ALLTIME),
         getBoard(blitzDaily),
         getBoard(blitzWeekly),
         getBoardAscending(KEY_BLITZ),
+        redis(`zcard/${KEY_BLITZ}`),
       ]);
-      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard });
+      return res.status(200).json({ blitzBoard, blitzDailyBoard, blitzWeeklyBoard, blitzTargetBoard, blitzTotalCount: blitzTotalCount.result || 0 });
     }
 
-    const [board, dailyBoard, weeklyBoard, targetBoard] = await Promise.all([
+    const [board, dailyBoard, weeklyBoard, targetBoard, totalCount, dailyTotalCount] = await Promise.all([
       getBoard(KEY_ALL, TOP_ALLTIME),
       getBoard(daily),
       getBoard(weekly),
       getBoardAscending(KEY_ALL),
+      redis(`zcard/${KEY_ALL}`),
+      redis(`zcard/${daily}`),
     ]);
-    return res.status(200).json({ board, dailyBoard, weeklyBoard, targetBoard });
+    return res.status(200).json({ board, dailyBoard, weeklyBoard, targetBoard, totalCount: totalCount.result || 0, dailyTotalCount: dailyTotalCount.result || 0 });
   }
 
   if (req.method === 'POST') {
@@ -396,14 +406,18 @@ export default async function handler(req, res) {
       getBoard(weekly),
     ]);
 
-    const rankData = await redis(`zcount/${KEY_ALL}/${score + 1}/+inf`);
+    const [rankData, dailyRankData, weeklyRankData, totalCountData] = await Promise.all([
+      redis(`zcount/${KEY_ALL}/${score + 1}/+inf`),
+      redis(`zcount/${daily}/${score + 1}/+inf`),
+      redis(`zcount/${weekly}/${score + 1}/+inf`),
+      redis(`zcard/${KEY_ALL}`),
+    ]);
     const rank = (rankData.result || 0) + 1;
-    const dailyRankData = await redis(`zcount/${daily}/${score + 1}/+inf`);
     const dailyRank = (dailyRankData.result || 0) + 1;
-    const weeklyRankData = await redis(`zcount/${weekly}/${score + 1}/+inf`);
     const weeklyRank = (weeklyRankData.result || 0) + 1;
+    const totalCount = totalCountData.result || 0;
 
-    return res.status(200).json({ board, dailyBoard, weeklyBoard, rank, dailyRank, weeklyRank });
+    return res.status(200).json({ board, dailyBoard, weeklyBoard, rank, dailyRank, weeklyRank, totalCount });
   }
 
   return res.status(405).json({ error: 'method not allowed' });
