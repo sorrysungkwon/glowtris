@@ -106,7 +106,17 @@ export function startDailyChallenge() {
 function _settingsHTML(p, showPWA=true) {
   return `
     <div class="sg-label">AUDIO</div>
-    <button class="toggle-btn${S.muteAudio?' muted':''}" id="${p}-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON'}</button>
+    <div class="settings-row">
+      <span class="settings-lbl">BGM</span>
+      <input type="range" class="neon-range" min="0" max="100" value="${S.bgmVol}" oninput="updateBGMVolume(this.value)">
+      <span class="settings-val" id="${p}-bgm-val">${S.bgmVol}%</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">SFX</span>
+      <input type="range" class="neon-range" min="0" max="100" value="${S.sfxVol}" oninput="updateSFXVolume(this.value)">
+      <span class="settings-val" id="${p}-sfx-val">${S.sfxVol}%</span>
+    </div>
+    <button class="toggle-btn${S.muteAudio?' muted':''}" id="${p}-mute-btn" onclick="toggleMute()">${S.muteAudio?'🔇 MUTE ALL':'🔊 MUTE ALL'}</button>
 
     <div class="sg-sep"></div>
     <div class="sg-label">VISUAL</div>
