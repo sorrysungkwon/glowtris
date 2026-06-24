@@ -301,8 +301,15 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
     const a = alltime.length ? estRank(alltime) : null;
     const top1 = a?.top1 ?? d?.top1 ?? null;
     const gap  = top1 && S.score < top1 ? top1 - S.score : null;
-    const dPct = d ? Math.max(1, Math.ceil(d.rank / d.len * 100)) : null;
-    const aPct = a ? Math.max(1, Math.ceil(a.rank / a.len * 100)) : null;
+    // Use server-provided total counts for accurate %; fall back to board.length
+    const dTotal  = S.isBlitzMode ? (c.blitzTotalCount || 0)
+                  : S.isDailyMode ? (c.challengeTodayCount || 0)
+                  : (c.dailyTotalCount || 0);
+    const aTotal  = S.isBlitzMode ? (c.blitzTotalCount || 0)
+                  : S.isDailyMode ? (c.challengeAlltimeCount || 0)
+                  : (c.totalCount || 0);
+    const dPct = d ? Math.max(1, Math.min(100, Math.ceil(d.rank / (dTotal || d.len) * 100))) : null;
+    const aPct = a ? Math.max(1, Math.min(100, Math.ceil(a.rank / (aTotal || a.len) * 100))) : null;
     return `<div class="gov-rank-rows">
       ${d ? `<div class="gov-rank-row-item">
         <span class="gov-rank-label">TODAY</span>
