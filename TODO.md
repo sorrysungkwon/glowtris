@@ -31,24 +31,31 @@
 ### v0.8.1
 - [ ] Share daily challenge result link. (seeded URL)
 - [ ] Leaderboard UI polish.
+- [ ] One-line hook copy on start screen. ("Beat real players. Daily.")
+- [ ] Basic onboarding. (controls hint on first visit)
 
-## NEXT V0.9 (FEEL POLISH)
+### 🚀 SOFT LAUNCH — after v0.8.1
+- [ ] Reddit r/webgames + r/Tetris + r/gamedev (story angle post)
+- [ ] Product Hunt (scheduled)
+- [ ] Short-form video clip — overtake moment (TikTok / YouTube Shorts / IG Reels)
+- [ ] Blog post: "How I built a competitive Tetris clone"
+- [ ] Target: DAU 500
+
+## NEXT V0.9 (FEEL POLISH — post soft launch)
 ### v0.9.0
 - [ ] Screen bleed red when blocks are high. (Danger vignette)
 - [ ] Score number spring bounce on update. (HUD spring anim)
 ### v0.9.1
 - [ ] Result screen redesign. (launch quality)
 - [ ] Mode select UI cleanup.
-### v0.9.5 — PRE-LAUNCH GATE
+### v0.9.5 — PRE-v1.0 GATE
 - [ ] Update Privacy Policy. (Firebase + Lemon Squeezy)
 - [ ] Security audit all API endpoints.
 - [ ] SEO audit. (Schema/OpenGraph check)
 - [ ] PWA audit. (sw.js offline cache check)
-- [ ] Write Reddit/HN/Product Hunt post drafts.
-- [ ] Blog post draft done.
 - [ ] Marketing copy done.
 
-## NEXT V1.0 (OFFICIAL LAUNCH)
+## NEXT V1.0 (OFFICIAL LAUNCH — with auth)
 ### v1.0.0 — Auth
 - [ ] Firebase Auth setup. Google + email login.
 - [ ] Server verify Firebase token on protected routes.
@@ -64,12 +71,6 @@
 - [ ] Redis: user:{uid}:shields. Cap 5.
 - [ ] Weekly cron: grant 1 free shield Sunday UTC.
 - [ ] Auto-consume on streak break. Show in UI.
-### 🚀 LAUNCH
-- [ ] Day 1: Reddit (r/webgames + r/Tetris + r/gamedev story angle)
-- [ ] Day 2: Hacker News Show HN
-- [ ] Day 7: Product Hunt (scheduled, testimonials collected)
-- [ ] Short-form video (TikTok / YouTube Shorts / IG Reels)
-- [ ] Blog post: "How I built a competitive Tetris clone" (draft before v0.9.5 gate)
 
 ## NEXT V1.1 (MONETIZATION & EXPANSION)
 ### v1.1.0 — Lemon Squeezy
