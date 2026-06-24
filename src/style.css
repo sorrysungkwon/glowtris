@@ -706,6 +706,8 @@
       gap: 1px;
       flex: 1;
       min-width: 0;
+      position: relative;
+      overflow: visible;
     }
     #mh-vs-label { color: rgba(255,230,0,0.5); }
     .mh-vs-name {
@@ -726,7 +728,17 @@
       transition: filter 0.3s;
     }
     .mh-vs-block.overtaken {
-      animation: target-shatter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      animation: target-shatter 0.5s ease-out;
+    }
+    .mh-vs-block.overtaken::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,230,0,0.75) 0%, rgba(255,180,0,0.3) 40%, transparent 70%);
+      pointer-events: none;
+      animation: glow-burst 0.55s ease-out forwards;
     }
     .mh-vs-name { overflow: hidden; }
 
@@ -2327,16 +2339,32 @@ button, a { touch-action: manipulation; }
   transition: width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Overtake flash — preview.html shatter */
+/* Overtake flash — subtle brightness only, no box scale */
 @keyframes target-shatter {
-  0%   { transform: scale(1);    filter: brightness(1); }
-  15%  { transform: scale(1.15); filter: brightness(3); box-shadow: 0 0 50px #ffe600, 0 0 20px #fff, inset 0 0 20px rgba(255,230,0,0.05); border-color: #fff; }
-  35%  { transform: scale(0.95); filter: brightness(1.5); box-shadow: 0 0 20px #ffe600, inset 0 0 20px rgba(255,230,0,0.05); }
-  100% { transform: scale(1);    filter: brightness(1); }
+  0%   { filter: brightness(1); }
+  20%  { filter: brightness(2.5); }
+  100% { filter: brightness(1); }
+}
+
+/* Radial glow burst — circle expands from center, fades out */
+@keyframes glow-burst {
+  0%   { transform: translate(-50%,-50%) scale(0);   opacity: 0.9; }
+  100% { transform: translate(-50%,-50%) scale(3.5); opacity: 0; }
 }
 
 .overtaken {
-  animation: target-shatter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  animation: target-shatter 0.5s ease-out;
+}
+.overtaken::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,230,0,0.75) 0%, rgba(255,180,0,0.3) 40%, transparent 70%);
+  pointer-events: none;
+  animation: glow-burst 0.55s ease-out forwards;
 }
 
 /* Slide animations — preview.html exact */
