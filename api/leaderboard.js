@@ -56,8 +56,11 @@ const MAX_SCORE = 99_999_999;
 const SPRINT_MIN_MS = 15_000;
 const SPRINT_MAX_MS = 3_600_000;
 
-// Rate limit: max 5 POST submissions per IP per 60s window.
-const RATE_LIMIT  = 5;
+// Rate limits per IP per 60s window.
+// POST (score submit): 10 — fastest human play ~30s/game → max 2/min; 10 covers shared IPs.
+// GET (leaderboard fetch): 30 — one per game start + occasional manual refresh.
+const RATE_LIMIT_POST = 10;
+const RATE_LIMIT_GET  = 30;
 const RATE_WINDOW = 60; // seconds
 
 async function redis(cmd) {
@@ -106,17 +109,17 @@ async function getSprintBoard(key, limit = TOP) {
   return board;
 }
 
-// Returns true if the IP has exceeded the rate limit, false otherwise.
+// Returns true if the IP has exceeded the rate limit for the given method.
 // Costs 1 Redis command on hot path (INCR), +1 EXPIRE on first hit in window.
-async function checkRateLimit(ip) {
-  const key = `rl:${ip.replace(/[^a-fA-F0-9.:]/g, '_')}`;
+async function checkRateLimit(ip, method) {
+  const limit = method === 'GET' ? RATE_LIMIT_GET : RATE_LIMIT_POST;
+  const key = `rl:${method}:${ip.replace(/[^a-fA-F0-9.:]/g, '_')}`;
   const incr = await redis(`incr/${key}`);
   const count = incr.result || 0;
   if (count === 1) {
-    // First request in this window — set expiry (fire-and-forget, no await needed)
     redis(`expire/${key}/${RATE_WINDOW}`);
   }
-  return count > RATE_LIMIT;
+  return count > limit;
 }
 
 // Marathon dedup: keep personal best (highest score).
@@ -191,6 +194,11 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
+    const getIp = req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
+    if (await checkRateLimit(getIp, 'GET')) {
+      return res.status(429).json({ error: 'too many requests' });
+    }
+
     // Cache GET responses at the Vercel edge for 60s.
     // Cuts Redis reads ~50% at zero cost — extends Upstash free tier from ~416 to ~700 DAU.
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
@@ -242,7 +250,7 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     // --- Rate limiting ---
     const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
-    if (await checkRateLimit(ip)) {
+    if (await checkRateLimit(ip, 'POST')) {
       return res.status(429).json({ error: 'too many requests' });
     }
 
