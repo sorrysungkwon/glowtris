@@ -1042,9 +1042,17 @@ export function initTargetUI() {
     lbList = S._lbCache.challengeBoard || [];
     rawTargetKey = 'dailyTargetBoard';
   } else {
-    lbList = S._lbCache.dailyBoard || [];
-    if (lbList.length === 0) lbList = S._lbCache.board || [];
+    // Merge all-time + daily so targets reach the true #1 (e.g. 6M), not just today's top
+    const allTime = S._lbCache.board || [];
+    const daily = S._lbCache.dailyBoard || [];
+    const merged = new Map();
+    for (const e of [...daily, ...allTime]) {
+      if (!merged.has(e.name) || e.score > merged.get(e.name).score) merged.set(e.name, e);
+    }
+    lbList = [...merged.values()].sort((a, b) => b.score - a.score);
   }
+
+  S.targetCrown = false;
 
   let real = lbList.filter(t => typeof t.score === 'number' && t.score > 0);
   const minReal = real.length > 0 ? Math.min(...real.map(t => t.score)) : Infinity;
@@ -1175,9 +1183,21 @@ function triggerTargetOvertake() {
 
       S.targetIndex++;
       if (S.targetIndex >= S.targets.length) {
-        tBox.style.display = 'none';
-        if (mName) mName.textContent = '—';
-        if (mScore) mScore.textContent = '—';
+        // Crown state: beat everyone — show player as #1
+        const playerName = localStorage.getItem('glowTrisName') || 'YOU';
+        tTitle.textContent = '👑 #1';
+        tTitle.style.color = '#ffe600';
+        document.getElementById('target-name').textContent = playerName;
+        document.getElementById('target-score').textContent = S.score.toLocaleString();
+        if (mVsLabel) { mVsLabel.textContent = '👑'; mVsLabel.style.color = '#ffe600'; }
+        if (mName) { mName.classList.remove('anim-slide-out'); void mName.offsetWidth; mName.classList.add('anim-slide-in'); mName.textContent = playerName; }
+        if (mScore) { mScore.style.filter = ''; mScore.classList.remove('anim-slide-out'); void mScore.offsetWidth; mScore.classList.add('anim-slide-in'); mScore.textContent = S.score.toLocaleString(); }
+        const fill = document.getElementById('target-progress');
+        if (fill) { fill.style.transition = 'none'; fill.style.width = '100%'; }
+        tContent.classList.remove('anim-slide-out');
+        void tContent.offsetWidth;
+        tContent.classList.add('anim-slide-in');
+        S.targetCrown = true;
         S.targetAnimating = false;
         return;
       }
@@ -1214,7 +1234,17 @@ function triggerTargetOvertake() {
 }
 
 export function updateTargetUI() {
-  if (S.isSprintMode || S.isFlowMode || S.targetAnimating || S.targetIndex >= S.targets.length) return;
+  if (S.isSprintMode || S.isFlowMode || S.targetAnimating) return;
+
+  if (S.targetCrown) {
+    const scoreEl = document.getElementById('target-score');
+    const mScore = document.getElementById('mob-target-score');
+    if (scoreEl) scoreEl.textContent = S.score.toLocaleString();
+    if (mScore) mScore.textContent = S.score.toLocaleString();
+    return;
+  }
+
+  if (S.targetIndex >= S.targets.length) return;
   
   const target = S.targets[S.targetIndex];
   if (S.score >= target.score) {
