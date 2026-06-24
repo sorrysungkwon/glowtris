@@ -1797,26 +1797,41 @@
     color: var(--badge-gold); text-shadow: 0 0 10px var(--badge-gold-border);
     font-size: var(--type-title-m);
   }
-  .gov-rank-row {
-    border-top: 1px solid var(--outline); padding-top: 10px; margin-top: 6px;
-    flex-direction: column; align-items: flex-start; gap: 2px;
+  /* Gestalt: performance block (stats + rank + badges) tight-grouped */
+  .gov-perf-group { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+  .gov-perf-group .game-over-stats { margin-bottom: 0; }
+
+  /* Rank estimate: two rows (TODAY / ALL TIME) as a mini-card */
+  .gov-rank-rows {
+    width: 100%; font-family: 'Orbitron', monospace;
+    background: var(--surface-2); border: 1px solid var(--outline);
+    border-radius: var(--r-md); padding: 10px 12px; box-sizing: border-box;
+    display: flex; flex-direction: column; gap: 4px;
   }
-  .gov-rank-main {
-    display: flex; justify-content: space-between; align-items: baseline; width: 100%;
+  .gov-rank-row-item {
+    display: flex; align-items: baseline; gap: 6px;
   }
-  .gov-rank-val {
-    font-size: var(--type-title-m); font-weight: 900;
-    color: var(--badge-gold); text-shadow: 0 0 10px var(--badge-gold-border);
+  .gov-rank-label {
+    font-size: var(--type-label-m); letter-spacing: 1.5px; font-weight: 700;
+    color: var(--on-surface-muted); min-width: 64px;
+  }
+  .gov-rank-num {
+    font-size: var(--type-headline-s); font-weight: 900;
+    color: var(--badge-gold); text-shadow: 0 0 8px var(--badge-gold-border);
+    flex: 1;
   }
   .gov-rank-pct {
-    font-size: var(--type-label-l); font-weight: 700; letter-spacing: 2px;
-    color: rgba(255, 230, 0, 0.55);
+    font-size: var(--type-label-l); font-weight: 700; letter-spacing: 1.5px;
+    color: rgba(255, 230, 0, 0.5);
   }
   .gov-rank-gap {
     font-size: var(--type-label-m); letter-spacing: 1px;
-    color: var(--on-surface-muted); font-family: 'Orbitron', monospace; align-self: flex-end;
+    color: var(--on-surface-muted); margin-top: 2px; text-align: right;
   }
   .gov-rank-gap.is-top1 { color: var(--badge-gold); text-shadow: 0 0 8px var(--badge-gold); }
+
+  /* Action group: clear separation from performance */
+  .gov-action-group { width: 100%; margin-top: 16px; }
 
   /* --- Daily Challenge Overlay Polish --- */
   .daily-header {
