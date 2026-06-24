@@ -1377,6 +1377,7 @@ export function toggleHaptic() {
   localStorage.setItem(LS.HAPTIC, S.hapticEnabled ? '1' : '0');
   const btn = _sEl('haptic-btn');
   if (btn) { btn.textContent = S.hapticEnabled ? '📳 HAPTIC ON' : '📳 HAPTIC OFF'; btn.classList.toggle('muted', !S.hapticEnabled); }
+  if (S.hapticEnabled && navigator.vibrate) navigator.vibrate([40, 30, 80]);
 }
 export function updateGhost() {
   S.ghostVisible = !S.ghostVisible;
