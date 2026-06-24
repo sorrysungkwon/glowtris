@@ -636,6 +636,7 @@
   #mob-next-col, #mob-hold-col { display:none; }
 
   @media (max-width:600px) {
+    #app { gap:12px; }
     #desktop-header { display:none; }
     #left-panel, #right-column { display:none; }
 
@@ -746,7 +747,7 @@
       color: rgba(0,200,255,0.5);
     }
 
-    #game-row { gap: 4px; }
+    #game-row { gap: 4px; margin-top: 6px; }
     #game-canvas { border-radius: var(--r-xs); }
   }
 
