@@ -1257,13 +1257,6 @@ export function updateTargetUI() {
       const pct = Math.max(0, Math.min(100, ((S.score - prevScore) / (target.score - prevScore)) * 100));
       progressFill.style.width = pct + '%';
     }
-    // Gap to current target
-    const gap = target.score - S.score;
-    const gapTxt = gap > 0 ? `${gap.toLocaleString()} to beat` : '';
-    const gapEl = document.getElementById('target-gap');
-    const mGapEl = document.getElementById('mob-target-gap');
-    if (gapEl) { gapEl.textContent = gapTxt; gapEl.style.display = gapTxt ? '' : 'none'; }
-    if (mGapEl) { mGapEl.textContent = gapTxt; mGapEl.style.display = gapTxt ? '' : 'none'; }
   }
 }
 
