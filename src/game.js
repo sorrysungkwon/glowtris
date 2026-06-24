@@ -1,5 +1,5 @@
 import { S, LS, ACHIEVEMENTS, COLS, ROWS, VANISH_ROWS, COLOR_TO_KEY, SUPPORT_URL, MAX_PARTICLES, PIECES, SPRINT_LINES, LEVEL_LINES, SCORE_TABLE, TSPIN_SCORE, TSPIN_MINI_SCORE, mulberry32, fmtTime, _getAchievements, _getLifetime, gtag, getGameMode } from './shared.js';
-import { toggleMute, startBGM, stopBGM, pauseBGM, resumeBGM, sfxMove, sfxRotate, sfxHardDrop, sfxHold, sfxLineClear, sfxGameOver, sfxTSpin, sfxAchievementUnlock, applyMuteToGain, onPageHide, onPageShow, closeAudio, sfxUIHover, sfxUIClick, sfxCountdownTick, sfxCountdownGo, sfxSprintGoal, sfxDailyComplete } from './audio.js';
+import { toggleMute, updateBGMVolume, updateSFXVolume, startBGM, stopBGM, pauseBGM, resumeBGM, sfxMove, sfxRotate, sfxHardDrop, sfxHold, sfxLineClear, sfxGameOver, sfxTSpin, sfxAchievementUnlock, applyMuteToGain, onPageHide, onPageShow, closeAudio, sfxUIHover, sfxUIClick, sfxCountdownTick, sfxCountdownGo, sfxSprintGoal, sfxDailyComplete } from './audio.js';
 
 document.addEventListener('mouseover', (e) => {
   const btn = e.target.closest('.action-btn, .lb-tab, .toggle-btn, .mode-card, .ach-badge-wrap');
@@ -759,6 +759,8 @@ function gameLoop(ts){
 // ─── Game control ─────────────────────────────────────────────────────────────
 function loadSettings(){
   S.muteAudio=localStorage.getItem(LS.MUTE)==='1';
+  S.bgmVol=parseInt(localStorage.getItem(LS.BGM_VOL)||'80');
+  S.sfxVol=parseInt(localStorage.getItem(LS.SFX_VOL)||'100');
   S.das=parseInt(localStorage.getItem(LS.DAS)||'150');
   S.arr=parseInt(localStorage.getItem(LS.ARR)||'33');
   S.sdf=parseInt(localStorage.getItem(LS.SDF)||'40');
@@ -1177,7 +1179,7 @@ Object.assign(window, {
   togglePause, showStartScreen, showModeSelector, openSettings,
   submitScore, submitSprintScore, submitBlitzScore, shareScore, shareSprintScore,
   renderLbTab, setLbMode, loadStartLeaderboard,
-  toggleMute, updateDAS, updateARR, updateSDF, updateLockDelay,
+  toggleMute, updateBGMVolume, updateSFXVolume, updateDAS, updateARR, updateSDF, updateLockDelay,
   updateGhost, updateColorblind, cycleAnimIntensity, togglePerfMode, toggleHaptic,
   openHowToPlay, closeHowToPlay, openStats, closeStats,
   showAchTooltip, hideAchTooltip,

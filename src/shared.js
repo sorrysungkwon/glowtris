@@ -91,6 +91,8 @@ export const LS = {
   DAILY_DATE:   'glowTrisDailyDate',
   NAME:         'glowTrisName',
   MUTE:         'glowTrisMute',
+  BGM_VOL:      'glowTrisBgmVol',
+  SFX_VOL:      'glowTrisSfxVol',
   DAS:          'glowTrisDAS',
   SDF:          'glowTrisSDF',
   DCD:          'glowTrisDCD',
@@ -217,6 +219,8 @@ export const S = {
 
   // Audio / visual settings (written by audio.js or ui.js, read by both)
   muteAudio:     false,
+  bgmVol:        80,
+  sfxVol:        100,
   animIntensity: 'full',   // 'full' | 'reduced' | 'off'
   lowPerfMode:   false,
   colorblindMode:false,

@@ -1,7 +1,7 @@
 import { S, LS } from './shared.js';
 
 // ─── Audio state (module-local) ───────────────────────────────────────────────
-let audioCtx=null,masterGain=null,bgmPlaying=false,bgmNextTime=0,bgmBeat=0,bgmScheduler=null,bgmNodes=[];
+let audioCtx=null,masterGain=null,bgmGain=null,sfxGain=null,bgmPlaying=false,bgmNextTime=0,bgmBeat=0,bgmScheduler=null,bgmNodes=[];
 
 // iOS routes Web Audio to earpiece by default; playing a silent <audio> forces speaker output
 let _speakerUnlocked=false;
@@ -20,13 +20,19 @@ function getAudioCtx(){
   // If the browser fully closed the context (rare — long backgrounding on iOS
   // can do this), recreate it. resume() does nothing on a closed context.
   if(audioCtx && audioCtx.state==='closed'){
-    audioCtx=null; masterGain=null;
+    audioCtx=null; masterGain=null; bgmGain=null; sfxGain=null;
   }
   if(!audioCtx){
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
     masterGain=audioCtx.createGain();
     masterGain.connect(audioCtx.destination);
     masterGain.gain.value=S.muteAudio?0:1;
+    bgmGain=audioCtx.createGain();
+    bgmGain.gain.value=S.bgmVol/100;
+    bgmGain.connect(masterGain);
+    sfxGain=audioCtx.createGain();
+    sfxGain.gain.value=S.sfxVol/100;
+    sfxGain.connect(masterGain);
   }
   unlockSpeaker();
   // 'suspended' = standard pause; 'interrupted' = iOS 16+ backgrounding state.
@@ -46,7 +52,7 @@ export function toggleMute(){
   if(audioCtx){
     if(audioCtx.state==='closed'){
       // Force recreation on next playBeep — masterGain is gone too.
-      audioCtx=null; masterGain=null;
+      audioCtx=null; masterGain=null; bgmGain=null; sfxGain=null;
     } else if(audioCtx.state==='suspended' || audioCtx.state==='interrupted'){
       audioCtx.resume().catch(()=>{});
       _speakerUnlocked=false; unlockSpeaker();
@@ -61,6 +67,34 @@ export function toggleMute(){
   ['ov','st'].forEach(p=>{
     const b=document.getElementById(p+'-mute-btn');
     if(b){b.textContent=S.muteAudio?'🔇 AUDIO OFF':'🔊 AUDIO ON';b.classList.toggle('muted',S.muteAudio);}
+  });
+}
+
+export function updateBGMVolume(val) {
+  S.bgmVol = Math.max(0, Math.min(100, Number(val)));
+  if (bgmGain) bgmGain.gain.value = S.bgmVol / 100;
+  localStorage.setItem(LS.BGM_VOL, S.bgmVol);
+  _syncVolLabels();
+}
+
+export function updateSFXVolume(val) {
+  S.sfxVol = Math.max(0, Math.min(100, Number(val)));
+  if (sfxGain) sfxGain.gain.value = S.sfxVol / 100;
+  localStorage.setItem(LS.SFX_VOL, S.sfxVol);
+  _syncVolLabels();
+}
+
+function _syncVolLabels() {
+  const icon = document.getElementById('mute-icon');
+  const btn  = document.getElementById('btn-mute');
+  const allMuted = S.muteAudio || (S.bgmVol === 0 && S.sfxVol === 0);
+  if (icon) icon.textContent = allMuted ? 'volume_off' : S.bgmVol === 0 ? 'music_off' : 'volume_up';
+  if (btn)  btn.classList.toggle('muted', allMuted);
+  ['ov','st'].forEach(p => {
+    const bv = document.getElementById(`${p}-bgm-val`);
+    const sv = document.getElementById(`${p}-sfx-val`);
+    if (bv) bv.textContent = S.bgmVol + '%';
+    if (sv) sv.textContent = S.sfxVol + '%';
   });
 }
 
@@ -219,9 +253,12 @@ function _bgmRegister(src, ...rest){
     });
   };
 }
+function bgmDst(){return bgmGain||masterGain;}
+function sfxDst(){return sfxGain||masterGain;}
+
 function bgmScheduleKick(t){
   const osc=audioCtx.createOscillator(),g=audioCtx.createGain();
-  osc.connect(g);g.connect(masterGain);
+  osc.connect(g);g.connect(bgmDst());
   osc.type='sine';
   osc.frequency.setValueAtTime(110,t);
   osc.frequency.exponentialRampToValueAtTime(40,t+0.12);
@@ -233,7 +270,7 @@ function bgmScheduleKick(t){
 function bgmScheduleSnare(t){
   const buf=_getDrumBuf();if(!buf)return;
   const src=audioCtx.createBufferSource(),filt=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
-  src.buffer=buf;src.connect(filt);filt.connect(g);g.connect(masterGain);
+  src.buffer=buf;src.connect(filt);filt.connect(g);g.connect(bgmDst());
   filt.type='bandpass';filt.frequency.value=3500;filt.Q.value=0.5;
   g.gain.setValueAtTime(0.18,t);
   g.gain.exponentialRampToValueAtTime(0.001,t+0.09);
@@ -243,7 +280,7 @@ function bgmScheduleSnare(t){
 function bgmScheduleHihat(t){
   const buf=_getDrumBuf();if(!buf)return;
   const src=audioCtx.createBufferSource(),filt=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
-  src.buffer=buf;src.connect(filt);filt.connect(g);g.connect(masterGain);
+  src.buffer=buf;src.connect(filt);filt.connect(g);g.connect(bgmDst());
   filt.type='highpass';filt.frequency.value=9000;
   g.gain.setValueAtTime(0.07,t);
   g.gain.exponentialRampToValueAtTime(0.001,t+0.03);
@@ -264,7 +301,7 @@ function getBGMBeat(){
 function bgmScheduleNote(freq,t,dur,vol,type='square'){
   const ctx=audioCtx;
   const osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.connect(gain);gain.connect(masterGain);
+  osc.connect(gain);gain.connect(bgmDst());
   osc.type=type;osc.frequency.setValueAtTime(freq,t);
   gain.gain.setValueAtTime(vol,t);
   gain.gain.exponentialRampToValueAtTime(0.001,t+dur*0.9);
@@ -422,7 +459,7 @@ function playSFX(key) {
   if (ctx.state !== 'running' || !_sfxCache[key]) return;
   const src = ctx.createBufferSource();
   src.buffer = _sfxCache[key];
-  src.connect(masterGain);
+  src.connect(sfxDst());
   src.start(ctx.currentTime);
 }
 
