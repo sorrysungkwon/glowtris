@@ -3,14 +3,14 @@ import { S, LS } from './shared.js';
 // ─── Audio state (module-local) ───────────────────────────────────────────────
 let audioCtx=null,masterGain=null,bgmGain=null,sfxGain=null,bgmPlaying=false,bgmNextTime=0,bgmBeat=0,bgmScheduler=null,bgmNodes=[];
 
-// iOS routes Web Audio to earpiece by default; playing a silent <audio> forces speaker output
+// iOS routes Web Audio to earpiece by default; playing a silent <audio> forces speaker output.
+// Only needed on iOS — on desktop/Android this interrupts external music playing.
+const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 let _speakerUnlocked=false;
 function unlockSpeaker(){
-  if(_speakerUnlocked)return;
+  if(!_isIOS||_speakerUnlocked)return;
   _speakerUnlocked=true;
   const a=document.createElement('audio');
-  // minimal silent WAV (0 samples, valid header) — forces iOS to route Web Audio
-  // to the speaker instead of the earpiece.  Stop after 1s; the routing persists.
   a.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
   a.volume=0.001;a.loop=true;
   a.play().then(()=>setTimeout(()=>{a.pause();a.src='';},1000)).catch(()=>{});
