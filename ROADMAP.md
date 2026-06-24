@@ -36,8 +36,9 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 | Sub-version | Scope | Notes |
 |---|---|---|
 | v0.9.0 | Danger vignette (red border glow when board is high), HUD spring animation on score update | Canvas + CSS |
-| v0.9.1 | Result screen redesign (launch quality), mode select UI cleanup | Visual overhaul |
-| **v0.9.5** | **Pre-launch checklist** — Privacy Policy update, security audit, marketing copy written. **Audits:** SEO (Schema/OpenGraph), PWA (sw.js offline cache), Analytics (streak telemetry). | Critical gate |
+| v0.9.1 | Result screen redesign (launch quality), mode select UI cleanup, **first-run onboarding screen** (1-tap dismissible) | Visual overhaul & UX |
+| v0.9.2 | **Mobile Control Overhaul** — Swipe gestures (replace virtual buttons), robust iOS canvas sizing (`ResizeObserver`) | Mobile UX |
+| **v0.9.5** | **Pre-launch checklist** — Privacy Policy, **Legal Scrub** (remove "Tetris" terms, use custom block names), marketing copy. **Audits:** SEO, PWA. **Security:** CSP, Anti-Cheat, XSS. **Ops:** Viral `LAUNCH_RUNBOOK.md` created. | Critical gate |
 
 **Gate to v1.0:** v0.9.5 checklist 100% complete.
 
@@ -59,10 +60,10 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 
 ### v1.0.1 — Streak System
 
-- Server-side streak tracking: `user:{uid}:streak`, `user:{uid}:last_play` in Redis
-- 24h UTC reset — no play today = streak drops to 0
+- Server-side streak tracking: `user:{uid}:streak`, `user:{uid}:last_play` in Redis (with TTL to prevent zombie keys)
+- 24h UTC reset + **2h grace period** (prevents punishing late-night players)
 - Streak displayed in game header (🔥 N) when logged in
-- Streak block on result screen (current streak, best streak)
+- **"Best Streak" Badge**: Never resets, serves as permanent trophy to prevent "Streak Death Spiral" churn
 - Streak resets are server-authoritative (no client manipulation)
 
 ### v1.0.2 — Streak Shield (Free)
@@ -78,11 +79,11 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 ### 🚀 v1.0 Launch
 
 - [ ] **Launch Sequencing**:
-  - **Day 1**: Reddit (`r/webgames`, `r/Tetris`, `r/gamedev` — story angle)
+  - **Day 1**: Reddit (`r/webgames`, `r/puzzle`, `r/gamedev` — story angle, absolutely no mention of 'Tetris')
   - **Day 2**: Hacker News (Show HN post)
   - **Day 7**: Product Hunt (Scheduled launch with collected testimonials)
 - [ ] Short-form video marketing (TikTok, YouTube Shorts, IG Reels)
-- [ ] Blog post: "How I built a competitive Tetris clone in the browser" (Draft assigned and completed before v0.9.5 gate)
+- [ ] Blog post: "How I built a competitive falling block puzzle in the browser" (Draft assigned and completed before v0.9.5 gate)
 
 ---
 
@@ -90,10 +91,11 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 
 **Goal:** Once the core loop is stable, introduce monetization and deeper engagement features.
 
-### v1.1.0 — Lemon Squeezy (Paid Shields)
+### v1.1.0 — Lemon Squeezy (Monetization)
+- **Pre-requisite:** Upgrade to Vercel Pro ($20/mo) to comply with commercial TOS
 - Lemon Squeezy integration
-- Product: Shield Pack — pricing TBD (e.g. 5 shields / $2.99)
-- Webhook: `order_created` → verify signature → `user:{uid}:shields += N`
+- Product: **Cosmetics / Habit Protectors** — Avoid P2W backlash by pivoting shields to "habit protectors only" or selling board skins/neon trails instead
+- Webhook: `order_created` → verify signature → `user:{uid}:item += N`
 - No card data touches our servers
 
 ### v1.1.1 — Avatar + Push Nudge
@@ -104,12 +106,15 @@ Duolingo cross-platform model: mobile builds the habit, PC is where real improve
 
 ## Security Principles (v1.0+)
 
-- **Least privilege**: Only UID stored in Redis. Email stays in Firebase.
-- **Token verification**: Every auth-required endpoint calls `verifyIdToken` server-side.
-- **Payment isolation**: Lemon Squeezy handles all card data. We only store shield count delta.
+- **Anti-Cheat Validation**: Clients cannot dictate scores. Server issues a signed HMAC session token. Score API validates minimum elapsed time and plausibility.
+- **Client State Encapsulation**: Game logic and state (e.g. score) must be enclosed in module closures, never exposed globally (`window.score`) to deter DevTools tampering.
+- **XSS Prevention & CSP**: Strict input sanitization on all user-generated content (like `displayName`). Enforce Content-Security-Policy and X-Frame-Options in `vercel.json`.
+- **Rate Limiting**: All edge functions (auth, score submission) are protected by Redis-backed IP/UID rate limiting to prevent DDoS and billing abuse.
+- **Least privilege & Data Masking**: Only UID stored in Redis. Email stays in Firebase. Leaderboard API payloads must strip UIDs and only expose public names.
+- **Token verification**: Every auth-required endpoint calls `verifyIdToken` server-side. Firebase Auth domains strictly restricted to `glowtris.com` and `prevglow.vercel.app`.
+- **Payment isolation & Idempotency**: Lemon Squeezy handles card data. Webhooks verified with HMAC signature and use Redis `SETNX` on `event_id` to prevent double-crediting.
 - **No PII in logs**: Vercel logs must not contain emails, tokens, or card details.
-- **Webhook verification**: All Lemon Squeezy webhooks verified with HMAC signature.
-- **CORS**: Already restricted to glowtris.com + prevglow.vercel.app.
+- **Strict CORS**: No wildcard `Access-Control-Allow-Origin: *` endpoints (including maintenance routes). Restricted to official domains.
 
 ---
 
@@ -122,7 +127,8 @@ v0.8  🔲  Social Signals
   └─ v0.8.1  Challenge share + LB polish
 v0.9  🔲  Feel Polish
   └─ v0.9.0  Danger vignette + HUD anim
-  └─ v0.9.1  Result screen + mode select redesign
+  └─ v0.9.1  Result screen + onboarding
+  └─ v0.9.2  Mobile swipe gestures
   └─ v0.9.5  Pre-launch checklist ← GATE
 v1.0  🔲  Official Launch
   └─ v1.0.0  Firebase Auth
