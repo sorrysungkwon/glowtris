@@ -1797,6 +1797,26 @@
     color: var(--badge-gold); text-shadow: 0 0 10px var(--badge-gold-border);
     font-size: var(--type-title-m);
   }
+  .gov-rank-row {
+    border-top: 1px solid var(--outline); padding-top: 10px; margin-top: 6px;
+    flex-direction: column; align-items: flex-start; gap: 2px;
+  }
+  .gov-rank-main {
+    display: flex; justify-content: space-between; align-items: baseline; width: 100%;
+  }
+  .gov-rank-val {
+    font-size: var(--type-title-m); font-weight: 900;
+    color: var(--badge-gold); text-shadow: 0 0 10px var(--badge-gold-border);
+  }
+  .gov-rank-pct {
+    font-size: var(--type-label-l); font-weight: 700; letter-spacing: 2px;
+    color: rgba(255, 230, 0, 0.55);
+  }
+  .gov-rank-gap {
+    font-size: var(--type-label-m); letter-spacing: 1px;
+    color: var(--on-surface-muted); font-family: 'Orbitron', monospace; align-self: flex-end;
+  }
+  .gov-rank-gap.is-top1 { color: var(--badge-gold); text-shadow: 0 0 8px var(--badge-gold); }
 
   /* --- Daily Challenge Overlay Polish --- */
   .daily-header {

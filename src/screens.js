@@ -293,38 +293,33 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
           <span class="stat-label">BEST</span>
           <span class="stat-val highlight" id="gov-hi-val">0</span>
         </div>
+        ${(() => {
+          // Alltime boards only — no daily mix (daily skews rank vs all-time players)
+          const c = S._lbCache || {};
+          let ref = S.isBlitzMode ? (c.blitzBoard || [])
+                  : S.isDailyMode ? (c.challengeAlltimeBoard || [])
+                  : (c.board || []);
+          if (!ref.length && S.targets && S.targets.length) ref = S.targets;
+          if (!ref.length) return '';
+          const sorted = [...ref].sort((a, b) => b.score - a.score);
+          const above = sorted.filter(e => e.score > S.score).length;
+          const estRank = above + 1;
+          const estPct = Math.max(1, Math.ceil(estRank / sorted.length * 100));
+          const top1 = sorted[0] ? sorted[0].score : null;
+          const gap = top1 && S.score < top1 ? top1 - S.score : null;
+          return `<div class="stat-item gov-rank-row">
+            <div class="gov-rank-main">
+              <span class="stat-label">RANK</span>
+              <span class="gov-rank-val">~#${estRank}<span class="gov-rank-pct"> · TOP ${estPct}%</span></span>
+            </div>
+            ${gap
+              ? `<span class="gov-rank-gap">${gap.toLocaleString()} PTS FROM #1</span>`
+              : `<span class="gov-rank-gap is-top1">👑 #1 POSITION</span>`}
+          </div>`;
+        })()}
       </div>
 
       ${badgesHTML ? `<div style="width:100%;margin-bottom:18px">${badgesHTML}</div>` : ''}
-      
-      ${(() => {
-        // Real board by mode (no NPC inflation). S.targets as last resort.
-        const c = S._lbCache || {};
-        let ref = [];
-        if (S.isBlitzMode) {
-          ref = c.blitzBoard && c.blitzBoard.length ? c.blitzBoard
-              : c.blitzDailyBoard && c.blitzDailyBoard.length ? c.blitzDailyBoard : [];
-        } else if (S.isDailyMode) {
-          ref = c.challengeAlltimeBoard && c.challengeAlltimeBoard.length ? c.challengeAlltimeBoard
-              : c.challengeBoard && c.challengeBoard.length ? c.challengeBoard : [];
-        } else {
-          ref = c.board && c.board.length ? c.board
-              : c.dailyBoard && c.dailyBoard.length ? c.dailyBoard : [];
-        }
-        // fallback: S.targets has at minimum NPC warmup (always non-empty after game start)
-        if (!ref.length && S.targets && S.targets.length) ref = S.targets;
-        if (!ref.length) return '';
-        const sorted = [...ref].sort((a, b) => b.score - a.score);
-        const above = sorted.filter(e => e.score > S.score).length;
-        const estRank = above + 1;
-        const estPct = Math.max(1, Math.ceil(estRank / sorted.length * 100));
-        const top1 = sorted[0] ? sorted[0].score : null;
-        const gap = top1 && S.score < top1 ? top1 - S.score : null;
-        return `<div style="text-align:center;margin-bottom:14px;line-height:1.8">
-          <div style="font-size:10px;letter-spacing:2px;color:#ffe600;opacity:0.85">~#${estRank} · TOP ${estPct}%</div>
-          ${gap ? `<div style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.3)">${gap.toLocaleString()} PTS FROM #1</div>` : '<div style="font-size:9px;letter-spacing:2px;color:#ffe600">👑 #1</div>'}
-        </div>`;
-      })()}
       <div style="width:100%">
         <input id="lb-name" class="neon-input" maxlength="12" placeholder="ENTER NAME" value="${savedName}" autocomplete="off" spellcheck="false">
         <div class="btn-row sub-actions">
