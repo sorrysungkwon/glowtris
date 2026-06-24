@@ -297,6 +297,18 @@ export function _renderGameOverScreen({ isNewBest, newStreak, displayMaxCombo, i
 
       ${badgesHTML ? `<div style="width:100%;margin-bottom:18px">${badgesHTML}</div>` : ''}
       
+      ${(() => {
+        const board = S._lbCache && S._lbCache.board || [];
+        if (!board.length) return '';
+        const above = board.filter(e => e.score > S.score).length;
+        const estRank = above + 1;
+        const estPct = Math.max(1, Math.ceil(estRank / board.length * 100));
+        const gap = board[0] && S.score < board[0].score ? board[0].score - S.score : null;
+        return `<div style="text-align:center;margin-bottom:14px;line-height:1.8">
+          <div style="font-size:10px;letter-spacing:2px;color:#ffe600;opacity:0.85">~#${estRank} · TOP ${estPct}%</div>
+          ${gap ? `<div style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.3)">${gap.toLocaleString()} PTS FROM #1</div>` : '<div style="font-size:9px;letter-spacing:2px;color:#ffe600">👑 #1</div>'}
+        </div>`;
+      })()}
       <div style="width:100%">
         <input id="lb-name" class="neon-input" maxlength="12" placeholder="ENTER NAME" value="${savedName}" autocomplete="off" spellcheck="false">
         <div class="btn-row sub-actions">
