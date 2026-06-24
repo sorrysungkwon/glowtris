@@ -150,7 +150,7 @@ export function _applyTouchCELL() {
   const padTop    = Math.max(8, safeTop);
   const padBottom = Math.max(8, safeBottom);
   const appPaddingV = padTop + padBottom;
-  const gapsAndBreathing = 24 + 8;
+  const gapsAndBreathing = 24 + 8 + 6;
   const availH = H - appPaddingV - headerH - ctrlH - gapsAndBreathing;
   if (availH <= 0) return;
 

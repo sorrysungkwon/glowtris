@@ -747,7 +747,7 @@
       color: rgba(0,200,255,0.5);
     }
 
-    #game-row { gap: 4px; }
+    #game-row { gap: 4px; margin-top: 6px; }
     #game-canvas { border-radius: var(--r-xs); }
   }
 
