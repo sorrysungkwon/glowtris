@@ -46,9 +46,9 @@ const TOP_ALLTIME = 20;
 const DAILY_TTL  = 60 * 60 * 52;
 const WEEKLY_TTL = 60 * 60 * 24 * 8;
 
-// Score bounds: 0 < score ≤ 10M (roughly 4+ hours of perfect play).
+// Score bounds: 0 < score ≤ 99,999,999.
 // Rejects obvious spoofed submissions without needing server-side game simulation.
-const MAX_SCORE = 10_000_000;
+const MAX_SCORE = 99_999_999;
 
 // Sprint time bounds (milliseconds).
 // 15s lower bound = physically impossible 40-line clear time.
