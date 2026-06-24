@@ -3,18 +3,6 @@ import { S, LS } from './shared.js';
 // ─── Audio state (module-local) ───────────────────────────────────────────────
 let audioCtx=null,masterGain=null,bgmGain=null,sfxGain=null,bgmPlaying=false,bgmNextTime=0,bgmBeat=0,bgmScheduler=null,bgmNodes=[];
 
-// iOS routes Web Audio to earpiece by default; playing a silent <audio> forces speaker output.
-// Only needed on iOS — on desktop/Android this interrupts external music playing.
-const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-let _speakerUnlocked=false;
-function unlockSpeaker(){
-  if(!_isIOS||_speakerUnlocked)return;
-  _speakerUnlocked=true;
-  const a=document.createElement('audio');
-  a.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
-  a.volume=0.001;a.loop=true;
-  a.play().then(()=>setTimeout(()=>{a.pause();a.src='';},1000)).catch(()=>{});
-}
 
 function getAudioCtx(){
   // If the browser fully closed the context (rare — long backgrounding on iOS
@@ -34,7 +22,6 @@ function getAudioCtx(){
     sfxGain.gain.value=S.sfxVol/100;
     sfxGain.connect(masterGain);
   }
-  unlockSpeaker();
   // 'suspended' = standard pause; 'interrupted' = iOS 16+ backgrounding state.
   // Both need an explicit resume() inside a user-gesture handler to recover.
   if(audioCtx.state==='suspended' || audioCtx.state==='interrupted'){
@@ -55,7 +42,6 @@ export function toggleMute(){
       audioCtx=null; masterGain=null; bgmGain=null; sfxGain=null;
     } else if(audioCtx.state==='suspended' || audioCtx.state==='interrupted'){
       audioCtx.resume().catch(()=>{});
-      _speakerUnlocked=false; unlockSpeaker();
     }
   }
   if(masterGain)masterGain.gain.value=S.muteAudio?0:1;
@@ -494,12 +480,6 @@ export function applyMuteToGain(){
 }
 export function onPageHide(){pauseBGM();}
 export function onPageShow(){
-  // Re-unlock the speaker on every visibility return — iOS PWA loses the
-  // routing after a long background. The flag-reset + unlockSpeaker call is
-  // safe to invoke even when already unlocked (idempotent: it creates one
-  // silent <audio>, plays for 1s, then stops).
-  _speakerUnlocked = false;
-  if(audioCtx) unlockSpeaker();
   // Try to wake suspended/interrupted contexts so the next gesture (mute,
   // RESUME, hover SFX) sees a running ctx. iOS may still ignore this without
   // a user gesture; the gesture-driven resume in toggleMute / togglePause
