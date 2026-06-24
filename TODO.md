@@ -17,6 +17,11 @@
 - [x] Real people from server. Not fake name. (Real-user warmup targets, 10-band log-scale random)
 - [x] Each mode fight own people. (Mode-specific boards: blitz/daily)
 - [x] Keep 500 people not 100. (API cap expanded)
+- [x] Fight real #1 not just today top. (alltime+daily merged, crown state after beating everyone)
+- [x] BGM and SFX separate volume knob. (Settings sliders, 0%=off)
+- [x] Speed keep going past lv12. (3-phase curve: lv1→10→20→32, cap 16ms)
+- [x] Open game no stop outside music. (remove iOS speaker hack)
+- [x] Score go up to 99999999. (API cap raised)
 - [ ] Make screen shake on big clear. (skipped)
 
 ## NEXT V0.8 (SOCIAL SIGNALS)
