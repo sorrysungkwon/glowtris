@@ -1,4 +1,4 @@
-const CACHE      = 'glowtris-0a4344';
+const CACHE      = 'glowtris-5a51b3';
 const FONT_CACHE = 'glowtris-fonts-v2';
 const APP_SHELL  = [
   '/index.html', '/sprint.html', '/unblocked.html', '/tetris-online.html',
