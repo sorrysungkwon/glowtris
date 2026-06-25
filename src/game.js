@@ -741,9 +741,12 @@ makeDpadSlide('.nes-dpad', {
   'btn-left':  { press: () => { moveX(-1); S.dasCharge.left = 0; },  keyTarget: 'ArrowLeft'  },
   'btn-right': { press: () => { moveX(1);  S.dasCharge.right = 0; }, keyTarget: 'ArrowRight' },
   'btn-soft':  { press: () => { S.dasCharge.down = 0; },              keyTarget: 'ArrowDown'  },
-  'btn-drop':  { press: () => hardDrop() },
 });
 
+// btn-drop is intentionally excluded from the slide system — slide-in triggers
+// accidental hard drops. Direct tap only via makeTouchBtn (stopPropagation blocks
+// the container slide handler from claiming this touch).
+makeTouchBtn('btn-drop', () => hardDrop(), 'game');
 makeTouchBtn('btn-rotate',()=>rotatePiece(1),'game');
 makeTouchBtn('btn-rotate-ccw',()=>rotatePiece(-1),'game');
 makeTouchBtn('btn-rotate-180',()=>rotatePiece(2),'game');
